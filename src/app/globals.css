@@ -1,0 +1,122 @@
+@import "tailwindcss";
+
+/*
+  DrawUp Lab / DrawUp Gallery design tokens — carried over verbatim from the
+  validated preview (published as the "DrawUp Season 1" Artifact) so the real
+  app starts from the same palette instead of create-next-app's defaults.
+
+  Two worlds, one token set:
+  - DrawUp Lab: the site-wide dark default (near-black + holo-blue/orange/
+    purple accents). Home, Arch Coach, Check, Details, Resources, Swap,
+    Pricing all live here.
+  - DrawUp Gallery: the silver-to-white, navy-text world firm/project
+    surfaces use (Discover, Connect, For Firms, Firm Profile). Apply the
+    `.world-gallery` class to a page/section to switch into it — every
+    component should read the semantic --paper/--ink/--surface/etc.
+    variables generically, so moving a page between worlds is a one-line
+    class change, not a rewrite. See the preview artifact for the full
+    component CSS this token set was extracted from.
+*/
+
+:root {
+  /* ---- DrawUp Lab (dark, default) ---- */
+  --lab-navy: #0a0a0c;
+  --lab-deep: #141417;
+  --lab-blue: #1e1e22;
+  --holo-blue: #8fd3ff;
+  --holo-yellow: #ffe58a;
+  --holo-orange: #ffb36b;
+  --holo-purple: #a78bff;
+  --vibe-grad: linear-gradient(120deg, #ff7a7a 0%, #ffb36b 45%, #a78bff 100%);
+  --vibe-grad-cool: linear-gradient(120deg, #8fd3ff 0%, #a78bff 55%, #ff7ab8 100%);
+  --lab-soft-white: #f3f7fb;
+  --lab-ink-soft: #b7c8dd;
+  --lab-ink-faint: #7d93af;
+  --lab-line: rgba(255, 255, 255, 0.14);
+
+  --paper: var(--lab-navy);
+  --surface: var(--lab-deep);
+  --surface-2: rgba(255, 255, 255, 0.05);
+  --line: var(--lab-line);
+  --grid-line: rgba(255, 255, 255, 0.05);
+  --ink: var(--lab-soft-white);
+  --ink-soft: var(--lab-ink-soft);
+  --ink-faint: var(--lab-ink-faint);
+
+  --blue: var(--holo-blue);
+  --blue-deep: var(--holo-blue);
+  --blue-tint: rgba(143, 211, 255, 0.12);
+  --blue-pastel: var(--holo-orange);
+  --blue-pastel-ink: var(--holo-orange);
+
+  /* Solid CTA fill is decoupled from heading color so buttons stay legible
+     once --blue-deep becomes a pale heading tone on dark pages. */
+  --cta-fill: var(--vibe-grad);
+  --cta-ink: #1c2b3d;
+  --panel-grad: linear-gradient(135deg, var(--lab-deep) 0%, #1a1a1f 55%, #241b32 100%);
+
+  --yellow: #f5b400;
+  --yellow-tint: #fff3d6;
+  --yellow-ink: #7a5a00;
+  --orange: #e8742a;
+  --orange-tint: #fde8d8;
+  --orange-ink: #8a4315;
+  --red: #e03b32;
+  --red-tint: #fbe2df;
+  --red-ink: #8f251f;
+  --green: #1e8e5a;
+  --green-tint: #e1f3ea;
+  --green-ink: #135c3a;
+
+  /* ---- DrawUp Gallery (silver-to-white, applied via .world-gallery) ---- */
+  --gallery-top: #d8dde3;
+  --gallery-mid: #eef0f3;
+  --gallery-mid2: #e3e6ea;
+  --gallery-white: #ffffff;
+  --gallery-navy: #071d38;
+  --gallery-navy-2: #44566c;
+  --gallery-navy-3: #7c8aa0;
+  --gallery-line2: #dce1e6;
+
+  --font-display: "Archivo", sans-serif;
+  --font-body: "IBM Plex Sans", sans-serif;
+  --font-mono: "IBM Plex Mono", monospace;
+  --font-gallery: "Lato", sans-serif;
+  color-scheme: dark;
+
+  /* Tailwind-facing aliases */
+  --background: var(--paper);
+  --foreground: var(--ink);
+}
+
+.world-gallery {
+  --paper: var(--gallery-white);
+  --surface: var(--gallery-mid);
+  --surface-2: var(--gallery-mid2);
+  --line: var(--gallery-line2);
+  --ink: var(--gallery-navy);
+  --ink-soft: var(--gallery-navy-2);
+  --ink-faint: var(--gallery-navy-3);
+  --blue: var(--gallery-navy);
+  --blue-deep: var(--gallery-navy);
+  --cta-fill: var(--gallery-navy);
+  --cta-ink: #ffffff;
+  color-scheme: light;
+}
+
+.world-gallery h1,
+.world-gallery h2,
+.world-gallery h3 {
+  font-family: var(--font-gallery);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+}
