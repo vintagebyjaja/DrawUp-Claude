@@ -60,3 +60,7 @@ The home hero uses the exact approved command-center artwork supplied by the own
 - The DrawUp navigation now sits at the top of the public site.
 - Join Preseason remains public-facing launch language.
 - V3 animated command-center hero and Supabase migrations are preserved.
+
+
+## V6 — Global AEC Network
+V6 expands Discover, Firms, Resources/Codes and Connect internationally. Discover now includes a Universities directory with U.S.-by-state, international-by-continent/country and Study Abroad pathways. Connect adds worldwide precedent search. A migration (`0007_global_directory.sql`) adds the university/program data foundation. The current HTML includes seeded directory UI and filter controls; production search should bind these controls to Supabase data as records are verified.

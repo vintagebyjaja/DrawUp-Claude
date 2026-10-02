@@ -452,6 +452,9 @@
   }
   @media (max-width:860px){.holo-overlays{inset:-1% -3% -2%;}}
 
+
+/* V6 — Global AEC discovery */
+.world-controls{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0}.world-controls select,.world-input{min-height:42px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);padding:0 12px;font-family:var(--font-mono);font-size:11px}.world-input{min-width:280px;flex:1}.world-controls.compact{margin:12px 0 18px}.global-search-panel{border:1px solid var(--line);background:linear-gradient(135deg,rgba(159,216,255,.18),rgba(232,216,255,.22),rgba(154,219,207,.18));padding:20px;border-radius:12px;margin:0 0 24px}.global-search-panel h3,.study-abroad h3{font-size:24px;margin:4px 0 6px}.global-search-panel p,.study-abroad p{color:var(--ink-soft);max-width:760px}.region-strip,.region-note{font-family:var(--font-mono);font-size:11px;color:var(--ink-soft)}.region-strip{padding:12px 0 18px;border-bottom:1px solid var(--line);margin-bottom:18px}.school-actions{display:flex;gap:8px;margin-top:14px}.school-actions a{font-family:var(--font-mono);font-size:10px;text-transform:uppercase;border:1px solid var(--line);padding:7px 9px;border-radius:6px}.study-abroad{margin:24px 0 6px;padding:22px;border:1px solid var(--line);border-radius:12px;background:#fff}.precedent-row{display:flex;gap:8px;flex-wrap:wrap}.precedent-row span{font-family:var(--font-mono);font-size:10px;border:1px solid var(--line);background:#fff;padding:7px 9px;border-radius:999px}.directory-mode{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 16px}.directory-mode .region-note{margin-left:8px}@media(max-width:700px){.world-controls>*{width:100%;min-width:0}.university-grid{grid-template-columns:1fr}}
 </style>
 
 
@@ -531,6 +534,7 @@
           <a href="#discover" data-page="discover" data-sub="projects">Projects</a>
           <a href="#discover" data-page="discover" data-sub="firms">Firms</a>
           <a href="#discover" data-page="discover" data-sub="people">People</a>
+          <a href="#discover" data-page="discover" data-sub="universities">Universities</a>
         </div>
       </div>
       <div class="nav-item"><a href="#coach" class="nav-link" data-page="coach">Arch Coach</a></div>
@@ -554,6 +558,7 @@
           <a href="#resources" data-page="resources" data-sub="codes">Codes</a>
           <a href="#resources" data-page="resources" data-sub="aia">AIA &amp; NOMA</a>
           <a href="#resources" data-page="resources" data-sub="education">Education</a>
+          <a href="#resources" data-page="resources" data-sub="international">International</a>
         </div>
       </div>
       <div class="nav-item"><a href="#swap" class="nav-link" data-page="swap">Swap</a></div>
@@ -938,16 +943,21 @@
   <div class="page-head wrap">
     <span class="eyebrow">Discover</span>
     <h1>Search the work.</h1>
-    <p>Projects, firms, and the people behind them — DrawUp's own database, every attribution sourced.</p>
+    <p>Projects, firms, people, and universities across the U.S. and around the world — search the built environment by place, discipline, and expertise.</p>
   </div>
   <div class="wrap">
     <div class="subtabs" id="discover-tabs">
       <button class="subtab active" data-sub="projects">Projects</button>
       <button class="subtab" data-sub="firms">Firms</button>
       <button class="subtab" data-sub="people">People</button>
+      <button class="subtab" data-sub="universities">Universities</button>
     </div>
 
     <div class="discover-pane" data-pane="projects">
+      <div class="global-search-panel">
+        <div><span class="eyebrow">Global project search</span><h3>Find precedents anywhere.</h3><p>Search projects by country, U.S. state, continent, building type, firm, or design feature.</p></div>
+        <div class="world-controls"><input class="world-input" placeholder="Search project, city, firm or precedent…"><select><option>United States</option><option>International</option><option>All World</option></select><select><option>All U.S. States</option><option>North Carolina</option><option>New York</option><option>California</option><option>Texas</option></select><select><option>All Continents</option><option>Africa</option><option>Asia</option><option>Europe</option><option>North America</option><option>South America</option><option>Oceania</option></select></div>
+      </div>
       <div class="card-grid">
         <div class="proj-card">
           <div class="proj-media" style="background:linear-gradient(135deg,#1c4f85,#bfe0f7);"><span class="pill pill-demo">Demo</span></div>
@@ -970,6 +980,7 @@
         <h2>Find the firm behind the work.</h2>
         <p>Firm pages are built to be sent to clients — so the showcase treatment starts right here in search.</p>
       </div>
+      <div class="world-controls compact"><select><option>United States</option><option>International</option><option>All World</option></select><select><option>All U.S. States</option><option>North Carolina</option><option>Georgia</option><option>Texas</option><option>California</option></select><select><option>All Continents</option><option>Africa</option><option>Asia</option><option>Europe</option><option>North America</option><option>South America</option><option>Oceania</option></select><input class="world-input" placeholder="Country or city…"></div>
       <div class="gallery-filters">
         <span class="gallery-chip active">Near You</span><span class="gallery-chip">Healthcare</span><span class="gallery-chip">Education</span>
         <span class="gallery-chip">Workplace</span><span class="gallery-chip">Hospitality</span><span class="gallery-chip">Civic</span><span class="gallery-chip">Multifamily</span>
@@ -998,6 +1009,19 @@
 
     <div class="discover-pane" data-pane="people" hidden>
       <div class="people-empty">People directory opens as verified project attribution grows — lead architects and designers will appear here once a firm or owner confirms their role on a project.</div>
+    </div>
+
+    <div class="discover-pane gallery-panel" data-pane="universities" hidden>
+      <div class="gallery-intro"><span class="eyebrow">University directory</span><h2>Find where you’ll build next.</h2><p>Explore architecture, engineering, design, planning and construction programs in the United States and around the world. Built for students, parents, transfers and study-abroad planning.</p></div>
+      <div class="world-controls"><input class="world-input" placeholder="Search school, program, city or country…"><select><option>United States</option><option>International</option><option>Study Abroad</option><option>All World</option></select><select><option>All U.S. States</option><option>Alabama</option><option>California</option><option>District of Columbia</option><option>Florida</option><option>Georgia</option><option>New York</option><option>North Carolina</option><option>Texas</option><option>Virginia</option></select><select><option>All Continents</option><option>Africa</option><option>Asia</option><option>Europe</option><option>North America</option><option>South America</option><option>Oceania</option></select></div>
+      <div class="gallery-filters"><span class="gallery-chip active">All Programs</span><span class="gallery-chip">Architecture</span><span class="gallery-chip">Engineering</span><span class="gallery-chip">Interior Design</span><span class="gallery-chip">Construction</span><span class="gallery-chip">Planning</span><span class="gallery-chip">Landscape</span><span class="gallery-chip">HBCU</span><span class="gallery-chip">Study Abroad</span></div>
+      <div class="region-strip"><b>Browse:</b> United States by State · Africa · Asia · Europe · North America · South America · Oceania</div>
+      <div class="gallery-grid university-grid">
+        <div class="gallery-card"><div class="gallery-mark" style="background:var(--blue-deep);">HU</div><h3>Hampton University</h3><span class="meta">HAMPTON, VA · UNITED STATES</span><p>Architecture &amp; built-environment pathways.</p><div class="school-actions"><a href="#">School</a><a href="#">Programs</a></div></div>
+        <div class="gallery-card"><div class="gallery-mark" style="background:var(--orange);">US</div><h3>U.S. School Directory</h3><span class="meta">UNITED STATES · BROWSE BY STATE</span><p>Architecture, engineering, design and construction programs across all 50 states + D.C.</p><div class="school-actions"><a href="#">Browse States</a></div></div>
+        <div class="gallery-card"><div class="gallery-mark" style="background:#9adbcf;">INT</div><h3>International Programs</h3><span class="meta">GLOBAL · BROWSE BY CONTINENT + COUNTRY</span><p>Discover schools and English-taught or local-language AEC programs worldwide.</p><div class="school-actions"><a href="#">Browse World</a><a href="#">Study Abroad</a></div></div>
+      </div>
+      <div class="study-abroad"><span class="eyebrow">Study Abroad</span><h3>Take the studio somewhere new.</h3><p>Explore semester exchanges, summer studios, international design programs and partner-school opportunities. Filters are ready for country, language, term, discipline and cost.</p></div>
     </div>
   </div>
 </section>
@@ -1163,13 +1187,14 @@
   <div class="page-head wrap">
     <span class="eyebrow">Resources</span>
     <h1>Codes, chapters &amp; professional development.</h1>
-    <p>The State Code Directory, AIA &amp; NOMA chapters by state, and AEC learning — all in one place.</p>
+    <p>U.S. state codes, international standards, professional organizations, and AEC learning — organized by jurisdiction.</p>
   </div>
   <div class="wrap">
     <div class="subtabs" id="resources-tabs">
       <button class="subtab active" data-sub="codes">Codes</button>
       <button class="subtab" data-sub="aia">AIA &amp; NOMA</button>
       <button class="subtab" data-sub="education">Education</button>
+      <button class="subtab" data-sub="international">International</button>
     </div>
     <div class="resources-pane" data-pane="codes">
       <div class="detail-grid">
@@ -1192,6 +1217,11 @@
         <div class="detail-card"><span class="meta">CAREER</span><h4>ARE study resources</h4></div>
         <div class="detail-card"><span class="meta">VENDORS</span><h4>Professional development</h4></div>
       </div>
+    </div>
+    <div class="resources-pane" data-pane="international" hidden>
+      <div class="gallery-intro"><span class="eyebrow">Global codes + standards</span><h2>Work by jurisdiction.</h2><p>Navigate building regulations and professional resources by continent and country. DrawUp should always identify the applicable jurisdiction and source before treating a reference as project guidance.</p></div>
+      <div class="world-controls"><select><option>Choose Continent</option><option>Africa</option><option>Asia</option><option>Europe</option><option>North America</option><option>South America</option><option>Oceania</option></select><select><option>Choose Country</option><option>Canada</option><option>Mexico</option><option>United Kingdom</option><option>France</option><option>Germany</option><option>Ghana</option><option>Kenya</option><option>South Africa</option><option>India</option><option>Japan</option><option>Australia</option><option>Brazil</option></select></div>
+      <div class="detail-grid"><div class="detail-card"><span class="meta">BUILDING CODES</span><h4>Country + local jurisdictions</h4></div><div class="detail-card"><span class="meta">ACCESSIBILITY</span><h4>International accessibility standards</h4></div><div class="detail-card"><span class="meta">ENERGY</span><h4>Energy + sustainability references</h4></div><div class="detail-card"><span class="meta">PROFESSIONAL</span><h4>Institutes + licensing bodies</h4></div></div>
     </div>
   </div>
 </section>
@@ -1228,13 +1258,14 @@
   <div class="page-head wrap">
     <span class="eyebrow">For firms</span>
     <h1>Your work deserves more than a directory listing.</h1>
-    <p>Show projects. Show people. Show expertise. Get discovered. Give your team DrawUp — a firm subscription is marketing and product access in one.</p>
+    <p>Show projects. Show people. Show expertise. Get discovered worldwide. DrawUp connects U.S. and international AEC firms through one searchable global network.</p>
     <div class="hero-actions" style="margin-top:18px;">
       <a class="btn btn-primary" href="#">Claim Your Firm</a>
       <a class="btn btn-ghost" href="#pricing" data-page="pricing">View Firm Plans</a>
     </div>
   </div>
   <div class="wrap" style="padding-block:10px 56px;">
+    <div class="world-controls"><select><option>United States</option><option>International</option><option>All World</option></select><select><option>Browse U.S. by State</option><option>North Carolina</option><option>New York</option><option>California</option><option>Texas</option></select><select><option>Browse International by Continent</option><option>Africa</option><option>Asia</option><option>Europe</option><option>North America</option><option>South America</option><option>Oceania</option></select><input class="world-input" placeholder="Country, city or firm…"></div>
     <div class="gallery-intro" style="margin-top:20px;">
       <span class="eyebrow">On the wall</span>
       <h2>What a firm profile looks like on DrawUp.</h2>
@@ -1267,11 +1298,13 @@
 <section class="page world-gallery" id="page-connect" hidden>
   <div class="page-head wrap">
     <span class="eyebrow">Connect</span>
-    <h1>Every firm on DrawUp.</h1>
-    <p>The league directory — every licensed architecture firm in the U.S., every market, every city. Name on top, home markets underneath, the way a roster lists a team. A firm doesn't have to sign up to be listed here; it has to claim its page to be <strong>Verified</strong>. International firms join the roster in Season 2.</p>
+    <h1>The built world, connected.</h1>
+    <p>Search firms and project precedents across the United States and around the world. U.S. results can be narrowed by state; international results can be explored by continent and country. Firms claim their page to become <strong>Verified</strong>.</p>
     <div class="roster-legend" style="display:flex;gap:18px;flex-wrap:wrap;margin:18px 0 6px;"><span style="display:flex;align-items:center;gap:7px;font-family:var(--font-mono);font-size:11.5px;color:var(--ink-soft);"><span class="pill pill-verified roster-tag">Verified</span> claimed &amp; confirmed by the firm</span><span style="display:flex;align-items:center;gap:7px;font-family:var(--font-mono);font-size:11.5px;color:var(--ink-soft);"><span class="pill pill-listed roster-tag">Listed</span> on the roster, not yet claimed</span><span style="display:flex;align-items:center;gap:7px;font-family:var(--font-mono);font-size:11.5px;color:var(--ink-soft);"><span class="pill pill-promoted roster-tag">Promoted</span> Showcase/Pro tier firm</span></div>
   </div>
   <div class="wrap" style="padding-bottom:50px;">
+    <div class="global-search-panel connect-global"><div><span class="eyebrow">Global precedent search</span><h3>Find the project your client is describing.</h3><p>Search worldwide by project type, location, feature, material, scale or firm — then use the results as precedent research.</p></div><div class="world-controls"><input class="world-input" placeholder="e.g. waterfront STEM center, timber arena, adaptive reuse…"><select><option>All World</option><option>United States</option><option>International</option></select><select><option>All U.S. States</option><option>North Carolina</option><option>New York</option><option>California</option><option>Texas</option></select><select><option>All Continents</option><option>Africa</option><option>Asia</option><option>Europe</option><option>North America</option><option>South America</option><option>Oceania</option></select></div><div class="precedent-row"><span>Project Type</span><span>Building Feature</span><span>Material</span><span>Climate</span><span>Firm</span><span>Country</span></div></div>
+    <div class="directory-mode"><button class="subtab active">U.S. Firms</button><button class="subtab">International Firms</button><span class="region-note">International directory: browse by continent → country → city</span></div>
     <div class="roster-index" id="roster-index">
       <span class="has" data-letter="A" tabindex="0" role="button">A</span><span class="has" data-letter="B" tabindex="0" role="button">B</span><span class="has" data-letter="C" tabindex="0" role="button">C</span><span class="has" data-letter="D" tabindex="0" role="button">D</span><span class="has" data-letter="E" tabindex="0" role="button">E</span><span class="has" data-letter="F" tabindex="0" role="button">F</span><span class="has" data-letter="G" tabindex="0" role="button">G</span><span class="has" data-letter="H" tabindex="0" role="button">H</span><span>I</span><span>J</span><span>K</span><span class="has" data-letter="L" tabindex="0" role="button">L</span><span class="has" data-letter="M" tabindex="0" role="button">M</span><span>N</span><span>O</span><span class="has" data-letter="P" tabindex="0" role="button">P</span><span>Q</span><span class="has" data-letter="R" tabindex="0" role="button">R</span><span class="has" data-letter="S" tabindex="0" role="button">S</span><span class="has" data-letter="T" tabindex="0" role="button">T</span><span>U</span><span>V</span><span class="has" data-letter="W" tabindex="0" role="button">W</span><span>X</span><span>Y</span><span>Z</span>
     </div>
@@ -1350,7 +1383,7 @@
       </div>
     </div>
 
-    <div class="roster-cta"><a class="btn btn-primary btn-sm" href="#">Claim Your Firm</a><p style="font-family:var(--font-mono);font-size:11px;color:var(--ink-faint);margin-top:10px;">Don't see your firm? It'll be added automatically as we build out the national directory.</p></div>
+    <div class="roster-cta"><a class="btn btn-primary btn-sm" href="#">Claim Your Firm</a><p style="font-family:var(--font-mono);font-size:11px;color:var(--ink-faint);margin-top:10px;">Don't see your firm? Claim or submit it as we build out the global directory.</p></div>
   </div>
 </section>
 
