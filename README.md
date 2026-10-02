@@ -44,3 +44,6 @@ The Next.js shell is intentionally thin so you can get back into the site immedi
 
 ## Season 1 hologram animation update
 The home hero now includes animated architectural holograms: a walking human-flow figure, an Arch Coach figure drawing a building on a holographic board, court study, project-goal massing, window detail, extra projection lasers, orbiting HUD nodes, and floating particles. Motion respects `prefers-reduced-motion`. The former RFI marker was moved away from the central logo and relabeled as a window-detail marker.
+
+## V3 approved hero
+The home hero uses the exact approved command-center artwork supplied by the owner (`public/drawup-hero-command-center.png`) with lightweight CSS motion layered over it: pulsing projector/medallion, moving scan beam and lasers, floating HUD panels, a walking Human Flow figure, particles, and an Arch Coach drawing trace. Navigation and the rest of the Season 1 preview remain functional.
