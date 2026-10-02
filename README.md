@@ -64,3 +64,11 @@ The home hero uses the exact approved command-center artwork supplied by the own
 
 ## V6 — Global AEC Network
 V6 expands Discover, Firms, Resources/Codes and Connect internationally. Discover now includes a Universities directory with U.S.-by-state, international-by-continent/country and Study Abroad pathways. Connect adds worldwide precedent search. A migration (`0007_global_directory.sql`) adds the university/program data foundation. The current HTML includes seeded directory UI and filter controls; production search should bind these controls to Supabase data as records are verified.
+
+
+## V7 university starter directory
+Adds 10 starter schools with working search, U.S./international/study-abroad scope, state, continent and program filters. School/program buttons link to official university or department sites. Starter records are intentionally a head start, not a complete global directory.
+
+
+## V7 featured-university update
+The Universities directory now opens with Featured Universities: Hampton University (HBCU), MIT (U.S. research), and Holy Spirit University of Kaslik / USEK (international). MIT and USEK are also included in the searchable starter directory.
