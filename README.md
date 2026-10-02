@@ -72,3 +72,10 @@ Adds 10 starter schools with working search, U.S./international/study-abroad sco
 
 ## V7 featured-university update
 The Universities directory now opens with Featured Universities: Hampton University (HBCU), MIT (U.S. research), and Holy Spirit University of Kaslik / USEK (international). MIT and USEK are also included in the searchable starter directory.
+
+## V8 responsive/mobile update
+- Responsive breakpoints adapt DrawUp for phone, tablet, and desktop without user-agent sniffing.
+- Phones use a compact app-style header, hamburger drawer, and fixed six-item bottom navigation.
+- Mobile home hero is reorganized for a vertical, touch-first layout inspired by native mobile apps.
+- Directory chips/tabs become horizontal touch scrollers; cards collapse to one column; university controls become mobile-friendly.
+- Tablet navigation and spacing are tightened while retaining the desktop information architecture.
