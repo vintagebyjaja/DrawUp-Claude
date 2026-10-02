@@ -79,3 +79,7 @@ The Universities directory now opens with Featured Universities: Hampton Univers
 - Mobile home hero is reorganized for a vertical, touch-first layout inspired by native mobile apps.
 - Directory chips/tabs become horizontal touch scrollers; cards collapse to one column; university controls become mobile-friendly.
 - Tablet navigation and spacing are tightened while retaining the desktop information architecture.
+
+
+## V8 Student Portfolio Review
+Arch Coach now includes Architecture and Interior Design portfolio review cards with PDF-only validation (20 MB max) and a Student plan at $10/month. Migration `0008_student_portfolio_reviews.sql` adds the private Supabase storage bucket and review metadata table. The static preview validates/selects files; production AI review still needs the authenticated upload + Arch Coach processing endpoint wired to Supabase.

@@ -502,6 +502,14 @@
   }
   @media (max-width:390px){.nav-right .btn-primary{padding:9px 11px;font-size:11px}.brand{font-size:18px}.mobile-bottom-nav a{font-size:8px}.mobile-bottom-nav a .m-icon{font-size:18px}.world-controls{grid-template-columns:1fr}}
 
+
+  /* ---------- ARCH COACH: STUDENT PORTFOLIO REVIEW ---------- */
+  .student-review{margin-top:28px;padding:28px;border:1px solid var(--line);border-radius:24px;background:linear-gradient(135deg,rgba(143,211,255,.14),rgba(167,139,255,.10),rgba(255,179,107,.10));}
+  .student-review-head{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;flex-wrap:wrap;margin-bottom:20px}.student-review-head h2{margin:5px 0 8px}.student-badge{display:inline-flex;padding:8px 12px;border-radius:999px;background:var(--lab-navy);color:white;font-family:var(--font-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+  .review-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.review-card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px}.review-card h3{margin:0 0 7px}.review-card p{margin:0 0 16px;color:var(--muted)}
+  .portfolio-drop{display:block;border:1.5px dashed #9aa9ba;border-radius:14px;padding:18px;text-align:center;cursor:pointer;background:#f8fafc;transition:.2s}.portfolio-drop:hover{border-color:var(--blue-deep);background:#f1f7fb}.portfolio-drop input{display:none}.portfolio-drop strong{display:block;margin-bottom:4px}.portfolio-file{display:block;margin-top:8px;font-family:var(--font-mono);font-size:11px;color:var(--muted)}.review-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:12px}.review-note{font-size:12px;color:var(--muted);margin-top:12px!important}.review-status{font-size:12px;font-weight:700;color:var(--blue-deep)}
+  @media(max-width:720px){.student-review{padding:18px;margin-top:20px;border-radius:20px}.review-grid{grid-template-columns:1fr}.review-card{padding:18px}.student-review-head{display:block}.student-badge{margin-top:10px}}
+
 </style>
 
 
@@ -1127,6 +1135,27 @@
         <span class="mode-chip">Find a Firm</span><span class="mode-chip">Find a Project</span>
       </div>
       <p class="disclaimer" style="margin-top:20px;max-width:640px;">Arch Coach assists with review and research. It is not a licensed architect, engineer of record, code official, or AHJ — final interpretation, professional responsibility and AHJ approval remain with the appropriate licensed professionals.</p>
+
+      <div class="student-review" id="student-portfolio-review">
+        <div class="student-review-head">
+          <div><span class="eyebrow">Student Portfolio Review</span><h2>Put your portfolio in front of Arch Coach.</h2><p>Upload a small PDF for structured feedback before reviews, internships, transfers or applications. Arch Coach comments on presentation, storytelling, project sequence, clarity and portfolio organization — without rewriting your work for you.</p></div>
+          <span class="student-badge">Student · $10/mo</span>
+        </div>
+        <div class="review-grid">
+          <article class="review-card">
+            <span class="eyebrow">Architecture</span><h3>Portfolio Arch Check</h3><p>Get recommendations on project selection, drawings, diagrams, process, technical communication, page hierarchy and the overall story of your architecture portfolio.</p>
+            <label class="portfolio-drop" for="arch-portfolio-pdf"><strong>Upload architecture portfolio PDF</strong><span>PDF only · up to 20 MB</span><input id="arch-portfolio-pdf" class="portfolio-input" type="file" accept="application/pdf" data-kind="Architecture"><span class="portfolio-file">No file selected</span></label>
+            <div class="review-actions"><button class="btn btn-accent btn-sm portfolio-submit" type="button" data-input="arch-portfolio-pdf">Ask Arch Coach to Review</button><span class="review-status" aria-live="polite"></span></div>
+          </article>
+          <article class="review-card">
+            <span class="eyebrow">Interior Design</span><h3>Interior Design Portfolio Check</h3><p>Get feedback on concepts, plans, elevations, material palettes, renderings, FF&amp;E communication, process work, page composition and how clearly each project communicates your design thinking.</p>
+            <label class="portfolio-drop" for="interior-portfolio-pdf"><strong>Upload interior design portfolio PDF</strong><span>PDF only · up to 20 MB</span><input id="interior-portfolio-pdf" class="portfolio-input" type="file" accept="application/pdf" data-kind="Interior Design"><span class="portfolio-file">No file selected</span></label>
+            <div class="review-actions"><button class="btn btn-accent btn-sm portfolio-submit" type="button" data-input="interior-portfolio-pdf">Ask Arch Coach to Review</button><span class="review-status" aria-live="polite"></span></div>
+          </article>
+        </div>
+        <p class="review-note">Student Portfolio Review is included with the Student plan. Feedback is advisory and educational; admissions, academic and hiring decisions remain with the applicable school, firm or reviewer.</p>
+      </div>
+
     </div>
 
     <!-- App mode: for free/emerging users on a phone, Arch Coach can open into a
@@ -1496,12 +1525,13 @@
 <section class="page" id="page-pricing" hidden>
   <div class="page-head wrap">
     <span class="eyebrow">Pricing</span>
-    <h1>Explore, Emerging, Firms.</h1>
+    <h1>Explore, Student, Emerging, Firms.</h1>
     <p>Every DrawUp account can use Swap. Memberships include monthly credits; need more, purchase additional credits.</p>
   </div>
   <div class="wrap">
     <div class="price-grid">
       <div class="price-card" style="--c:var(--blue)"><h3>Explore</h3><div class="price-num">$0</div><p>Firm Search, Project Search, Who Designed It, Arch Coach Lite, Swap starter credits.</p></div>
+      <div class="price-card" style="--c:var(--holo-purple)"><h3>Student</h3><div class="price-num">$10<span>/mo</span></div><p>Arch Coach student access, Architecture + Interior Design Portfolio Checks, small PDF uploads, portfolio feedback and recommendations.</p></div>
       <div class="price-card featured" style="--c:var(--orange)"><h3>Emerging</h3><div class="price-num">$19<span>/mo</span></div><p>Arch Coach Pro, full AEC Chat, Project Threads, DrawUp Check, monthly Swap credits.</p></div>
       <div class="price-card" style="--c:var(--blue-deep)"><h3>Firms</h3><div class="price-num">from $49<span>/mo</span></div><p>Marketing profile + DrawUp access — seats, shared Swap credits, team Arch Coach.</p></div>
     </div>
@@ -1746,5 +1776,28 @@
     chips.forEach(function(chip){ chip.addEventListener('click',function(){ activeProgram=chip.dataset.program; chips.forEach(function(c){c.classList.toggle('active',c===chip)}); applyUniversityFilters(); }); });
     document.querySelectorAll('#university-regions button').forEach(function(btn){ btn.addEventListener('click',function(){ var r=btn.dataset.region; if(r==='United States'){scope.value='United States';continent.value='All Continents';} else {scope.value='All World';continent.value=r;} state.value='All U.S. States'; applyUniversityFilters(); }); });
   })();
+
+
+// Student portfolio PDF review prototype interactions
+document.querySelectorAll('.portfolio-input').forEach(input => {
+  input.addEventListener('change', () => {
+    const label = input.closest('.portfolio-drop');
+    const out = label && label.querySelector('.portfolio-file');
+    const file = input.files && input.files[0];
+    if (!out) return;
+    if (!file) { out.textContent = 'No file selected'; return; }
+    if (file.type !== 'application/pdf') { out.textContent = 'Please choose a PDF file.'; input.value=''; return; }
+    if (file.size > 20 * 1024 * 1024) { out.textContent = 'That PDF is over 20 MB. Please use a smaller file.'; input.value=''; return; }
+    out.textContent = file.name + ' · ' + (file.size/1024/1024).toFixed(1) + ' MB';
+  });
+});
+document.querySelectorAll('.portfolio-submit').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const input = document.getElementById(btn.dataset.input);
+    const status = btn.parentElement.querySelector('.review-status');
+    if (!input || !input.files || !input.files[0]) { status.textContent = 'Choose a PDF first.'; return; }
+    status.textContent = 'Ready for Arch Coach review · Student plan required.';
+  });
+});
 
 </script>
