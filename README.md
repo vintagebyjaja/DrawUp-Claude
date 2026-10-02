@@ -83,3 +83,10 @@ The Universities directory now opens with Featured Universities: Hampton Univers
 
 ## V8 Student Portfolio Review
 Arch Coach now includes Architecture and Interior Design portfolio review cards with PDF-only validation (20 MB max) and a Student plan at $10/month. Migration `0008_student_portfolio_reviews.sql` adds the private Supabase storage bucket and review metadata table. The static preview validates/selects files; production AI review still needs the authenticated upload + Arch Coach processing endpoint wired to Supabase.
+
+
+## V8 directory correction
+- University directory now includes 240 starter listing entries: 30 each for Architecture, Engineering, Interior Design, Construction, Planning, Landscape, HBCU and Study Abroad.
+- Featured Hampton / MIT / USEK cards only display on All Programs.
+- International Firms is now an interactive directory toggle with starter international firms.
+- Seeded university links use discovery searches where an official department URL has not yet been verified; replace these with verified direct URLs as the production database is populated.
