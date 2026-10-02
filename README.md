@@ -40,3 +40,7 @@ The current working Season 1 site is:
 `public/drawup-preview.html`
 
 The Next.js shell is intentionally thin so you can get back into the site immediately. Future routes/components can be migrated out of the preview one at a time without losing the validated design.
+
+
+## Season 1 hologram animation update
+The home hero now includes animated architectural holograms: a walking human-flow figure, an Arch Coach figure drawing a building on a holographic board, court study, project-goal massing, window detail, extra projection lasers, orbiting HUD nodes, and floating particles. Motion respects `prefers-reduced-motion`. The former RFI marker was moved away from the central logo and relabeled as a window-detail marker.
