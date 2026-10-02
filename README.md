@@ -1,3 +1,9 @@
+# DrawUp GitHub Ready V5
+
+V5 preserves everything from V4 and fixes the homepage hologram layering. The legacy foreground logo/SVG callouts are disabled because the approved command-center hero art already contains the DrawUp medallion. Added subtle live collaboration motion over the people: Arch Coach drawing/sketching on the holographic plan, teammates pointing toward the drawing, pulsing collaboration glow, moving lasers, scan, walking figure, beam and HUD motion.
+
+Deploy as before with the existing repository.
+
 # DrawUp — GitHub-ready recovery build
 
 This repo restores the validated **DrawUp Season 1** preview as the working site instead of the placeholder “DrawUp Studio” scaffold screen.
@@ -47,3 +53,10 @@ The home hero now includes animated architectural holograms: a walking human-flo
 
 ## V3 approved hero
 The home hero uses the exact approved command-center artwork supplied by the owner (`public/drawup-hero-command-center.png`) with lightweight CSS motion layered over it: pulsing projector/medallion, moving scan beam and lasers, floating HUD panels, a walking Human Flow figure, particles, and an Arch Coach drawing trace. Navigation and the rest of the Season 1 preview remain functional.
+
+
+## V4 cleanup
+- Removed the prototype PREVIEW / DEMO banner from the public marketing experience.
+- The DrawUp navigation now sits at the top of the public site.
+- Join Preseason remains public-facing launch language.
+- V3 animated command-center hero and Supabase migrations are preserved.
