@@ -1349,7 +1349,11 @@
           <span class="eyebrow">New chat</span>
           <h2>AEC chat built around the work.</h2>
           <p>Start a general chat, a project thread, or a learning thread — Arch Coach keeps them separate and searchable.</p>
-          <a class="btn btn-accent btn-sm" style="margin-top:16px;" href="#">Ask Arch Coach</a>
+          <div class="coach-free-trial" style="margin-top:16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+            <button class="btn btn-accent btn-sm" id="coach-free-question" type="button">Ask Arch Coach Free</button>
+            <span class="mode-chip" id="coach-free-count">10 free questions remaining</span>
+          </div>
+          <p class="disclaimer" style="margin-top:10px;color:rgba(255,255,255,.72);">Try Arch Coach right away with 10 free questions. No card required. Create a free Explore account to keep your history and continue across devices.</p>
         </div>
         <div class="chat-mock">
           <div class="bubble user"><span class="who">You</span>What should I verify for an accessible entrance?</div>
@@ -1710,6 +1714,15 @@
       </div>
     </div>
 
+    </div>
+
+    <div id="international-firm-directory" hidden>
+      <div class="roster-index international-regions" id="international-region-index" style="gap:8px;flex-wrap:wrap;margin:16px 0;"><span class="has active" data-intl-region="All" tabindex="0" role="button">ALL</span><span class="has" data-intl-region="Europe" tabindex="0" role="button">EUROPE</span><span class="has" data-intl-region="Asia" tabindex="0" role="button">ASIA</span><span class="has" data-intl-region="Middle East" tabindex="0" role="button">MIDDLE EAST</span><span class="has" data-intl-region="Africa" tabindex="0" role="button">AFRICA</span><span class="has" data-intl-region="North America" tabindex="0" role="button">N. AMERICA</span><span class="has" data-intl-region="South America" tabindex="0" role="button">S. AMERICA</span><span class="has" data-intl-region="Oceania" tabindex="0" role="button">OCEANIA</span></div>
+      <div class="roster-letter" style="margin-top:8px;">International firms</div>
+      <div class="roster-grid" id="international-firm-grid"><a class="roster-row intl-firm" data-region="Europe" href="#firm-profile" data-page="firm-profile"><span class="roster-no">UK</span><span class="roster-name">ZAHA HADID ARCHITECTS</span><span class="roster-loc">LONDON, UNITED KINGDOM · EUROPE</span><span class="pill pill-listed roster-tag">Listed</span></a><a class="roster-row intl-firm" data-region="Europe" href="#firm-profile" data-page="firm-profile"><span class="roster-no">UK</span><span class="roster-name">FOSTER + PARTNERS</span><span class="roster-loc">LONDON, UNITED KINGDOM · EUROPE</span><span class="pill pill-listed roster-tag">Listed</span></a><a class="roster-row intl-firm" data-region="Europe" href="#firm-profile" data-page="firm-profile"><span class="roster-no">NL</span><span class="roster-name">MVRDV</span><span class="roster-loc">ROTTERDAM, NETHERLANDS · EUROPE</span><span class="pill pill-listed roster-tag">Listed</span></a><a class="roster-row intl-firm" data-region="Europe" href="#firm-profile" data-page="firm-profile"><span class="roster-no">NO</span><span class="roster-name">SNØHETTA</span><span class="roster-loc">OSLO, NORWAY · EUROPE</span><span class="pill pill-listed roster-tag">Listed</span></a><a class="roster-row intl-firm" data-region="Europe" href="#firm-profile" data-page="firm-profile"><span class="roster-no">DK</span><span class="roster-name">BJARKE INGELS GROUP (BIG)</span><span class="roster-loc">COPENHAGEN, DENMARK · EUROPE</span><span class="pill pill-listed roster-tag">Listed</span></a><a class="roster-row intl-firm" data-region="Europe" href="#firm-profile" data-page="firm-profile"><span class="roster-no">CH</span><span class="roster-name">HERZOG &amp; DE MEURON</span><span class="roster-loc">BASEL, SWITZERLAND · EUROPE</span><span class="pill pill-listed roster-tag">Listed</span></a><a class="roster-row intl-firm" data-region="Europe" href="#firm-profile" data-page="firm-profile"><span class="roster-no">IT</span><span class="roster-name">RENZO PIANO BUILDING WORKSHOP</span><span class="roster-loc">GENOA, ITALY · EUROPE</span><span class="pill pill-listed roster-tag">Listed</span></a><a class="roster-row intl-firm" data-region="Europe" href="#firm-profile" data-page="firm-profile"><span class="roster-no">UK</span><span class="roster-name">DAVID CHIPPERFIELD ARCHITECTS</span><span class="roster-loc">LONDON, UNITED KINGDOM · EUROPE</span><span class="pill pill-listed roster-tag">Listed</span></a><a class="roster-row intl-firm" data-region="Asia" href="#firm-profile" data-page="firm-profile"><span class="roster-no">JP</span><span class="roster-name">KENGO KUMA &amp; ASSOCIATES</span><span class="roster-loc">TOKYO, JAPAN · ASIA</span><span class="pill pill-listed roster-tag">Listed</span></a><a class="roster-row intl-firm" data-region="Asia" href="#firm-profile" data-page="firm-profile"><span class="roster-no">JP</span><span class="roster-name">SANAA</span><span class="roster-loc">TOKYO, JAPAN · ASIA</span><span class="pill pill-listed roster-tag">Listed</span></a><a class="roster-row intl-firm" data-region="Asia" href="#firm-profile" data-page="firm-profile"><span class="roster-no">JP</span><span class="roster-name">SHIGERU BAN ARCHITECTS</span><span class="roster-loc">TOKYO, JAPAN · ASIA</span><span class="pill pill-listed roster-tag">Listed</span></a><a class="roster-row intl-firm" data-region="Asia" href="#firm-profile" data-page="firm-profile"><span class="roster-no">SG</span><span class="roster-name">WOHA</span><span class="roster-loc">SINGAPORE · ASIA</span><span class="pill pill-listed roster-tag">Listed</span></a><a class="roster-row intl-firm" data-region="Asia" href="#firm-profile" data-page="firm-profile"><span class="roster-no">CN</span><span class="roster-name">MAD ARCHITECTS</span><span class="roster-loc">BEIJING, CHINA · ASIA</span><span class="pill pill-listed roster-tag">Listed</span></a><a class="roster-row intl-firm" data-region="Middle East" href="#firm-profile" data-page="firm-profile"><span class="roster-no">LB</span><span class="roster-name">BERNARD KHOURY / DW5</span><span class="roster-loc">BEIRUT, LEBANON · MIDDLE EAST</span><span class="pill pill-listed roster-tag">Listed</span></a><a class="roster-row intl-firm" data-region="Middle East" href="#firm-profile" data-page="firm-profile"><span class="roster-no">AE</span><span class="roster-name">X-ARCHITECTS</span><span class="roster-loc">DUBAI, UAE · MIDDLE EAST</span><span class="pill pill-listed roster-tag">Listed</span></a><a class="roster-row intl-firm" data-region="Africa" href="#firm-profile" data-page="firm-profile"><span class="roster-no">GH</span><span class="roster-name">ADJAYE ASSOCIATES</span><span class="roster-loc">ACCRA, GHANA · AFRICA</span><span class="pill pill-listed roster-tag">Listed</span></a><a class="roster-row intl-firm" data-region="Africa" href="#firm-profile" data-page="firm-profile"><span class="roster-no">ZA</span><span class="roster-name">COUNTERSPACE</span><span class="roster-loc">JOHANNESBURG, SOUTH AFRICA · AFRICA</span><span class="pill pill-listed roster-tag">Listed</span></a><a class="roster-row intl-firm" data-region="Africa" href="#firm-profile" data-page="firm-profile"><span class="roster-no">BF</span><span class="roster-name">KÉRÉ ARCHITECTURE</span><span class="roster-loc">GANDO, BURKINA FASO · AFRICA</span><span class="pill pill-listed roster-tag">Listed</span></a><a class="roster-row intl-firm" data-region="North America" href="#firm-profile" data-page="firm-profile"><span class="roster-no">CA</span><span class="roster-name">DIAMOND SCHMITT</span><span class="roster-loc">TORONTO, CANADA · NORTH AMERICA</span><span class="pill pill-listed roster-tag">Listed</span></a><a class="roster-row intl-firm" data-region="North America" href="#firm-profile" data-page="firm-profile"><span class="roster-no">MX</span><span class="roster-name">FR-EE / FERNANDO ROMERO ENTERPRISE</span><span class="roster-loc">MEXICO CITY, MEXICO · NORTH AMERICA</span><span class="pill pill-listed roster-tag">Listed</span></a><a class="roster-row intl-firm" data-region="South America" href="#firm-profile" data-page="firm-profile"><span class="roster-no">CL</span><span class="roster-name">ELEMENTAL</span><span class="roster-loc">SANTIAGO, CHILE · SOUTH AMERICA</span><span class="pill pill-listed roster-tag">Listed</span></a><a class="roster-row intl-firm" data-region="South America" href="#firm-profile" data-page="firm-profile"><span class="roster-no">BR</span><span class="roster-name">STUDIO MK27</span><span class="roster-loc">SÃO PAULO, BRAZIL · SOUTH AMERICA</span><span class="pill pill-listed roster-tag">Listed</span></a><a class="roster-row intl-firm" data-region="Oceania" href="#firm-profile" data-page="firm-profile"><span class="roster-no">AU</span><span class="roster-name">WOODS BAGOT</span><span class="roster-loc">ADELAIDE, AUSTRALIA · OCEANIA</span><span class="pill pill-listed roster-tag">Listed</span></a><a class="roster-row intl-firm" data-region="Oceania" href="#firm-profile" data-page="firm-profile"><span class="roster-no">AU</span><span class="roster-name">COX ARCHITECTURE</span><span class="roster-loc">SYDNEY, AUSTRALIA · OCEANIA</span><span class="pill pill-listed roster-tag">Listed</span></a></div>
+      <p class="region-note" style="margin:18px 0 0;">Starter international roster for V9. Browse by region now; country + city expansion is ready for the production directory.</p>
+    </div>
+
     <div class="roster-cta"><a class="btn btn-primary btn-sm" href="#">Claim Your Firm</a><p style="font-family:var(--font-mono);font-size:11px;color:var(--ink-faint);margin-top:10px;">Don't see your firm? Claim or submit it as we build out the global directory.</p></div>
   </div>
 </section>
@@ -1754,21 +1767,22 @@
 <section class="page" id="page-pricing" hidden>
   <div class="page-head wrap">
     <span class="eyebrow">Pricing</span>
-    <h1>Explore, Student, Emerging, Firms.</h1>
-    <p>Every DrawUp account can use Swap. Memberships include monthly credits; need more, purchase additional credits.</p>
+    <h1>Try Arch Coach free. Upgrade when you need more.</h1>
+    <p>Start with 10 Arch Coach questions free — no card required. Paid memberships include larger monthly credit pools, and additional credits can be purchased anytime. Standard Arch Coach questions use 4 credits each.</p>
   </div>
   <div class="wrap">
     <div class="price-grid">
-      <div class="price-card" style="--c:var(--blue)"><h3>Explore</h3><div class="price-num">$0</div><p>Firm Search, Project Search, Who Designed It, Arch Coach Lite, Swap starter credits.</p></div>
-      <div class="price-card" style="--c:var(--holo-purple)"><h3>Student</h3><div class="price-num">$10<span>/mo</span></div><p>Arch Coach student access, Architecture + Interior Design Portfolio Checks, small PDF uploads, portfolio feedback and recommendations.</p></div>
-      <div class="price-card featured" style="--c:var(--orange)"><h3>Emerging</h3><div class="price-num">$19<span>/mo</span></div><p>Arch Coach Pro, full AEC Chat, Project Threads, DrawUp Check, monthly Swap credits.</p></div>
-      <div class="price-card" style="--c:var(--blue-deep)"><h3>Firms</h3><div class="price-num">from $49<span>/mo</span></div><p>Marketing profile + DrawUp access — seats, shared Swap credits, team Arch Coach.</p></div>
+      <div class="price-card" style="--c:var(--blue)"><h3>Explore</h3><div class="price-num">$0</div><p><strong>10 Arch Coach questions free.</strong> No card required. Includes Firm Search, Project Search, Who Designed It and basic Discover access.</p></div>
+      <div class="price-card" style="--c:var(--holo-blue)"><h3>Arch Coach</h3><div class="price-num">$8.20<span>/mo</span></div><p><strong>100 credits/month</strong> — up to 25 standard questions at 4 credits each. Arch Coach chat access with the option to buy more credits anytime.</p></div>
+      <div class="price-card" style="--c:var(--holo-purple)"><h3>Student</h3><div class="price-num">$10<span>/mo</span></div><p><strong>500 credits/month</strong> — up to 125 standard questions, plus Architecture + Interior Design Portfolio Checks, small PDF uploads, student feedback and recommendations.</p></div>
+      <div class="price-card featured" style="--c:var(--orange)"><h3>Emerging</h3><div class="price-num">$19<span>/mo</span></div><p><strong>1,200 credits/month</strong> — up to 300 standard questions, plus Arch Coach Pro, full AEC Chat, Project Threads, DrawUp Check and monthly Swap access.</p></div>
+      <div class="price-card" style="--c:var(--blue-deep)"><h3>Firms</h3><div class="price-num">from $49<span>/mo</span></div><p>Shared team credit pools, seats, firm profile tools and expanded DrawUp access. Additional credits can be purchased anytime.</p></div>
     </div>
     <div class="section-head" style="margin-top:36px;"><h2>Firm plans</h2></div>
     <div class="firm-tier-grid">
       <div class="price-card" style="--c:var(--blue)"><h3>Firm Free</h3><div class="price-num">$0</div><p>Basic profile, logo, Firm Search presence, claim profile.</p></div>
-      <div class="price-card" style="--c:var(--yellow)"><h3>Showcase</h3><div class="price-num">$49<span>/mo</span></div><p>Featured projects, 3 seats, Arch Coach Pro, shared Swap credits.</p></div>
-      <div class="price-card" style="--c:var(--orange)"><h3>Pro</h3><div class="price-num">$99<span>/mo</span></div><p>More seats, advanced analytics, priority profile tools.</p></div>
+      <div class="price-card" style="--c:var(--yellow)"><h3>Showcase</h3><div class="price-num">$49<span>/mo</span></div><p><strong>3,000 shared credits/month</strong>, featured projects, 3 seats, Arch Coach Pro and shared Swap access.</p></div>
+      <div class="price-card" style="--c:var(--orange)"><h3>Pro</h3><div class="price-num">$99<span>/mo</span></div><p><strong>7,500 shared credits/month</strong>, more seats, advanced analytics, priority profile tools and expanded team Arch Coach access.</p></div>
     </div>
   </div>
 </section>
@@ -2012,9 +2026,31 @@
   (function(){
     var usBtn=document.getElementById('us-firms-btn'), intlBtn=document.getElementById('intl-firms-btn'), us=document.getElementById('us-firm-directory'), intl=document.getElementById('international-firm-directory');
     if(!usBtn||!intlBtn||!us||!intl) return;
-    function setMode(mode){ var isIntl=mode==='intl'; us.hidden=isIntl; intl.hidden=!isIntl; usBtn.classList.toggle('active',!isIntl); intlBtn.classList.toggle('active',isIntl); }
-    usBtn.addEventListener('click',function(){setMode('us')}); intlBtn.addEventListener('click',function(){setMode('intl')});
+    function setMode(mode){ var isIntl=mode==='intl'; us.hidden=isIntl; intl.hidden=!isIntl; usBtn.classList.toggle('active',!isIntl); intlBtn.classList.toggle('active',isIntl); if(isIntl){ intl.scrollIntoView({behavior:'smooth',block:'nearest'}); } }
+    usBtn.addEventListener('click',function(e){e.preventDefault();setMode('us')}); intlBtn.addEventListener('click',function(e){e.preventDefault();setMode('intl')});
+    document.querySelectorAll('#international-region-index [data-intl-region]').forEach(function(btn){ btn.addEventListener('click',function(){ var region=btn.dataset.intlRegion; document.querySelectorAll('#international-region-index [data-intl-region]').forEach(function(b){b.classList.toggle('active',b===btn)}); document.querySelectorAll('#international-firm-grid .intl-firm').forEach(function(card){card.hidden=region!=='All' && card.dataset.region!==region;}); }); });
   })();
+
+// Arch Coach free-question preview counter. Production usage is enforced server-side via Supabase.
+(function(){
+  const key = 'drawup_arch_coach_free_questions_used';
+  const btn = document.getElementById('coach-free-question');
+  const label = document.getElementById('coach-free-count');
+  if(!btn || !label) return;
+  function used(){ return Math.min(10, Math.max(0, Number(localStorage.getItem(key) || 0))); }
+  function render(){
+    const remaining = 10 - used();
+    label.textContent = remaining ? `${remaining} free question${remaining===1?'':'s'} remaining · no card required` : 'Free questions used · View plans';
+    btn.textContent = remaining ? 'Ask Arch Coach Free' : 'View Arch Coach Plans';
+  }
+  btn.addEventListener('click', function(){
+    const u = used();
+    if(u >= 10){ showPage('pricing', false); location.hash = '#pricing'; return; }
+    localStorage.setItem(key, String(u + 1));
+    render();
+  });
+  render();
+})();
 
 // Student portfolio PDF review prototype interactions
 document.querySelectorAll('.portfolio-input').forEach(input => {

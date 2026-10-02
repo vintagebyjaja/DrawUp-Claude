@@ -73,7 +73,7 @@ Adds 10 starter schools with working search, U.S./international/study-abroad sco
 ## V7 featured-university update
 The Universities directory now opens with Featured Universities: Hampton University (HBCU), MIT (U.S. research), and Holy Spirit University of Kaslik / USEK (international). MIT and USEK are also included in the searchable starter directory.
 
-## V8 responsive/mobile update
+## V9 responsive/mobile update
 - Responsive breakpoints adapt DrawUp for phone, tablet, and desktop without user-agent sniffing.
 - Phones use a compact app-style header, hamburger drawer, and fixed six-item bottom navigation.
 - Mobile home hero is reorganized for a vertical, touch-first layout inspired by native mobile apps.
@@ -81,12 +81,38 @@ The Universities directory now opens with Featured Universities: Hampton Univers
 - Tablet navigation and spacing are tightened while retaining the desktop information architecture.
 
 
-## V8 Student Portfolio Review
+## V9 Student Portfolio Review
 Arch Coach now includes Architecture and Interior Design portfolio review cards with PDF-only validation (20 MB max) and a Student plan at $10/month. Migration `0008_student_portfolio_reviews.sql` adds the private Supabase storage bucket and review metadata table. The static preview validates/selects files; production AI review still needs the authenticated upload + Arch Coach processing endpoint wired to Supabase.
 
 
-## V8 directory correction
+## V9 directory correction
 - University directory now includes 240 starter listing entries: 30 each for Architecture, Engineering, Interior Design, Construction, Planning, Landscape, HBCU and Study Abroad.
 - Featured Hampton / MIT / USEK cards only display on All Programs.
 - International Firms is now an interactive directory toggle with starter international firms.
 - Seeded university links use discovery searches where an official department URL has not yet been verified; replace these with verified direct URLs as the production database is populated.
+
+
+## V9 International Firms fix
+- Connect → International Firms now opens a real visible international roster.
+- Seeded 24 recognizable firms including Zaha Hadid Architects, Foster + Partners, MVRDV, Snøhetta, BIG, Kengo Kuma & Associates, WOHA, ELEMENTAL and more.
+- Added clickable region filters for Europe, Asia, Middle East, Africa, North America, South America and Oceania.
+- U.S. Firms toggle switches back to the existing U.S. roster.
+
+
+## V9 Arch Coach free trial update
+- New accounts can try the first **10 Arch Coach questions free** before a paid plan is required.
+- Pricing copy now makes the 10-question allowance explicit.
+- Student remains **$10/month** and includes ongoing Arch Coach student access plus Architecture and Interior Design portfolio PDF reviews.
+- `0009_arch_coach_free_questions.sql` adds the server-side usage foundation. The browser counter is only preview UI; production must enforce usage in the authenticated API/server path.
+
+
+## V9 credit-model update
+- Explore: 10 Arch Coach questions free, no card required.
+- Arch Coach: $8.20/month, 100 credits (25 standard questions).
+- Student: $10/month, 500 credits (125 standard questions) + portfolio reviews.
+- Emerging: $19/month, 1,200 credits (300 standard questions) + broader DrawUp tools.
+- Firm Showcase: $49/month, 3,000 shared credits.
+- Firm Pro: $99/month, 7,500 shared credits.
+- Standard text question: 4 credits. Heavier actions may use more credits; show cost before execution.
+- Paid users may purchase additional credits.
+- Apply Supabase migration `0010_arch_coach_credits_and_plans.sql` after prior migrations.
