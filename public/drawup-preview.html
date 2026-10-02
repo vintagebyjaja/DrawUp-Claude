@@ -630,7 +630,7 @@
       <a class="nav-signin" href="#firms" data-page="firms">For Firms</a>
       <a class="nav-signin" href="#pricing" data-page="pricing">Pricing</a>
       <div class="nav-search">⌕ Search</div>
-      <a class="nav-signin" href="#">Sign in</a>
+      <a class="nav-signin" href="#" id="drawup-signin">Sign in</a>
       <a class="btn btn-primary btn-sm" href="#">Join Preseason</a>
     </div>
     <button class="mobile-menu-btn" id="mobile-menu-btn" type="button" aria-label="Open menu" aria-expanded="false">☰</button>
@@ -1362,10 +1362,15 @@
           </div>
           <p class="disclaimer" style="margin-top:10px;color:rgba(255,255,255,.72);">Try Arch Coach right away with 10 free questions. No card required. Create a free Explore account to keep your history and continue across devices.</p>
         </div>
-        <div class="chat-mock">
-          <div class="bubble user"><span class="who">You</span>What should I verify for an accessible entrance?</div>
-          <div class="bubble coach"><span class="who">Arch Coach</span>Let's break it down by route, door clearance, threshold, maneuvering clearance and hardware…</div>
-          <div style="text-align:right;"><span class="btn btn-ghost btn-sm" style="background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.3);">Save to Project Thread</span></div>
+        <div class="chat-mock" id="arch-coach-live">
+          <div id="arch-coach-messages" style="display:flex;flex-direction:column;gap:10px;max-height:360px;overflow:auto;">
+            <div class="bubble coach"><span class="who">Arch Coach</span>Ask me an AEC question. I can explain concepts, suggest a path to follow, and help identify what you should verify next.</div>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:12px;align-items:flex-end;">
+            <textarea id="arch-coach-input" rows="2" placeholder="Ask Arch Coach…" style="flex:1;resize:vertical;border-radius:10px;border:1px solid rgba(255,255,255,.22);padding:11px 12px;background:rgba(4,15,28,.72);color:#fff;font:inherit;"></textarea>
+            <button class="btn btn-accent btn-sm" id="arch-coach-send" type="button">Send</button>
+          </div>
+          <div id="arch-coach-status" class="disclaimer" style="margin-top:8px;color:rgba(255,255,255,.72);">Sign in to use your 10 free questions.</div>
         </div>
       </div>
       <div class="coach-modes">
@@ -2082,25 +2087,10 @@
     document.querySelectorAll('#international-region-index [data-intl-region]').forEach(function(btn){ btn.addEventListener('click',function(){ var region=btn.dataset.intlRegion; document.querySelectorAll('#international-region-index [data-intl-region]').forEach(function(b){b.classList.toggle('active',b===btn)}); document.querySelectorAll('#international-firm-grid .intl-firm').forEach(function(card){card.hidden=region!=='All' && card.dataset.region!==region;}); }); });
   })();
 
-// Arch Coach free-question preview counter. Production usage is enforced server-side via Supabase.
+// Arch Coach free-question button now opens the live authenticated chat.
 (function(){
-  const key = 'drawup_arch_coach_free_questions_used';
-  const btn = document.getElementById('coach-free-question');
-  const label = document.getElementById('coach-free-count');
-  if(!btn || !label) return;
-  function used(){ return Math.min(10, Math.max(0, Number(localStorage.getItem(key) || 0))); }
-  function render(){
-    const remaining = 10 - used();
-    label.textContent = remaining ? `${remaining} free question${remaining===1?'':'s'} remaining · no card required` : 'Free questions used · View plans';
-    btn.textContent = remaining ? 'Ask Arch Coach Free' : 'View Arch Coach Plans';
-  }
-  btn.addEventListener('click', function(){
-    const u = used();
-    if(u >= 10){ showPage('pricing', false); location.hash = '#pricing'; return; }
-    localStorage.setItem(key, String(u + 1));
-    render();
-  });
-  render();
+  const btn=document.getElementById('coach-free-question');
+  if(btn) btn.addEventListener('click',function(){ document.getElementById('arch-coach-input')?.focus(); });
 })();
 
 // Student portfolio PDF review prototype interactions

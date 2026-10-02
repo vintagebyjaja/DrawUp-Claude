@@ -120,3 +120,6 @@ Arch Coach now includes Architecture and Interior Design portfolio review cards 
 
 ## V10
 Adds clickable Privacy, Terms, AI Policy, Professional Disclaimer, Q + A, and a Season 2 Coming Soon concept page.
+
+## V10 Arch Coach live connection
+The Arch Coach page now connects authenticated DrawUp users to the deployed Supabase `arch-coach` Edge Function. Configure `NEXT_PUBLIC_SUPABASE_URL` and either `NEXT_PUBLIC_SUPABASE_ANON_KEY` or `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` in the deployment environment. Migration `0011_arch_coach_live_backend.sql` is the database support used by the live Edge Function; do not rerun it if the same backend SQL package was already applied successfully.
