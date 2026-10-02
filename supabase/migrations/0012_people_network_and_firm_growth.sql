@@ -1,0 +1,24 @@
+-- DrawUp V10 People, public profiles, network, messaging, and firm growth
+alter table if exists public.profiles add column if not exists avatar_url text;
+alter table if exists public.profiles add column if not exists professional_level text;
+alter table if exists public.profiles add column if not exists current_location text;
+alter table if exists public.profiles add column if not exists home_office text;
+alter table if exists public.profiles add column if not exists school text;
+alter table if exists public.profiles add column if not exists degree text;
+alter table if exists public.profiles add column if not exists employer_name text;
+alter table if exists public.profiles add column if not exists website text;
+alter table if exists public.profiles add column if not exists bio text;
+alter table if exists public.profiles add column if not exists is_public boolean not null default true;
+create table if not exists public.career_timeline(id bigint generated always as identity primary key,user_id uuid not null references auth.users(id) on delete cascade,role text not null,organization text,location text,start_date date,end_date date,description text,sort_order integer default 0,created_at timestamptz default now());
+create table if not exists public.connections(id bigint generated always as identity primary key,requester_id uuid not null references auth.users(id) on delete cascade,addressee_id uuid not null references auth.users(id) on delete cascade,status text not null default 'pending' check(status in('pending','accepted','blocked')),created_at timestamptz default now(),unique(requester_id,addressee_id));
+create table if not exists public.direct_messages(id bigint generated always as identity primary key,sender_id uuid not null references auth.users(id) on delete cascade,recipient_id uuid not null references auth.users(id) on delete cascade,body text not null check(char_length(body) between 1 and 5000),read_at timestamptz,created_at timestamptz default now());
+create table if not exists public.firm_directory_submissions(id bigint generated always as identity primary key,submitted_by uuid references auth.users(id) on delete set null,firm_name text not null,city text,state_region text,country text default 'United States',website text,status text not null default 'pending',created_at timestamptz default now());
+alter table public.career_timeline enable row level security; alter table public.connections enable row level security; alter table public.direct_messages enable row level security; alter table public.firm_directory_submissions enable row level security;
+create policy "public career timeline read" on public.career_timeline for select using(true);
+create policy "own career timeline write" on public.career_timeline for all using(auth.uid()=user_id) with check(auth.uid()=user_id);
+create policy "connection participants read" on public.connections for select using(auth.uid()=requester_id or auth.uid()=addressee_id);
+create policy "request connections" on public.connections for insert with check(auth.uid()=requester_id);
+create policy "connection participants update" on public.connections for update using(auth.uid()=requester_id or auth.uid()=addressee_id);
+create policy "message participants read" on public.direct_messages for select using(auth.uid()=sender_id or auth.uid()=recipient_id);
+create policy "send own messages" on public.direct_messages for insert with check(auth.uid()=sender_id);
+create policy "signed in firm submissions" on public.firm_directory_submissions for insert with check(auth.uid()=submitted_by);
