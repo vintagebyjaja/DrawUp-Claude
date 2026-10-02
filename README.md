@@ -1,10 +1,26 @@
-# DrawUp Studio
+# DrawUp
 
-The real DrawUp product app — distinct from the marketing/waitlist site.
-Hand-scaffolded (Next.js 16, React 19, TypeScript, Tailwind v4, App Router,
-pnpm) because Claude's cloud sandbox has the npm registry blocked by org
-policy, so `pnpm create next-app` couldn't run there. This gives you the
-same result — you just need to install dependencies yourself.
+One site, deployed at drawup.studio: marketing/browsing is public, signing
+in is what unlocks actually using DrawUp (Arch Coach, Swap, Check, saving
+projects, Connect submissions). There is no separate marketing site anymore
+— this repo is it. Hand-scaffolded (Next.js 16, React 19, TypeScript,
+Tailwind v4, App Router, pnpm) because Claude's cloud sandbox has the npm
+registry blocked by org policy, so `pnpm create next-app` couldn't run
+there. This gives you the same result — you just need to install
+dependencies yourself.
+
+## Auth model
+
+Every route is publicly reachable and server-renders — nothing 404s or
+redirects a signed-out visitor away. `src/middleware.ts` refreshes the
+Supabase session cookie on every request; `src/components/nav.tsx` reads
+that session server-side so the nav shows "Sign in" or "Sign out" correctly
+on first paint, no flash. `/sign-in` is email+password against Supabase Auth
+(`profiles` row is created automatically via the `handle_new_user` trigger
+in migration `0001`). Pages whose real feature needs an account (Arch Coach,
+Check, Swap, Connect) are marked `gated` in `src/components/stub-page.tsx`
+and show a sign-in prompt for the feature itself, while the page stays
+browsable either way.
 
 ## Get started
 
@@ -17,22 +33,29 @@ Then open http://localhost:3000.
 
 ## Design reference
 
-`design/drawup-preview.html` is the validated Season 1 design — open it
-directly in a browser, no build step needed. It's a static, hash-routed
-single-file mockup covering every Season 1 page (Home, Discover, Arch Coach,
-Check, Details, Resources, Swap, Connect, Firm Profile, Pricing, For Firms)
-and is the source of truth for layout, copy, and the DrawUp Lab / DrawUp
-Gallery visual system. `src/app/globals.css` already carries the same design
-tokens (`--paper`, `--ink`, `--holo-blue`, `.world-gallery`, etc.) pulled
-straight from it, so real routes you build here start from the real palette
-instead of reinventing it. Build real pages against this reference instead
-of treating it as the deliverable — it has no backend, no auth, and every
-interaction is a client-side mock.
+`design/drawup-preview.html` (also served live at `/preview.html`) is the
+validated Season 1 design — a static, hash-routed single-file mockup
+covering every Season 1 page and the source of truth for layout, copy, and
+the DrawUp Lab / DrawUp Gallery visual system. `src/app/globals.css` already
+carries the same design tokens (`--paper`, `--ink`, `--holo-blue`,
+`.world-gallery`, etc.) pulled straight from it. Every real route below
+links out to its matching section of `/preview.html` under "see the full
+design" until that route is reading live data — so visitors always see
+either the real thing or an honest, working preview of it, never a gap.
 
 ## Structure
 
-- `src/app/` — App Router pages (layout.tsx, page.tsx, globals.css)
-- `design/drawup-preview.html` — the validated Season 1 design reference
+- `src/app/` — real App Router routes: `/` (home), `/sign-in`, `/discover`,
+  `/coach`, `/check`, `/details`, `/resources`, `/swap`, `/connect`,
+  `/pricing`, `/firms` — all public, themed, and linked from the shared nav
+- `src/components/` — `nav.tsx` / `footer.tsx` (shared layout, session-aware),
+  `auth-status.tsx` (sign in/out), `countdown.tsx`, `stub-page.tsx` (the
+  shared shell the not-yet-live-data routes render)
+- `src/lib/supabase/` — `client.ts` (browser) and `server.ts` (Server
+  Components/Route Handlers) Supabase clients
+- `src/middleware.ts` — refreshes the Supabase session cookie on every request
+- `design/drawup-preview.html` / `public/preview.html` — the validated
+  Season 1 design reference (same file, also served live)
 - `supabase/migrations/` — the full Season 1 data model, numbered in run order
 - `next.config.ts` — Next.js config
 - `postcss.config.mjs` — Tailwind v4 PostCSS plugin
@@ -40,9 +63,11 @@ interaction is a client-side mock.
 
 ## Next steps toward the real product
 
-- Build out the App Router routes for each Season 1 page against the design
-  reference above (`/discover`, `/coach`, `/check`, `/details`, `/resources`,
-  `/swap`, `/connect`, `/firm/[slug]`, `/pricing`, `/firms`).
+- Wire each route to live Supabase data — right now they render through
+  `StubPage`, which is honest about not reading real data yet rather than
+  faking it. Discover/Connect need real `firms`/`aec_projects` queries; Check
+  needs the upload + review flow; Swap needs the generation flow; Arch Coach
+  needs the chat/thread flow (0004).
 - Founder console: a `/hq` (or similar) route, gated on `is_founder()`, for
   adding firms directly and uploading firm/project photos — the schema for
   this already exists (`firms`, `firm_offices`, `firm_photos`,
