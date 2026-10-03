@@ -1,3 +1,7 @@
+# DrawUp V13.5
+
+V13.5 consolidates the V13.3 portal workspace and V13.4 profile-history update, plus authenticated navigation cleanup.
+
 # DrawUp GitHub Ready V5
 
 V5 preserves everything from V4 and fixes the homepage hologram layering. The legacy foreground logo/SVG callouts are disabled because the approved command-center hero art already contains the DrawUp medallion. Added subtle live collaboration motion over the people: Arch Coach drawing/sketching on the holographic plan, teammates pointing toward the drawing, pulsing collaboration glow, moving lasers, scan, walking figure, beam and HUD motion.
