@@ -140,3 +140,6 @@ Season 1 countdown court now uses the balanced DrawUp hologram palette (cyan, mi
 - Run `supabase/migrations/0013_arch_coach_v11_credits.sql` once.
 - Deploy `supabase/functions/arch-coach/index.ts` as the updated `arch-coach` Edge Function.
 - The Edge Function asks for project location before jurisdiction-sensitive answers, uses OpenAI Responses web search for current source research, prioritizes ICC/AHJ/official ADA sources, and can request an original 3D/hologram visual. It does not bundle or reproduce copyrighted Ching PDFs; user-authorized uploads can be analyzed, and Ching/Wiley can be referenced educationally.
+
+## V13.2 hotfix
+V13.2 explicitly loads the portal runtime in the production preview shell and hands successful Supabase sign-ins directly to it. It adds first-time profile photo upload and fixes laptop hero containment. See `V13.2-TEST.md`.
