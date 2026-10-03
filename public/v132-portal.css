@@ -39,3 +39,7 @@ html,body{max-width:100%;overflow-x:hidden}
 /* V13.5 authenticated shell: public acquisition CTAs never appear for signed-in members. */
 .du-authenticated .join-preseason{display:none!important}
 .du-authenticated #drawer .drawer-cta.join-preseason{display:none!important}
+/* V13.6 persistent onboarding + unique username feedback */
+.du-username-status{display:block;margin-top:8px;font-size:12px;font-weight:700;color:#718096;letter-spacing:.01em}
+.du-username-status[data-state="good"]{color:#16835f}
+.du-username-status[data-state="bad"]{color:#c43d3d}

@@ -1,3 +1,7 @@
+# DrawUp V13.6
+
+V13.6 builds on V13.5 with persistent Supabase-backed onboarding progress and live globally unique username checks. Completed onboarding does not reopen on normal sign-in; Profile > Edit Profile remains the intentional edit path.
+
 # DrawUp V13.5
 
 V13.5 consolidates the V13.3 portal workspace and V13.4 profile-history update, plus authenticated navigation cleanup.
