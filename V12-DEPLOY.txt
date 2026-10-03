@@ -1,0 +1,30 @@
+DRAWUP V12 — SIMPLE DEPLOY
+
+1. Upload this V12 ZIP/repo content to the SAME DrawUp GitHub repo.
+2. In Supabase SQL Editor, run:
+   supabase/migrations/0013_arch_coach_v11_credits.sql (only if you have not already run it)
+   supabase/migrations/0014_v12_school_profiles_and_student_verification.sql
+3. Supabase > Edge Functions > arch-coach: replace index.ts with the included V12 file and Deploy.
+4. Create/deploy a second Edge Function named: drawup-search
+   Use: supabase/functions/drawup-search/index.ts
+5. Keep OPENAI_API_KEY in Supabase Secrets. Never put it in GitHub.
+
+V12 SEARCH
+- Search button + Enter work.
+- Duplicate clicks are locked while a search is running.
+- DrawUp database is checked first.
+- Trusted-source research runs through drawup-search when needed.
+- Search itself does NOT use Arch Coach credits.
+- No Google search redirects.
+- Bank of America Stadium has a seeded DrawUp project result while live research is being wired/deployed.
+- Users see a futuristic search tunnel instead of a dead loading spinner.
+
+V12 RESOURCES
+- NAAB + NCARB added.
+- AIA/NOMA/ADA/ICC resource cards open a DrawUp landing portal first, then the direct official source.
+- University cards open DrawUp university profiles first; Google search links were removed.
+
+V12 COMMUNITY
+- Education/trade affiliations support students + alumni, graduation year, program and discoverability.
+- Student subscription verification can record school email plus current student ID/enrollment evidence.
+- Verification evidence is not public profile data.
