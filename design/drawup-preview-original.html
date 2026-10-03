@@ -892,9 +892,16 @@
         </div>
       </div>
       <div class="coach-modes">
-        <span class="mode-chip">Code Question</span><span class="mode-chip">ADA / Accessibility</span><span class="mode-chip">Detail Question</span>
-        <span class="mode-chip">Construction Question</span><span class="mode-chip">Material Question</span><span class="mode-chip">Revit Question</span>
-        <span class="mode-chip">Find a Firm</span><span class="mode-chip">Find a Project</span>
+        <span class="mode-chip">Code Question · 5–10 cr</span><span class="mode-chip">ADA / Accessibility · 5–10 cr</span><span class="mode-chip">Detail Question · 25–50 cr</span>
+        <span class="mode-chip">Plan Analysis · 20–40 cr</span><span class="mode-chip">Space Planning · 30–75 cr</span><span class="mode-chip">Compliance Report · 50–100 cr</span>
+        <span class="mode-chip">3D Detail · +25 cr</span><span class="mode-chip">Hologram Detail · +50 cr</span>
+      </div>
+      <div style="margin-top:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+        <label class="disclaimer" for="arch-coach-location" style="margin:0;">Project location</label>
+        <input id="arch-coach-location" placeholder="City, State / Country (when relevant)" style="min-width:260px;flex:1;border-radius:10px;border:1px solid rgba(255,255,255,.18);padding:10px 12px;background:rgba(4,15,28,.72);color:#fff;">
+        <select id="arch-coach-visual" style="border-radius:10px;border:1px solid rgba(255,255,255,.18);padding:10px 12px;background:#071523;color:#fff;">
+          <option value="standard">Standard answer</option><option value="drawing">Original drawing/detail</option><option value="3d">3D explanation (+25 credits)</option><option value="hologram">Hologram-style detail (+50 credits)</option>
+        </select>
       </div>
       <p class="disclaimer" style="margin-top:20px;max-width:640px;">Arch Coach assists with review and research. It is not a licensed architect, engineer of record, code official, or AHJ — final interpretation, professional responsibility and AHJ approval remain with the appropriate licensed professionals.</p>
     </div>
@@ -1265,6 +1272,18 @@
       <div class="price-card" style="--c:var(--blue)"><h3>Explore</h3><div class="price-num">$0</div><p>Firm Search, Project Search, Who Designed It, Arch Coach Lite, Swap starter credits.</p></div>
       <div class="price-card featured" style="--c:var(--orange)"><h3>Emerging</h3><div class="price-num">$19<span>/mo</span></div><p>Arch Coach Pro, full AEC Chat, Project Threads, DrawUp Check, monthly Swap credits.</p></div>
       <div class="price-card" style="--c:var(--blue-deep)"><h3>Firms</h3><div class="price-num">from $49<span>/mo</span></div><p>Marketing profile + DrawUp access — seats, shared Swap credits, team Arch Coach.</p></div>
+    </div>
+    <div class="section-head" style="margin-top:36px;"><h2>How credits work</h2><p>Arch Coach estimates the charge before heavier work. Final usage can vary with document size and generation complexity.</p></div>
+    <div class="detail-grid">
+      <div class="detail-card"><span class="meta">2–5 credits</span><h4>Basic Arch Coach question</h4></div>
+      <div class="detail-card"><span class="meta">5–10 credits</span><h4>Code / ADA question</h4></div>
+      <div class="detail-card"><span class="meta">20–40 credits</span><h4>Analyze uploaded plan</h4></div>
+      <div class="detail-card"><span class="meta">30–75 credits</span><h4>Space-planning generation</h4></div>
+      <div class="detail-card"><span class="meta">25–50 credits</span><h4>Detail generation</h4></div>
+      <div class="detail-card"><span class="meta">50–100 credits</span><h4>Code-compliance report</h4></div>
+      <div class="detail-card"><span class="meta">75–150 credits</span><h4>Photoreal render</h4></div>
+      <div class="detail-card"><span class="meta">100–250 credits</span><h4>Large drawing / document analysis</h4></div>
+      <div class="detail-card"><span class="meta">+25 / +50 credits</span><h4>3D explanation / hologram-style detail</h4></div>
     </div>
     <div class="section-head" style="margin-top:36px;"><h2>Firm plans</h2></div>
     <div class="firm-tier-grid">

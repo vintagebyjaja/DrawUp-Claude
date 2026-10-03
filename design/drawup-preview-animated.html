@@ -1364,9 +1364,9 @@
           <p>Start a general chat, a project thread, or a learning thread — Arch Coach keeps them separate and searchable.</p>
           <div class="coach-free-trial" style="margin-top:16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
             <button class="btn btn-accent btn-sm" id="coach-free-question" type="button">Ask Arch Coach Free</button>
-            <span class="mode-chip" id="coach-free-count">10 free questions remaining</span>
+            <span class="mode-chip" id="coach-free-count">10 guest questions remaining</span>
           </div>
-          <p class="disclaimer" style="margin-top:10px;color:rgba(255,255,255,.72);">Try Arch Coach right away with 10 free questions. No card required. Create a free Explore account to keep your history and continue across devices.</p>
+          <p class="disclaimer" style="margin-top:10px;color:rgba(255,255,255,.72);">Try Arch Coach right away with 10 guest questions — no sign in required. Create a free Explore account to receive 50 credits, save history and continue across devices.</p>
         </div>
         <div class="chat-mock" id="arch-coach-live">
           <div id="arch-coach-messages" style="display:flex;flex-direction:column;gap:10px;max-height:360px;overflow:auto;">
@@ -1380,9 +1380,16 @@
         </div>
       </div>
       <div class="coach-modes">
-        <span class="mode-chip">Code Question</span><span class="mode-chip">ADA / Accessibility</span><span class="mode-chip">Detail Question</span>
-        <span class="mode-chip">Construction Question</span><span class="mode-chip">Material Question</span><span class="mode-chip">Revit Question</span>
-        <span class="mode-chip">Find a Firm</span><span class="mode-chip">Find a Project</span>
+        <span class="mode-chip">Code Question · 5–10 cr</span><span class="mode-chip">ADA / Accessibility · 5–10 cr</span><span class="mode-chip">Detail Question · 25–50 cr</span>
+        <span class="mode-chip">Plan Analysis · 20–40 cr</span><span class="mode-chip">Space Planning · 30–75 cr</span><span class="mode-chip">Compliance Report · 50–100 cr</span>
+        <span class="mode-chip">3D Detail · +25 cr</span><span class="mode-chip">Hologram Detail · +50 cr</span>
+      </div>
+      <div style="margin-top:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+        <label class="disclaimer" for="arch-coach-location" style="margin:0;">Project location</label>
+        <input id="arch-coach-location" placeholder="City, State / Country (when relevant)" style="min-width:260px;flex:1;border-radius:10px;border:1px solid rgba(255,255,255,.18);padding:10px 12px;background:rgba(4,15,28,.72);color:#fff;">
+        <select id="arch-coach-visual" style="border-radius:10px;border:1px solid rgba(255,255,255,.18);padding:10px 12px;background:#071523;color:#fff;">
+          <option value="standard">Standard answer</option><option value="drawing">Original drawing/detail</option><option value="3d">3D explanation (+25 credits)</option><option value="hologram">Hologram-style detail (+50 credits)</option>
+        </select>
       </div>
       <p class="disclaimer" style="margin-top:20px;max-width:640px;">Arch Coach assists with review and research. It is not a licensed architect, engineer of record, code official, or AHJ — final interpretation, professional responsibility and AHJ approval remain with the appropriate licensed professionals.</p>
 
@@ -1804,7 +1811,7 @@
 <details class="qa-item"><summary>Does DrawUp make drawings permit-ready?</summary><p>No. DrawUp does not certify, stamp, seal, approve or guarantee drawings as permit-ready, code-compliant or construction-ready. The responsible design team and applicable licensed professionals make final determinations.</p></details>
 <details class="qa-item"><summary>Who makes the final design decision?</summary><p>You do. DrawUp can provide observations, options and recommendations, but design authorship and final aesthetic, technical and project decisions remain with the user and responsible design professionals.</p></details>
 <details class="qa-item"><summary>Are my AEC Arch Coach conversations private?</summary><p>DrawUp is designed so your private project conversations are not publicly visible to other users. Access and handling remain subject to the Privacy Policy, security controls, legal requirements and service providers needed to operate the platform.</p></details>
-<details class="qa-item"><summary>What are Arch Coach credits?</summary><p>Credits meter AI usage. Standard text questions currently use 4 credits. Explore accounts receive 10 free standard questions with no card required; paid plans include monthly credit allowances and may offer additional credit purchases.</p></details>
+<details class="qa-item"><summary>What are Arch Coach credits?</summary><p>Credits meter AI usage by workload. Visitors receive 10 guest questions; signed-up Explore accounts receive 50 credits. Basic questions generally use 2–5 credits, code/ADA questions 5–10, and heavier plan, detail, compliance, rendering and document workflows use more. DrawUp displays estimated usage before heavier actions.</p></details>
 <details class="qa-item"><summary>Can I cancel a paid subscription?</summary><p>Yes. You may cancel at any time. Unless otherwise required by law or stated at purchase, cancellation stops renewal and access continues through the end of the already-paid billing period.</p></details>
 </div></div></section>
 
@@ -1845,21 +1852,33 @@
   <div class="page-head wrap">
     <span class="eyebrow">Pricing</span>
     <h1>Try Arch Coach free. Upgrade when you need more.</h1>
-    <p>Start with 10 Arch Coach questions free — no card required. Paid memberships include larger monthly credit pools, and additional credits can be purchased anytime. Standard Arch Coach questions use 4 credits each.</p>
+    <p>Start with 10 guest questions before signup. A free Explore account includes 50 credits. Credits scale with the work: quick questions use a few credits, while plan analysis, generated details, compliance reports and visual generations use more. Arch Coach shows the estimated credit cost before heavier actions.</p>
   </div>
   <div class="wrap">
     <div class="price-grid">
-      <div class="price-card" style="--c:var(--blue)"><h3>Explore</h3><div class="price-num">$0</div><p><strong>10 Arch Coach questions free.</strong> No card required. Includes Firm Search, Project Search, Who Designed It and basic Discover access.</p></div>
-      <div class="price-card" style="--c:var(--holo-blue)"><h3>Arch Coach</h3><div class="price-num">$8.20<span>/mo</span></div><p><strong>100 credits/month</strong> — up to 25 standard questions at 4 credits each. Arch Coach chat access with the option to buy more credits anytime.</p></div>
-      <div class="price-card" style="--c:var(--holo-purple)"><h3>Student</h3><div class="price-num">$10<span>/mo</span></div><p><strong>500 credits/month</strong> — up to 125 standard questions, plus Architecture + Interior Design Portfolio Checks, small PDF uploads, student feedback and recommendations.</p></div>
-      <div class="price-card featured" style="--c:var(--orange)"><h3>Emerging</h3><div class="price-num">$19<span>/mo</span></div><p><strong>1,200 credits/month</strong> — up to 300 standard questions, plus Arch Coach Pro, full AEC Chat, Project Threads, DrawUp Check and monthly Swap access.</p></div>
+      <div class="price-card" style="--c:var(--blue)"><h3>Explore</h3><div class="price-num">$0</div><p><strong>50 credits when you create a free account.</strong> Visitors can try 10 guest questions before signup. Includes Firm Search, Project Search, Who Designed It and basic Discover access.</p></div>
+      <div class="price-card" style="--c:var(--holo-blue)"><h3>Arch Coach</h3><div class="price-num">$8.20<span>/mo</span></div><p><strong>300 credits/month</strong> for everyday AEC questions, code research and detail guidance. Buy additional credits anytime.</p></div>
+      <div class="price-card" style="--c:var(--holo-purple)"><h3>Student</h3><div class="price-num">$10<span>/mo</span></div><p><strong>750 credits/month</strong>, plus Architecture + Interior Design Portfolio Checks, PDF review, detail guidance, code learning and student feedback.</p></div>
+      <div class="price-card featured" style="--c:var(--orange)"><h3>Emerging</h3><div class="price-num">$19<span>/mo</span></div><p><strong>2,000 credits/month</strong> for heavier professional workflows, plus Arch Coach Pro, AEC Chat, Project Threads, DrawUp Check and monthly Swap access.</p></div>
       <div class="price-card" style="--c:var(--blue-deep)"><h3>Firms</h3><div class="price-num">from $49<span>/mo</span></div><p>Shared team credit pools, seats, firm profile tools and expanded DrawUp access. Additional credits can be purchased anytime.</p></div>
+    </div>
+    <div class="section-head" style="margin-top:36px;"><h2>How credits work</h2><p>Arch Coach estimates the charge before heavier work. Final usage can vary with document size and generation complexity.</p></div>
+    <div class="detail-grid">
+      <div class="detail-card"><span class="meta">2–5 credits</span><h4>Basic Arch Coach question</h4></div>
+      <div class="detail-card"><span class="meta">5–10 credits</span><h4>Code / ADA question</h4></div>
+      <div class="detail-card"><span class="meta">20–40 credits</span><h4>Analyze uploaded plan</h4></div>
+      <div class="detail-card"><span class="meta">30–75 credits</span><h4>Space-planning generation</h4></div>
+      <div class="detail-card"><span class="meta">25–50 credits</span><h4>Detail generation</h4></div>
+      <div class="detail-card"><span class="meta">50–100 credits</span><h4>Code-compliance report</h4></div>
+      <div class="detail-card"><span class="meta">75–150 credits</span><h4>Photoreal render</h4></div>
+      <div class="detail-card"><span class="meta">100–250 credits</span><h4>Large drawing / document analysis</h4></div>
+      <div class="detail-card"><span class="meta">+25 / +50 credits</span><h4>3D explanation / hologram-style detail</h4></div>
     </div>
     <div class="section-head" style="margin-top:36px;"><h2>Firm plans</h2></div>
     <div class="firm-tier-grid">
       <div class="price-card" style="--c:var(--blue)"><h3>Firm Free</h3><div class="price-num">$0</div><p>Basic profile, logo, Firm Search presence, claim profile.</p></div>
-      <div class="price-card" style="--c:var(--yellow)"><h3>Showcase</h3><div class="price-num">$49<span>/mo</span></div><p><strong>3,000 shared credits/month</strong>, featured projects, 3 seats, Arch Coach Pro and shared Swap access.</p></div>
-      <div class="price-card" style="--c:var(--orange)"><h3>Pro</h3><div class="price-num">$99<span>/mo</span></div><p><strong>7,500 shared credits/month</strong>, more seats, advanced analytics, priority profile tools and expanded team Arch Coach access.</p></div>
+      <div class="price-card" style="--c:var(--yellow)"><h3>Showcase</h3><div class="price-num">$49<span>/mo</span></div><p><strong>5,000 shared credits/month</strong>, featured projects, 3 seats, Arch Coach Pro and shared Swap access.</p></div>
+      <div class="price-card" style="--c:var(--orange)"><h3>Pro</h3><div class="price-num">$99<span>/mo</span></div><p><strong>12,000 shared credits/month</strong>, more seats, advanced analytics, priority profile tools and expanded team Arch Coach access.</p></div>
     </div>
   </div>
 </section>
@@ -2158,7 +2177,7 @@ document.querySelectorAll('.portfolio-submit').forEach(btn => {
  async function init(){try{const cfg=await fetch('/api/supabase-config',{cache:'no-store'}).then(r=>r.json());if(!cfg.url||!cfg.key||!window.supabase)throw new Error('Supabase site keys are not configured yet.');client=window.supabase.createClient(cfg.url,cfg.key);}catch(e){$('arch-coach-status').textContent=e.message;}}
  async function session(){if(!client)throw new Error('Arch Coach is still connecting. Try again.');let r=await client.auth.getSession();if(r.data.session)return r.data.session;r=await client.auth.signInAnonymously();if(r.error)throw new Error('Enable Anonymous Sign-Ins in Supabase Auth settings for the free trial.');return r.data.session;}
  function bubble(kind,text){const box=$('arch-coach-messages'),d=document.createElement('div'),w=document.createElement('span');d.className='bubble '+(kind==='user'?'user':'coach');w.className='who';w.textContent=kind==='user'?'You':'Arch Coach';d.append(w,document.createTextNode(text));box.appendChild(d);box.scrollTop=box.scrollHeight;}
- async function send(){const input=$('arch-coach-input'),btn=$('arch-coach-send'),st=$('arch-coach-status'),message=input.value.trim();if(!message){input.focus();return;}btn.disabled=true;st.textContent='Arch Coach is thinking…';bubble('user',message);input.value='';try{const ses=await session();const r=await client.functions.invoke('arch-coach',{body:{message},headers:{Authorization:'Bearer '+ses.access_token}});if(r.error)throw r.error;if(r.data?.error)throw new Error(r.data.error);const answer=r.data?.answer||r.data?.response||r.data?.message||r.data?.output_text||'Response received.';bubble('coach',answer);if(Number.isInteger(r.data?.free_questions_remaining)){$('coach-free-count').textContent=r.data.free_questions_remaining+' free questions remaining · no card required';st.textContent='Free trial · '+r.data.free_questions_remaining+' questions remaining.';}else if(Number.isInteger(r.data?.credits_remaining))st.textContent=r.data.credits_remaining+' credits remaining.';else st.textContent='Arch Coach is ready.';}catch(e){bubble('coach',e.message||'Something went wrong.');st.textContent=e.message||'Something went wrong.';}finally{btn.disabled=false;input.focus();}}
+ async function send(){const input=$('arch-coach-input'),btn=$('arch-coach-send'),st=$('arch-coach-status'),message=input.value.trim();if(!message){input.focus();return;}const location=$('arch-coach-location')?.value.trim()||'';const visual_mode=$('arch-coach-visual')?.value||'standard';btn.disabled=true;st.textContent='Arch Coach is thinking…';bubble('user',message);input.value='';const locationTimer=setTimeout(()=>{if(!location)st.textContent='Still drawing it up… If this is code, ADA, zoning or jurisdiction-specific, add your project city/state or country so Coach can check the right path.';},2500);try{const ses=await session();const r=await client.functions.invoke('arch-coach',{body:{message,location,visual_mode},headers:{Authorization:'Bearer '+ses.access_token}});clearTimeout(locationTimer);if(r.error)throw r.error;if(r.data?.error)throw new Error(r.data.error);const answer=r.data?.answer||r.data?.response||r.data?.message||r.data?.output_text||'Response received.';bubble('coach',answer);if(r.data?.image_base64){const img=document.createElement('img');img.src='data:image/png;base64,'+r.data.image_base64;img.alt='Original Arch Coach visual detail';img.style='width:100%;max-width:640px;margin-top:10px;border-radius:16px;border:1px solid rgba(255,255,255,.18)';$('arch-coach-messages').appendChild(img);$('arch-coach-messages').scrollTop=$('arch-coach-messages').scrollHeight;}if(Number.isInteger(r.data?.free_questions_remaining)){$('coach-free-count').textContent=r.data.free_questions_remaining+' guest questions remaining · no card required';st.textContent='Guest access · '+r.data.free_questions_remaining+' questions remaining.';}else if(Number.isInteger(r.data?.credits_remaining))st.textContent=(r.data.credits_charged? r.data.credits_charged+' credits used · ':'')+r.data.credits_remaining+' credits remaining.';else st.textContent='Arch Coach is ready.';}catch(e){bubble('coach',e.message||'Something went wrong.');st.textContent=e.message||'Something went wrong.';}finally{clearTimeout(locationTimer);btn.disabled=false;input.focus();}}
  document.addEventListener('DOMContentLoaded',()=>{init();$('drawup-signin')?.addEventListener('click',e=>{e.preventDefault();showAuth('signin')});document.querySelectorAll('.join-preseason').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();showAuth('signup')}));$('auth-close')?.addEventListener('click',hideAuth);$('auth-backdrop')?.addEventListener('click',hideAuth);$('auth-switch')?.addEventListener('click',()=>showAuth(authMode==='signin'?'signup':'signin'));$('auth-submit')?.addEventListener('click',async()=>{if(!client)return;const email=$('auth-email').value.trim(),password=$('auth-password').value;$('auth-status').textContent='Working…';const r=authMode==='signup'?await client.auth.signUp({email,password}):await client.auth.signInWithPassword({email,password});if(r.error){$('auth-status').textContent=r.error.message;return;}$('auth-status').textContent=r.data.session?'Success.':'Check your email to confirm your account.';if(r.data.session)setTimeout(hideAuth,300);});$('arch-coach-send')?.addEventListener('click',send);$('arch-coach-input')?.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}});$('coach-free-question')?.addEventListener('click',()=>$('arch-coach-input')?.focus());});
 })();
 

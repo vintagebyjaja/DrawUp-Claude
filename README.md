@@ -126,3 +126,17 @@ The Arch Coach page now connects authenticated DrawUp users to the deployed Supa
 
 ## V11 visual update
 Season 1 countdown court now uses the balanced DrawUp hologram palette (cyan, mint, peach/orange, lavender) with continuous float, pulse, scan, electric sweep, glow, and subtle motion effects. No animation-detail labels are shown in the UI.
+
+## V11 Arch Coach credit + AEC reference update
+- Visitors: 10 guest questions before signup.
+- Free Explore account: 50 starter credits.
+- Arch Coach $8.20: 300 credits/month.
+- Student $10: 750 credits/month.
+- Emerging $19: 2,000 credits/month.
+- Firm Showcase $49: 5,000 shared credits/month.
+- Firm Pro $99: 12,000 shared credits/month.
+- Workload pricing is shown on the Pricing page: basic 2–5, code/ADA 5–10, plan analysis 20–40, space planning 30–75, details 25–50, compliance report 50–100, photoreal 75–150, large drawing/document analysis 100–250 credits.
+- Optional visual upgrades: 3D explanation +25 credits; hologram-style detail +50 credits.
+- Run `supabase/migrations/0013_arch_coach_v11_credits.sql` once.
+- Deploy `supabase/functions/arch-coach/index.ts` as the updated `arch-coach` Edge Function.
+- The Edge Function asks for project location before jurisdiction-sensitive answers, uses OpenAI Responses web search for current source research, prioritizes ICC/AHJ/official ADA sources, and can request an original 3D/hologram visual. It does not bundle or reproduce copyrighted Ching PDFs; user-authorized uploads can be analyzed, and Ching/Wiley can be referenced educationally.

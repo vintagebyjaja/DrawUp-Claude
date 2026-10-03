@@ -1,0 +1,16 @@
+DRAWUP V11 — ARCH COACH UPDATE
+
+1. Upload this project to the SAME DrawUp GitHub repo.
+2. In Supabase SQL Editor, run once: supabase/migrations/0013_arch_coach_v11_credits.sql
+3. In Supabase Edge Functions > arch-coach > Code, replace index.ts with: supabase/functions/arch-coach/index.ts
+4. Deploy the arch-coach Edge Function.
+5. Keep OPENAI_API_KEY in Supabase Edge Function Secrets. Never place it in GitHub.
+
+Notes:
+- 10 guest questions remain for anonymous visitors.
+- Signed-up Explore accounts get 50 starter credits.
+- Current pricing page explains variable workload credits.
+- Jurisdiction-sensitive questions request project location.
+- Code research prioritizes official ICC/AHJ/ADA sources and verifies edition/section before claiming a requirement.
+- Ching/Wiley works are educational references only; no unauthorized copyrighted PDFs or copied figures are bundled.
+- 3D/hologram visual modes are optional credit upgrades.
