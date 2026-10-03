@@ -36,6 +36,7 @@ function classify(message:string, visual:string){
 function needsLocation(message:string){return /\bibc\b|\bicc\b|\bada\b|accessib|building code|zoning|egress|occupancy|permit|fire rating|structural|wind|snow|seismic|climate/.test(message.toLowerCase());}
 
 Deno.serve(async(req)=>{
+  let refundAdmin:any=null, refundUserId:string|null=null, refundAnonymous=false, refundMonthly=0, refundPurchased=0, refundAction='failed_request', reservationMade=false;
   if(req.method==='OPTIONS') return new Response('ok',{headers:cors});
   try{
     console.log('[arch-coach] request start');
@@ -46,7 +47,7 @@ Deno.serve(async(req)=>{
     const auth=req.headers.get('Authorization')||'';
     const token=auth.replace(/^Bearer\s+/i,'');
     if(!token) return json({error:'Please start a DrawUp session.'},401);
-    const admin=createClient(supabaseUrl,serviceKey,{auth:{persistSession:false}});
+    const admin=createClient(supabaseUrl,serviceKey,{auth:{persistSession:false}}); refundAdmin=admin;
     const {data:{user},error:userError}=await admin.auth.getUser(token);
     if(userError||!user) return json({error:'Your DrawUp session could not be verified.'},401);
     const body=await req.json();
@@ -60,24 +61,24 @@ Deno.serve(async(req)=>{
     }
 
     const {action,cost}=classify(message,visual);
-    const isAnonymous=Boolean((user as any).is_anonymous);
+    const isAnonymous=Boolean((user as any).is_anonymous); refundUserId=user.id; refundAnonymous=isAnonymous;
     if(isAnonymous && (visual==='3d'||visual==='hologram')) return json({error:'Create a free Explore account to use 3D or hologram detail generation. Your free account starts with 50 credits.'},402);
 
     console.log('[arch-coach] reserve',{user:user.id,isAnonymous,action,cost});
     const {data:access,error:accessError}=await admin.rpc('reserve_arch_coach_v11_access',{p_user_id:user.id,p_is_anonymous:isAnonymous,p_cost:cost,p_action:action,p_thread_id:null});
     if(accessError) throw new Error('Credit reservation failed: '+accessError.message);
-    if(!access?.ok) return json({error:access?.code==='INSUFFICIENT_CREDITS'?`This action needs about ${cost} credits. You have ${access?.credits_remaining??0}.`:'Your free Arch Coach allowance has been used.',...access},402);
+    if(!access?.ok) return json({error:access?.code==='INSUFFICIENT_CREDITS'?`This action needs about ${cost} credits. You have ${access?.credits_remaining??0}.`:'Your free Arch Coach allowance has been used.',...access},402); reservationMade=true; refundMonthly=Number(access?.monthly_used||0); refundPurchased=Number(access?.purchased_used||0); refundAction=action;
 
     const userText=`Project location: ${location||'not provided'}\nRequested visual mode: ${visual}\nEstimated DrawUp action: ${action}\n\nUser question: ${message}`;
     const tools:any[]=[{type:'web_search'}];
     if(visual==='3d'||visual==='hologram') tools.push({type:'image_generation'});
     console.log('[arch-coach] OpenAI request',{action,visual});
-    const ai=await fetch('https://api.openai.com/v1/responses',{method:'POST',headers:{Authorization:`Bearer ${openaiKey}`,'Content-Type':'application/json'},body:JSON.stringify({model:Deno.env.get('OPENAI_MODEL')||'gpt-5.6-sol',instructions:SYSTEM_PROMPT,input:userText,tools})});
+    const ai=await fetch('https://api.openai.com/v1/responses',{method:'POST',headers:{Authorization:`Bearer ${openaiKey}`,'Content-Type':'application/json'},body:JSON.stringify({model:Deno.env.get('OPENAI_MODEL')||'gpt-5',instructions:SYSTEM_PROMPT,input:userText,tools})});
     const payload=await ai.json();
     if(!ai.ok){console.error('[arch-coach] OpenAI error',payload);throw new Error(payload?.error?.message||'OpenAI request failed.');}
     const answer=payload.output_text||payload.output?.filter((x:any)=>x.type==='message').flatMap((x:any)=>x.content||[]).filter((x:any)=>x.type==='output_text').map((x:any)=>x.text).join('\n')||'Arch Coach completed the request.';
     const imageCall=payload.output?.find((x:any)=>x.type==='image_generation_call');
     console.log('[arch-coach] success',{action,cost});
     return json({answer,image_base64:imageCall?.result||null,action,estimated_cost:cost,...access});
-  }catch(err){console.error('[arch-coach] fatal',err);return json({error:err instanceof Error?err.message:String(err),stage:'arch-coach-v11'},500);}
+  }catch(err){console.error('[arch-coach] fatal',err);if(reservationMade&&refundAdmin&&refundUserId){try{await refundAdmin.rpc('refund_arch_coach_v13_access',{p_user_id:refundUserId,p_is_anonymous:refundAnonymous,p_monthly_used:refundMonthly,p_purchased_used:refundPurchased,p_action:refundAction});console.log('[arch-coach] reservation refunded',{action:refundAction});}catch(refundErr){console.error('[arch-coach] refund failed',refundErr);}}return json({error:'Arch Coach hit a connection issue. Your DrawUp allowance was not charged. Please try again.',code:'COACH_TEMPORARILY_UNAVAILABLE'},503);}
 });
