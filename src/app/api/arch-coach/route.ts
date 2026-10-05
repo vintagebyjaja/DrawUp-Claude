@@ -42,6 +42,7 @@ export async function POST(request: Request) {
     const body = await request.json();
     const message = String(body?.message || '').trim();
     const location = String(body?.location || '').trim();
+    const image = typeof body?.image === 'string' && /^data:image\/(png|jpeg|webp);base64,/.test(body.image) ? body.image : '';
     const history = (Array.isArray(body?.history) ? body.history : [])
       .filter((x: any) => (x?.role === 'user' || x?.role === 'assistant') && typeof x?.content === 'string')
       .slice(-16) as ChatTurn[];
@@ -61,7 +62,7 @@ export async function POST(request: Request) {
     let lastError = 'Arch Coach request failed.';
 
     for (const model of models) {
-      const payload: any = { model, input };
+      const payload: any = image ? { model, input: [{ role: 'user', content: [{ type: 'input_text', text: input }, { type: 'input_image', image_url: image }] }] } : { model, input };
       if (research) payload.tools = [{ type: 'web_search' }];
       const response = await fetch('https://api.openai.com/v1/responses', {
         method: 'POST',
