@@ -48,24 +48,22 @@ export async function POST(request: Request) {
       .slice(-16) as ChatTurn[];
     if (!message) return NextResponse.json({ error: 'Message required.' }, { status: 400 });
 
-    const fullConversation = [...history.map(x=>x.content), message].join(' ');
-    const jurisdictionQuestion = /\b(zoning|udo|building code|ibc|ada|accessib|permit|ordinance|jurisdiction|occupancy|egress|fire code|energy code|setback|parking requirement|code compliance)\b/i.test(fullConversation);
-    const explicitPlace = /\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*,\s*(?:[A-Z]{2}|[A-Za-z]{4,})\b/.test(fullConversation) || /\b(Charlotte|Atlanta|Raleigh|Greensboro|Durham|New York|Los Angeles|Chicago|Miami|Houston|Dallas|Seattle|Boston|Philadelphia|Washington)\b/i.test(fullConversation);
-    if (jurisdictionQuestion && !explicitPlace && !location) {
-      return NextResponse.json({ answer: 'What city and state/province is the project in? I need the project jurisdiction before I give you the code, accessibility, egress, zoning, or permitting answer.', needs_location: true, sources: [] });
-    }
-
     const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) return NextResponse.json({ error: 'Arch Coach is not connected to the server AI key.' }, { status: 503 });
 
     const transcript = history.map(t => `${t.role === 'user' ? 'USER' : 'ARCH COACH'}: ${t.content}`).join('\n');
     const combined = `${transcript}\nPROJECT LOCATION FIELD: ${location || '(not separately supplied)'}`;
     const research = needsCurrentResearch(combined);
+    const jurisdictionSpecific = /\b(zoning|udo|building code|ibc|ada|permit|ordinance|jurisdiction|occupancy|egress|fire code|energy code|setback|parking requirement)\b/i.test(combined);
+    const locationClue = Boolean(location) || /\b(?:in|at|for)\s+[A-Z][A-Za-z .'-]{2,}(?:,\s*[A-Z]{2})?\b/.test(transcript) || /\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*,\s*[A-Z]{2}\b/.test(transcript);
+    if (jurisdictionSpecific && !locationClue) {
+      return NextResponse.json({ answer: 'Where is the project located (city, state/province, and country)? I need the project jurisdiction before I give you a zoning, code, accessibility, egress, or permitting answer.', sources: [], needs_location: true, researched: false });
+    }
     const instructions = `You are Arch Coach, DrawUp's AEC copilot. Be useful, concise, professional, and practical. Preserve context from the entire conversation. Never ask for information the user already supplied in the conversation. If a user gives a location as a follow-up, connect it to the earlier question automatically. For jurisdiction-specific zoning, code, ADA, permitting, standards, firms, projects, products, or other current facts, research current sources and answer from them. Prefer official government/AHJ/code/institutional sources first, then authoritative AEC sources. Clearly distinguish a binding requirement from guidance or a recommendation. Do not claim a design is code compliant; note that final interpretation/approval belongs to the applicable licensed professionals and AHJ when relevant. Do not tell the user to Google something. Answer the question first, then give the useful details. Do not mention internal model names, API keys, credits, or implementation details.`;
 
     const input = `${instructions}\n\nCONVERSATION:\n${transcript || `USER: ${message}`}\n${location ? `\nPROJECT LOCATION: ${location}` : ''}\n\nRespond to the user's latest message in context.`;
     const configured = process.env.DRAWUP_COACH_MODEL || process.env.DRAWUP_SEARCH_MODEL;
-    const models = [...new Set([configured, process.env.DRAWUP_SEARCH_MODEL, 'gpt-6-luna', 'gpt-5.6-sol'].filter(Boolean))] as string[];
+    const models = [...new Set([configured, 'gpt-5.6-sol', 'gpt-5'].filter(Boolean))] as string[];
     let lastError = 'Arch Coach request failed.';
 
     for (const model of models) {
