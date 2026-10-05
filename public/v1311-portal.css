@@ -78,3 +78,5 @@ html,body{max-width:100%;overflow-x:hidden}
 
 /* V16 account identity */
 .du-account-email{margin:18px 0 22px}.du-account-email input[readonly]{background:rgba(7,25,43,.07)!important;color:#334a62!important;cursor:not-allowed}.du-click-edit{cursor:pointer}.du-click-edit:hover{transform:translateY(-1px);border-color:rgba(98,215,255,.55)!important}
+/* V16.2 project imagery */
+.du-search-project-hero{padding:0!important;overflow:hidden;min-height:260px}.du-search-project-hero img{display:block;width:100%;max-height:620px;object-fit:cover}.du-live-project-image{min-height:210px;background-color:#0a1a2b;background-repeat:no-repeat}.recent-project-card .du-live-project-image{width:100%}

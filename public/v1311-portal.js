@@ -154,6 +154,7 @@ function duCoachKey(){return 'drawup_coach_threads_'+(currentUser?.id||'guest')}
 function duThreads(){try{return JSON.parse(localStorage.getItem(duCoachKey())||'[]')}catch(e){return[]}}
 function duSaveThreads(v){localStorage.setItem(duCoachKey(),JSON.stringify(v.slice(0,30)))}
 function duCoach(w){let threads=duThreads(),active=threads[0]||{id:Date.now().toString(),title:'New play',messages:[]};if(!threads.length){threads=[active];duSaveThreads(threads)};const draw=()=>{w.innerHTML=`<div class="du-coach-shell"><aside class="du-coach-threads"><button class="du-btn primary" id="dc-new">＋ New play</button><div class="du-coach-thread-list">${threads.map(t=>`<button data-thread="${t.id}" class="${t.id===active.id?'active':''}"><b>${esc(t.title||'New play')}</b><small>${t.messages?.length||0} messages</small></button>`).join('')}</div></aside><section class="du-coach-main"><div class="du-work-head"><div><span class="du-kicker">ARCH COACH</span><h1>${esc(active.title||'New play')}</h1><p>Your AEC copilot — research, compare, visualize and keep each question in its own thread.</p></div></div><div class="du-coach-tools"><button data-portal-tab="search">⌕ Search</button><button data-portal-tab="discover">◈ Compare schools</button><button data-portal-tab="connect">∞ Compare firms</button><button id="dc-play">◇ Let’s Play</button><label>＋ Graphic<input id="dc-image" type="file" accept="image/*" hidden></label></div><div id="dc-messages" class="du-coach-messages">${active.messages.length?active.messages.map(m=>`<article class="${m.role}"><span>${m.role==='user'?'YOU':'ARCH COACH'}</span><p>${esc(m.content)}</p>${m.image?`<img src="${m.image}" alt="Attached graphic">`:''}${m.sources?.length?`<div class="du-coach-sources">${m.sources.map(s=>`<a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.title||'Source')} ↗</a>`).join('')}</div>`:''}</article>`).join(''):'<div class="du-coach-empty"><b>What are we drawing up?</b><p>Start a question, research a code, compare a firm or school, or pull in a graphic.</p></div>'}</div><div id="dc-preview"></div><form id="dc-form" class="du-coach-compose"><textarea id="dc-input" rows="3" placeholder="Ask Arch Coach…"></textarea><button class="du-btn primary">Send</button></form><div id="dc-status" class="du-muted"></div></section></div>`;bind()};let pendingImage='';const bind=()=>{w.querySelector('#dc-new').onclick=()=>{active={id:Date.now().toString(),title:'New play',messages:[]};threads.unshift(active);duSaveThreads(threads);draw()};w.querySelectorAll('[data-thread]').forEach(b=>b.onclick=()=>{active=threads.find(t=>t.id===b.dataset.thread)||active;draw()});w.querySelector('#dc-play').onclick=()=>openPortalTab('projects');const fi=w.querySelector('#dc-image');fi.onchange=()=>{const f=fi.files?.[0];if(!f)return;const r=new FileReader();r.onload=()=>{pendingImage=String(r.result);w.querySelector('#dc-preview').innerHTML=`<div class="du-coach-preview"><img src="${pendingImage}"><span>${esc(f.name)}</span></div>`};r.readAsDataURL(f)};w.querySelector('#dc-form').onsubmit=async e=>{e.preventDefault();const inp=w.querySelector('#dc-input'),text=inp.value.trim();if(!text&&!pendingImage)return;const user={role:'user',content:text||'Review this graphic.',image:pendingImage||undefined};active.messages.push(user);if(active.title==='New play')active.title=(text||'Graphic review').slice(0,42);inp.value='';const img=pendingImage;pendingImage='';duSaveThreads(threads);draw();const st=w.querySelector('#dc-status');st.textContent='Arch Coach is drawing it up…';try{const history=active.messages.map(x=>({role:x.role,content:x.content}));const r=await fetch('/api/arch-coach',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:user.content,history,image:img,location:currentProfile?.current_location||''})});const d=await r.json();if(!r.ok)throw new Error(d.error||'Connection issue');active.messages.push({role:'assistant',content:d.answer,sources:d.sources||[]});duSaveThreads(threads);draw()}catch(err){st.textContent=err.message||'Connection issue'}}};draw()}
+window.duCoachNative=duCoach;
 const prevOpen=openPortalTab;openPortalTab=async function(tab='dashboard'){if(tab==='arch-coach'){duRestoreEmbedded?.();document.querySelectorAll('[data-portal-tab]').forEach(x=>x.classList.toggle('active',x.dataset.portalTab===tab));const w=$('du-workspace-content');duCoach(w);return}return prevOpen(tab)};
 })();
 
@@ -216,4 +217,97 @@ function starterDetailCard(d){return `<article class="du-glass du-starter-detail
 window.duStarterProject=function(w){w.innerHTML=`<div class="du-work-head"><div><span class="du-kicker">DRAWUP STARTER PROJECT</span><h1>${DU_STARTER.name}</h1><p>One project that teaches the full DrawUp workflow. The original AI image is preserved only as the Step 1 learning source.</p></div><span class="du-live-pill">EXAMPLE · NOT DEMO</span></div><div class="du-starter-steps"><button class="active" data-step="1"><b>01</b><span>Find the flaws</span></button><button data-step="2"><b>02</b><span>Understand the fix</span></button><button data-step="3"><b>03</b><span>DrawUp Ready</span></button></div><div id="du-starter-stage"></div>`;const stage=w.querySelector('#du-starter-stage');const show=n=>{w.querySelectorAll('[data-step]').forEach(b=>b.classList.toggle('active',b.dataset.step==n));if(n==1)stage.innerHTML=`<div class="du-starter-split"><article class="du-glass"><span class="du-kicker">AI GENERATED SOURCE</span><h2>Looks plausible. Is it coordinated?</h2><img class="du-ai-source" src="/starter-athletic-storage/01-ai-generated-source.png" alt="AI-generated athletic storage drawing example"></article><div class="du-flaw-list">${DU_FLAWS.map((f,i)=>`<article class="du-glass"><b>${String(i+1).padStart(2,'0')} · ${esc(f[0])}</b><p>${esc(f[1])}</p></article>`).join('')}</div></div>`;else if(n==2)stage.innerHTML=`<article class="du-glass du-wide"><span class="du-kicker">CORRECTED ASSEMBLY</span><h2>Every piece comes from one coordinated building.</h2><p>Step 2 corrects the conflicts identified in Step 1 before teaching the assembly. Foundation, floor, walls, openings, roof and connections are treated as one system.</p><img class="du-holo-assembly" src="/starter-athletic-storage/02-corrected-hologram.svg" alt="Corrected exploded holographic building assembly"><div class="du-assembly-pills">${['Foundation / Support','Floor System','Wall Framing','Headers + Openings','Sheathing + Envelope','Roof Assembly','Connections + Load Path'].map(x=>`<button>${x}</button>`).join('')}</div></article>`;else stage.innerHTML=`<div class="du-section-title"><div><span class="du-kicker">DRAWUP READY</span><h2>Coordinated sheet set</h2><p>Black-and-white documentation with DrawUp titleblocks, scales, callouts and cross-references. Typical learning content — project-specific verification is still required.</p></div></div><div class="du-sheet-grid">${DU_SHEETS.map(s=>`<article class="du-glass"><img src="${s[2]}" alt="${s[1]}"><span class="du-kicker">${s[0]}</span><h3>${s[1]}</h3><a href="${s[2]}" target="_blank" rel="noopener">Open full sheet ↗</a></article>`).join('')}</div>`};w.querySelectorAll('[data-step]').forEach(b=>b.onclick=()=>show(Number(b.dataset.step)));show(1)};
 const oldProjects=duPortalProjects;duPortalProjects=async function(w){await oldProjects(w);const grid=w.querySelector('.du-v15-project-grid');if(grid&&!grid.querySelector('[data-starter-project]'))grid.insertAdjacentHTML('afterbegin',`<article class="du-glass du-v15-project du-starter-project" data-starter-project><span class="du-kicker">STARTER PROJECT · EXAMPLE</span><h3>${DU_STARTER.name}</h3><p>${DU_STARTER.description}</p><button id="du-open-starter">Open learning project →</button></article>`);w.querySelector('#du-open-starter')?.addEventListener('click',()=>duStarterProject(w));};
 const oldDetails=renderDetails;renderDetails=async function(w){await oldDetails(w);const grid=w.querySelector('#du-detail-grid');if(!grid)return;const dbCards=[...grid.children];if(dbCards.length===1&&grid.textContent.includes('Build the DrawUp detail catalog'))grid.innerHTML='';grid.insertAdjacentHTML('afterbegin',DU_STARTER_DETAILS.map(starterDetailCard).join(''));w.querySelectorAll('[data-cat]').forEach(b=>{const old=b.onclick;b.onclick=()=>{if(old)old();setTimeout(()=>{const g=w.querySelector('#du-detail-grid');const cat=b.dataset.cat;const starter=DU_STARTER_DETAILS.filter(d=>d[0]===cat);if(starter.length)g.insertAdjacentHTML('afterbegin',starter.map(starterDetailCard).join(''))},0)}});w.querySelectorAll('[data-starter-use]').forEach(b=>b.onclick=()=>alert('This is DrawUp typical learning content. Duplicate it into a project, then coordinate dimensions, assemblies, loads, codes and jurisdiction before construction use.'))};
+})();
+
+
+/* DrawUp V16.1 — authoritative Portal router. LAST definition wins. No placeholder workspaces. */
+(function(){
+  const duFinalProfile = renderProfile;
+  window.openPortalTab = openPortalTab = async function(tab='dashboard'){
+    try{duRestoreEmbedded?.()}catch(_e){}
+    document.querySelectorAll('[data-portal-tab]').forEach(x=>x.classList.toggle('active',x.dataset.portalTab===tab));
+    const w=$('du-workspace-content'); if(!w)return;
+    w.innerHTML='<div class="du-loading">DRAWING IT UP…</div>';
+    if(currentUser && (tab==='profile'||tab==='dashboard')){try{const fresh=await loadProfile(currentUser);if(fresh)currentProfile=fresh}catch(_e){}}
+    if(tab==='dashboard') return renderDashboard(w);
+    if(tab==='search') return duPortalSearchV15(w);
+    if(tab==='profile') return duFinalProfile(w);
+    if(tab==='projects') return duPortalProjects(w);
+    if(tab==='arch-coach') return window.duCoachNative ? window.duCoachNative(w) : (w.innerHTML='<article class="du-glass"><h2>Arch Coach connection unavailable.</h2><p>Refresh once after this deployment. If this remains, check the browser console.</p></article>');
+    if(tab==='details') return renderDetails(w);
+    if(tab==='check') return duEmbedPublic(w,'page-check');
+    if(tab==='discover') return duEmbedPublic(w,'page-discover');
+    if(tab==='connect') return duEmbedPublic(w,'page-connect');
+    if(tab==='firm') return renderFirm(w);
+    if(tab==='team') return renderTeam(w);
+    if(tab==='account') return renderAccount(w);
+    return renderDashboard(w);
+  };
+})();
+
+/* DrawUp V16.2 — persistent Portal navigation + visual search previews */
+(function(){
+  const DU_TAB_KEY='drawup_portal_current_tab_v162';
+  const validTabs=new Set(['dashboard','search','profile','projects','arch-coach','check','details','discover','connect','firm','team','account']);
+  function saveTab(tab){try{if(validTabs.has(tab))localStorage.setItem(DU_TAB_KEY,tab)}catch(_e){}}
+  function savedTab(){try{const t=localStorage.getItem(DU_TAB_KEY);return validTabs.has(t)?t:'dashboard'}catch(_e){return'dashboard'}}
+  function researchImage(r){return r?.image||r?.image_url||r?.hero_image||r?.thumbnail||r?.sources?.find?.(s=>s?.image||s?.image_url||s?.thumbnail)?.image||r?.sources?.find?.(s=>s?.image_url)?.image_url||r?.sources?.find?.(s=>s?.thumbnail)?.thumbnail||''}
+  function cacheResearch(query,r){try{const key='drawup_research_'+String(query||r?.title||'').toLowerCase().trim();if(key!=='drawup_research_')localStorage.setItem(key,JSON.stringify({title:r?.title||query,image:researchImage(r),result:r,at:Date.now()}));}catch(_e){}}
+  function cachedResearch(query){try{return JSON.parse(localStorage.getItem('drawup_research_'+String(query||'').toLowerCase().trim())||'null')}catch(_e){return null}}
+  function applyRecentProjectImages(){document.querySelectorAll('.recent-project-card[data-query]').forEach(card=>{const c=cachedResearch(card.dataset.query);const image=c?.image||researchImage(c?.result);if(!image)return;let media=card.querySelector('.proj-img,.project-image,.proj-media');if(!media){media=document.createElement('div');media.className='proj-img du-live-project-image';card.insertBefore(media,card.firstChild)}media.style.backgroundImage=`url("${String(image).replace(/"/g,'%22')}")`;media.style.backgroundSize='cover';media.style.backgroundPosition='center';media.innerHTML='';});}
+  window.DrawUpApplyProjectImages=applyRecentProjectImages;
+  setTimeout(applyRecentProjectImages,0);
+
+  // Search results stay inside the signed-in Portal and show the same project image DrawUp research found.
+  window.duRenderSearchResult=duRenderSearchResult=function(w,r,query){
+    cacheResearch(query,r); applyRecentProjectImages();
+    const hero=researchImage(r);
+    const fields=[['Location',r.location],['Designed by',r.architect],['Engineered by',r.engineers],['Constructed by',r.contractor],['Owner / Developer',r.owner],['Opened',r.opened],['Completed',r.completed],['Area',r.area],['Cost',r.cost],['Capacity',r.capacity]].filter(x=>x[1]);
+    w.innerHTML=`<div class="du-work-head"><div><span class="du-kicker">DRAWUP SEARCH</span><h1>${esc(r.title||query)}</h1><p>${esc([r.type,r.location].filter(Boolean).join(' · ')||'DrawUp research')}</p></div><button class="du-btn ghost" data-portal-tab="search">New search</button></div>
+    ${hero?`<article class="du-glass du-wide du-search-project-hero"><img src="${esc(hero)}" alt="${esc((r.title||query)+' project image')}" loading="eager"></article>`:''}
+    ${r.summary||r.description?`<article class="du-glass du-wide"><h2>Overview</h2><p>${esc(r.summary||r.description)}</p></article>`:''}
+    ${r.answer?`<article class="du-glass du-wide"><h2>DrawUp answer</h2><p class="du-answer">${esc(r.answer)}</p></article>`:''}
+    ${fields.length?`<div class="du-profile-grid">${fields.map(x=>`<article class="du-glass"><span class="du-kicker">${esc(x[0])}</span><h3>${esc(x[1])}</h3></article>`).join('')}</div>`:''}
+    ${Array.isArray(r.design_highlights)&&r.design_highlights.length?`<article class="du-glass du-wide"><h2>AEC highlights</h2><ul>${r.design_highlights.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></article>`:''}
+    ${Array.isArray(r.items)&&r.items.length?`<div class="du-section-title"><h2>Results</h2></div><div class="du-profile-grid">${r.items.map(x=>`<article class="du-glass"><h3>${esc(x.title||'Result')}</h3>${x.subtitle?`<p>${esc(x.subtitle)}</p>`:''}${x.summary?`<p>${esc(x.summary)}</p>`:''}${x.url?`<a href="${esc(x.url)}" target="_blank" rel="noopener">Open source ↗</a>`:''}</article>`).join('')}</div>`:''}
+    ${Array.isArray(r.sources)&&r.sources.length?`<div class="du-section-title"><h2>Sources</h2></div><div class="du-profile-grid">${r.sources.slice(0,8).map(duSourceCard).join('')}</div>`:''}`;
+  };
+
+  window.duPortalSearchV15=duPortalSearchV15=function(w){
+    w.innerHTML=`<div class="du-work-head"><div><span class="du-kicker">DRAWUP SEARCH</span><h1>What are you drawing up?</h1><p>Projects, firms, people, universities, codes, details and resources — without leaving your Portal.</p></div></div><div class="du-search-stage"><div class="du-search-holo"><div class="du-holo-model"><i></i><i></i><i></i><b>DU</b></div></div><form id="du-v15-search" class="du-search-box"><input id="du-v15-q" type="search" placeholder="Search a project, building, firm, person, school, code or detail…" autocomplete="off"><button class="du-btn primary">Search DrawUp →</button></form><div class="du-search-types">${['Projects','Firms','People','Universities','Codes','Details','Resources'].map(x=>`<button type="button" data-v15-type="${x}">${x}</button>`).join('')}</div><div id="du-v156-search-status"></div></div>`;
+    const f=w.querySelector('#du-v15-search'),q=w.querySelector('#du-v15-q'),st=w.querySelector('#du-v156-search-status');
+    f.onsubmit=async e=>{e.preventDefault();const term=q.value.trim();if(!term)return;saveTab('search');st.innerHTML='<div class="du-loading">SEARCHING · FINDING · ASSEMBLING…</div>';try{const res=await fetch('/api/project-research',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query:term,type:'all'})});const data=await res.json().catch(()=>({}));if(!res.ok||!data?.result)throw new Error(data?.error||'Search unavailable');duRenderSearchResult(w,data.result,term)}catch(err){st.innerHTML=`<article class="du-glass"><h2>Search connection issue</h2><p>${esc(err.message||'Please try again.')}</p></article>`}};
+    w.querySelectorAll('[data-v15-type]').forEach(b=>b.onclick=()=>{q.value=b.dataset.v15Type+' ';q.focus()});
+  };
+
+  // Final routing authority: never leave the Portal for a Portal tab.
+  const priorRouter=openPortalTab;
+  window.openPortalTab=openPortalTab=async function(tab='dashboard'){
+    if(!validTabs.has(tab))tab='dashboard'; saveTab(tab);
+    try{history.replaceState({drawupPortal:true,tab},'', '#portal')}catch(_e){}
+    duRestoreEmbedded?.();
+    document.querySelectorAll('[data-portal-tab]').forEach(x=>x.classList.toggle('active',x.dataset.portalTab===tab));
+    const w=$('du-workspace-content'); if(!w)return; w.innerHTML='<div class="du-loading">DRAWING IT UP…</div>';
+    if(currentUser&&(tab==='profile'||tab==='dashboard')){try{const fresh=await loadProfile(currentUser);if(fresh)currentProfile=fresh}catch(_e){}}
+    if(tab==='search')return duPortalSearchV15(w);
+    if(tab==='projects')return duPortalProjects(w);
+    if(tab==='arch-coach')return (window.duCoachNative||duCoach)(w);
+    if(tab==='details')return renderDetails(w);
+    if(tab==='profile')return renderProfile(w);
+    if(tab==='dashboard')return renderDashboard(w);
+    if(tab==='firm')return renderFirm(w);
+    if(tab==='team')return renderTeam(w);
+    if(tab==='account')return renderAccount(w);
+    if(tab==='check')return duEmbedPublic(w,'page-check');
+    if(tab==='discover')return duEmbedPublic(w,'page-discover');
+    if(tab==='connect')return duEmbedPublic(w,'page-connect');
+    return priorRouter(tab);
+  };
+
+  // Opening/reloading the Portal restores the exact workspace tab instead of forcing Dashboard/home.
+  window.openPortal=openPortal=function(){
+    $('du-login-tunnel')?.classList.remove('open');$('du-onboarding')?.classList.remove('open');$('du-portal')?.classList.add('open');syncPortalIdentity();loadCredits();
+    const tab=savedTab(); try{history.replaceState({drawupPortal:true,tab},'', '#portal')}catch(_e){} openPortalTab(tab);
+  };
+  window.addEventListener('pageshow',async()=>{try{const s=(await client?.auth.getSession())?.data?.session;if(s?.user&&!s.user.is_anonymous){currentUser=s.user;if(!currentProfile)currentProfile=await loadProfile(currentUser);decorateSignedIn();if(location.hash==='#portal')openPortal()}}catch(_e){}});
 })();
