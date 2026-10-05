@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "DrawUp Season 1",
-  description: "The built world, drawn together.",
+  description: "Draw it up. See it through.",
   manifest: "/manifest.webmanifest",
   icons: {
     icon: "/icons/drawup-icon-512.png",

@@ -1,7 +1,7 @@
 {
   "name": "DrawUp",
   "short_name": "DrawUp",
-  "description": "The built world, drawn together.",
+  "description": "Draw it up. See it through.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0a0a0c",
