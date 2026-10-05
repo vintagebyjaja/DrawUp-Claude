@@ -79,3 +79,55 @@ async function renderFirm(w){const firm=currentProfile?.primary_affiliation_name
 const duOpenPortalTabBase=openPortalTab;openPortalTab=async function(tab='dashboard'){document.querySelectorAll('[data-portal-tab]').forEach(x=>x.classList.toggle('active',x.dataset.portalTab===tab));const w=$('du-workspace-content');if(!w)return;w.innerHTML='<div class="du-loading">DRAWING IT UP…</div>';if(tab==='details')return renderDetails(w);return duOpenPortalTabBase(tab)};
 
 })();
+
+/* DrawUp V15 — populated Portal workspaces */
+let duEmbeddedPublicPage=null,duEmbeddedHome=null,duEmbeddedNext=null;
+function duRestoreEmbedded(){
+  if(!duEmbeddedPublicPage||!duEmbeddedHome)return;
+  duEmbeddedPublicPage.hidden=true;
+  duEmbeddedPublicPage.classList.remove('du-portal-embedded-page');
+  if(duEmbeddedNext&&duEmbeddedNext.parentNode===duEmbeddedHome) duEmbeddedHome.insertBefore(duEmbeddedPublicPage,duEmbeddedNext);
+  else duEmbeddedHome.appendChild(duEmbeddedPublicPage);
+  duEmbeddedPublicPage=null;duEmbeddedHome=null;duEmbeddedNext=null;
+}
+function duEmbedPublic(w,pageId){
+  duRestoreEmbedded();
+  const page=document.getElementById(pageId); if(!page){w.innerHTML='<div class="du-empty"><h1>Workspace unavailable.</h1></div>';return;}
+  duEmbeddedPublicPage=page;duEmbeddedHome=page.parentNode;duEmbeddedNext=page.nextSibling;
+  page.hidden=false;page.classList.add('du-portal-embedded-page');w.innerHTML='';w.appendChild(page);
+}
+async function duPortalProjects(w){
+  let projects=[];
+  try{const r=await client.from('projects').select('*').or(`owner_id.eq.${currentUser.id},created_by.eq.${currentUser.id}`).limit(12);projects=r.data||[]}catch(e){try{const r=await client.from('projects').select('*').limit(12);projects=r.data||[]}catch(_){}}
+  w.innerHTML=`<div class="du-work-head"><div><span class="du-kicker">PROJECTS</span><h1>Your work starts here.</h1><p>Start a project, work with Arch Coach, visualize with Let’s Play, or continue recent work.</p></div></div>
+  <div class="du-v15-actions">
+    <button class="du-v15-action primary" data-v15-project="new"><span>＋</span><b>Start New</b><small>Create a DrawUp project workspace.</small></button>
+    <button class="du-v15-action" data-portal-tab="arch-coach"><span>✦</span><b>Work with Arch Coach</b><small>Ask, analyze and build with project context.</small></button>
+    <button class="du-v15-action" data-v15-project="play"><span>◈</span><b>Let’s Play</b><small>Visualize ideas and explore design possibilities.</small></button>
+  </div>
+  <div class="du-section-title"><div><span class="du-kicker">YOUR PROJECTS</span><h2>${projects.length?'Recent projects':'Ready when you are.'}</h2></div><button class="du-btn ghost" data-portal-tab="search">Search DrawUp</button></div>
+  <div class="du-v15-project-grid">${projects.length?projects.map((p,i)=>`<article class="du-glass du-v15-project"><span class="du-kicker">${esc(p.status||'PROJECT')}</span><h3>${esc(p.name||p.title||'Untitled Project')}</h3><p>${esc(p.location||p.project_location||p.description||'DrawUp project')}</p><button data-v15-open-project="${esc(p.id||'')}">Open project →</button></article>`).join(''):`<article class="du-glass du-v15-project-empty"><div class="du-stage-orb"><i></i><b>DU</b></div><h3>Draw it up. See it through.</h3><p>Your active projects will appear here as you create them.</p></article>`}</div>`;
+  w.querySelector('[data-v15-project="new"]')?.addEventListener('click',()=>{const n=prompt('Project name');if(!n)return;alert('Project workspace: '+n+'\n\nConnect this action to your production project-creation flow when the projects table fields are finalized.');});
+  w.querySelector('[data-v15-project="play"]')?.addEventListener('click',()=>{duRestoreEmbedded();closePortal();navigate('swap')});
+}
+function duPortalSearchV15(w){
+  w.innerHTML=`<div class="du-work-head"><div><span class="du-kicker">DRAWUP SEARCH</span><h1>What are you drawing up?</h1><p>Projects, firms, people, universities, codes, details and resources — one search across DrawUp.</p></div></div>
+  <div class="du-search-stage"><div class="du-search-holo"><div class="du-holo-model"><i></i><i></i><i></i><b>DU</b></div></div><form id="du-v15-search" class="du-search-box"><input id="du-v15-q" type="search" placeholder="Search a project, building, firm, person, school, code or detail…" autocomplete="off"><button class="du-btn primary">Search DrawUp →</button></form><div class="du-search-types">${['Projects','Firms','People','Universities','Codes','Details','Resources'].map(x=>`<button type="button" data-v15-type="${x}">${x}</button>`).join('')}</div></div>`;
+  const f=w.querySelector('#du-v15-search'),q=w.querySelector('#du-v15-q');
+  f.onsubmit=e=>{e.preventDefault();const term=q.value.trim();if(!term)return;const pub=document.getElementById('drawup-search-input'),btn=document.getElementById('drawup-search-button');if(pub&&btn){pub.value=term;btn.click();}else{alert('Search is loading. Please try again.')}};
+  w.querySelectorAll('[data-v15-type]').forEach(b=>b.onclick=()=>{q.value=b.dataset.v15Type+' ';q.focus()});
+}
+const duOpenPortalTabPreV15=openPortalTab;
+openPortalTab=async function(tab='dashboard'){
+  duRestoreEmbedded();
+  document.querySelectorAll('[data-portal-tab]').forEach(x=>x.classList.toggle('active',x.dataset.portalTab===tab));
+  const w=$('du-workspace-content');if(!w)return;w.innerHTML='<div class="du-loading">DRAWING IT UP…</div>';
+  if(tab==='projects')return duPortalProjects(w);
+  if(tab==='search')return duPortalSearchV15(w);
+  if(tab==='arch-coach')return duEmbedPublic(w,'page-coach');
+  if(tab==='check')return duEmbedPublic(w,'page-check');
+  if(tab==='details')return duEmbedPublic(w,'page-details');
+  if(tab==='discover')return duEmbedPublic(w,'page-discover');
+  if(tab==='connect')return duEmbedPublic(w,'page-connect');
+  return duOpenPortalTabPreV15(tab);
+};
