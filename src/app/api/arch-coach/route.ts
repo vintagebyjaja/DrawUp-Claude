@@ -48,6 +48,13 @@ export async function POST(request: Request) {
       .slice(-16) as ChatTurn[];
     if (!message) return NextResponse.json({ error: 'Message required.' }, { status: 400 });
 
+    const fullConversation = [...history.map(x=>x.content), message].join(' ');
+    const jurisdictionQuestion = /\b(zoning|udo|building code|ibc|ada|accessib|permit|ordinance|jurisdiction|occupancy|egress|fire code|energy code|setback|parking requirement|code compliance)\b/i.test(fullConversation);
+    const explicitPlace = /\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*,\s*(?:[A-Z]{2}|[A-Za-z]{4,})\b/.test(fullConversation) || /\b(Charlotte|Atlanta|Raleigh|Greensboro|Durham|New York|Los Angeles|Chicago|Miami|Houston|Dallas|Seattle|Boston|Philadelphia|Washington)\b/i.test(fullConversation);
+    if (jurisdictionQuestion && !explicitPlace && !location) {
+      return NextResponse.json({ answer: 'What city and state/province is the project in? I need the project jurisdiction before I give you the code, accessibility, egress, zoning, or permitting answer.', needs_location: true, sources: [] });
+    }
+
     const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) return NextResponse.json({ error: 'Arch Coach is not connected to the server AI key.' }, { status: 503 });
 
@@ -58,7 +65,7 @@ export async function POST(request: Request) {
 
     const input = `${instructions}\n\nCONVERSATION:\n${transcript || `USER: ${message}`}\n${location ? `\nPROJECT LOCATION: ${location}` : ''}\n\nRespond to the user's latest message in context.`;
     const configured = process.env.DRAWUP_COACH_MODEL || process.env.DRAWUP_SEARCH_MODEL;
-    const models = [...new Set([configured, 'gpt-5.6-sol', 'gpt-5'].filter(Boolean))] as string[];
+    const models = [...new Set([configured, process.env.DRAWUP_SEARCH_MODEL, 'gpt-6-luna', 'gpt-5.6-sol'].filter(Boolean))] as string[];
     let lastError = 'Arch Coach request failed.';
 
     for (const model of models) {
