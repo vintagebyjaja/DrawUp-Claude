@@ -616,7 +616,7 @@
 @media (prefers-reduced-motion:reduce){.exact-motion *{animation:none!important}}
 @media (max-width:900px){#page-home > .hero{min-height:620px;background-position:58% top}#page-home > .hero > .wrap{min-height:620px}.exact-motion{opacity:.65}}
 </style>
-<link rel="stylesheet" href="/v1311-portal.css">
+<link rel="stylesheet" href="/v1311-portal.css?v=15.6">
 
 <div class="preview-banner" style="display:none">DRAWUP · DRAW IT UP. SEE IT THROUGH.</div>
 
@@ -2182,13 +2182,40 @@ document.querySelectorAll('.portfolio-submit').forEach(btn => {
 
 // ---- DrawUp live auth + guest Arch Coach ----
 (function(){
- let client=null, authMode='signin'; const $=id=>document.getElementById(id);
+ let client=null, authMode='signin', coachHistory=[]; const $=id=>document.getElementById(id);
  function showAuth(mode){authMode=mode||'signin';$('auth-modal').style.display='block';$('auth-backdrop').style.display='block';$('auth-title').textContent=authMode==='signup'?'Join Preseason':'Sign in';$('auth-submit').textContent=authMode==='signup'?'Create free account':'Sign in';$('auth-switch').textContent=authMode==='signup'?'Already have an account? Sign in':'Need an account? Join Preseason free';$('auth-status').textContent='';}
  function hideAuth(){$('auth-modal').style.display='none';$('auth-backdrop').style.display='none';}
- async function init(){try{const cfg=await fetch('/api/supabase-config',{cache:'no-store'}).then(r=>r.json());if(!cfg.url||!cfg.key||!window.supabase)throw new Error('Supabase site keys are not configured yet.');client=window.supabase.createClient(cfg.url,cfg.key);window.drawupSupabaseClient=client;}catch(e){$('arch-coach-status').textContent=e.message;}}
+ async function init(){try{const cfg=await fetch('/api/supabase-config',{cache:'no-store'}).then(r=>r.json());if(!cfg.url||!cfg.key||!window.supabase)throw new Error('Supabase site keys are not configured yet.');client=window.supabase.createClient(cfg.url,cfg.key,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storage:window.localStorage}});window.drawupSupabaseClient=client;}catch(e){$('arch-coach-status').textContent=e.message;}}
  async function session(){if(!client)throw new Error('Arch Coach is still connecting. Try again.');let r=await client.auth.getSession();if(r.data.session)return r.data.session;r=await client.auth.signInAnonymously();if(r.error)throw new Error('Enable Anonymous Sign-Ins in Supabase Auth settings for the free trial.');return r.data.session;}
  function bubble(kind,text){const box=$('arch-coach-messages'),d=document.createElement('div'),w=document.createElement('span');d.className='bubble '+(kind==='user'?'user':'coach');w.className='who';w.textContent=kind==='user'?'You':'Arch Coach';d.append(w,document.createTextNode(text));box.appendChild(d);box.scrollTop=box.scrollHeight;}
- async function send(){const input=$('arch-coach-input'),btn=$('arch-coach-send'),st=$('arch-coach-status'),message=input.value.trim();if(!message){input.focus();return;}const location=$('arch-coach-location')?.value.trim()||'';const visual_mode=$('arch-coach-visual')?.value||'standard';btn.disabled=true;st.textContent='Arch Coach is thinking…';bubble('user',message);input.value='';const locationTimer=setTimeout(()=>{if(!location)st.textContent='Still drawing it up… If this is code, ADA, zoning or jurisdiction-specific, add your project city/state or country so Coach can check the right path.';},2500);try{const ses=await session();const r=await client.functions.invoke('arch-coach',{body:{message,location,visual_mode},headers:{Authorization:'Bearer '+ses.access_token}});clearTimeout(locationTimer);if(r.error)throw r.error;if(r.data?.error)throw new Error(r.data.error);const answer=r.data?.answer||r.data?.response||r.data?.message||r.data?.output_text||'Response received.';bubble('coach',answer);if(r.data?.image_base64){const img=document.createElement('img');img.src='data:image/png;base64,'+r.data.image_base64;img.alt='Original Arch Coach visual detail';img.style='width:100%;max-width:640px;margin-top:10px;border-radius:16px;border:1px solid rgba(255,255,255,.18)';$('arch-coach-messages').appendChild(img);$('arch-coach-messages').scrollTop=$('arch-coach-messages').scrollHeight;}if(Number.isInteger(r.data?.free_questions_remaining)){$('coach-free-count').textContent=r.data.free_questions_remaining+' guest questions remaining · no card required';st.textContent='Guest access · '+r.data.free_questions_remaining+' questions remaining.';}else if(Number.isInteger(r.data?.credits_remaining))st.textContent=(r.data.credits_charged? r.data.credits_charged+' credits used · ':'')+r.data.credits_remaining+' credits remaining.';else st.textContent='Arch Coach is ready.';}catch(e){const raw=e?.message||'';const friendly=/non-2xx|edge function|fetch|network|500|503/i.test(raw)?'Arch Coach hit a connection issue. Your DrawUp allowance was not charged. Please try again.':(raw||'Arch Coach could not complete that request. Please try again.');bubble('coach',friendly);st.textContent=friendly;}finally{clearTimeout(locationTimer);btn.disabled=false;input.focus();}}
+ async function send(){
+  const input=$('arch-coach-input'),btn=$('arch-coach-send'),st=$('arch-coach-status'),message=input.value.trim();
+  if(!message){input.focus();return;}
+  const location=$('arch-coach-location')?.value.trim()||'';
+  const visual_mode=$('arch-coach-visual')?.value||'standard';
+  btn.disabled=true;st.textContent='Arch Coach is researching…';bubble('user',message);input.value='';
+  coachHistory.push({role:'user',content:message});
+  try{
+    let accessToken='';
+    try{const ses=await session();accessToken=ses?.access_token||'';}catch(_e){}
+    const r=await fetch('/api/arch-coach',{method:'POST',headers:{'Content-Type':'application/json',...(accessToken?{Authorization:'Bearer '+accessToken}:{})},body:JSON.stringify({message,location,visual_mode,history:coachHistory.slice(-16)})});
+    const data=await r.json().catch(()=>({}));
+    if(!r.ok||data?.error)throw new Error(data?.error||('Arch Coach request failed ('+r.status+').'));
+    const answer=data?.answer||'Arch Coach could not form a response.';
+    coachHistory.push({role:'assistant',content:answer});
+    bubble('coach',answer);
+    if(Array.isArray(data?.sources)&&data.sources.length){
+      const box=$('arch-coach-messages'),wrap=document.createElement('div');wrap.className='bubble coach';
+      const who=document.createElement('span');who.className='who';who.textContent='Sources';wrap.appendChild(who);
+      data.sources.slice(0,6).forEach(src=>{const a=document.createElement('a');a.href=src.url;a.target='_blank';a.rel='noopener';a.textContent=src.title||src.url;a.style='display:block;margin:6px 0;color:#087ca7;text-decoration:underline;';wrap.appendChild(a);});
+      box.appendChild(wrap);box.scrollTop=box.scrollHeight;
+    }
+    st.textContent=data?.researched?'Arch Coach · live research complete':'Arch Coach is ready.';
+  }catch(e){
+    const friendly='Arch Coach could not complete that request. Your DrawUp allowance was not charged. Please try again.';
+    console.error('Arch Coach request failed:',e);bubble('coach',friendly);st.textContent=friendly;
+  }finally{btn.disabled=false;input.focus();}
+ }
  document.addEventListener('DOMContentLoaded',()=>{init();$('drawup-signin')?.addEventListener('click',e=>{e.preventDefault();showAuth('signin')});document.querySelectorAll('.join-preseason').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();showAuth('signup')}));$('auth-close')?.addEventListener('click',hideAuth);$('auth-backdrop')?.addEventListener('click',hideAuth);$('auth-switch')?.addEventListener('click',()=>showAuth(authMode==='signin'?'signup':'signin'));$('auth-submit')?.addEventListener('click',async()=>{if(!client)return;const email=$('auth-email').value.trim(),password=$('auth-password').value;$('auth-status').textContent='Working…';const r=authMode==='signup'?await client.auth.signUp({email,password}):await client.auth.signInWithPassword({email,password});if(r.error){$('auth-status').textContent=r.error.message;return;}$('auth-status').textContent=r.data.session?'Success.':'Check your email to confirm your account.';if(r.data.session){hideAuth(); if(window.DrawUpPortalAfterAuth) window.DrawUpPortalAfterAuth(r.data.session.user); else location.hash='#portal';}});$('arch-coach-send')?.addEventListener('click',send);$('arch-coach-input')?.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}});$('coach-free-question')?.addEventListener('click',()=>$('arch-coach-input')?.focus());});
 })();
 
@@ -2249,4 +2276,4 @@ document.querySelectorAll('.portfolio-submit').forEach(btn => {
 })();
 </script>
 
-<script src="/v1311-portal.js"></script>
+<script src="/v1311-portal.js?v=15.6"></script>
