@@ -21,7 +21,7 @@ let firmCache=null;
 async function loadFirms(){
   if(firmCache)return firmCache;
   const c=await db();if(!c)throw new Error('DrawUp database is not connected.');
-  const {data,error}=await c.from('firms').select('id,slug,name,description,website,logo_url,hero_image_url,is_verified,discipline,firm_offices(city,state,country,is_headquarters)').eq('is_demo',false).order('name').limit(2000);
+  const {data,error}=await c.from('firms').select('id,slug,name,description,website,logo_url,hero_image_url,is_verified,discipline,firm_offices(city,state,country,is_headquarters,is_confirmed,source)').eq('is_demo',false).order('name').limit(2000);
   if(error)throw error;firmCache=data||[];return firmCache;
 }
 
@@ -52,36 +52,96 @@ async function renderConnect(){
   const inp=host.querySelector('.du-live-filter');inp.oninput=()=>{connectQuery=inp.value;clearTimeout(inp._t);inp._t=setTimeout(()=>{renderConnect().then(()=>{const i=host.querySelector('.du-live-filter');i.focus();i.setSelectionRange(i.value.length,i.value.length);});},200);};
 }
 
-/* ---------- discover: projects + firms ---------- */
-function projectCard(p){const img=(p.project_images||[]).sort((a,b)=>(b.is_hero?1:0)-(a.is_hero?1:0)||a.sort_order-b.sort_order)[0]?.image_url;const team=(p.project_firms||[]).filter(x=>x.firms&&!x.firms.is_demo).slice(0,2).map(x=>`<b>${esc(x.role)}:</b> ${esc(x.firms.name)}`).join('<br>');
-  return `<div class="proj-card du-live-project" data-project-slug="${esc(p.slug)}" tabindex="0" role="button">${img?`<div class="proj-media real-project-media" style="background-image:url('${esc(img).replace(/'/g,'%27')}')"></div>`:''}<div class="proj-body"><h3>${esc(p.name)}</h3><span class="proj-meta">${esc([p.city,p.state,US.has(p.country)?'':p.country].filter(Boolean).join(', ').toUpperCase())}${p.project_type?' · '+esc(String(p.project_type).toUpperCase()):''}${p.completion_year?' · '+esc(p.completion_year):''}</span>${team?`<p class="proj-arch">${team}</p>`:''}${img?'':'<p class="meta">No project photo on file yet.</p>'}</div></div>`;}
-async function renderDiscover(){
-  const c=await db();if(!c)return;
-  const grid=$('recent-project-grid');
-  if(grid){
-    const {data,error}=await c.from('aec_projects').select('slug,name,city,state,country,project_type,completion_year,project_images(image_url,is_hero,sort_order),project_firms(role,firms(name,slug,is_demo))').eq('is_demo',false).order('updated_at',{ascending:false}).limit(24);
-    grid.innerHTML=error?emptyBlock('Projects unavailable.',error.message,false):(data||[]).length?data.map(projectCard).join(''):`<div class="du-live-empty"><h3>No projects in DrawUp yet.</h3><p>DrawUp shows only projects it has records for. Project profiles appear here as they are added and verified, with their real photos.</p></div>`;
-    grid.querySelectorAll('[data-project-slug]').forEach(el=>{el.onclick=()=>openProject(el.dataset.projectSlug);el.onkeydown=e=>{if(e.key==='Enter')el.click();};});
-  }
-  const fg=$('du-live-discover-firms');
-  if(fg){try{const firms=await loadFirms();fg.innerHTML=firms.length?firms.slice(0,24).map(f=>`<div class="gallery-card" data-page="firm-profile" data-firm-slug="${esc(f.slug)}">${f.logo_url?`<img class="gallery-logo" src="${esc(f.logo_url)}" alt="">`:''}<h3>${esc(f.name)}</h3><span class="meta">${esc(firmLocations(f).toUpperCase()||'LOCATION NOT LISTED')}</span>${f.description?`<p>${esc(String(f.description).slice(0,140))}</p>`:''}</div>`).join(''):emptyBlock('No firms in DrawUp yet.','Firms appear here once they are in the DrawUp directory.');}catch(e){fg.innerHTML=emptyBlock('Firms unavailable.',e.message||String(e),false);}}
+/* ---------- discover: projects + firms (V19: every filter is wired, all matches shown) ---------- */
+const CONTINENT={'United Kingdom':'Europe','Germany':'Europe','France':'Europe','Spain':'Europe','Italy':'Europe','Netherlands':'Europe','Denmark':'Europe','Norway':'Europe','Sweden':'Europe','Switzerland':'Europe','Austria':'Europe','Belgium':'Europe','Ireland':'Europe','Poland':'Europe','Romania':'Europe','Portugal':'Europe','Finland':'Europe','Greece':'Europe','Turkiye':'Europe','Turkey':'Europe','China':'Asia','Hong Kong':'Asia','Japan':'Asia','South Korea':'Asia','Singapore':'Asia','India':'Asia','Vietnam':'Asia','Thailand':'Asia','Malaysia':'Asia','Kazakhstan':'Asia','Indonesia':'Asia','Philippines':'Asia','Taiwan':'Asia','United Arab Emirates':'Middle East','Saudi Arabia':'Middle East','Qatar':'Middle East','Lebanon':'Middle East','Israel':'Middle East','Kuwait':'Middle East','Bahrain':'Middle East','Oman':'Middle East','Canada':'North America','Mexico':'North America','US':'North America','Brazil':'South America','Chile':'South America','Argentina':'South America','Peru':'South America','Colombia':'South America','Ecuador':'South America','Australia':'Oceania','New Zealand':'Oceania','South Africa':'Africa','Ghana':'Africa','Nigeria':'Africa','Kenya':'Africa','Rwanda':'Africa','Botswana':'Africa','Egypt':'Africa','Morocco':'Africa','Burkina Faso':'Africa'};
+const STATES={AL:'Alabama',AK:'Alaska',AZ:'Arizona',AR:'Arkansas',CA:'California',CO:'Colorado',CT:'Connecticut',DE:'Delaware',DC:'District of Columbia',FL:'Florida',GA:'Georgia',HI:'Hawaii',ID:'Idaho',IL:'Illinois',IN:'Indiana',IA:'Iowa',KS:'Kansas',KY:'Kentucky',LA:'Louisiana',ME:'Maine',MD:'Maryland',MA:'Massachusetts',MI:'Michigan',MN:'Minnesota',MS:'Mississippi',MO:'Missouri',MT:'Montana',NE:'Nebraska',NV:'Nevada',NH:'New Hampshire',NJ:'New Jersey',NM:'New Mexico',NY:'New York',NC:'North Carolina',ND:'North Dakota',OH:'Ohio',OK:'Oklahoma',OR:'Oregon',PA:'Pennsylvania',PR:'Puerto Rico',RI:'Rhode Island',SC:'South Carolina',SD:'South Dakota',TN:'Tennessee',TX:'Texas',UT:'Utah',VT:'Vermont',VA:'Virginia',WA:'Washington',WV:'West Virginia',WI:'Wisconsin',WY:'Wyoming'};
+const normCountry=c=>US.has(c||'US')?'US':c;
+function continentOf(c){return CONTINENT[normCountry(c)]||'';}
+function firmKind(f){if(f.discipline)return f.discipline;const n=String(f.name||'');if(/construct|builders|contract|turner|skanska|whiting|clark\b|mortenson|gilbane|mccarthy|hensel|balfour/i.test(n))return'Construction';if(/engineer|tomasetti|walter p|arup|aecom|hdr|wsp|stantec|jacobs|kimley|dewberry|stv|hntb|ghd|thornton|moore|henderson|burns|fluor|arcadis/i.test(n))return'Engineering';return'Architecture';}
+function hqOf(f){const o=(f.firm_offices||[]);return o.find(x=>x.is_headquarters)||o[0]||null;}
+function fillStateSelect(sel,rows,getStates){if(!sel||sel.dataset.filled)return;const set=new Set();rows.forEach(r=>getStates(r).forEach(s=>s&&STATES[s]&&set.add(s)));sel.innerHTML='<option value="">All U.S. States</option>'+[...set].sort((x,y)=>STATES[x].localeCompare(STATES[y])).map(s=>`<option value="${s}">${esc(STATES[s])}</option>`).join('');sel.dataset.filled='1';}
+const discoverState={firmChip:'all',firmLimit:48,projects:null};
+let myHome=null;
+async function homeState(){if(myHome!==null)return myHome;myHome='';try{const c=await db();const u=(await c.auth.getSession()).data.session?.user;if(u){const {data}=await c.from('profiles').select('home_office,current_location').eq('id',u.id).maybeSingle();const m=/,\s*([A-Za-z]{2})\b/.exec(data?.home_office||data?.current_location||'');myHome=m?m[1].toUpperCase():'';}}catch(_e){}return myHome;}
+function firmMatches(f,opts){
+  const offs=f.firm_offices||[];
+  if(opts.scope==='us'&&!offs.some(o=>normCountry(o.country)==='US')&&offs.length)return false;
+  if(opts.scope==='intl'&&!offs.some(o=>normCountry(o.country)!=='US'))return false;
+  if(opts.state&&!offs.some(o=>normCountry(o.country)==='US'&&String(o.state||'').toUpperCase()===opts.state))return false;
+  if(opts.continent&&!offs.some(o=>continentOf(o.country)===opts.continent))return false;
+  if(opts.chip==='verified'&&!f.is_verified)return false;
+  if(['Architecture','Engineering','Construction'].includes(opts.chip)&&firmKind(f)!==opts.chip)return false;
+  if(opts.chip==='near'&&!(opts.home&&offs.some(o=>String(o.state||'').toUpperCase()===opts.home)))return false;
+  if(opts.q){const hay=(f.name+' '+(f.description||'')+' '+(f.discipline||'')+' '+offs.map(o=>[o.city,o.state,STATES[String(o.state||'').toUpperCase()]||'',o.country].join(' ')).join(' ')).toLowerCase();if(!opts.q.split(/\s+/).every(t=>hay.includes(t)))return false;}
+  return true;
 }
+function firmCardHTML(f){const hq=hqOf(f),n=(f.firm_offices||[]).length;const site=f.website?String(f.website).replace(/^https?:\/\/(www\.)?/,'').replace(/\/.*$/,''):'';
+  return `<div class="gallery-card du-firm-card" data-page="firm-profile" data-firm-slug="${esc(f.slug)}" tabindex="0" role="button">${f.logo_url?`<img class="gallery-logo" src="${esc(f.logo_url)}" alt="">`:`<div class="gallery-mark">${esc(String(f.name).replace(/[^A-Za-z0-9 ]/g,'').split(/\s+/).filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase()||'DU')}</div>`}<h3>${esc(f.name)}</h3><span class="meta">${esc(hq?officeLine(hq).toUpperCase():'LOCATION NOT LISTED YET')}</span><span class="du-firm-card-sub">${esc(firmKind(f))}${n>1?' · '+n+' offices':''}${site?' · '+esc(site):''}</span>${f.is_verified?'<span class="pill pill-verified">Verified</span>':''}</div>`;}
+async function renderDiscoverFirms(){
+  const fg=$('du-live-discover-firms');if(!fg)return;
+  let firms;try{firms=await loadFirms();}catch(e){fg.innerHTML=emptyBlock('Firms unavailable.',e.message||String(e),false);return;}
+  fillStateSelect($('du-firm-state'),firms,f=>(f.firm_offices||[]).filter(o=>normCountry(o.country)==='US').map(o=>String(o.state||'').toUpperCase()));
+  const opts={q:($('du-firm-q')?.value||'').trim().toLowerCase(),scope:$('du-firm-scope')?.value||'all',state:$('du-firm-state')?.value||'',continent:$('du-firm-continent')?.value||'',chip:discoverState.firmChip,home:discoverState.firmChip==='near'?await homeState():''};
+  const shown=firms.filter(f=>firmMatches(f,opts));
+  const cnt=$('du-firm-count');if(cnt)cnt.textContent=opts.chip==='near'&&!opts.home?'Add your home office (City, ST) to your profile to see firms near you.':`${shown.length} of ${firms.length} firms in the DrawUp directory`;
+  fg.innerHTML=shown.length?shown.slice(0,discoverState.firmLimit).map(firmCardHTML).join('')+(shown.length>discoverState.firmLimit?`<div class="du-show-more"><button class="btn btn-ghost btn-sm" type="button" id="du-firm-more">Show ${Math.min(48,shown.length-discoverState.firmLimit)} more of ${shown.length-discoverState.firmLimit}</button></div>`:''):emptyBlock('No firms match those filters.','Try All World, clear the state, or search a different name or city. Missing a firm? Add it and DrawUp reviews it.');
+  const more=$('du-firm-more');if(more)more.onclick=()=>{discoverState.firmLimit+=48;renderDiscoverFirms();};
+}
+function bindDiscoverControls(){
+  const fc=$('du-firm-controls');if(fc&&!fc.dataset.bound){fc.dataset.bound='1';let t;const go=()=>{discoverState.firmLimit=48;clearTimeout(t);t=setTimeout(renderDiscoverFirms,140);};fc.querySelectorAll('input,select').forEach(el=>{el.addEventListener('input',go);el.addEventListener('change',go);});
+    $('du-firm-scope')?.addEventListener('change',()=>{if($('du-firm-scope').value==='intl')$('du-firm-state').value='';});
+    document.querySelectorAll('#du-firm-chips [data-chip]').forEach(ch=>ch.addEventListener('click',()=>{discoverState.firmChip=ch.dataset.chip;document.querySelectorAll('#du-firm-chips [data-chip]').forEach(x=>x.classList.toggle('active',x===ch));go();}));}
+  const pc=$('du-proj-controls');if(pc&&!pc.dataset.bound){pc.dataset.bound='1';let t;const go=()=>{clearTimeout(t);t=setTimeout(renderDiscoverProjects,140);};pc.querySelectorAll('input,select').forEach(el=>{el.addEventListener('input',go);el.addEventListener('change',go);});}
+}
+function projectMedia(p){const img=(p.project_images||[]).sort((a,b)=>(b.is_hero?1:0)-(a.is_hero?1:0)||a.sort_order-b.sort_order)[0]?.image_url;
+  if(img)return `<div class="proj-media real-project-media" style="background-image:url('${esc(img).replace(/'/g,'%27')}')"></div>`;
+  return `<div class="proj-media du-proj-nophoto"><span class="du-proj-type">${esc(String(p.project_type||'Project').toUpperCase())}</span><b>${esc(p.name)}</b><small>${esc([p.city,p.state].filter(Boolean).join(', '))}</small><em>Photos are added by the firms on the project${p.image_page_url?' · official photos linked inside':''}</em></div>`;}
+function projectCard(p){const team=(p.project_firms||[]).filter(x=>x.firms&&!x.firms.is_demo).slice(0,3).map(x=>`<b>${esc(x.role)}:</b> ${esc(x.firms.name)}`).join('<br>');
+  const yr=p.completion_year||p.opened_year;
+  return `<div class="proj-card du-live-project" data-project-slug="${esc(p.slug)}" tabindex="0" role="button">${projectMedia(p)}<div class="proj-body"><h3>${esc(p.name)}</h3><span class="proj-meta">${esc([p.city,p.state,US.has(p.country)?'':p.country].filter(Boolean).join(', ').toUpperCase())}${p.project_type?' · '+esc(String(p.project_type).toUpperCase()):''}${yr?' · '+esc(yr):''}</span>${p.description?`<p class="du-proj-desc">${esc(String(p.description).slice(0,190))}${String(p.description).length>190?'…':''}</p>`:''}${team?`<p class="proj-arch">${team}</p>`:''}<span class="du-proj-open">Open full project profile →</span></div></div>`;}
+async function renderDiscoverProjects(){
+  const grid=$('recent-project-grid');if(!grid)return;const c=await db();if(!c)return;
+  if(!discoverState.projects){const {data,error}=await c.from('aec_projects').select('slug,name,city,state,country,project_type,completion_year,opened_year,description,image_page_url,project_images(image_url,is_hero,sort_order),project_firms(role,firms(name,slug,is_demo))').eq('is_demo',false).order('updated_at',{ascending:false}).limit(500);
+    if(error){grid.innerHTML=emptyBlock('Projects unavailable.',error.message,false);return;}discoverState.projects=data||[];}
+  const all=discoverState.projects;fillStateSelect($('du-proj-state'),all,p=>normCountry(p.country)==='US'?[String(p.state||'').toUpperCase()]:[]);
+  const q=($('du-proj-q')?.value||'').trim().toLowerCase(),scope=$('du-proj-scope')?.value||'all',st=$('du-proj-state')?.value||'',ct=$('du-proj-continent')?.value||'';
+  const shown=all.filter(p=>{if(scope==='us'&&normCountry(p.country)!=='US')return false;if(scope==='intl'&&normCountry(p.country)==='US')return false;if(st&&String(p.state||'').toUpperCase()!==st)return false;if(ct&&continentOf(p.country)!==ct)return false;if(q){const hay=[p.name,p.city,p.state,STATES[String(p.state||'').toUpperCase()]||'',p.country,p.project_type,p.description,...(p.project_firms||[]).map(x=>x.firms?.name+' '+x.role)].join(' ').toLowerCase();if(!q.split(/\s+/).every(t=>hay.includes(t)))return false;}return true;});
+  grid.innerHTML=all.length?(shown.length?shown.map(projectCard).join(''):emptyBlock('No projects match those filters.','Try All World or a different search.',false)):`<div class="du-live-empty"><h3>No projects in DrawUp yet.</h3><p>DrawUp shows only projects it has records for. Project profiles appear here as they are added and verified, with their real photos.</p></div>`;
+  grid.querySelectorAll('[data-project-slug]').forEach(el=>{el.onclick=()=>openProject(el.dataset.projectSlug);el.onkeydown=e=>{if(e.key==='Enter')el.click();};});
+}
+async function renderDiscover(){bindDiscoverControls();await Promise.all([renderDiscoverProjects(),renderDiscoverFirms()]);}
 
 /* ---------- profiles ---------- */
+function domainOf(u){try{return new URL(u).hostname.replace(/^www\./,'');}catch(_e){return '';}}
+function officeTag(o){if(o.source==='member_reported'&&!o.is_confirmed)return '<span class="du-office-tag">Reported by a DrawUp member</span>';if(o.source==='public_research'&&!o.is_confirmed)return '<span class="du-office-tag">Unconfirmed</span>';return '';}
+function rosterHTML(rows){
+  const cur=rows.filter(r=>r.is_current),past=rows.filter(r=>!r.is_current),now=new Date().getFullYear();
+  const ini=n=>esc(String(n||'D').split(/\s+/).map(x=>x[0]).slice(0,2).join('').toUpperCase());
+  const yrs=r=>r.start_year?(!r.is_current&&r.end_year===r.start_year?String(r.start_year):`${r.start_year}–${r.is_current?'Present':(r.end_year||'')}`):(r.is_current?'Present':(r.end_year?'Until '+r.end_year:'—'));
+  const ten=r=>{if(!r.start_year)return '—';const n=(r.is_current?now:(r.end_year||now))-r.start_year;return n<1?'<1 yr':n+' yr'+(n===1?'':'s');};
+  const table=(title,list,empty)=>`<div class="du-roster-block"><div class="du-roster-title"><b>${title}</b><span>${list.length}</span></div>${list.length?`<div class="du-roster-scroll"><table class="du-roster"><thead><tr><th>Name</th><th>Position</th><th>Office</th><th>Years</th><th class="num">Tenure</th></tr></thead><tbody>${list.map(r=>`<tr data-du-person="${esc(r.user_id)}" tabindex="0"><td class="who"><div class="du-roster-who"><span class="du-roster-av">${r.avatar_url?`<img src="${esc(r.avatar_url)}" alt="">`:ini(r.display_name)}</span><span><a href="#">${esc(r.display_name)}</a>${r.verified?' <span class="du-check" title="Verified by DrawUp">✓</span>':''}${r.username?`<small>@${esc(r.username)}</small>`:''}</span></div></td><td>${esc(r.role||'—')}</td><td>${esc(r.location||'—')}</td><td class="yrs">${esc(yrs(r))}</td><td class="num">${esc(ten(r))}</td></tr>`).join('')}</tbody></table></div>`:`<p class="meta">${empty}</p>`}</div>`;
+  return `<h3 style="margin-top:22px">Roster</h3><div class="du-roster-wrap">${table('Current team',cur,'No DrawUp members list this firm as their current workplace yet.')}${table('Former team',past,'No DrawUp members list this firm as a past workplace yet.')}</div><p class="meta du-source-note">Built from DrawUp members’ work history. Members choose whether their profile is public.</p>`;
+}
 async function firmProfileHTML(slug){
   const c=await db();if(!c)return null;
   const {data:f,error}=await c.from('firms').select('*,firm_offices(*),firm_photos(image_url,caption,sort_order),firm_services(service),firm_markets(market)').eq('slug',slug).eq('is_demo',false).maybeSingle();
   if(error)return `<article class="du-glass"><h2>Firm unavailable.</h2><p>${esc(error.message)}</p></article>`;if(!f)return null;
-  const {data:pf}=await c.from('project_firms').select('role,provenance,aec_projects(slug,name,city,state,is_demo)').eq('firm_id',f.id);
-  const projects=(pf||[]).filter(x=>x.aec_projects&&!x.aec_projects.is_demo);
+  const [{data:pf},{data:roster},adm]=await Promise.all([
+    c.from('project_firms').select('role,provenance,aec_projects(slug,name,city,state,country,project_type,completion_year,opened_year,description,image_page_url,is_demo,project_images(image_url,is_hero,sort_order))').eq('firm_id',f.id),
+    c.rpc('drawup_firm_roster',{p_firm_id:f.id}).then(r=>({data:r.error?[]:(r.data||[])}),()=>({data:[]})),
+    c.rpc('is_firm_admin',{target_firm_id:f.id}).then(r=>r,()=>({data:false}))]);
+  const seen=new Set(),projects=(pf||[]).filter(x=>x.aec_projects&&!x.aec_projects.is_demo&&!seen.has(x.aec_projects.slug)&&seen.add(x.aec_projects.slug));
   const photos=[...(f.hero_image_url?[{image_url:f.hero_image_url}]:[]),...(f.firm_photos||[]).sort((a,b)=>a.sort_order-b.sort_order)];
-  return `<div class="du-live-profile"><div class="du-live-profile-head">${f.logo_url?`<img class="du-live-logo" src="${esc(f.logo_url)}" alt="">`:''}<div><span class="eyebrow">DrawUp Firm Profile${f.discipline?' · '+esc(f.discipline):''}</span><h1>${esc(f.name)}</h1><p>${esc((f.firm_offices||[]).map(officeLine).filter(Boolean).join(' · '))} ${tag(f)}</p></div>${f.website?`<a class="btn btn-ghost btn-sm" href="${esc(f.website)}" target="_blank" rel="noopener">Visit firm website ↗</a>`:''}</div>
+  const offices=(f.firm_offices||[]).slice().sort((a,b)=>(b.is_headquarters?1:0)-(a.is_headquarters?1:0)||(normCountry(a.country)==='US'?0:1)-(normCountry(b.country)==='US'?0:1)||String(a.state||'').localeCompare(String(b.state||''))||String(a.city).localeCompare(String(b.city)));
+  const hq=offices.find(o=>o.is_headquarters);
+  return `<div class="du-live-profile du-firm-profile"><div class="du-live-profile-head">${f.logo_url?`<img class="du-live-logo" src="${esc(f.logo_url)}" alt="">`:''}<div><span class="eyebrow">DrawUp Firm Profile${f.discipline?' · '+esc(f.discipline):''}</span><h1>${esc(f.name)}</h1><p>${hq?'Headquarters: '+esc(officeLine(hq))+' · ':''}${offices.length} office${offices.length===1?'':'s'}${f.founded_year?' · Founded '+esc(f.founded_year):''} ${tag(f)}</p></div><div class="du-firm-actions">${f.website?`<a class="btn btn-ghost btn-sm" href="${esc(f.website)}" target="_blank" rel="noopener">${esc(domainOf(f.website)||'Firm website')} ↗</a>`:''}${adm?.data===true?`<button class="btn btn-primary btn-sm" type="button" data-du-manage-firm="${esc(f.slug)}">Manage this firm</button>`:''}</div></div>
   ${photos.length?`<div class="du-live-photos">${photos.slice(0,6).map(p=>`<figure><img src="${esc(p.image_url)}" alt="${esc(p.caption||f.name)}" loading="lazy">${p.caption?`<figcaption>${esc(p.caption)}</figcaption>`:''}</figure>`).join('')}</div>`:''}
   ${f.description?`<p class="du-live-desc">${esc(f.description)}</p>`:''}
   ${(f.firm_services||[]).length||(f.firm_markets||[]).length?`<p class="meta">${esc([...(f.firm_services||[]).map(x=>x.service),...(f.firm_markets||[]).map(x=>x.market)].join(' · '))}</p>`:''}
-  ${(f.firm_offices||[]).filter(o=>o.phone).map(o=>`<div class="office-block"><div class="office-head">${esc(officeLine(o))}${o.is_headquarters?' <span class="meta">· Headquarters</span>':''}</div><a class="btn btn-accent btn-sm" href="tel:${esc(o.phone)}">Call ${esc(o.phone)}</a></div>`).join('')}
-  <h3 style="margin-top:22px">Projects on DrawUp</h3>${projects.length?`<ul class="du-live-list">${projects.map(x=>`<li><a href="#" data-project-slug="${esc(x.aec_projects.slug)}">${esc(x.aec_projects.name)}</a> <span class="meta">${esc(x.role)}${x.provenance&&x.provenance!=='unverified'?' · '+esc(String(x.provenance).replace('_',' ')):' · unverified attribution'}</span></li>`).join('')}</ul>`:'<p class="meta">No projects are attributed to this firm in DrawUp yet.</p>'}
-  ${f.is_verified?'':'<p class="disclaimer">This firm has not claimed its DrawUp profile. Details shown come from DrawUp\'s directory record only.</p>'}</div>`;
+  <h3 style="margin-top:22px">Offices</h3>${offices.length?`<div class="du-office-grid">${offices.map(o=>`<div class="du-office"><b>${esc(officeLine(o)||o.city)}</b>${o.is_headquarters?'<span class="du-office-hq">Headquarters</span>':''}${o.address?`<small>${esc(o.address)}</small>`:''}${o.phone?`<a href="tel:${esc(o.phone)}">${esc(o.phone)}</a>`:''}${officeTag(o)}</div>`).join('')}</div>${f.source_url?`<p class="meta du-source-note">Office list from ${esc(domainOf(f.source_url))}${/^Unconfirmed/.test(f.research_note||'')?' and other public sources (not yet confirmed by the firm)':''}. Members add offices automatically when they list this firm in their work history.</p>`:''}`:'<p class="meta">No offices on file yet. Members add them automatically when they list this firm and its city in their work history.</p>'}
+  ${rosterHTML(roster||[])}
+  <h3 style="margin-top:22px">Projects on DrawUp</h3>${projects.length?`<div class="card-grid du-firm-projects">${projects.map(x=>projectCard({...x.aec_projects,project_firms:[{role:x.role,firms:{name:f.name,slug:f.slug}}]})).join('')}</div>`:'<p class="meta">No projects are attributed to this firm in DrawUp yet.</p>'}
+  ${f.is_verified?'':'<p class="disclaimer">This firm has not claimed its DrawUp profile. Details shown come from DrawUp\'s directory record and public sources.</p>'}</div>`;
 }
 async function projectProfileHTML(slug){
   const c=await db();if(!c)return null;
@@ -89,27 +149,35 @@ async function projectProfileHTML(slug){
   if(error)return `<article class="du-glass"><h2>Project unavailable.</h2><p>${esc(error.message)}</p></article>`;if(!p)return null;
   const imgs=(p.project_images||[]).sort((a,b)=>(b.is_hero?1:0)-(a.is_hero?1:0)||a.sort_order-b.sort_order);
   const team=(p.project_firms||[]).filter(x=>x.firms&&!x.firms.is_demo);
-  const facts=[['Location',[p.city,p.state,US.has(p.country)?'':p.country].filter(Boolean).join(', ')],['Type',p.project_type],['Status',p.status],['Completed',p.completion_year],['Size',p.size_sqft?Number(p.size_sqft).toLocaleString()+' sf':'']].filter(x=>x[1]);
-  return `<div class="du-live-profile"><span class="eyebrow">DrawUp Project Profile</span><h1>${esc(p.name)}</h1>
-  ${imgs.length?`<div class="du-live-photos">${imgs.slice(0,8).map(i=>`<figure><img src="${esc(i.image_url)}" alt="${esc(i.caption||p.name)}" loading="lazy">${i.caption?`<figcaption>${esc(i.caption)}</figcaption>`:''}</figure>`).join('')}</div>`:'<p class="meta">No project photos on file yet.</p>'}
-  ${facts.length?`<div class="du-live-facts">${facts.map(x=>`<div><span class="meta">${esc(x[0])}</span><b>${esc(x[1])}</b></div>`).join('')}</div>`:''}
+  const facts=[['Address',p.street_address],['Location',[p.city,p.state,US.has(p.country)?'':p.country].filter(Boolean).join(', ')],['Type',p.project_type],['Status',p.status],['Opened',p.opened_year],['Completed',p.completion_year],['Owner',p.owner_name],['Cost',p.cost_text],['Capacity',p.capacity_text],['Size',p.size_text||(p.size_sqft?Number(p.size_sqft).toLocaleString()+' sf':'')]].filter(x=>x[1]);
+  const kf=Array.isArray(p.key_facts)?p.key_facts:[],cf=Array.isArray(p.conflicts)?p.conflicts:[];
+  return `<div class="du-live-profile du-project-profile"><span class="eyebrow">DrawUp Project Profile</span><h1>${esc(p.name)}</h1>${p.street_address?`<p class="du-project-address">${esc(p.street_address)}</p>`:''}
+  ${imgs.length?`<div class="du-live-photos">${imgs.slice(0,8).map(i=>`<figure><img src="${esc(i.image_url)}" alt="${esc(i.caption||p.name)}" loading="lazy">${i.caption?`<figcaption>${esc(i.caption)}</figcaption>`:''}</figure>`).join('')}</div>`:`<div class="du-proj-nophoto du-proj-nophoto-wide"><span class="du-proj-type">${esc(String(p.project_type||'Project').toUpperCase())}</span><b>${esc(p.name)}</b><small>No photos on DrawUp yet. Firms credited on this project can add photos with credit from their Portal.</small>${p.image_page_url?`<a class="btn btn-ghost btn-sm" href="${esc(p.image_page_url)}" target="_blank" rel="noopener">See official project photos on ${esc(domainOf(p.image_page_url))} ↗</a>`:''}</div>`}
   ${p.description?`<p class="du-live-desc">${esc(p.description)}</p>`:''}
+  ${facts.length?`<div class="du-live-facts">${facts.map(x=>`<div><span class="meta">${esc(x[0])}</span><b>${esc(x[1])}</b></div>`).join('')}</div>`:''}
+  ${kf.length?`<h3>Key facts</h3><ul class="du-live-list du-key-facts">${kf.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:''}
   <h3>Who designed, engineered and built it</h3>${team.length||(p.project_people||[]).length?`<ul class="du-live-list">${team.map(x=>`<li><b>${esc(x.role)}:</b> <a href="#" data-firm-slug="${esc(x.firms.slug)}">${esc(x.firms.name)}</a> <span class="meta">${esc(String(x.provenance||'unverified').replace('_',' '))}</span></li>`).join('')}${(p.project_people||[]).map(x=>`<li><b>${esc(x.role||'Team')}:</b> ${esc(x.name)} <span class="meta">${esc(String(x.provenance||'unverified').replace('_',' '))}</span></li>`).join('')}</ul>`:'<p class="meta">No team attribution on record yet.</p>'}
+  ${cf.length?`<h3>Where sources disagree</h3><ul class="du-live-list du-conflicts">${cf.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:''}
   ${(p.project_awards||[]).length?`<h3>Awards</h3><ul class="du-live-list">${p.project_awards.map(a=>`<li>${esc(a.award_name)}${a.award_year?' · '+esc(a.award_year):''}</li>`).join('')}</ul>`:''}
-  ${(p.project_sources||[]).length?`<h3>Sources</h3><ul class="du-live-list">${p.project_sources.map(s=>`<li><a href="${esc(s.source_url)}" target="_blank" rel="noopener">${esc(s.source_name)} ↗</a></li>`).join('')}</ul>`:''}</div>`;
+  ${(p.project_tags||[]).length?`<p class="meta">${p.project_tags.map(t=>esc(t.tag)).join(' · ')}</p>`:''}
+  ${(p.project_sources||[]).length?`<h3>Sources</h3><ul class="du-live-list du-sources">${p.project_sources.map(s=>`<li><a href="${esc(s.source_url)}" target="_blank" rel="noopener">${esc(s.source_name)} ↗</a></li>`).join('')}</ul>`:''}</div>`;
 }
 function bindProfileLinks(root,openFirm,openProj){
   root.querySelectorAll('[data-firm-slug]').forEach(a=>a.onclick=e=>{e.preventDefault();e.stopPropagation();openFirm(a.dataset.firmSlug);});
   root.querySelectorAll('[data-project-slug]').forEach(a=>a.onclick=e=>{e.preventDefault();e.stopPropagation();openProj(a.dataset.projectSlug);});
+  root.querySelectorAll('[data-du-person]').forEach(tr=>{const go=e=>{if(e.type==='keydown'&&e.key!=='Enter')return;e.preventDefault();e.stopPropagation();window.DrawUpV19?.openPerson?.(tr.dataset.duPerson);};tr.onclick=go;tr.onkeydown=go;});
+  root.querySelectorAll('[data-du-manage-firm]').forEach(b=>b.onclick=e=>{e.preventDefault();e.stopPropagation();try{sessionStorage.setItem('du-manage-firm',b.dataset.duManageFirm);}catch(_e){}if(window.DrawUpPortal?.isSignedIn?.()){window.DrawUpPortal.openPortal('firm');window.DrawUpPortal.openPortalTab('firm');}});
 }
 function showPublicPage(id){const link=document.querySelector(`[data-page="${id}"]`);document.querySelectorAll('.page').forEach(p=>p.hidden=p.id!=='page-'+id);history.replaceState(null,'','#'+id);window.scrollTo(0,0);}
 async function openFirm(slug){
   if(window.DrawUpPortal?.isSignedIn?.()&&document.getElementById('du-portal')?.classList.contains('open'))return window.DrawUpPortal.openFirm(slug);
+  document.querySelectorAll('.v12-portal.open').forEach(x=>x.classList.remove('open'));
   const host=$('du-live-firm-profile');if(!host)return;host.innerHTML='<p class="meta">Loading firm…</p>';showPublicPage('firm-profile');
   host.innerHTML=(await firmProfileHTML(slug))||emptyBlock('Firm not found.','This firm is not in the DrawUp directory.',false);bindProfileLinks(host,openFirm,openProject);
 }
 async function openProject(slug){
   if(window.DrawUpPortal?.isSignedIn?.()&&document.getElementById('du-portal')?.classList.contains('open'))return window.DrawUpPortal.openProject(slug);
+  document.querySelectorAll('.v12-portal.open').forEach(x=>x.classList.remove('open'));
   const host=$('du-live-firm-profile');if(!host)return;host.innerHTML='<p class="meta">Loading project…</p>';showPublicPage('firm-profile');
   host.innerHTML=(await projectProfileHTML(slug))||emptyBlock('Project not found.','This project is not in DrawUp.',false);bindProfileLinks(host,openFirm,openProject);
 }
@@ -138,7 +206,7 @@ document.addEventListener('click',e=>{
   const sub=e.target.closest('[data-du-submit-firm]');if(sub){e.preventDefault();openFirmSubmission();return;}
   const f=e.target.closest('[data-firm-slug]');if(f&&!f.closest('#du-portal')&&!f.closest('.du-live-profile')){e.preventDefault();e.stopImmediatePropagation();openFirm(f.dataset.firmSlug);}
 },true);
-window.DrawUpLive={refresh,firmProfileHTML,projectProfileHTML,bindProfileLinks,openFirmSubmission,searchDb,openFirm,openProject};
+window.DrawUpLive={refresh,loadFirms,projectCard,firmProfileHTML,projectProfileHTML,bindProfileLinks,openFirmSubmission,searchDb,openFirm,openProject};
 function boot(){refresh();}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 })();

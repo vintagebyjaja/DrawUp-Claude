@@ -622,6 +622,7 @@
 <link rel="stylesheet" href="/v1311-portal.css?v=16.3">
 <link rel="stylesheet" href="/drawup-v17.css?v=18.0">
 <link rel="stylesheet" href="/drawup-v18.css?v=18.0">
+<link rel="stylesheet" href="/drawup-v19.css?v=19.1">
 
 <div class="preview-banner" style="display:none">DRAWUP · DRAW IT UP. SEE IT THROUGH.</div>
 
@@ -1038,7 +1039,7 @@
     <div class="discover-pane" data-pane="projects">
       <div class="global-search-panel">
         <div><span class="eyebrow">Global project search</span><h3>Find precedents anywhere.</h3><p>Search projects by country, U.S. state, continent, building type, firm, or design feature.</p></div>
-        <div class="world-controls"><input class="world-input" placeholder="Search project, city, firm or precedent…"><select><option>United States</option><option>International</option><option>All World</option></select><select><option>All U.S. States</option><option>North Carolina</option><option>New York</option><option>California</option><option>Texas</option></select><select><option>All Continents</option><option>Africa</option><option>Asia</option><option>Europe</option><option>North America</option><option>South America</option><option>Oceania</option></select></div>
+        <div class="world-controls" id="du-proj-controls"><input class="world-input" id="du-proj-q" placeholder="Search project, city, firm or precedent…" autocomplete="off"><select id="du-proj-scope" aria-label="Region"><option value="all">All World</option><option value="us">United States</option><option value="intl">International</option></select><select id="du-proj-state" aria-label="U.S. state"><option value="">All U.S. States</option></select><select id="du-proj-continent" aria-label="Continent"><option value="">All Continents</option><option>Africa</option><option>Asia</option><option>Europe</option><option>North America</option><option>South America</option><option>Oceania</option><option>Middle East</option></select></div>
       </div>
       <div class="card-grid" id="recent-project-grid"><p class="meta">Loading DrawUp projects…</p></div>
     </div>
@@ -1049,11 +1050,8 @@
         <h2>Find the firm behind the work.</h2>
         <p>Firm pages are built to be sent to clients — so the showcase treatment starts right here in search.</p>
       </div>
-      <div class="world-controls compact"><select><option>United States</option><option>International</option><option>All World</option></select><select><option>All U.S. States</option><option>North Carolina</option><option>Georgia</option><option>Texas</option><option>California</option></select><select><option>All Continents</option><option>Africa</option><option>Asia</option><option>Europe</option><option>North America</option><option>South America</option><option>Oceania</option></select><input class="world-input" placeholder="Country or city…"></div>
-      <div class="gallery-filters">
-        <span class="gallery-chip active">Near You</span><span class="gallery-chip">Healthcare</span><span class="gallery-chip">Education</span>
-        <span class="gallery-chip">Workplace</span><span class="gallery-chip">Hospitality</span><span class="gallery-chip">Civic</span><span class="gallery-chip">Multifamily</span>
-      </div>
+      <div class="world-controls compact" id="du-firm-controls"><input class="world-input" id="du-firm-q" placeholder="Firm name, city, state or country…" autocomplete="off"><select id="du-firm-scope" aria-label="Region"><option value="all">All World</option><option value="us">United States</option><option value="intl">International</option></select><select id="du-firm-state" aria-label="U.S. state"><option value="">All U.S. States</option></select><select id="du-firm-continent" aria-label="Continent"><option value="">All Continents</option><option>Africa</option><option>Asia</option><option>Europe</option><option>North America</option><option>South America</option><option>Oceania</option><option>Middle East</option></select></div>
+      <div class="gallery-filters" id="du-firm-chips"><button type="button" class="gallery-chip active" data-chip="all">All firms</button><button type="button" class="gallery-chip" data-chip="near">Near you</button><button type="button" class="gallery-chip" data-chip="Architecture">Architecture</button><button type="button" class="gallery-chip" data-chip="Engineering">Engineering</button><button type="button" class="gallery-chip" data-chip="Construction">Construction</button><button type="button" class="gallery-chip" data-chip="verified">Verified</button></div><p class="meta du-filter-count" id="du-firm-count"></p>
       <div class="gallery-grid" id="du-live-discover-firms"><p class="meta">Loading DrawUp firms…</p></div></div>
     </div>
 
@@ -1746,18 +1744,8 @@
       <div class="price-card featured" style="--c:var(--orange)"><h3>Emerging</h3><div class="price-num">$19<span>/mo</span></div><p><strong>2,000 credits/month</strong> for heavier professional workflows, plus Arch Coach Pro, AEC Chat, Project Threads, DrawUp Check and monthly Swap access.</p></div>
       <div class="price-card" style="--c:var(--blue-deep)"><h3>Firms</h3><div class="price-num">from $49<span>/mo</span></div><p>Shared team credit pools, seats, firm profile tools and expanded DrawUp access. Additional credits can be purchased anytime.</p></div>
     </div>
-    <div class="section-head" style="margin-top:36px;"><h2>How credits work</h2><p>Arch Coach estimates the charge before heavier work. Final usage can vary with document size and generation complexity.</p></div>
-    <div class="detail-grid">
-      <div class="detail-card"><span class="meta">2–5 credits</span><h4>Basic Arch Coach question</h4></div>
-      <div class="detail-card"><span class="meta">5–10 credits</span><h4>Code / ADA question</h4></div>
-      <div class="detail-card"><span class="meta">20–40 credits</span><h4>Analyze uploaded plan</h4></div>
-      <div class="detail-card"><span class="meta">30–75 credits</span><h4>Space-planning generation</h4></div>
-      <div class="detail-card"><span class="meta">25–50 credits</span><h4>Detail generation</h4></div>
-      <div class="detail-card"><span class="meta">50–100 credits</span><h4>Code-compliance report</h4></div>
-      <div class="detail-card"><span class="meta">75–150 credits</span><h4>Photoreal render</h4></div>
-      <div class="detail-card"><span class="meta">100–250 credits</span><h4>Large drawing / document analysis</h4></div>
-      <div class="detail-card"><span class="meta">+25 / +50 credits</span><h4>3D explanation / hologram-style detail</h4></div>
-    </div>
+    <div class="section-head du-credits-head" style="margin-top:36px;"><h2>How credits work</h2><p>Each action shows its cost before it runs. If an AI job fails, the credits come back to you automatically.</p></div>
+    <div class="du-credit-table" role="table" aria-label="Credit costs"><div class="du-credit-row" role="row"><span class="du-credit-cost" role="cell">3</span><span role="cell"><b>Arch Coach question</b><small>Everyday AEC questions</small></span></div><div class="du-credit-row" role="row"><span class="du-credit-cost" role="cell">8</span><span role="cell"><b>Code, ADA or zoning question</b><small>Researched against current sources</small></span></div><div class="du-credit-row" role="row"><span class="du-credit-cost" role="cell">30</span><span role="cell"><b>Arch Coach with a plan or image</b><small>You attach a drawing or photo</small></span></div><div class="du-credit-row" role="row"><span class="du-credit-cost" role="cell">30</span><span role="cell"><b>DrawUp Check, up to 10 pages</b><small>Plan review report with findings</small></span></div><div class="du-credit-row" role="row"><span class="du-credit-cost" role="cell">150</span><span role="cell"><b>DrawUp Check, over 10 pages</b><small>Full drawing sets and specs</small></span></div><div class="du-credit-row" role="row"><span class="du-credit-cost" role="cell">100</span><span role="cell"><b>DrawUp Swap image</b><small>Refunded automatically if it fails</small></span></div><div class="du-credit-row" role="row"><span class="du-credit-cost" role="cell">35–150</span><span role="cell"><b>Details, layouts and renders</b><small>On the public Arch Coach page</small></span></div><div class="du-credit-row" role="row"><span class="du-credit-cost" role="cell">Free</span><span role="cell"><b>Search, Discover and profiles</b><small>Firms, projects, people, universities</small></span></div></div>
     <div class="section-head" style="margin-top:36px;"><h2>Firm plans</h2></div>
     <div class="firm-tier-grid">
       <div class="price-card" style="--c:var(--blue)"><h3>Firm Free</h3><div class="price-num">$0</div><p>Basic profile, logo, Firm Search presence, claim profile.</p></div>
@@ -2148,6 +2136,7 @@ document.querySelectorAll('.portfolio-submit').forEach(btn => {
   }
   async function search(){const q=input?.value.trim();if(!q||busy)return;
     if(window.DrawUpPortal?.search?.(q))return;
+    if(window.DrawUpV19?.publicSearch){window.DrawUpV19.publicSearch(q,activeType);return;}
     try{const kind=activeType==='projects'||activeType==='firms'?activeType:'all';const res=await window.DrawUpLive.searchDb(q,kind);renderDb(res,q);return;}catch(e){console.warn('DrawUp database search failed, falling back to web research:',e);}
 busy=true;button.disabled=true;button.textContent='Drawing it up…';tunnel.classList.add('open');$('v12-tunnel-query').textContent=q;$('v12-tunnel-route').textContent=/bank of america stadium/i.test(q)?'Routing to Charlotte, North Carolina…':'Researching the best available DrawUp result…';const statuses=['SEARCHING DRAWUP','IDENTIFYING RESULT','CHECKING SOURCES','CONNECTING INFORMATION','DRAWING IT UP'];let i=0;$('v12-tunnel-status').textContent=statuses[0];const timer=setInterval(()=>{$('v12-tunnel-status').textContent=statuses[Math.min(++i,statuses.length-1)]},850);let r=localMatch(q);if(r?.directFirm&&window.DrawUpV13?.openFirm){clearInterval(timer);tunnel.classList.remove('open');window.DrawUpV13.openFirm(r.title,r.location);busy=false;button.disabled=false;button.textContent='Search';return;}if(!r)r=await externalResearch(q);const elapsed=Promise.resolve();await new Promise(res=>setTimeout(res,r?Math.max(650,Math.min(1800,650)):1600));clearInterval(timer);tunnel.classList.remove('open');if(r)render(r,q);else render({title:q,type:'Search',sources:[]},q);busy=false;button.disabled=false;button.textContent='Search';}
   button?.addEventListener('click',search);input?.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();search()}});$('v12-portal-close')?.addEventListener('click',()=>portal.classList.remove('open'));
@@ -2157,7 +2146,8 @@ busy=true;button.disabled=true;button.textContent='Drawing it up…';tunnel.clas
 })();
 </script>
 
-<script src="/drawup-portal-v17.js?v=18.0"></script>
-<script src="/drawup-live-v17.js?v=18.0"></script>
+<script src="/drawup-portal-v17.js?v=19.0"></script>
+<script src="/drawup-live-v17.js?v=19.1"></script>
 <script src="/drawup-draw-core-v18.js?v=18.0"></script>
-<script src="/drawup-tools-v18.js?v=18.0"></script>
+<script src="/drawup-tools-v18.js?v=19.0"></script>
+<script src="/drawup-v19.js?v=19.1"></script>

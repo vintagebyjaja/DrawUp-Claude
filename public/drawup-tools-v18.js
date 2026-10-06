@@ -212,29 +212,58 @@ function reportPDF(r,findings,proj){
 
 /* ====================================================================== SWAP */
 const SWAP_TYPES=[['material','Materials / finishes'],['color','Colors'],['landscape','Landscape / site'],['lighting','Time of day / lighting'],['interior','Interior finishes']];
+/* DrawUp Swap (V19): full-width workspace, a basketball-court portal with a shot clock while
+   the image generates, a preview you can open full screen, and downloads that save straight to
+   the device as DrawUp files (no storage links shown). */
+const SWAP_CLOCK=75; // typical generation time in seconds; the clock runs into overtime if it takes longer
+async function swapBlob(c,path){const {data,error}=await c.client.storage.from(BUCKET).download(path);if(error)throw error;return data;}
+const swapUrls=new Map();
+async function swapImg(c,path){if(!path)return'';if(swapUrls.has(path))return swapUrls.get(path);try{const u=URL.createObjectURL(await swapBlob(c,path));swapUrls.set(path,u);return u;}catch(_e){return '';}}
+function swapName(g){const d=new Date(g.completed_at||g.created_at||Date.now());const p=n=>String(n).padStart(2,'0');return `DrawUp-Swap-${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}.${(String(g.result_path||'').split('.').pop()||'png').replace('jpeg','jpg')}`;}
+async function swapDownload(c,g){try{const blob=await swapBlob(c,g.result_path);download(swapName(g),blob);c.toast('Saved '+swapName(g)+' to your device.');}catch(e){c.toast('Download failed — '+(e.message||e),true);}}
+function swapLightbox(c,g,src,before){document.getElementById('du-swap-lightbox')?.remove();document.body.insertAdjacentHTML('beforeend',`<div id="du-swap-lightbox" class="du-swap-lightbox" role="dialog" aria-label="Swap preview"><div class="du-swap-lb-bar"><b>DrawUp Swap</b><span>${c.esc(g.prompt||'')}</span>${before?'<button type="button" class="du-btn ghost" data-lb-compare>Show before</button>':''}<button type="button" class="du-btn primary" data-lb-dl>Download</button><button type="button" class="du-btn ghost" data-lb-x>Close</button></div><div class="du-swap-lb-stage"><img src="${c.esc(src)}" alt="Swap result"></div></div>`);
+  const lb=document.getElementById('du-swap-lightbox'),img=lb.querySelector('img');lb.querySelector('[data-lb-x]').onclick=()=>lb.remove();lb.onclick=e=>{if(e.target===lb||e.target.classList.contains('du-swap-lb-stage'))lb.remove();};lb.querySelector('[data-lb-dl]').onclick=()=>swapDownload(c,g);
+  const cmp=lb.querySelector('[data-lb-compare]');if(cmp)cmp.onclick=()=>{const showingBefore=img.src===before;img.src=showingBefore?src:before;cmp.textContent=showingBefore?'Show before':'Show after';};
+  document.addEventListener('keydown',function k(e){if(e.key==='Escape'){lb.remove();document.removeEventListener('keydown',k);}});}
+function courtPortal(c,label){document.getElementById('du-swap-court')?.remove();
+  document.body.insertAdjacentHTML('beforeend',`<div id="du-swap-court" class="du-swap-court"><div class="du-court-floor"><i class="du-court-line l1"></i><i class="du-court-line l2"></i><i class="du-court-circle"></i><i class="du-court-key k1"></i><i class="du-court-key k2"></i></div><div class="du-court-ball"></div><div class="du-court-card"><span class="du-kicker">DRAWUP SWAP · IN PLAY</span><div class="du-shotclock"><span class="du-shotclock-label">SHOT CLOCK</span><b id="du-shotclock">${SWAP_CLOCK}</b></div><h2 id="du-court-status">Bringing your image onto the court…</h2><p>${c.esc(label||'')}</p><div class="du-court-result" id="du-court-result"></div><div class="du-court-actions"><button type="button" class="du-btn ghost" id="du-court-hide">Keep working — I’ll check back</button></div></div></div>`);
+  const el=document.getElementById('du-swap-court'),clock=document.getElementById('du-shotclock'),status=document.getElementById('du-court-status');const t0=Date.now();
+  const msgs=['Reading the building, camera and light…','Matching materials to your description…','Rendering the swap…','Checking edges and lighting…','Final touches…'];
+  const timer=setInterval(()=>{const s=Math.round((Date.now()-t0)/1000),left=SWAP_CLOCK-s;if(left>=0){clock.textContent=left;el.classList.toggle('du-clock-late',left<=10);}else{clock.textContent='OT +'+(-left);el.classList.add('du-clock-ot');}status.textContent=left>=0?msgs[Math.min(msgs.length-1,Math.floor(s/(SWAP_CLOCK/msgs.length)))]:'Overtime — still generating. Bigger images can take longer.';},500);
+  const close=()=>{clearInterval(timer);el.remove();};document.getElementById('du-court-hide').onclick=close;
+  return {close,done(html,ok){clearInterval(timer);el.classList.add(ok?'du-court-made':'du-court-miss');clock.textContent=ok?'✓':'✕';status.textContent=ok?'Bucket. Your swap is ready.':'No good — the generation failed.';document.getElementById('du-court-result').innerHTML=html;document.getElementById('du-court-hide').textContent='Close';}};
+}
 P.registerTab('swap',async(w,c)=>{
   const projects=await myProjects(c);
   const {data:gens,error}=await c.client.from('swap_generations').select('*').eq('owner_id',c.user.id).order('created_at',{ascending:false}).limit(40);
   if(error)throw error;
   const seq=w.dataset.seq;
-  w.innerHTML=`<div class="du-work-head"><div><span class="du-kicker">DRAWUP SWAP</span><h1>Swap materials on a real image</h1><p>Upload a photo or render, describe the change, and DrawUp generates a new version that keeps the building, camera and lighting. Every result is saved to your account.</p></div></div>
-  <div class="du-two-col">
-    <article class="du-glass"><h2>New swap</h2>
+  w.innerHTML=`<div class="du-swap-full"><div class="du-work-head"><div><span class="du-kicker">DRAWUP SWAP</span><h1>Swap materials on a real image</h1><p>Upload a photo or render, describe the change, and DrawUp generates a new version that keeps the building, camera and lighting. Every result is saved to your account.</p></div></div>
+  <div class="du-swap-grid">
+    <article class="du-glass du-swap-form"><h2>New swap</h2>
       <div class="du-field"><label>Image (JPG, PNG or WebP, up to 20 MB)</label><input type="file" id="sw-file" accept="image/jpeg,image/png,image/webp"></div><div id="sw-preview" class="du-swap-preview"></div>
       <div class="du-field"><label>What to change</label><select id="sw-type">${SWAP_TYPES.map(([k,l])=>`<option value="${k}">${l}</option>`).join('')}</select></div>
-      <div class="du-field"><label>Describe the change</label><textarea id="sw-prompt" rows="3" placeholder="e.g. Replace the red brick with light gray standing-seam metal panels; keep the windows and storefront the same."></textarea></div>
+      <div class="du-field"><label>Describe the change</label><textarea id="sw-prompt" rows="4" placeholder="e.g. Replace the red brick with light gray standing-seam metal panels; keep the windows and storefront the same."></textarea></div>
       <div class="du-field"><label>Project</label>${projectSelect(c,projects,'','sw-proj')}</div>
       <p class="du-muted">Cost: 100 credits per image. Refunded automatically if generation fails.</p>
       <button class="du-btn primary" id="sw-go">Generate</button> <span id="sw-status" class="du-save-status"></span>
     </article>
-    <article class="du-glass"><h2>Your swaps</h2><div id="sw-list" class="du-swap-list">${gens.length?'':'<p class="du-muted">No swaps yet.</p>'}</div></article>
-  </div>`;
+    <article class="du-glass du-swap-results"><h2>Your swaps</h2><div id="sw-list" class="du-swap-list">${gens.length?'':'<p class="du-muted">No swaps yet.</p>'}</div></article>
+  </div></div>`;
   const listEl=$q(w,'#sw-list');
-  const card=async g=>{const [src,res]=await Promise.all([signedUrl(c,g.source_path),signedUrl(c,g.result_path)]);return `<div class="du-swap-card" data-gen="${g.id}"><div class="du-swap-pair"><figure><img src="${c.esc(src)}" alt="Original"><figcaption>Before</figcaption></figure><figure>${res?`<img src="${c.esc(res)}" alt="Swapped">`:`<div class="du-swap-wait">${g.status==='failed'?'FAILED':g.status==='queued'?'NOT STARTED':'GENERATING…'}</div>`}<figcaption>After</figcaption></figure></div><p><b>${c.esc((SWAP_TYPES.find(t=>t[0]===g.swap_type)||[0,'Swap'])[1])}</b> · ${c.esc(g.prompt)}</p><small class="du-muted">${fmtWhen(g.created_at)}${g.credits_charged?' · '+g.credits_charged+' credits':''}${g.error?' · '+c.esc(g.error):''}</small>${res?`<p><a class="du-btn ghost" href="${c.esc(res)}" download target="_blank" rel="noopener">Download</a></p>`:''}${g.status==='queued'?`<p><button class="du-btn ghost" data-start-gen="${g.id}">Start</button></p>`:''}</div>`;};
-  const renderList=async rows=>{if(!rows.length)return;listEl.innerHTML=(await Promise.all(rows.map(card))).join('');listEl.querySelectorAll('[data-start-gen]').forEach(b=>b.onclick=async()=>{b.disabled=true;try{await api(c,'/api/swap',{method:'POST',body:JSON.stringify({generation_id:b.dataset.startGen})});c.openPortalTab('swap');}catch(e){b.disabled=false;c.toast(e.message,true);}});};
+  const label=g=>c.esc((SWAP_TYPES.find(t=>t[0]===g.swap_type)||[0,'Swap'])[1]);
+  const card=async g=>{const [src,res]=await Promise.all([swapImg(c,g.source_path),swapImg(c,g.result_path)]);return `<div class="du-swap-card" data-gen="${g.id}"><div class="du-swap-pair"><figure><img src="${c.esc(src)}" alt="Original"><figcaption>Before</figcaption></figure><figure>${res?`<button type="button" class="du-swap-open" data-open-gen="${g.id}" title="Open preview"><img src="${c.esc(res)}" alt="Swapped"><span>Preview ⤢</span></button>`:`<div class="du-swap-wait">${g.status==='failed'?'FAILED':g.status==='queued'?'NOT STARTED':'<i class="du-mini-ball"></i>GENERATING…'}</div>`}<figcaption>After</figcaption></figure></div><p><b>${label(g)}</b> · ${c.esc(g.prompt)}</p><small class="du-muted">${fmtWhen(g.created_at)}${g.credits_charged?' · '+g.credits_charged+' credits':''}${g.error?' · '+c.esc(g.error):''}</small>${res?`<p class="du-swap-actions"><button type="button" class="du-btn primary" data-dl-gen="${g.id}">Download</button> <button type="button" class="du-btn ghost" data-open-gen="${g.id}">Preview</button></p>`:''}${g.status==='queued'?`<p><button class="du-btn ghost" data-start-gen="${g.id}">Start</button></p>`:''}</div>`;};
+  const bindList=()=>{listEl.querySelectorAll('[data-start-gen]').forEach(b=>b.onclick=async()=>{b.disabled=true;try{await api(c,'/api/swap',{method:'POST',body:JSON.stringify({generation_id:b.dataset.startGen})});c.openPortalTab('swap');}catch(e){b.disabled=false;c.toast(e.message,true);}});
+    listEl.querySelectorAll('[data-dl-gen]').forEach(b=>b.onclick=()=>swapDownload(c,gens.find(g=>g.id===b.dataset.dlGen)));
+    listEl.querySelectorAll('[data-open-gen]').forEach(b=>b.onclick=async()=>{const g=gens.find(x=>x.id===b.dataset.openGen);swapLightbox(c,g,await swapImg(c,g.result_path),await swapImg(c,g.source_path));});};
+  const renderList=async rows=>{if(!rows.length)return;listEl.innerHTML=(await Promise.all(rows.map(card))).join('');bindList();};
   await renderList(gens);
   $q(w,'#sw-file').onchange=e=>{const f=e.target.files[0];$q(w,'#sw-preview').innerHTML=f?`<img src="${URL.createObjectURL(f)}" alt="Selected image">`:'';};
-  const poll=async()=>{let active=gens.filter(g=>g.status==='generating');while(active.length&&w.dataset.seq===seq){await sleep(5000);if(w.dataset.seq!==seq)return;let changed=false;for(const g of active){try{const d=await api(c,'/api/swap?id='+g.id);if(d.generation&&d.generation.status!==g.status){Object.assign(g,d.generation);changed=true;}}catch(e){console.warn('swap poll',e);}}if(changed){await renderList(gens);P.ctx&&document.dispatchEvent(new Event('du-credits'));}active=gens.filter(g=>g.status==='generating');}};
+  let court=null,watching=null;
+  let polling=false;
+  const poll=async()=>{if(polling)return;polling=true;try{await pollLoop();}finally{polling=false;}};
+  const pollLoop=async()=>{let active=gens.filter(g=>g.status==='generating');while(active.length&&w.dataset.seq===seq){await sleep(3000);if(w.dataset.seq!==seq){court?.close();return;}let changed=false;for(const g of active){try{const d=await api(c,'/api/swap?id='+g.id);if(d.generation&&d.generation.status!==g.status){Object.assign(g,d.generation);changed=true;
+        if(court&&watching===g.id){if(g.status==='complete'){const res=await swapImg(c,g.result_path);court.done(`<button type="button" class="du-swap-open" id="du-court-open"><img src="${c.esc(res)}" alt="Swap result"><span>Open full screen ⤢</span></button><div class="du-court-actions"><button type="button" class="du-btn primary" id="du-court-dl">Download</button></div>`,true);document.getElementById('du-court-dl').onclick=()=>swapDownload(c,g);document.getElementById('du-court-open').onclick=async()=>swapLightbox(c,g,res,await swapImg(c,g.source_path));}else court.done(`<p>${c.esc(g.error||'Generation failed.')}</p>`,false);court=null;}}}catch(e){console.warn('swap poll',e);}}if(changed){await renderList(gens);document.dispatchEvent(new Event('du-credits'));}active=gens.filter(g=>g.status==='generating');}};
   $q(w,'#sw-go').onclick=async()=>{
     const st=$q(w,'#sw-status'),btn=$q(w,'#sw-go'),file=$q(w,'#sw-file').files[0],prompt=$q(w,'#sw-prompt').value.trim();
     if(!file){c.toast('Choose an image first.',true);return;}
@@ -246,10 +275,11 @@ P.registerTab('swap',async(w,c)=>{
       const id=uuid(),ext=file.type==='image/png'?'png':file.type==='image/webp'?'webp':'jpg',path=`${c.user.id}/swap/${id}-source.${ext}`;
       const up=await c.client.storage.from(BUCKET).upload(path,file,{contentType:file.type});if(up.error)throw up.error;
       const ins=await c.client.from('swap_generations').insert({id,owner_id:c.user.id,source_path:path,swap_type:$q(w,'#sw-type').value,prompt,project_thread_id:$q(w,'#sw-proj').value||null}).select('*').single();if(ins.error)throw ins.error;
-      st.textContent=' Starting…';
-      try{await api(c,'/api/swap',{method:'POST',body:JSON.stringify({generation_id:id})});}catch(e){c.toast(e.message,true);}
-      c.openPortalTab('swap');
-    }catch(e){btn.disabled=false;st.textContent=' Not started — '+(e.message||e);}
+      st.textContent=' Starting…';court=courtPortal(c,prompt);watching=id;
+      let started=null;try{started=await api(c,'/api/swap',{method:'POST',body:JSON.stringify({generation_id:id})});}catch(e){court.done(`<p>${c.esc(e.message||String(e))}</p>`,false);court=null;c.toast(e.message,true);}
+      const g={...ins.data,...(started?.generation||{})};gens.unshift(g);await renderList(gens);btn.disabled=false;st.textContent='';$q(w,'#sw-prompt').value='';
+      if(g.status==='generating')poll();
+    }catch(e){court?.close();court=null;btn.disabled=false;st.textContent=' Not started — '+(e.message||e);}
   };
   poll();
 });

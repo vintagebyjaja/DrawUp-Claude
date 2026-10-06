@@ -63,7 +63,8 @@ export async function POST(request: Request) {
         { type: 'input_text', text: `Edit this architectural image. ${rule}\nRequested change: ${gen.prompt}\nReturn one photorealistic image.` },
         { type: 'input_image', image_url: `data:${type};base64,${bytesToBase64(file.bytes)}` },
       ] }],
-      tools: [{ type: 'image_generation', quality: 'high', size: 'auto' }],
+      // 'medium' keeps architectural detail and finishes far faster than 'high'; override with DRAWUP_SWAP_QUALITY.
+      tools: [{ type: 'image_generation', quality: process.env.DRAWUP_SWAP_QUALITY || 'medium', size: 'auto' }],
       tool_choice: { type: 'image_generation' },
       background: true,
       store: true,
