@@ -214,7 +214,7 @@ function openPortal(tab){
   openPortalTab(tab||tabFromHash()||savedTab());
 }
 function closePortal(){restoreEmbedded();$('du-portal')?.classList.remove('open');$('du-profile-panel')?.classList.remove('open');document.documentElement.classList.remove('du-in-portal');portalReady=false;}
-async function loadPlanPill(){try{const {data}=await client.from('arch_coach_credit_accounts').select('*').eq('user_id',currentUser.id).maybeSingle();$('du-plan-status').textContent=data?((data.plan_code||'explore').replace(/_/g,' ').toUpperCase()+' · '+((data.monthly_credits_remaining||0)+(data.purchased_credits_remaining||0))+' credits'):'';}catch(_e){}}
+async function loadPlanPill(){try{const {data}=await client.from('arch_coach_credit_accounts').select('*').eq('user_id',currentUser.id).maybeSingle();$('du-plan-status').textContent=data?((data.plan_code||'explore').replace(/_/g,' ').toUpperCase()+' · '+(data.unlimited_access?'Unlimited credits':((data.monthly_credits_remaining||0)+(data.purchased_credits_remaining||0))+' credits')):'';}catch(_e){}}
 
 /* Public pages shown inside the Portal are moved in, then put back exactly where they were. */
 let embedded=null;
