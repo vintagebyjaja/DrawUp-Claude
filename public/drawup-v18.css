@@ -1,0 +1,53 @@
+/* DrawUp V18 — Draw, Check, Swap, HQ Portal screens. New classes only. */
+.du-two-col{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:18px;align-items:start}
+@media (max-width:900px){.du-two-col{grid-template-columns:1fr}}
+.du-field textarea,.du-field select,.du-head-actions select,.du-head-actions input,.du-draw-tools select{width:100%;background:#081b2d;color:#eaf7ff;border:1px solid rgba(117,224,255,.3);border-radius:10px;padding:10px;font:inherit}
+.du-head-actions select,.du-head-actions input,.du-draw-tools select{width:auto;padding:7px 10px}
+.du-field input[type=file]{color:#cfe9f7}
+.du-status-pill{display:inline-block;padding:3px 9px;border-radius:999px;font:700 10.5px/1.4 'IBM Plex Mono',monospace;letter-spacing:.06em;background:rgba(117,224,255,.14);color:#9ce8ff}
+.du-status-pill[data-state=complete]{background:rgba(80,220,140,.16);color:#7ef0b0}
+.du-status-pill[data-state=failed],.du-status-pill[data-state=critical]{background:rgba(255,110,110,.18);color:#ff9a9a}
+.du-status-pill[data-state=major]{background:rgba(255,170,70,.18);color:#ffc27a}
+.du-status-pill[data-state=minor]{background:rgba(255,230,120,.14);color:#ffe38a}
+.du-check-row{cursor:pointer}.du-check-row>div:last-child{text-align:right;display:flex;flex-direction:column;gap:4px;align-items:flex-end}
+.du-findings{display:flex;flex-direction:column;gap:10px}
+.du-finding{border:1px solid rgba(117,224,255,.16);border-left-width:4px;border-radius:12px;padding:12px 14px;background:rgba(4,18,32,.45)}
+.du-finding.du-sev-critical{border-left-color:#ff6b6b}.du-finding.du-sev-major{border-left-color:#ffaa46}.du-finding.du-sev-minor{border-left-color:#ffe066}.du-finding.du-sev-info{border-left-color:#75e0ff}
+.du-finding-head{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.du-finding-head small{color:#7896af}
+.du-finding p{margin:8px 0 0}
+.du-stat.du-sev-critical strong{color:#ff9a9a}.du-stat.du-sev-major strong{color:#ffc27a}
+/* Swap */
+.du-swap-preview img{max-width:100%;max-height:220px;border-radius:12px;display:block;margin:6px 0 12px}
+.du-swap-list{display:flex;flex-direction:column;gap:16px}
+.du-swap-pair{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.du-swap-pair figure{margin:0}.du-swap-pair img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:10px;display:block}
+.du-swap-pair figcaption{font-size:11px;color:#7896af;margin-top:4px}
+.du-swap-wait{aspect-ratio:4/3;border-radius:10px;border:1px dashed rgba(117,224,255,.35);display:grid;place-items:center;font:700 11px 'IBM Plex Mono',monospace;color:#9ce8ff;letter-spacing:.08em}
+.du-swap-card{padding-bottom:14px;border-bottom:1px solid rgba(117,224,255,.12)}
+/* Draw */
+.du-draw-bar{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:6px 0 10px}
+.du-draw-tools{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.du-draw-tools button{background:#0b2238;color:#cfe9f7;border:1px solid rgba(117,224,255,.25);border-radius:9px;padding:7px 11px;font:600 12.5px 'IBM Plex Sans',system-ui,sans-serif;cursor:pointer}
+.du-draw-tools button.on{background:#1b8cff;border-color:#1b8cff;color:#fff}
+.du-draw-tools label{color:#9fb8cc;font-size:12.5px;display:flex;gap:6px;align-items:center}
+.du-draw-split{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:14px}
+@media (max-width:900px){.du-draw-split{grid-template-columns:1fr}}
+.du-draw-canvas{background:#fff;border-radius:14px;min-height:560px;height:68vh;overflow:hidden;outline:none;box-shadow:inset 0 0 0 1px rgba(13,27,42,.12)}
+.du-draw-canvas [data-wall],.du-draw-canvas [data-opening]{cursor:pointer}
+.du-draw-inspect hr{border:0;border-top:1px solid rgba(117,224,255,.15);margin:14px 0}
+.du-draw-warn{color:#ffc27a;font-size:12.5px}
+.du-draw-note{font-size:12px;margin-top:10px}
+.du-draw-start .du-glass{min-height:0}
+/* HQ */
+.du-hq-tabs{display:flex;gap:6px;margin:14px 0}
+.du-hq-tabs button{background:#0b2238;color:#cfe9f7;border:1px solid rgba(117,224,255,.25);border-radius:9px;padding:8px 13px;cursor:pointer;font:600 13px 'IBM Plex Sans',system-ui,sans-serif}
+.du-hq-tabs button.active{background:#1b8cff;border-color:#1b8cff;color:#fff}
+.du-hq-photos{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin:10px 0}
+.du-hq-photos figure{margin:0}.du-hq-photos img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:10px;display:block}
+.du-hq-photos figcaption{font-size:12px;color:#9fb8cc;margin-top:4px}
+.du-hq-thumb{width:84px;height:84px;object-fit:cover;border-radius:10px;display:block;margin:4px 0 8px;background:#fff}
+/* More Portal tools than before: let the side nav scroll on shorter screens instead of cutting off. */
+.du-side{overflow-y:auto;scrollbar-width:thin}
+@media (min-width:761px) and (max-height:900px){.du-side{gap:2px;padding-top:14px}.du-side .du-side-profile{padding-bottom:8px}}
+#du-portal .du-btn.ghost{border:1px solid rgba(117,224,255,.35);color:#d5ecfa}
+#du-portal .du-btn.ghost:hover{border-color:rgba(117,224,255,.7);color:#fff}

@@ -1,0 +1,47 @@
+/* DrawUp V17 — styles for the rebuilt Portal screens and the live directory.
+   Adds only new classes; nothing on the homepage hero/holograms is touched. */
+.du-toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,30px);opacity:0;pointer-events:none;z-index:2147483000;max-width:min(620px,92vw);padding:13px 18px;border-radius:14px;background:#0b2a44;border:1px solid rgba(117,224,255,.4);color:#eaf7ff;font:600 13px/1.45 'IBM Plex Sans',system-ui,sans-serif;box-shadow:0 18px 50px rgba(0,0,0,.45);transition:opacity .2s,transform .2s}
+.du-toast.open{opacity:1;transform:translate(-50%,0)}
+.du-toast[data-state=bad]{background:#3a1420;border-color:rgba(255,128,128,.5)}
+.du-result-card{cursor:pointer;min-height:0}
+.du-result-card:hover,.du-result-card:focus{outline:1px solid rgba(117,224,255,.5)}
+.du-result-media{margin:-14px -14px 12px;aspect-ratio:16/9;overflow:hidden;border-radius:inherit;border-bottom-left-radius:0;border-bottom-right-radius:0}
+.du-result-media img{width:100%;height:100%;object-fit:cover;display:block}
+.du-web-result{margin-top:16px}
+.du-web-result ul,.du-source-list{padding-left:18px;line-height:1.6}
+.du-web-result a,.du-source-list a{color:#9ce8ff}
+.du-section-title{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.du-head-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.du-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid rgba(117,224,255,.12)}
+.du-row>div:first-child{display:flex;flex-direction:column;gap:2px}
+.du-row small{color:#7896af}
+.du-starter-nav{margin-top:18px;justify-content:space-between}
+.du-starter-steps button.active{outline:2px solid #4dd2ff}
+.du-project-grid .du-v15-project{min-height:0}
+.du-coach-tools select{margin-left:6px;background:#081b2d;color:#eaf7ff;border:1px solid rgba(117,224,255,.3);border-radius:8px;padding:6px}
+.du-coach-messages article p{white-space:pre-wrap}
+.du-inline-grid small{font-weight:400;opacity:.7}
+.du-inline-card .du-btn.ghost{margin-left:8px}
+.du-save-status{margin-left:10px;font-size:13px}
+/* public live directory (light site theme) */
+.du-live-empty{grid-column:1/-1;padding:22px;border:1px dashed var(--ink-faint,#9aa);border-radius:12px;background:var(--paper,#fff)}
+.du-live-empty h3{margin:0 0 6px}
+.du-live-empty p{margin:0 0 12px;color:var(--ink-soft,#555);font-size:13.5px}
+#du-live-connect .directory-mode{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+#du-live-connect .du-live-filter{flex:1;min-width:200px}
+.du-live-profile h1{margin:6px 0}
+.du-live-profile-head{display:flex;gap:18px;align-items:flex-end;justify-content:space-between;flex-wrap:wrap}
+.du-live-logo{width:72px;height:72px;object-fit:contain;border-radius:12px;background:#fff}
+.du-live-photos{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin:18px 0}
+.du-live-photos figure{margin:0}
+.du-live-photos img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:10px;display:block}
+.du-live-photos figcaption{font-size:12px;color:var(--ink-faint,#777);margin-top:4px}
+.du-live-facts{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin:14px 0}
+.du-live-facts b{display:block}
+.du-live-desc{font-size:15px;line-height:1.6;max-width:720px}
+.du-live-list{padding-left:18px;line-height:1.8}
+.du-live-project{cursor:pointer}
+.gallery-logo{width:44px;height:44px;object-fit:contain;border-radius:8px;margin-bottom:8px}
+#du-portal .du-live-profile,#du-portal .du-live-empty{color:inherit;background:transparent}
+#du-portal .du-live-profile a{color:#9ce8ff}
+@media (max-width:640px){.du-row{flex-direction:column;align-items:flex-start}}
