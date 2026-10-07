@@ -232,12 +232,30 @@ async function openFirmSubmission(prefill){
 }
 
 /* ---------- database search for the public search bar ---------- */
-const DU_GENERIC_PROJECT_WORDS=new Set(['the','a','an','of','at','in','on','for','and','project','building','facility','venue','field','park','stadium','arena','center','centre','campus','complex','baseball','basketball','football','soccer','sports','indoor','outdoor']);
+const DU_GENERIC_PROJECT_WORDS=new Set(['the','a','an','of','at','in','on','for','and','project','building','facility','venue','field','park','stadium','arena','center','centre','campus','complex','baseball','basketball','football','soccer','sports','indoor','outdoor','nfl','nba','wnba','mlb','nhl','mls','ncaa']);
 function duNormName(v){return String(v||'').toLowerCase().replace(/&/g,' and ').replace(/[^a-z0-9]+/g,' ').trim();}
 function duCoreTokens(v){return duNormName(v).split(/\s+/).filter(x=>x&&x.length>1&&!DU_GENERIC_PROJECT_WORDS.has(x));}
-function duProjectScore(q,p){const nq=duNormName(q),nn=duNormName(p?.name);if(!nq||!nn)return 0;if(nq===nn)return 100;if(nq.includes(nn)||nn.includes(nq))return 96;const qt=duCoreTokens(q),nt=duCoreTokens(p?.name);if(!qt.length||!nt.length)return 0;const hit=nt.filter(t=>qt.includes(t)).length;const recall=hit/nt.length,precision=hit/qt.length;let score=70*recall+25*precision;if(recall===1)score+=8;const place=duNormName([p?.city,p?.state].filter(Boolean).join(' '));if(place&&nq.includes(place))score+=3;return Math.min(99,score);}
+function duProjectScore(q,p){
+  const nq=duNormName(q),nn=duNormName(p?.name);if(!nq||!nn)return 0;
+  if(nq===nn)return 100;if(nq.includes(nn)||nn.includes(nq))return 98;
+  const qt=duCoreTokens(q),nt=duCoreTokens(p?.name);if(!qt.length)return 0;
+  const aliases=(p?.project_tags||[]).map(x=>x?.tag||'').join(' ');
+  const sources=(p?.project_sources||[]).map(x=>x?.source_name||'').join(' ');
+  const context=duNormName([p?.name,p?.description,p?.city,p?.state,p?.country,p?.project_type,p?.owner_name,aliases,sources].filter(Boolean).join(' '));
+  const nameHit=nt.filter(t=>qt.includes(t)).length;
+  const contextHit=qt.filter(t=>context.includes(t)).length;
+  const contextRecall=contextHit/qt.length;
+  let score=0;
+  if(nt.length&&nameHit){const nameRecall=nameHit/nt.length,namePrecision=nameHit/qt.length;score=Math.max(score,70*nameRecall+25*namePrecision+(nameRecall===1?8:0));}
+  // If every meaningful query token is already present in the stored project record,
+  // treat it as a canonical DrawUp match even when the user searched by tenant/team/old-name context.
+  if(contextRecall===1)score=Math.max(score,92);
+  else if(contextRecall>=.75)score=Math.max(score,86);
+  const place=duNormName([p?.city,p?.state].filter(Boolean).join(' '));if(place&&nq.includes(place))score+=3;
+  return Math.min(99,score);
+}
 async function fuzzyProjects(c,q,maxRows){
-  const {data,error}=await c.from('aec_projects').select('slug,name,city,state,country,project_type,completion_year,opened_year,description,image_page_url,project_images(image_url,is_hero,sort_order)').eq('is_demo',false).limit(500);
+  const {data,error}=await c.from('aec_projects').select('slug,name,city,state,country,project_type,completion_year,opened_year,description,owner_name,image_page_url,project_tags(tag),project_sources(source_name),project_images(image_url,is_hero,sort_order)').eq('is_demo',false).limit(500);
   if(error)return [];
   return (data||[]).map(p=>({...p,_match_score:duProjectScore(q,p),image_url:projectMedia(p)})).filter(p=>p._match_score>=78).sort((a,b)=>b._match_score-a._match_score).slice(0,maxRows||12);
 }

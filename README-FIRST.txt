@@ -1,27 +1,17 @@
-DrawUp V21.5 — Search Match + Canonical Project + Back Button Fix
+DRAWUP V21.6 — CANONICAL / ALIAS PROJECT MATCH PATCH
 
-Replace these 3 files in your project:
+Fixes the remaining case where DrawUp already has a project but a natural-language or former-name search misses it.
 
-public/drawup-live-v17.js
-public/drawup-v19.js
-public/drawup-preview.html
+Example now handled:
+  "NFL Saints stadium" -> existing "Caesars Superdome" DrawUp record
 
-No SQL migration is required for this patch.
+What changed:
+- Existing-project matching now checks the whole known project record, not only the current project name.
+- Uses description, city/state/country, project type, owner, project tags and source names as identity context.
+- Common league/type words (NFL, NBA, MLB, stadium, arena, field, etc.) are treated as descriptors instead of forcing a false mismatch.
+- A strong contextual match becomes the canonical DrawUp result, so Arch Coach does not create a second competing project answer.
+- Existing V21.5 fuzzy matching, internal Back behavior, and image behavior remain intact.
 
-WHAT THIS PATCH FIXES
-1. Fuzzy project matching
-   - Searches like "CarMax Park Baseball Field" can match the existing "CarMax Park" project.
-   - Generic building words such as field, park, stadium, arena, building, project, sports, baseball, etc. no longer force DrawUp to treat a known project as a new unknown item.
+NO SQL REQUIRED.
 
-2. One canonical answer
-   - A strong existing DrawUp project match wins before web/AI research.
-   - DrawUp does not show a separate Quick Answer that can contradict the existing project profile.
-   - The existing DrawUp project record is opened as the canonical result.
-   - Web research remains for searches that do not already have a strong DrawUp match.
-
-3. Internal Back button
-   - Public firm/project profile pages now have an internal DrawUp Back button.
-   - It returns to the DrawUp page the user came from when possible, with Discover as the safe fallback.
-   - This avoids relying on the browser Back button, which may leave DrawUp.
-
-This patch is designed to sit on top of the V21/V21.4 Discover image work.
+Replace the included public files with these versions, preserving your existing deployment structure.
