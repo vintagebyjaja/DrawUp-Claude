@@ -38,7 +38,7 @@ function holoLoader(stage,label){
       if(text){lv.querySelector('p').textContent=text;const q=el.querySelector('.du-holo-quick');if(q&&!q.hidden)q.classList.add('du-quick-dim');}
       this.set(activity==='searching'?'Searching current sources…':activity==='read_sources'?'Reading the sources it found…':text?'Writing the full answer…':'Checking sources for the full answer…');
       const nearBottom=stage.scrollHeight-stage.scrollTop-stage.clientHeight<160;if(nearBottom)stage.scrollTop=stage.scrollHeight;},
-    quick(text,ms){const q=el.querySelector('.du-holo-quick');q.hidden=false;q.innerHTML=`<span class="du-quick-tag">Quick answer, still checking sources${ms?` · ${(ms/1000).toFixed(1)}s`:''}</span><p>${linkText(text)}</p><small>Not verified yet. The full answer with sources replaces this when it is ready.</small>`;el.classList.add('has-quick');this.set('Checking sources for the full answer…');stage.scrollTop=stage.scrollHeight;},
+    quick(text,ms){const q=el.querySelector('.du-holo-quick');q.hidden=false;q.innerHTML=`<span class="du-quick-tag">Quick answer, still checking sources${ms?` · ${(ms/1000).toFixed(1)}s`:''}</span><p>${linkText(text)}</p><small>Available now. Arch Coach is checking whether deeper verification adds anything useful.</small>`;el.classList.add('has-quick');this.set('Checking sources for the full answer…');stage.scrollTop=stage.scrollHeight;},
     done(){clearInterval(tick);el.remove();}};
 }
 const linkText=t=>window.DrawUpV19?.linkify?window.DrawUpV19.linkify(t):esc(t);
@@ -116,14 +116,19 @@ async function coachAsk({token,stage,label,endpoint,...body}){
       if(cursor===null)await sleep(Date.now()-t0<10000?1500:2500);else await sleep(250);
       const r=await fetch('/api/arch-coach?ticket='+encodeURIComponent(d.ticket)+(cursor!==null?'&after='+cursor:''),{headers:h,cache:'no-store'});
       const p=await r.json().catch(()=>({}));
-      if(!r.ok)throw new Error(p.error||'Arch Coach could not finish that answer. You were not charged.');
+      if(!r.ok){
+        // A later full-answer failure must never destroy a successful quick answer.
+        const fallback=text||d.quick?.answer;
+        if(fallback)return {answer:fallback,sources:[],partial:true,quick_preserved:true,full_answer_status:'failed',credits_charged:0,notice:'Quick answer available. Deeper verification could not finish.'};
+        throw new Error(p.error||'Arch Coach could not finish that answer. You were not charged.');
+      }
       if(p.status==='completed')return {...p,clarified_message:body.clarified?body.message:undefined};
       if(cursor!==null&&typeof p.cursor==='number'){cursor=p.cursor;if(p.delta){text+=p.delta;lastText=Date.now();}loader.live(text,p.activity);}
     }
     fetch('/api/arch-coach?ticket='+encodeURIComponent(d.ticket),{method:'DELETE',headers:h}).catch(()=>{});
     // Never leave the member with nothing: keep the quick answer (or what was written) and say it was not fully checked.
     const partial=text||d.quick?.answer;
-    if(partial)return {answer:partial+'\n\n(Arch Coach could not finish checking sources in time, so this answer is not fully verified. You were not charged.)',sources:[],partial:true,credits_charged:0};
+    if(partial)return {answer:partial,sources:[],partial:true,quick_preserved:true,full_answer_status:'timed_out',credits_charged:0,notice:'Quick answer available. Deeper verification is not complete.'};
     throw new Error('That answer took longer than two minutes, so DrawUp stopped it. You were not charged. Try asking a narrower question.');
   }finally{loader.done();}
 }
