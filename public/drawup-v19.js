@@ -52,7 +52,7 @@ const Research={
       if(!r.ok)throw new Error(d?.error||'Web research failed.');
       if(cursor!==null&&typeof d.cursor==='number'){cursor=d.cursor;if(d.delta){text+=d.delta;lastText=Date.now();}onPartial&&onPartial(partialFields(text),d.activity);}
     }
-    throw new Error('DrawUp stopped this search at two minutes. Try a more specific search, for example the project name plus its city.');
+    throw new Error('DRAWUP_REPORT_PENDING');
   },
   /* Resolves to the full result. opts.onQuick(quick) gets the quick answer; opts.onClarify(clarify) takes over
      a clarifying question (run resolves null); without it the search continues as typed. */
@@ -152,10 +152,20 @@ function provisionalHTML(q,st,head){
   if(st.clarify){
     h+=`<section class="du-rs-clarify"><span class="du-quick-tag">Quick question so DrawUp searches the right thing</span><h2>${esc(st.clarify.question)}</h2><div class="du-clarify-opts">${st.clarify.options.map((o,i)=>`<button type="button" data-rs-clar="${i}">${esc(o.label)}</button>`).join('')}</div><form class="du-rs-clarform"><input type="text" maxlength="160" placeholder="Or add a detail (city, state, program, building type…)" aria-label="Add a detail"><button class="du-rs-btn">Search</button></form><button type="button" class="du-rs-asis" data-rs-asis>Search “${esc(q)}” as typed</button></section>`;
   }else if(st.err){
-    h+=`<section class="du-rs-error"><h2>Web research could not finish</h2><p>${esc(st.err)}</p><button type="button" class="du-rs-btn" data-rs-retry>Try again</button></section>`;
-    if(st.quick)h+=`<section class="du-rs-quick"><span class="du-quick-tag">Quick answer · not verified</span><p>${esc(st.quick.answer)}</p></section>`;
+    // V21.7: never blame the user or ask them to rewrite a useful search. Preserve the answer we already have.
+    const pending=st.err==='DRAWUP_REPORT_PENDING'||/could not finish|failed|unavailable|did not start/i.test(String(st.err||''));
+    h+=`<section class="du-rs-query"><span class="du-quick-tag">You asked</span><p>${esc(q)}</p></section>`;
+    if(st.quick){
+      h+=`<section class="du-rs-quick"><span class="du-quick-tag">Answer available now</span><h2>${esc(st.quick.title||q)}</h2><p>${esc(st.quick.answer)}</p><small>${pending?'DrawUp could not complete the sourced report in this session. Use this answer now, or view the DrawUp profile later for the full report when available.':'The sourced report is not available yet.'}</small></section>`;
+    }else if(st.partial&&Object.keys(st.partial).some(k=>k[0]!=='_')){
+      h+=partialHTML(st.partial);
+      h+=`<section class="du-rs-pending"><h2>Full report still pending</h2><p>DrawUp kept everything it found so far. View the DrawUp profile later for the completed sourced report when available.</p></section>`;
+    }else{
+      h+=`<section class="du-rs-pending"><h2>Full report still pending</h2><p>DrawUp could not complete the sourced report in this session. You do not need to make your search more specific. Try again, or view the DrawUp profile later.</p><button type="button" class="du-rs-btn" data-rs-retry>Try again</button></section>`;
+    }
   }else{
     const secs=Math.round((Date.now()-st.t0)/1000);
+    h+=`<section class="du-rs-query"><span class="du-quick-tag">You asked</span><p>${esc(q)}</p></section>`;
     h+=`<section class="du-rs-quick${st.quick?'':' waiting'}"><span class="du-quick-tag">${st.quick?`Quick answer, still checking sources · ${(st.quick.ms/1000||0).toFixed(1)}s`:'Drawing up a quick answer…'}</span>${st.quick?`<h2>${esc(st.quick.title||q)}</h2><p>${esc(st.quick.answer)}</p><small>Not verified yet. The full answer with sources replaces this when it is ready.</small>`:''}<div class="du-rs-checking"><i></i><span>${st.activity==='searching'?'Searching live sources':st.activity==='read_sources'?'Reading the sources it found':st.partial?'Writing up what it found':'Checking live sources for the full answer'}</span><b data-rs-clock>${secs}s</b></div></section>`;
     if(st.partial&&Object.keys(st.partial).some(k=>k[0]!=='_'))h+=partialHTML(st.partial);
   }
@@ -176,7 +186,8 @@ function searchCss(){if(document.getElementById('du-speed19-css'))return;const s
 .du-rs-clarform{display:flex;gap:8px;flex-wrap:wrap}.du-rs-clarform input{flex:1 1 200px;min-width:0;border:1px solid #c9d6de;border-radius:10px;padding:10px 12px;font:inherit}
 .du-rs-asis{margin-top:10px;background:none;border:0;padding:0;color:#33505f;text-decoration:underline;cursor:pointer;font:inherit;font-size:13px}
 .du-rs-found{margin-top:14px;border:1px solid rgba(11,127,163,.35);border-radius:16px;padding:16px 18px;background:#fff}.du-rs-found dl{margin:8px 0 6px;display:grid;gap:8px}.du-rs-found dl>div{display:grid;grid-template-columns:120px 1fr;gap:10px}.du-rs-found dt{font-weight:700;color:#33505f;font-size:13px}.du-rs-found dd{margin:0;color:#10202b;line-height:1.5;overflow-wrap:anywhere}.du-rs-found small{color:#5b6b78}.du-caret{display:inline-block;width:7px;height:14px;margin-left:2px;background:#0b7fa3;vertical-align:-2px;animation:duBlink 1s steps(2) infinite}@keyframes duBlink{50%{opacity:0}}@media(max-width:520px){.du-rs-found dl>div{grid-template-columns:1fr;gap:2px}}
-.du-rs-ingest{border-style:solid;border-color:rgba(155,93,229,.45);background:rgba(155,93,229,.06)}`;document.head.appendChild(s);}
+.du-rs-ingest{border-style:solid;border-color:rgba(155,93,229,.45);background:rgba(155,93,229,.06)}
+.du-rs-query{margin:0 0 14px;padding:12px 16px;border-radius:14px;background:rgba(11,127,163,.06);border:1px solid rgba(11,127,163,.18)}.du-rs-query p{margin:6px 0 0;font-weight:700;color:#102a43}.du-rs-pending{border:1px solid rgba(11,127,163,.25);border-radius:16px;padding:16px 18px;background:#fff}.du-rs-pending h2{margin-top:0}`;document.head.appendChild(s);}
 
 /* V20 speed: one progressive search into `el`. Shows DrawUp matches instantly, a labeled quick answer
    within seconds (or chips for an ambiguous search), then the full sourced page replaces it.
