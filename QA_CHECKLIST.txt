@@ -1,0 +1,15 @@
+ARCH COACH PERSONAL ROUTING — QA CHECKLIST
+
+[ ] "What would you do?" returns an immediate first-person answer.
+[ ] "What do you think?" does not trigger verification.
+[ ] "How would you design this?" does not trigger verification.
+[ ] "What would you include?" does not trigger verification.
+[ ] Atrium Health waiting-area example routes to Coach Mode.
+[ ] Coach Mode does not display the verification countdown.
+[ ] Coach Mode does not display "Checking sources for the full answer..."
+[ ] "What should I do?" can use player/project context.
+[ ] Code/compliance claims trigger verification.
+[ ] "Verify this" triggers verification.
+[ ] Mixed design + compliance questions support both immediate reasoning and verification.
+[ ] Arch Coach never claims an unverified code statement is verified.
+[ ] Existing player context can personalize Coach Mode without inventing preferences.
