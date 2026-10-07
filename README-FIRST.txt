@@ -1,31 +1,18 @@
-DRAWUP V21.2 — ARCH COACH BACKGROUND COMPLETION + NOTIFICATIONS
+DRAWUP V21.3 — DISCOVER PROJECT IMAGE FIX
 
-WHAT THIS DOES
-- Keeps a successful Quick Answer permanently instead of letting a later full-answer failure erase it.
-- Lets simple/sufficient Quick Answers end immediately (the prior 3-file fix is included here).
-- For deeper questions, the OpenAI background response continues even if the page's live waiting window ends.
-- Persists a durable Arch Coach job in Supabase.
-- In Portal threads, saves the Quick Answer immediately as the assistant message, then replaces/expands that SAME message when the full answer is ready.
-- Creates an in-app notification when a background answer completes (or when deeper verification fails while the Quick Answer remains saved).
-- On the user's next DrawUp visit, unfinished jobs are reconciled before notifications are shown, so this works even without a hosting cron.
-- Includes an optional Vercel cron config to reconcile jobs every minute while the user is away.
+Replace these two files in your DrawUp project:
+1. src/app/api/project-research/route.ts
+2. src/lib/drawup-ingest.ts
 
-INSTALL
-1) Run this SQL ONCE in Supabase SQL Editor:
-   supabase/migrations/0042_arch_coach_background_answers.sql
+No SQL migration is required for this patch. It uses the existing project_images table already used by Discover and firm project profiles.
 
-2) Replace/add these project files at the exact paths shown:
-   src/app/api/arch-coach/route.ts
-   src/app/api/arch-coach/reconcile/route.ts   (NEW)
-   src/lib/drawup-quick.ts
-   public/drawup-v20.js
-   public/drawup-portal-v17.js
-
-3) OPTIONAL SCHEDULER:
-   vercel.json is included for Vercel deployments. Set CRON_SECRET in the host environment.
-   If you are not on Vercel, you can omit vercel.json. The system still reconciles a user's jobs automatically on their next DrawUp visit. A host scheduler can also call GET /api/arch-coach/reconcile with Authorization: Bearer <CRON_SECRET>.
+WHAT CHANGED
+- DrawUp Search now explicitly asks web research for a real project image + the page that supplied it.
+- When a researched project is ingested into Discover, its web-discovered image is saved into project_images as the hero image if the project does not already have a photo.
+- Existing firm-uploaded/project-uploaded photos are NEVER overwritten by web search.
+- Discover already reads project_images, so the image appears automatically on the project card and project profile.
+- Projects can now be ingested even when research did not identify an architect/engineer/contractor team; previously that early return could prevent the project itself from being saved.
+- If no trustworthy image is returned, DrawUp keeps the existing placeholder rather than inventing a fake project image.
 
 IMPORTANT
-- Do not cancel a job just because the browser stopped waiting. That was the old behavior that prevented true background completion.
-- Browser/system notifications are only mirrored if the user has already granted notification permission. DrawUp does not force a permission prompt. The in-app notification works independently.
-- Portal answers are durable because they have a coach thread/message to update. Public/guest questions still get durable job + notification state; their Quick Answer remains on-screen for the current session, while completed background state is retained in arch_coach_jobs.
+Previously discovered projects with no image will get an image the next time that project is researched/refreshed through DrawUp Search. New researched projects get this behavior immediately.

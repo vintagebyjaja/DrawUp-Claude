@@ -17,6 +17,7 @@ const ROLE_OK = /architect|engineer|contractor|builder|construction|design/i;
 const clean = (s: unknown) => String(s ?? '').replace(/\([^)]*\)/g, ' ').replace(/\s+/g, ' ').replace(/^[\s,;:.-]+|[\s,;:.-]+$/g, '').trim();
 const slugify = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 70);
 const httpUrl = (u: unknown) => (/^https?:\/\/[^\s]+$/i.test(String(u || '')) ? String(u) : '');
+const imageUrl = (u: unknown) => { const x = httpUrl(u); return x && !/google\.|bing\.com\/search|search\?q=/i.test(x) ? x : ''; };
 
 /** True when a candidate looks like a real firm name and not filler text. */
 export function looksLikeFirm(name: string) {
@@ -104,7 +105,6 @@ export async function ingestResearch(r: any, query: string): Promise<IngestRepor
       if (!ok) report.skipped.push(t.name);
       return ok;
     }).slice(0, MAX_NEW_FIRMS);
-    if (!team.length) return report;
 
     // Resolve firms first (existing via drawup_match_firm, else list a new unverified one).
     const resolved: { id: string; slug: string; name: string; role: string; created: boolean }[] = [];
@@ -143,6 +143,22 @@ export async function ingestResearch(r: any, query: string): Promise<IngestRepor
       createdProject = true;
       for (const s of (r.sources || []).filter((s: any) => httpUrl(s?.url)).slice(0, 6))
         await insert('project_sources', { project_id: project.id, source_name: clean(s.title || s.publisher || 'Source').slice(0, 200) || 'Source', source_url: s.url }).catch(() => null);
+    }
+    // V21.3 Discover media: a project found by DrawUp Search should keep a real project image.
+    // Firm-uploaded images always win: only add web-discovered media when the project has no image yet.
+    const existingImages = await rows(`project_images?project_id=eq.${project.id}&select=id&limit=1`);
+    if (!existingImages.length) {
+      const sourceObjects = Array.isArray(r.sources) ? r.sources : [];
+      const webImage = imageUrl(r.image || r.image_url || r.hero_image || r.thumbnail || sourceObjects.find((s: any) => imageUrl(s?.image))?.image);
+      if (webImage) {
+        const imageSource = httpUrl(r.image_source_url) || httpUrl(sourceObjects.find((s: any) => imageUrl(s?.image) === webImage)?.url) || sources[0] || '';
+        await insert('project_images', {
+          project_id: project.id, image_url: webImage,
+          caption: `Web-discovered project image${imageSource ? ' · source: ' + imageSource : ''}`.slice(0, 1000),
+          is_hero: true, sort_order: 0,
+        }).catch(() => null);
+        if (imageSource) await adminRest(`aec_projects?id=eq.${project.id}`, { method: 'PATCH', body: JSON.stringify({ image_page_url: imageSource }) }).catch(() => null);
+      }
     }
     report.project = { slug: project.slug, name: project.name, created: createdProject };
 
