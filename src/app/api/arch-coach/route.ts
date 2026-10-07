@@ -40,7 +40,7 @@ export function buildCoachPrompt({ message, transcript, location, extra = '' }: 
 
 const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
 const QUICK_HEAD_START_MS = 3000;
-const quickOut = (q: QuickResult | null) => q && q.kind === 'answer' ? { answer: q.answer, ms: q.ms, label: 'Quick answer, still checking sources' } : null;
+const quickOut = (q: QuickResult | null) => q && q.kind === 'answer' ? { answer: q.answer, ms: q.ms, final: q.final === true, label: q.final ? 'Answer' : 'Quick answer, still checking sources' } : null;
 const clarifyOut = (q: QuickResult) => q.kind === 'clarify' ? { question: q.question, options: q.options } : null;
 
 export async function POST(request: Request) {
@@ -85,6 +85,12 @@ export async function POST(request: Request) {
     const early = useQuick ? await Promise.race([quickP, sleep(QUICK_HEAD_START_MS).then(() => undefined)]) : null;
     const clarifyReply = (q: QuickResult) => { const c = clarifyOut(q)!; return NextResponse.json({ answer: c.question, clarify: c, needs_clarification: true, sources: [], researched: false, credits_charged: 0 }); };
     if (early && early.kind === 'clarify') return clarifyReply(early);
+    // V21.1: if the fast answer fully resolves a stable/simple question, stop here.
+    // Do not launch an unnecessary full research job that can later fail and erase a good answer.
+    if (early && early.kind === 'answer' && early.final === true && !research) {
+      await awardXp(user.id, 'ask', 'quick:' + createHash('sha1').update(message + early.answer).digest('hex'));
+      return NextResponse.json({ answer: early.answer, sources: [], researched: false, quick_final: true, credits_charged: 0, credits_remaining: null });
+    }
 
     const priced = questionCost(message, !!image);
     action = priced.action;
@@ -124,6 +130,16 @@ export async function POST(request: Request) {
         if (!data) data = (await openaiCreate({ ...payload, background: true, store: true }, models)).data;
         if (data?.status === 'completed' && outputText(data)) { await awardXp(user.id, 'ask', data.id || 'sync:' + Date.now()); return done(data); }
         const quick = early === undefined ? await quickP : early;
+        // The quick answer may finish just after the 3s head start. If it says the answer is
+        // already complete, cancel the unnecessary full job and return the useful answer.
+        if (quick && quick.kind === 'answer' && quick.final === true && !research) {
+          if (data?.id) await openaiCancel(data.id).catch(() => {});
+          if (data?.id) await refundOnce(user.id, access, action, data.id);
+          else await refundCredits(user.id, access, action);
+          access = null;
+          await awardXp(user.id, 'ask', 'quick:' + createHash('sha1').update(message + quick.answer).digest('hex'));
+          return NextResponse.json({ answer: quick.answer, sources: [], researched: false, quick_final: true, credits_charged: 0, credits_remaining: null });
+        }
         if (quick && quick.kind === 'clarify' && data?.id) {
           await openaiCancel(data.id);
           await refundOnce(user.id, access, action, data.id);
