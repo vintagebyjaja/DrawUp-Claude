@@ -1,18 +1,20 @@
-DRAWUP V21.3 — DISCOVER PROJECT IMAGE FIX
+DrawUp V21.4 — Discover project image backfill
 
-Replace these two files in your DrawUp project:
+WHY THIS FIX EXISTS
+DrawUp Search could already find and display a real image for a known building (for example SoFi Stadium), while Discover still showed the blue placeholder. The missing link was cached search results: cached results were returned to the Search UI without re-running the project ingest that saves the image into project_images.
+
+REPLACE THESE TWO FILES
 1. src/app/api/project-research/route.ts
 2. src/lib/drawup-ingest.ts
 
-No SQL migration is required for this patch. It uses the existing project_images table already used by Discover and firm project profiles.
+NO SQL REQUIRED.
 
-WHAT CHANGED
-- DrawUp Search now explicitly asks web research for a real project image + the page that supplied it.
-- When a researched project is ingested into Discover, its web-discovered image is saved into project_images as the hero image if the project does not already have a photo.
-- Existing firm-uploaded/project-uploaded photos are NEVER overwritten by web search.
-- Discover already reads project_images, so the image appears automatically on the project card and project profile.
-- Projects can now be ingested even when research did not identify an architect/engineer/contractor team; previously that early return could prevent the project itself from being saved.
-- If no trustworthy image is returned, DrawUp keeps the existing placeholder rather than inventing a fake project image.
+WHAT CHANGES
+- Fresh project research: saves a legitimate web-discovered project image into project_images when the project has no image.
+- Cached project research: now ALSO runs the same idempotent ingest/backfill. This is the key fix for projects DrawUp already knows, such as SoFi Stadium.
+- Existing firm/project photos always win; web imagery is only added when project_images is empty.
+- A project does NOT need a known architect, engineer, contractor, or firm in order to receive an image.
+- DrawUp does not invent an image of a real building; it uses the real image returned by project research and keeps the source page URL.
 
-IMPORTANT
-Previously discovered projects with no image will get an image the next time that project is researched/refreshed through DrawUp Search. New researched projects get this behavior immediately.
+AFTER DEPLOY
+Search/open a known project through DrawUp Search/Arch Coach once. If that result contains a valid real project image, the ingest will attach it to the existing Discover project record. Refresh Discover and the image should appear on the card and project profile.

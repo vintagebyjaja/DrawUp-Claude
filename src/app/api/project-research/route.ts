@@ -127,8 +127,15 @@ export async function POST(request: Request) {
       const hit = await cached(qn, key, type);
       if (hit?.result) {
         void patchRows(`id=eq.${hit.id}`, { hits: (hit.hits || 1) + 1 });
-        void saveRow({ ...base, status: 'cached', result: null, completed_at: new Date().toISOString() });
-        return NextResponse.json({ result: hit.result, cached: true, match: hit.match, saved_query: hit.query, saved_at: hit.completed_at });
+        // V21.4: cached research can already contain a real project image. Re-run the
+        // idempotent ingest so older DrawUp projects get that image backfilled into
+        // project_images instead of showing a placeholder forever. This does not
+        // require a firm/architect match and never overwrites an existing project photo.
+        const cachedResult = hit.result;
+        const ingest = await ingestResearch(cachedResult, query).catch(() => null);
+        if (ingest) cachedResult._ingest = ingest;
+        void saveRow({ ...base, status: 'cached', result: null, ingest, completed_at: new Date().toISOString() });
+        return NextResponse.json({ result: cachedResult, cached: true, match: hit.match, saved_query: hit.query, saved_at: hit.completed_at });
       }
       if (allowClarify) {
         const c = await cachedClarify(qn, key, type);
