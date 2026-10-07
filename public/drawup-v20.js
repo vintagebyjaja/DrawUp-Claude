@@ -30,9 +30,14 @@ function holoLoader(stage,label){
   el.innerHTML=`<div class="du-holo-quick" hidden></div><div class="du-holo-portal">${HOLO_SVG}</div><div class="du-holo-text"><span class="du-holo-kicker">ARCH COACH · DRAWING IT UP</span><b class="du-holo-phase">${esc(label||'Reading your question…')}</b><div class="du-holo-meter"><i></i></div><small class="du-holo-time">0s</small></div>`;
   stage.appendChild(el);stage.scrollTop=stage.scrollHeight;
   const t0=Date.now(),phases=[[0,'Reading your question…'],[4,'Checking codes, standards and current sources…'],[14,'Drawing up the answer…'],[40,'Cross-checking what it found…'],[75,'Almost there, finishing the write-up…']];
-  const tick=setInterval(()=>{const s=Math.round((Date.now()-t0)/1000);el.querySelector('.du-holo-time').textContent=s+'s of 2:00 max';const p=[...phases].reverse().find(x=>s>=x[0]);if(p&&!el.dataset.custom)el.querySelector('.du-holo-phase').textContent=p[1];el.querySelector('.du-holo-meter i').style.width=Math.min(96,100*(1-Math.exp(-s/30)))+'%';},500);
+  const tick=setInterval(()=>{const s=Math.round((Date.now()-t0)/1000);el.querySelector('.du-holo-time').textContent=el.querySelector('.du-holo-live p')?.textContent?s+'s · still writing':s+'s of 2:00 max';const p=[...phases].reverse().find(x=>s>=x[0]);if(p&&!el.dataset.custom)el.querySelector('.du-holo-phase').textContent=p[1];el.querySelector('.du-holo-meter i').style.width=Math.min(96,100*(1-Math.exp(-s/30)))+'%';},500);
   return {set(t){el.dataset.custom='1';el.querySelector('.du-holo-phase').textContent=t;},
     // V20 speed: the quick answer shows above the loader until the full sourced answer replaces it.
+    // V21: the full answer appears here as it is written, then the finished answer replaces the loader.
+    live(text,activity){let lv=el.querySelector('.du-holo-live');if(!lv){lv=document.createElement('div');lv.className='du-holo-live';lv.innerHTML='<span class="du-quick-tag">Full answer · writing now</span><p></p>';el.insertBefore(lv,el.querySelector('.du-holo-portal'));el.classList.add('has-quick');}
+      if(text){lv.querySelector('p').textContent=text;const q=el.querySelector('.du-holo-quick');if(q&&!q.hidden)q.classList.add('du-quick-dim');}
+      this.set(activity==='searching'?'Searching current sources…':activity==='read_sources'?'Reading the sources it found…':text?'Writing the full answer…':'Checking sources for the full answer…');
+      const nearBottom=stage.scrollHeight-stage.scrollTop-stage.clientHeight<160;if(nearBottom)stage.scrollTop=stage.scrollHeight;},
     quick(text,ms){const q=el.querySelector('.du-holo-quick');q.hidden=false;q.innerHTML=`<span class="du-quick-tag">Quick answer, still checking sources${ms?` · ${(ms/1000).toFixed(1)}s`:''}</span><p>${linkText(text)}</p><small>Not verified yet. The full answer with sources replaces this when it is ready.</small>`;el.classList.add('has-quick');this.set('Checking sources for the full answer…');stage.scrollTop=stage.scrollHeight;},
     done(){clearInterval(tick);el.remove();}};
 }
@@ -40,6 +45,7 @@ const linkText=t=>window.DrawUpV19?.linkify?window.DrawUpV19.linkify(t):esc(t);
 function speedCss(){if(document.getElementById('du-speed20-css'))return;const s=document.createElement('style');s.id='du-speed20-css';s.textContent=`
 .du-holo-load.has-quick{flex-wrap:wrap}.du-holo-quick{flex:1 1 100%;margin:0 0 10px;padding:12px 14px;border-radius:14px;border:1px dashed rgba(127,231,255,.55);background:rgba(127,231,255,.07);color:#e9fbff;text-align:left}
 .du-holo-quick p{margin:6px 0 4px;line-height:1.5;white-space:pre-wrap}.du-holo-quick small{color:rgba(233,251,255,.62);font-size:12px}
+.du-holo-live{flex:1 1 100%;margin:0 0 10px;padding:12px 14px;border-radius:14px;border:1px solid rgba(127,231,255,.35);background:rgba(4,15,28,.55);color:#f2fdff;text-align:left}.du-holo-live p{margin:6px 0 0;line-height:1.55;white-space:pre-wrap}.du-quick-dim{opacity:.55}
 .du-quick-tag{display:inline-block;font:700 11px/1.2 inherit;letter-spacing:.08em;text-transform:uppercase;color:#7fe7ff}
 .du-clarify{margin:8px 0;padding:14px;border-radius:16px;border:1px solid rgba(127,231,255,.45);background:linear-gradient(135deg,rgba(127,231,255,.10),rgba(155,93,229,.10));color:#eefcff}
 .du-clarify b{display:block;margin:4px 0 10px;font-size:15px}.du-clarify-opts{display:flex;flex-wrap:wrap;gap:8px}
@@ -68,15 +74,32 @@ function clarifyCard(stage,c){
 /* body: {message, history, location, project, image}. Resolves to the full answer payload.
    V20 speed: a quick answer shows within seconds (labeled, never presented as verified), then the
    full sourced answer replaces it. Ambiguous questions get chips first; the pick reruns with the clue. */
-async function coachAsk({token,stage,label,...body}){
+/* V21: guests get 10 questions per device. A device id (kept in storage and a cookie) and a light
+   browser fingerprint go to the server, which stores only one-way hashes of them. */
+function deviceId(){let id='';try{id=localStorage.getItem('du_device')||'';}catch(_e){}if(!id){const m=document.cookie.match(/(?:^|; )du_device=([\w-]+)/);id=m?m[1]:'';}
+  if(!id){id=(crypto.randomUUID?crypto.randomUUID():String(Math.random()).slice(2)+Date.now()).replace(/[^\w-]/g,'');}
+  try{localStorage.setItem('du_device',id);}catch(_e){}document.cookie='du_device='+id+'; max-age=63072000; path=/; SameSite=Lax';return id;}
+let fpCache='';
+function fingerprint(){if(fpCache)return fpCache;let c='';try{const cv=document.createElement('canvas');cv.width=220;cv.height=30;const x=cv.getContext('2d');x.textBaseline='top';x.font='14px Arial';x.fillStyle='#f60';x.fillRect(100,1,62,20);x.fillStyle='#069';x.fillText('DrawUp guest check',2,15);c=cv.toDataURL();}catch(_e){}
+  const parts=[navigator.userAgent,navigator.language,(navigator.languages||[]).join(','),screen.width+'x'+screen.height+'x'+screen.colorDepth,new Date().getTimezoneOffset(),Intl.DateTimeFormat().resolvedOptions().timeZone,navigator.hardwareConcurrency,navigator.maxTouchPoints,navigator.platform,c].join('|');
+  let h1=0x811c9dc5,h2=0x1b873593;for(let i=0;i<parts.length;i++){const k=parts.charCodeAt(i);h1=Math.imul(h1^k,16777619);h2=Math.imul(h2^k,2246822507);}
+  return fpCache=('fp'+(h1>>>0).toString(36)+(h2>>>0).toString(36)).padEnd(12,'0');}
+function guestHeaders(){try{return {'X-DrawUp-Device':deviceId(),'X-DrawUp-Fp':fingerprint()};}catch(_e){return {};}}
+/** Shows the guest questions left for this device on the public Arch Coach page (signed-out visitors only). */
+async function refreshGuestCount(){const el=document.getElementById('coach-free-count');if(!el)return;
+  try{const c=window.drawupSupabaseClient;const ses=c?(await c.auth.getSession()).data.session:null;if(ses&&!ses.user?.is_anonymous)return;
+    const r=await fetch('/api/arch-coach?guest=1',{headers:guestHeaders(),cache:'no-store'});const d=await r.json();
+    if(Number.isInteger(d.free_questions_remaining))el.textContent=d.free_questions_remaining+' guest question'+(d.free_questions_remaining===1?'':'s')+' remaining';}catch(_e){}}
+setTimeout(refreshGuestCount,1200);
+async function coachAsk({token,stage,label,endpoint,...body}){
   const loader=holoLoader(stage,label);
   try{
-    const h={'Content-Type':'application/json',Authorization:'Bearer '+token};
+    const h={'Content-Type':'application/json',Authorization:'Bearer '+token,...guestHeaders()};
     let d,res;
     for(let round=0;;round++){
-      res=await fetch('/api/arch-coach',{method:'POST',headers:h,body:JSON.stringify({...body,async:true})});
+      res=await fetch(endpoint||'/api/arch-coach',{method:'POST',headers:h,body:JSON.stringify({...body,async:true})});
       d=await res.json().catch(()=>({}));
-      if(!res.ok)throw new Error(d.error||'Arch Coach could not start ('+res.status+').');
+      if(!res.ok){if(d.code==='GUEST_LIMIT_REACHED'){const el=document.getElementById('coach-free-count');if(el)el.textContent='0 guest questions remaining';}throw new Error(d.error||'Arch Coach could not start ('+res.status+').');}
       if(!(d.clarify&&d.clarify.options?.length>=2&&round<1&&stage))break;
       loader.set('Waiting for your answer…');
       const clue=await clarifyCard(stage,d.clarify);
@@ -87,15 +110,20 @@ async function coachAsk({token,stage,label,...body}){
     }
     if(!d.ticket)return d;
     if(d.quick?.answer)loader.quick(d.quick.answer,d.quick.ms);
-    const t0=Date.now();
-    while(Date.now()-t0<LIMIT_MS){
-      await sleep(Date.now()-t0<10000?1500:2500);
-      const r=await fetch('/api/arch-coach?ticket='+encodeURIComponent(d.ticket),{headers:h,cache:'no-store'});
+    const t0=Date.now();let cursor=d.stream?Number(d.stream.cursor)||0:null,text='',lastText=t0;
+    // V21: streamed answers keep going while text is still arriving (up to 4 minutes); a silent job stops at 2:00.
+    while(Date.now()-t0<LIMIT_MS||(text&&Date.now()-lastText<20000&&Date.now()-t0<LIMIT_MS*2)){
+      if(cursor===null)await sleep(Date.now()-t0<10000?1500:2500);else await sleep(250);
+      const r=await fetch('/api/arch-coach?ticket='+encodeURIComponent(d.ticket)+(cursor!==null?'&after='+cursor:''),{headers:h,cache:'no-store'});
       const p=await r.json().catch(()=>({}));
       if(!r.ok)throw new Error(p.error||'Arch Coach could not finish that answer. You were not charged.');
       if(p.status==='completed')return {...p,clarified_message:body.clarified?body.message:undefined};
+      if(cursor!==null&&typeof p.cursor==='number'){cursor=p.cursor;if(p.delta){text+=p.delta;lastText=Date.now();}loader.live(text,p.activity);}
     }
     fetch('/api/arch-coach?ticket='+encodeURIComponent(d.ticket),{method:'DELETE',headers:h}).catch(()=>{});
+    // Never leave the member with nothing: keep the quick answer (or what was written) and say it was not fully checked.
+    const partial=text||d.quick?.answer;
+    if(partial)return {answer:partial+'\n\n(Arch Coach could not finish checking sources in time, so this answer is not fully verified. You were not charged.)',sources:[],partial:true,credits_charged:0};
     throw new Error('That answer took longer than two minutes, so DrawUp stopped it. You were not charged. Try asking a narrower question.');
   }finally{loader.done();}
 }
@@ -178,7 +206,7 @@ function saveBlob(name,bytes){const a=document.createElement('a');a.href=URL.cre
 function enhanceReviewing(w,id){
   const art=[...w.querySelectorAll('article.du-glass')].find(a=>/Reviewing your sheets/.test(a.querySelector('h2')?.textContent||''));
   if(!art||art.dataset.v20)return;art.dataset.v20='1';
-  art.innerHTML='<h2>Reviewing your sheets…</h2><div class="du-ckp"><div class="du-ckp-top"><b class="du-ckp-pct">0%</b><span class="du-ckp-phase">Opening your PDF…</span></div><div class="du-ckp-meter"><i></i></div><ol class="du-ckp-steps"></ol><small class="du-ckp-note"></small></div>';
+  art.innerHTML='<h2>Reviewing your sheets…</h2><div class="du-ckp"><div class="du-ckp-top"><b class="du-ckp-pct">0%</b><span class="du-ckp-phase">Opening your PDF…</span></div><div class="du-ckp-meter"><i></i></div><ol class="du-ckp-steps"></ol><small class="du-ckp-note"></small></div><div class="du-check-live" hidden aria-live="polite"><h3>Reading the sheets…</h3><ul class="du-check-found"></ul><p class="du-muted">Not final yet. The full report with locations, fixes and references replaces this list.</p></div>';
   loadReview(id).then(x=>{if(!x)return;const r=x.r,pages=r.page_count||Math.max(2,Math.round((r.file_size||3e6)/6e5)),est=30+9*pages,t0=new Date(r.started_at||r.created_at).getTime();
     const focus=(r.focus||[]).map(f=>f.replace('_',' '));
     const steps=[['Uploaded '+(r.file_name||'drawing set'),0],['Reading '+pages+' page'+(pages===1?'':'s')+' (sheets, notes, schedules)',0.08],['Checking '+(focus.join(', ')||'code, accessibility and coordination'),0.4],['Locating each finding on its sheet',0.75],['Writing the report and markups',0.9]];
@@ -374,5 +402,5 @@ async function openUniversity(name,meta,card){
 }
 // Replace the old dark campus portal with the profile (the old portal stays reachable from it).
 document.addEventListener('click',e=>{const b=e.target.closest('.drawup-school-profile');if(!b||!window.drawupSupabaseClient)return;const card=b.closest('.university-card');const name=(card?.dataset.name||card?.querySelector('h3')?.textContent||'').trim();if(!name)return;e.preventDefault();e.stopImmediatePropagation();openUniversity(name,card?.querySelector('.meta')?.textContent||'',card);},true);
-window.DrawUpV20=Object.assign(window.DrawUpV20||{},{coachAsk,holoLoader,buildMarkup,openShowcase,openUniversity});
+window.DrawUpV20=Object.assign(window.DrawUpV20||{},{coachAsk,guestHeaders,refreshGuestCount,holoLoader,buildMarkup,openShowcase,openUniversity});
 })();

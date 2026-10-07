@@ -672,7 +672,8 @@
         // head above the cut plane: dashed lines across the opening on both faces
         L('door', g.outer1, g.outer2, { opening: op.id, dash: true }); L('door', g.inner1, g.inner2, { opening: op.id, dash: true });
       } else {
-        const inward = mul(g.normal, -1), hinge = op.swing === 'right' ? g.inner2 : g.inner1, other = op.swing === 'right' ? g.inner1 : g.inner2;
+        // V21: op.opens 'out' swings the leaf to the +normal face (outside for exterior walls)
+        const ox = op.opens === 'out', inward = mul(g.normal, ox ? 1 : -1), hinge = op.swing === 'right' ? (ox ? g.outer2 : g.inner2) : (ox ? g.outer1 : g.inner1), other = op.swing === 'right' ? (ox ? g.outer1 : g.inner1) : (ox ? g.outer2 : g.inner2);
         const leafEnd = add(hinge, mul(inward, op.width));
         L('door', hinge, leafEnd, { opening: op.id });
         out.push({ t: 'arc', layer: 'door', c: hinge, r: op.width, from: other, to: leafEnd, opening: op.id });

@@ -125,15 +125,22 @@ function createHub(host,opts){
       if(H.section!=='messages')return;
       items.innerHTML=H.dmThreads.length?H.dmThreads.map(t=>{const p=H.profiles.get(t.other);return `<button type="button" class="dc-item ${H.sel===t.other?'active':''}" data-dc-open="${t.other}">${av(p)}<span class="dc-item-main"><b>${esc(nameOf(p))}</b><small>${t.last?(t.last.sender_id===me?'You: ':'')+esc(t.last.image_url&&t.last.body==='Photo'?'Photo':t.last.body):'New conversation'}</small></span><span class="dc-item-side">${t.last?`<time>${ago(t.last.created_at)}</time>`:''}${t.unread?`<i class="dc-count">${t.unread}</i>`:''}</span></button>`;}).join(''):`<div class="dc-list-empty"><p>No conversations yet.</p><p>Message a classmate, a coworker, a firm you admire, a GC or a vendor.</p></div>`;
     }else{
-      if(first)head.innerHTML=sec==='groups'?`<button type="button" class="du-btn dc-btn primary dc-new" data-dc-new>＋ New group chat</button>`:`<p class="dc-list-note">One chat per firm. Members come from each firm roster on DrawUp.</p>`;
-      const {data,error}=await H.c.rpc('connect_my_chats');
+      // V21: Firm chats has two sides. Internal = your firm chat, internal groups and DMs with people on your roster.
+      // External = collaborations with other firms and with individuals outside your firm.
+      const side=H.firmSide||(H.firmSide='internal');
+      if(first||sec==='firms')head.innerHTML=sec==='groups'?`<button type="button" class="du-btn dc-btn primary dc-new" data-dc-new>＋ New group chat</button>`:`<div class="dc-side" role="tablist" aria-label="Firm chats"><button type="button" role="tab" data-dc-side="internal" class="${side==='internal'?'active':''}" aria-selected="${side==='internal'}">Internal</button><button type="button" role="tab" data-dc-side="external" class="${side==='external'?'active':''}" aria-selected="${side==='external'}">External</button></div><p class="dc-list-note">${side==='internal'?'Just your firm: the firm chat, team groups and one-on-ones with people on your roster.':'Collaborations with other firms (their roster joins) and people outside your firm.'}</p><button type="button" class="du-btn dc-btn primary dc-new" data-dc-new>${side==='internal'?'＋ New internal group':'＋ New collaboration'}</button>`;
+      let {data,error}=await H.c.rpc('connect_my_chats_v21');
+      if(error&&/connect_my_chats_v21|function/i.test(error.message||''))({data,error}=await H.c.rpc('connect_my_chats'));
       if(error){items.innerHTML=`<p class="dc-err">${esc(error.message)}</p>`;return;}
       H.chats=data||[];if(H.section!==sec)return;
-      const list=H.chats.filter(c=>c.kind===(sec==='groups'?'group':'firm')),s=seen();
-      items.innerHTML=list.length?list.map(ch=>{const unread=ch.last_body&&(!s[ch.id]||new Date(ch.last_message_at)>new Date(s[ch.id]))&&H.sel!==ch.id;return `<button type="button" class="dc-item ${H.sel===ch.id?'active':''}" data-dc-open="${ch.id}"><span class="dc-av ${ch.kind==='firm'?'firm':'group'}">${esc(initials(ch.name||'Group'))}</span><span class="dc-item-main"><b>${esc(ch.name||'Group chat')}</b><small>${esc(ch.last_body||(ch.member_count+' member'+(ch.member_count===1?'':'s')))}</small></span><span class="dc-item-side"><time>${ago(ch.last_message_at)}</time>${unread?'<i class="dc-dot"></i>':''}</span></button>`;}).join(''):(sec==='groups'?`<div class="dc-list-empty"><p>No group chats yet.</p><p>Start one for a studio team, a project, a study group or an event crew.</p></div>`:`<div class="dc-list-empty"><p>You are not on a firm roster yet.</p><p>Firm chats appear once you are a member of a firm on DrawUp. Add your current firm in Profile.</p>${H.mode==='portal'?'<button type="button" class="du-btn dc-btn ghost" data-portal-tab="profile">Open Profile</button>':''}</div>`);
+      const list=H.chats.filter(c=>sec==='groups'?c.kind==='group'&&!c.scope:side==='internal'?(c.kind==='firm'||c.scope==='internal'):c.scope==='external'),s=seen();
+      if(sec==='firms'){await firmDMs(side);if(H.section!==sec||H.firmSide!==side)return;}
+      items.innerHTML=list.length?list.map(ch=>{const unread=ch.last_body&&(!s[ch.id]||new Date(ch.last_message_at)>new Date(s[ch.id]))&&H.sel!==ch.id;return `<button type="button" class="dc-item ${H.sel===ch.id?'active':''}" data-dc-open="${ch.id}"><span class="dc-av ${ch.kind==='firm'?'firm':'group'}">${esc(initials(ch.name||'Group'))}</span><span class="dc-item-main"><b>${esc(ch.name||((ch.partner_firms||[]).join(' · '))||'Group chat')}</b><small>${ch.scope==='external'&&(ch.partner_firms||[]).length?'<span class="dc-tag">'+esc(ch.partner_firms.join(' · '))+'</span> ':''}${esc(ch.last_body||(ch.member_count+' member'+(ch.member_count===1?'':'s')))}</small></span><span class="dc-item-side"><time>${ago(ch.last_message_at)}</time>${unread?'<i class="dc-dot"></i>':''}</span></button>`;}).join('')+(sec==='firms'?dmItemsHTML():''):(sec==='firms'&&H.firmDMs?.length?dmItemsHTML():sec==='groups'?`<div class="dc-list-empty"><p>No group chats yet.</p><p>Start one for a studio team, a project, a study group or an event crew.</p></div>`:(H.chats||[]).some(c=>c.kind==='firm')?`<div class="dc-list-empty"><p>${H.firmSide==='external'?'No collaborations yet.':'No internal chats yet.'}</p><p>${H.firmSide==='external'?'Start one with a consultant, a GC, a partner firm or anyone outside your firm.':'Start a group for a studio, a project team or QA/QC.'}</p></div>`:`<div class="dc-list-empty"><p>You are not on a firm roster yet.</p><p>Firm chats appear once you are a member of a firm on DrawUp. Add your current firm in Profile.</p>${H.mode==='portal'?'<button type="button" class="du-btn dc-btn ghost" data-portal-tab="profile">Open Profile</button>':''}</div>`);
     }
     items.querySelectorAll('[data-dc-open]').forEach(b=>b.onclick=()=>openThread(b.dataset.dcOpen));
-    const nb=head.querySelector('[data-dc-new]');if(nb)nb.onclick=()=>sec==='messages'?newMessage():newGroup();
+    items.querySelectorAll('[data-dc-dm]').forEach(b=>b.onclick=()=>go('messages',b.dataset.dcDm));
+    head.querySelectorAll('[data-dc-side]').forEach(b=>b.onclick=()=>{if(H.firmSide===b.dataset.dcSide)return;H.firmSide=b.dataset.dcSide;H.sel=null;const conv=root.querySelector('.dc-conv');if(conv)conv.innerHTML=`<div class="dc-conv-empty"><span class="du-kicker">FIRM CHATS · ${H.firmSide.toUpperCase()}</span><h2>Pick a chat or start one.</h2></div>`;loadList(true);});
+    const nb=head.querySelector('[data-dc-new]');if(nb)nb.onclick=()=>sec==='messages'?newMessage():sec==='firms'?newFirmChat(H.firmSide):newGroup();
     if(first){if(H.sel&&items.querySelector(`[data-dc-open="${H.sel}"]`))openThread(H.sel);else if(window.innerWidth>760){const f=items.querySelector('[data-dc-open]');if(f)openThread(f.dataset.dcOpen);}}
   }
 
@@ -145,7 +152,7 @@ function createHub(host,opts){
     const conv=split.querySelector('.dc-conv');
     let title='',sub='',actions='';
     if(H.section==='messages'){const p=H.profiles.get(id);title=nameOf(p);sub=[p?.title,p?.primary_affiliation_name].filter(Boolean).join(' · ')||'Direct message';actions=`<button type="button" class="dc-icon" data-dc-profile="${id}" title="View profile">Profile</button>`;}
-    else{const ch=H.chats.find(c=>c.id===id)||{};title=ch.name||'Group chat';sub=ch.kind==='firm'?'Firm chat · '+ch.member_count+' member'+(ch.member_count===1?'':'s'):ch.member_count+' member'+(ch.member_count===1?'':'s');actions=`<button type="button" class="dc-icon" data-dc-roster title="Members">Members</button>`;}
+    else{const ch=H.chats.find(c=>c.id===id)||{};title=ch.name||'Group chat';sub=ch.kind==='firm'?'Firm chat · '+ch.member_count+' member'+(ch.member_count===1?'':'s'):ch.scope?(ch.scope==='external'?'Collaboration'+((ch.partner_firms||[]).length?' with '+ch.partner_firms.join(', '):''):'Internal')+' · '+ch.member_count+' member'+(ch.member_count===1?'':'s'):ch.member_count+' member'+(ch.member_count===1?'':'s');actions=`<button type="button" class="dc-icon" data-dc-roster title="Members">Members</button>`;}
     conv.innerHTML=`<div class="dc-conv-head"><button type="button" class="dc-back" aria-label="Back to list">‹</button><div class="dc-conv-title">${H.section==='messages'?av(H.profiles.get(id)):`<span class="dc-av ${H.section==='firms'?'firm':'group'}">${esc(initials(title))}</span>`}<span><b>${esc(title)}</b><small>${esc(sub)}</small></span></div><div class="dc-conv-actions">${actions}</div></div>
     <div class="dc-msgs" aria-live="polite"><div class="dc-loading">Loading…</div></div>${composerHTML('Write a message…')}`;
     conv.querySelector('.dc-back').onclick=()=>{split.classList.remove('dc-show-conv');H.sel=null;};
@@ -229,7 +236,7 @@ function createHub(host,opts){
   async function searchPeople(q){
     let qb=H.c.from('profiles').select(PROFILE_COLS).eq('discoverable',true).neq('id',H.user.id).limit(12);
     const s=cleanQ(q);if(s)qb=qb.or(`display_name.ilike.%${s}%,username.ilike.%${s}%,primary_affiliation_name.ilike.%${s}%,title.ilike.%${s}%`);else qb=qb.order('updated_at',{ascending:false});
-    const {data}=await qb;(data||[]).forEach(p=>H.profiles.set(p.id,p));return data||[];
+    const {data}=await qb;const named=(data||[]).filter(p=>String(p.display_name||p.username||'').trim().length>0);named.forEach(p=>H.profiles.set(p.id,p));return named;
   }
   function peoplePicker(el,{multi,exclude=[]}){
     const picked=new Map();
@@ -246,6 +253,52 @@ function createHub(host,opts){
     const s=sheet(`<span class="du-kicker">NEW MESSAGE</span><h2>Who do you want to reach?</h2><div data-pp></div>`);
     const pp=peoplePicker(s.el.querySelector('[data-pp]'),{multi:false});
     pp.onPick(p=>{s.close();H.sel=p.id;loadList(false).then(()=>openThread(p.id));});
+  }
+  /* V21: one-on-ones shown under Firm chats, split by whether the other person is on one of your firm rosters. */
+  async function firmMates(){
+    if(H.mates&&Date.now()-H.mates.t<60000)return H.mates;
+    const firmChats=(H.chats||[]).filter(c=>c.kind==='firm');const ids=new Set(),firms=[];
+    for(const ch of firmChats){firms.push({id:ch.firm_id,name:ch.name,chat:ch.id});const {data}=await H.c.rpc('connect_chat_roster',{p_chat:ch.id});(data||[]).forEach(p=>{ids.add(p.user_id);H.profiles.set(p.user_id,{id:p.user_id,...p});});}
+    return H.mates={t:Date.now(),ids,firms};
+  }
+  async function firmDMs(side){
+    const me=H.user.id,m=await firmMates();
+    const {data}=await H.c.from('direct_messages').select('sender_id,recipient_id,body,image_url,created_at').or(`sender_id.eq.${me},recipient_id.eq.${me}`).order('created_at',{ascending:false}).limit(300);
+    const by=new Map();(data||[]).forEach(x=>{const o=x.sender_id===me?x.recipient_id:x.sender_id;if(!by.has(o))by.set(o,x);});
+    const rows=[...by.entries()].filter(([o])=>side==='internal'?m.ids.has(o):!m.ids.has(o));
+    await profilesFor(rows.map(r=>r[0]));H.firmDMs=rows;
+  }
+  function dmItemsHTML(){const rows=H.firmDMs||[];if(!rows.length)return '';const me=H.user.id;
+    return `<p class="dc-list-sub">One-on-ones</p>`+rows.map(([o,last])=>{const p=H.profiles.get(o);return `<button type="button" class="dc-item" data-dc-dm="${o}">${av(p)}<span class="dc-item-main"><b>${esc(nameOf(p))}</b><small>${last.sender_id===me?'You: ':''}${esc(last.image_url&&last.body==='Photo'?'Photo':last.body||'')}</small></span><span class="dc-item-side"><time>${ago(last.created_at)}</time></span></button>`;}).join('');}
+  async function newFirmChat(side){
+    const m=await firmMates();
+    if(!m.firms.length)return H.toast('Join your firm roster first (Profile), then start firm chats.',true);
+    const firmSel=m.firms.length>1?`<label class="dc-label">For firm<select class="dc-input" data-ffirm>${m.firms.map(f=>`<option value="${f.id}">${esc(f.name)}</option>`).join('')}</select></label>`:'';
+    const s=sheet(`<span class="du-kicker">${side==='internal'?'NEW INTERNAL GROUP':'NEW COLLABORATION'}</span><h2>${side==='internal'?'Start a chat just for your firm':'Start a chat with another firm or person'}</h2>${firmSel}
+      <label class="dc-label">Name<input class="dc-input" data-gname maxlength="120" placeholder="${side==='internal'?'Healthcare studio, Project team, QA/QC…':'Stadium JV with HOK, MEP coordination…'}"></label>
+      ${side==='external'?`<label class="dc-label">Partner firms (their whole DrawUp roster joins)</label><input type="search" class="dc-input" data-fq placeholder="Search firms by name"><div class="dc-picked" data-fpicked></div><div class="dc-people" data-fout></div><label class="dc-label">People outside your firm</label><div data-pp></div>`
+      :`<label class="dc-label">People on your roster</label><div class="dc-people" data-roster></div>`}
+      <div class="dc-sheet-actions"><button type="button" class="du-btn dc-btn primary" data-create>Create chat</button></div>`);
+    const firmId=()=>s.el.querySelector('[data-ffirm]')?.value||m.firms[0].id;
+    const picked=new Set(),partners=new Map();let pp=null;
+    if(side==='internal'){const box=s.el.querySelector('[data-roster]');const draw=async()=>{const f=m.firms.find(x=>x.id===firmId());const {data}=await H.c.rpc('connect_chat_roster',{p_chat:f.chat});
+        box.innerHTML=(data||[]).filter(p=>p.user_id!==H.user.id).map(p=>`<label class="dc-person dc-check"><input type="checkbox" value="${p.user_id}">${av({...p,id:p.user_id},'sm')}<span><b>${esc(nameOf(p))}</b><small>${esc(p.title||'Member')}</small></span></label>`).join('')||'<p class="dc-muted">No one else is on this roster yet.</p>';
+        box.querySelectorAll('input').forEach(i=>i.onchange=()=>i.checked?picked.add(i.value):picked.delete(i.value));};
+      s.el.querySelector('[data-ffirm]')?.addEventListener('change',()=>{picked.clear();draw();});draw();}
+    else{pp=peoplePicker(s.el.querySelector('[data-pp]'),{multi:true,exclude:[...m.ids]});
+      const fq=s.el.querySelector('[data-fq]'),fout=s.el.querySelector('[data-fout]'),fpk=s.el.querySelector('[data-fpicked]');
+      const drawP=()=>{fpk.innerHTML=[...partners.values()].map(f=>`<span class="dc-chip">${esc(f.name)}<button type="button" data-unf="${f.id}" aria-label="Remove">×</button></span>`).join('');fpk.querySelectorAll('[data-unf]').forEach(b=>b.onclick=()=>{partners.delete(b.dataset.unf);drawP();});};
+      let t;fq.oninput=()=>{clearTimeout(t);t=setTimeout(async()=>{const q=fq.value.trim().replace(/[%,()]/g,' ');if(q.length<2){fout.innerHTML='';return;}
+        const {data}=await H.c.from('firms').select('id,name,slug').ilike('name','%'+q+'%').eq('is_demo',false).limit(8);
+        fout.innerHTML=(data||[]).filter(f=>!m.firms.some(x=>x.id===f.id)).map(f=>`<button type="button" class="dc-person" data-fpick="${f.id}" data-fname="${esc(f.name)}"><span class="dc-av firm">${esc(initials(f.name))}</span><span><b>${esc(f.name)}</b><small>Firm</small></span></button>`).join('')||'<p class="dc-muted">No firm found.</p>';
+        fout.querySelectorAll('[data-fpick]').forEach(b=>b.onclick=()=>{partners.set(b.dataset.fpick,{id:b.dataset.fpick,name:b.dataset.fname});drawP();});},250);};}
+    s.el.querySelector('[data-create]').onclick=async e=>{const name=s.el.querySelector('[data-gname]').value.trim();
+      const members=side==='internal'?[...picked]:[...pp.picked.keys()],firms=[...partners.keys()];
+      if(!name&&!firms.length)return H.toast('Give the chat a name.',true);
+      if(!members.length&&!firms.length)return H.toast(side==='internal'?'Pick at least one person on your roster.':'Add a partner firm or a person.',true);
+      e.target.disabled=true;
+      const {data,error}=await H.c.rpc('connect_create_firm_chat',{p_firm:firmId(),p_scope:side,p_name:name||null,p_members:members,p_firms:firms});e.target.disabled=false;
+      if(error)return H.toast(error.message,true);s.close();H.toast(side==='internal'?'Internal group created.':'Collaboration chat created.');H.sel=data;await loadList(false);openThread(data);};
   }
   function newGroup(){
     const s=sheet(`<span class="du-kicker">NEW GROUP CHAT</span><h2>Start a group chat</h2><label class="dc-label">Group name<input class="dc-input" data-gname maxlength="120" placeholder="Studio 4B, Hospital team, ARE study group…"></label><label class="dc-label">Add people</label><div data-pp></div><div class="dc-sheet-actions"><button type="button" class="du-btn dc-btn primary" data-create>Create group</button></div>`);

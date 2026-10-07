@@ -2,7 +2,10 @@ import { NextResponse } from 'next/server';
 import { creditMessage, missingConfig, models as modelList, openaiCancel, openaiCreate, openaiGet, outputText, readTicket, refundCredits, refundOnce, reserveCredits, signTicket, signedInUser, sourcesFrom, type CreditAccess } from '@/lib/drawup-server';
 import { quickCall, quickCoachPrompt, type QuickResult } from '@/lib/drawup-quick';
 import { createHash } from 'node:crypto';
+import { recordDetailQuery, recordDetailSources } from '@/lib/drawup-details';
 import { awardXp, coachPersona } from '@/lib/drawup-coach-persona';
+import { guestKeys, guestLeft, reserveGuest, GUEST_LIMIT } from '@/lib/drawup-guest';
+import { streamCreate, streamRead, withoutSpeedHints } from '@/lib/drawup-stream';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -55,6 +58,7 @@ export async function POST(request: Request) {
       .filter((x: any) => (x?.role === 'user' || x?.role === 'assistant') && typeof x?.content === 'string')
       .slice(-16) as ChatTurn[];
     if (!message) return NextResponse.json({ error: 'Message required.' }, { status: 400 });
+    await recordDetailQuery(message, 'arch_coach', user.id); // V21 Detail Library: detail questions land in the shared detail database
 
     const notReady = missingConfig();
     if (notReady) return NextResponse.json({ error: 'Arch Coach is not connected yet: ' + notReady }, { status: 503 });
@@ -86,19 +90,38 @@ export async function POST(request: Request) {
     action = priced.action;
     access = await reserveCredits(user, priced.cost, action);
     if (!access.ok) return NextResponse.json({ error: creditMessage(access, priced.cost), ...access }, { status: 402 });
+    // V21: guests get 10 questions per device and network, not per browser session.
+    if (user.is_anonymous && !access.hq) {
+      const keys = guestKeys(request);
+      const left = await reserveGuest(keys);
+      if (left < 0) {
+        await refundCredits(user.id, access, action);
+        access = null;
+        return NextResponse.json({ error: 'Your 10 free guest questions on this device are used. Create a free DrawUp account to keep going.', code: 'GUEST_LIMIT_REACHED', free_questions_remaining: 0 }, { status: 402 });
+      }
+      access.guest_keys = keys;
+      access.free_questions_remaining = Math.min(left, Number.isInteger(access.free_questions_remaining) ? access.free_questions_remaining! : left);
+    }
     if (image) await awardXp(user.id, 'upload', 'img:' + createHash('sha1').update(image).digest('hex'));
 
     const input = buildCoachPrompt({ message, transcript, location, extra: persona });
     const models = modelList(process.env.DRAWUP_COACH_MODEL, process.env.DRAWUP_SEARCH_MODEL, 'gpt-5.6-sol');
     const payload: any = image ? { input: [{ role: 'user', content: [{ type: 'input_text', text: input }, { type: 'input_image', image_url: image }] }] } : { input };
     if (research) payload.tools = [{ type: 'web_search' }];
-    const done = (data: any) => NextResponse.json({ answer: outputText(data), sources: sourcesFrom(data), researched: research, credits_charged: access?.credits_charged ?? 0, credits_remaining: access?.credits_remaining ?? null });
+    const done = (data: any) => NextResponse.json({ answer: outputText(data), sources: sourcesFrom(data), researched: research, credits_charged: access?.credits_charged ?? 0, credits_remaining: access?.credits_remaining ?? null, free_questions_remaining: access?.free_questions_remaining ?? null });
 
     // V20: answer as a background job so long researched answers never hit the host's request time limit.
     // The page polls GET ?ticket=… ; the ticket is signed so only this user can read or refund the job.
     if (body?.async) {
       try {
-        const { data } = await openaiCreate({ ...payload, background: true, store: true }, models);
+        // V21: stream the full answer so the page shows it as it is written. Falls back to a plain background job.
+        let data: any = null, streamed = false;
+        const fast = { ...payload, reasoning: { effort: 'low' } };
+        try { data = await streamCreate(fast, models); streamed = true; }
+        catch (e: any) {
+          if (/reasoning/i.test(e?.message || '')) { try { data = await streamCreate(withoutSpeedHints(fast), models); streamed = true; } catch {} }
+        }
+        if (!data) data = (await openaiCreate({ ...payload, background: true, store: true }, models)).data;
         if (data?.status === 'completed' && outputText(data)) { await awardXp(user.id, 'ask', data.id || 'sync:' + Date.now()); return done(data); }
         const quick = early === undefined ? await quickP : early;
         if (quick && quick.kind === 'clarify' && data?.id) {
@@ -107,8 +130,8 @@ export async function POST(request: Request) {
           return clarifyReply(quick);
         }
         if (data?.id) {
-          const ticket = signTicket({ id: data.id, uid: user.id, action, research, access: { ok: access.ok, hq: access.hq, access_type: access.access_type, monthly_used: access.monthly_used, purchased_used: access.purchased_used, is_anonymous: access.is_anonymous, credits_charged: access.credits_charged, credits_remaining: access.credits_remaining } });
-          return NextResponse.json({ ticket, status: data.status || 'queued', quick: quickOut(quick) });
+          const ticket = signTicket({ id: data.id, uid: user.id, action, research, s: streamed ? 1 : 0, access: { ok: access.ok, hq: access.hq, access_type: access.access_type, monthly_used: access.monthly_used, purchased_used: access.purchased_used, is_anonymous: access.is_anonymous, credits_charged: access.credits_charged, credits_remaining: access.credits_remaining, free_questions_remaining: access.free_questions_remaining, guest_keys: access.guest_keys } });
+          return NextResponse.json({ ticket, status: data.status || 'queued', free_questions_remaining: access.free_questions_remaining ?? null, quick: quickOut(quick), stream: streamed ? { cursor: data.cursor || 0 } : null });
         }
       } catch (e: any) {
         if (!/background|store/i.test(e?.message || '')) throw e;
@@ -130,24 +153,41 @@ export async function POST(request: Request) {
 
 async function jobFor(request: Request) {
   const user = await signedInUser(request);
-  const t = readTicket<{ id: string; uid: string; action: string; research: boolean; access: CreditAccess }>(new URL(request.url).searchParams.get('ticket') || '');
+  const t = readTicket<{ id: string; uid: string; action: string; research: boolean; s?: number; access: CreditAccess }>(new URL(request.url).searchParams.get('ticket') || '');
   if (!user || !t || t.uid !== user.id) return null;
   return t;
 }
 
 export async function GET(request: Request) {
+  // V21: how many guest questions this device has left (shown before the first question).
+  if (new URL(request.url).searchParams.get('guest') === '1') {
+    return NextResponse.json({ free_questions_remaining: await guestLeft(guestKeys(request)), limit: GUEST_LIMIT });
+  }
   const t = await jobFor(request);
   if (!t) return NextResponse.json({ error: 'This Arch Coach answer belongs to another session.' }, { status: 403 });
   try {
+    // V21: streamed jobs return the text written since the page's cursor, then the full answer at the end.
+    const after = new URL(request.url).searchParams.get('after');
+    if (t.s && after !== null) {
+      let r;
+      try { r = await streamRead(t.id, Number(after) || 0, 7000); } catch { r = null; }
+      if (r && !r.final && !r.failed) return NextResponse.json({ status: 'in_progress', delta: r.text, cursor: r.cursor, activity: r.activity || null });
+      if (r?.failed && !r.final) {
+        await refundOnce(t.uid, t.access, t.action, t.id);
+        return NextResponse.json({ error: 'Arch Coach could not finish that answer. You were not charged.' }, { status: 502 });
+      }
+      // finished (or the stream could not be read): fall through to the normal read of the stored answer
+    }
     const data = await openaiGet(t.id);
     if (data.status === 'queued' || data.status === 'in_progress') return NextResponse.json({ status: data.status });
-    const answer = data.status === 'completed' ? outputText(data) : '';
+    const answer = data.status === 'completed' || data.status === 'incomplete' ? outputText(data) : '';
     if (!answer) {
       await refundOnce(t.uid, t.access, t.action, t.id);
       return NextResponse.json({ error: 'Arch Coach could not finish that answer. You were not charged.' }, { status: 502 });
     }
     await awardXp(t.uid, 'ask', t.id);
-    return NextResponse.json({ status: 'completed', answer, sources: sourcesFrom(data), researched: t.research, credits_charged: t.access?.credits_charged ?? 0, credits_remaining: t.access?.credits_remaining ?? null });
+    await recordDetailSources('arch_coach', { userId: t.uid }, sourcesFrom(data)); // V21 Detail Library
+    return NextResponse.json({ status: 'completed', answer, sources: sourcesFrom(data), researched: t.research, credits_charged: t.access?.credits_charged ?? 0, credits_remaining: t.access?.credits_remaining ?? null, free_questions_remaining: t.access?.free_questions_remaining ?? null });
   } catch (error: any) {
     return NextResponse.json({ status: 'in_progress', note: error?.message || 'Still checking.' });
   }

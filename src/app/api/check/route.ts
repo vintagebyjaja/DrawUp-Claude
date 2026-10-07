@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { streamCreate, streamRead } from '@/lib/drawup-stream';
 import { awardXp } from '@/lib/drawup-coach-persona';
 import {
   PRIVATE_BUCKET, adminSelectOne, adminUpdate, bytesToBase64, creditMessage, missingConfig, models,
@@ -122,7 +123,8 @@ export async function POST(request: Request) {
   ].join('\n');
 
   try {
-    const { data, model } = await openaiCreate({
+    // V21: streamed so the page can list findings as they are written; plain background job as fallback.
+    const checkPayload = {
       instructions: INSTRUCTIONS,
       input: [{ role: 'user', content: [
         { type: 'input_file', filename: review.file_name || 'drawings.pdf', file_data: 'data:application/pdf;base64,' + bytesToBase64(file.bytes) },
@@ -130,9 +132,10 @@ export async function POST(request: Request) {
       ] }],
       tools: review.jurisdiction ? [{ type: 'web_search' }] : [],
       text: { format: { type: 'json_schema', name: 'drawup_check_report', strict: true, schema: SCHEMA } },
-      background: true,
-      store: true,
-    }, models(process.env.DRAWUP_CHECK_MODEL, process.env.DRAWUP_COACH_MODEL));
+    };
+    const checkModels = models(process.env.DRAWUP_CHECK_MODEL, process.env.DRAWUP_COACH_MODEL);
+    const { data, model } = await streamCreate(checkPayload, checkModels).then(d => ({ data: d, model: d.model }))
+      .catch(() => openaiCreate({ ...checkPayload, background: true, store: true }, checkModels));
     const updated = await adminUpdate('check_reviews', review.id, {
       response_id: data.id, model, page_count: pages, credits_charged: access.credits_charged ?? 0,
       credit_access: access, error: null,
@@ -154,6 +157,12 @@ export async function GET(request: Request) {
   if (!review) return NextResponse.json({ error: 'Review not found.' }, { status: 404 });
   if (review.status !== 'reviewing' || !review.response_id) return NextResponse.json({ review });
 
+  // V21: findings written so far, for streamed reviews (the page passes its cursor as `after`).
+  const after = new URL(request.url).searchParams.get('after');
+  if (after !== null) {
+    const sr = await streamRead(review.response_id, Number(after) || 0, 7000).catch(() => null);
+    if (sr && !sr.final && !sr.failed) return NextResponse.json({ review, delta: sr.text, cursor: sr.cursor, activity: sr.activity || null });
+  }
   let data: any;
   try { data = await openaiGet(review.response_id); }
   catch (e: any) { return NextResponse.json({ review, warning: e.message }); }

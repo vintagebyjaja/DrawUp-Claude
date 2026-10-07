@@ -28,7 +28,44 @@ const SWAP_TYPES: Record<string, string> = {
   landscape: 'Change only the landscape/site elements described. Keep the building itself exactly as it is.',
   lighting: 'Change only the time of day / lighting described. Keep all geometry and materials exactly as they are.',
   interior: 'Change only the interior finishes/furnishings described. Keep the room geometry, openings and camera exactly as they are.',
+  // V21 modes
+  photoreal: 'Turn this image into a photorealistic architectural render, as if photographed with a real camera. Keep the exact composition, camera angle, geometry, openings and proportions. Follow the requested description closely: every material, colour, light condition and object it names must appear as described, and nothing it does not ask for should be added.',
+  play: 'This image is a rough mock-up the member made in DrawUp Let’s Play: some surfaces were recoloured with flat paint and some cut-out objects were pasted on. Turn it into one photorealistic image. Re-render each recoloured surface in its new colour with its real material texture, shading and reflections. Integrate each pasted object at the same position, size and rotation with correct perspective, contact shadows and lighting. Keep everything else identical.',
 };
+
+// V21: options sent with POST (validated here, never trusted as-is).
+const PEOPLE_COUNTS: Record<string, string> = { '1-2': 'one or two', few: 'a few (3 to 5)', busy: 'a busy scene of 6 to 12', crowd: 'a crowd of people' };
+const SOURCE_KINDS: Record<string, string> = { sketch: 'hand sketch or drawing', model: '3D model screenshot', photo: 'photo' };
+const clean = (v: unknown, n: number) => String(v ?? '').replace(/[\u0000-\u001f]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, n);
+const MAX_REFS = 3;
+const MAX_REF_BYTES = 8 * 1024 * 1024;
+
+type Opts = { lines: string[]; refs: string[] };
+function readOptions(gen: any, raw: any, userId: string): Opts {
+  const o = raw && typeof raw === 'object' ? raw : {};
+  const lines: string[] = [];
+  const refs: string[] = [];
+  if (gen.swap_type === 'photoreal') {
+    const kind = SOURCE_KINDS[String(o.source_kind || '')];
+    if (kind) lines.push(`The input is a ${kind}.`);
+    const p = o.people && typeof o.people === 'object' ? o.people : null;
+    const count = p && PEOPLE_COUNTS[String(p.count || '')];
+    if (count) {
+      const act = clean(p.activity, 80);
+      lines.push(`Add ${count} real-life people${act ? `, ${act}` : ''}, at correct scale for the space and camera, lit and shadowed to match the scene, candid (not posing), varied ages and appearances, no readable text or logos on clothing, and no recognisable real individuals.`);
+    } else lines.push('Do not add people unless the description asks for them.');
+  }
+  if (gen.swap_type === 'play') {
+    const objs = Array.isArray(o.objects) ? o.objects.slice(0, MAX_REFS) : [];
+    objs.forEach((x: any, i: number) => {
+      const desc = clean(x?.desc, 120);
+      const ref = typeof x?.ref_path === 'string' && pathIsOwn(x.ref_path, userId) && /\/swap\/[\w-]+\.(jpg|png|webp)$/i.test(x.ref_path) ? x.ref_path : '';
+      if (ref) refs.push(ref);
+      lines.push(`Pasted object ${i + 1}${desc ? `: reproduce exactly this object: ${desc}` : ''}.${ref ? ` Reference image ${refs.length + 1} shows the exact object, match its shape, colours and details.` : ''}`);
+    });
+  }
+  return { lines, refs };
+}
 
 async function loadOwned(id: string, userId: string) {
   if (!/^[0-9a-f-]{36}$/i.test(id)) return null;
@@ -144,11 +181,22 @@ export async function POST(request: Request) {
   const rule = SWAP_TYPES[gen.swap_type] || SWAP_TYPES.material;
   const area = String(gen.area || '').trim().slice(0, 120);
   const earlier = await threadContext(gen, user.id);
+  const opts = readOptions(gen, body?.options, user.id);
+  // V21 Let’s Play: the member’s own reference images of the objects they dragged in (best effort).
+  const refImages: { type: string; image_url: string }[] = [];
+  for (const p of opts.refs) {
+    try {
+      const f = await storageDownload(PRIVATE_BUCKET, p);
+      if (f.bytes.byteLength <= MAX_REF_BYTES) refImages.push({ type: 'input_image', image_url: `data:${/png|webp/.test(f.type) ? f.type : 'image/jpeg'};base64,${bytesToBase64(f.bytes)}` });
+    } catch { /* a missing reference only weakens the match */ }
+  }
   const text = [
     `Edit this architectural image. ${rule}`,
-    `Requested change: ${gen.prompt}`,
+    gen.swap_type === 'photoreal' ? `Description to follow: ${gen.prompt}` : `Requested change: ${gen.prompt}`,
+    ...opts.lines,
     area ? `Where: apply the change only to ${area === 'Marked area' ? 'the marked area' : 'the ' + area.toLowerCase()}. Leave every other surface as it is.` : '',
     maskData ? 'A mask is attached: its transparent pixels mark the exact region to change. Keep everything outside that region identical.' : '',
+    refImages.length ? 'The first image is the one to edit. The images after it are references only, do not return them.' : '',
     earlier.length ? `Earlier changes in this thread (already visible in the image, keep them): ${earlier.join('; ')}` : '',
     'Return one photorealistic image with the same framing.',
   ].filter(Boolean).join('\n');
@@ -159,6 +207,7 @@ export async function POST(request: Request) {
       input: [{ role: 'user', content: [
         { type: 'input_text', text },
         { type: 'input_image', image_url: `data:${type};base64,${bytesToBase64(file.bytes)}` },
+        ...refImages,
       ] }],
       tools: [tool],
       tool_choice: { type: 'image_generation' },

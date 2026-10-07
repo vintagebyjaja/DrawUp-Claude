@@ -99,9 +99,11 @@ export type CreditAccess = {
   code?: string;
   hq?: boolean;
   is_anonymous?: boolean;
+  free_questions_remaining?: number;
+  guest_keys?: string[]; // V21: hashed device / network keys of a guest question
 };
 
-async function isHqAccount(userId: string) {
+export async function isHqAccount(userId: string) {
   const p = await adminSelectOne<{ account_type: string }>('profiles', `id=eq.${userId}&select=account_type`);
   return p?.account_type === 'founder' || p?.account_type === 'drawup_admin';
 }
@@ -135,6 +137,9 @@ export async function refundCredits(userId: string, access: CreditAccess | null 
     });
   } catch (e) {
     console.error('[drawup] refund failed', action, e);
+  }
+  if (access.guest_keys?.length) {
+    try { await adminRpc('refund_guest_quota', { p_keys: access.guest_keys }); } catch (e) { console.error('[drawup] guest refund failed', action, e); }
   }
 }
 

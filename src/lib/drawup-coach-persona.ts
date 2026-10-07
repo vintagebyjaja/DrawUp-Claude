@@ -80,9 +80,9 @@ export async function coachPersona(userId: string): Promise<string> {
     const light = ranked.filter(([, v]) => Number(v) <= 40).map(([k]) => SKILL_LABELS[k]);
     if (light.length) lines.push(`Keep these lighter unless asked (still cover anything that matters for safety or code): ${light.join(', ')}.`);
   }
-  if (legend) {
-    lines.push(`Inspiration legend: draw on publicly documented design principles associated with ${legend.name} (${(legend.principles || []).join(', ')}) when they help the member's work. Do not role-play as ${legend.name}, do not speak in their voice, and do not invent or attribute quotes.`);
-  }
+  // V21: legends no longer change the coach's own answer. They are Hall of Fame guests the member asks
+  // for a second opinion after an answer (see legendPrompt below).
+  void legend;
   return lines.join('\n');
 }
 
@@ -97,4 +97,31 @@ export async function awardXp(userId: string, kind: XpKind, refId: string): Prom
     console.warn('Arch Coach XP not awarded', e);
     return 0;
   }
+}
+
+export type LegendInfo = { key: string; name: string; kind: string; principles: string[]; note: string | null; xp_required: number };
+
+/** Loads a legend and whether this member has unlocked it (DrawUp HQ accounts have every legend). */
+export async function legendFor(userId: string, key: string, hq: boolean): Promise<{ legend: LegendInfo | null; unlocked: boolean; xp: number }> {
+  const legend = /^[a-z0-9_-]{2,60}$/i.test(key) ? await adminSelectOne<LegendInfo>('arch_coach_legends', `key=eq.${encodeURIComponent(key)}&select=key,name,kind,principles,note,xp_required`) : null;
+  const row = await adminSelectOne<{ xp: number }>('arch_coach_profiles', `user_id=eq.${userId}&select=xp`);
+  const xp = Number(row?.xp || 0);
+  return { legend, unlocked: !!legend && (hq || xp >= legend.xp_required), xp };
+}
+
+/** The Hall of Fame second opinion: a legend's documented principles applied to Arch Coach's answer. */
+export function legendPrompt(l: LegendInfo, question: string, answer: string, language: string) {
+  return [
+    `You are Arch Coach, DrawUp's AEC copilot, giving a HALL OF FAME SECOND OPINION through the lens of ${l.name} (${l.kind}).`,
+    COACH_GUARDRAILS,
+    `Ground the opinion only in what is publicly documented about ${l.name}'s work and design principles (${(l.principles || []).join(', ')}${l.note ? '. Background: ' + l.note : ''}).`,
+    `Never role-play or write in the first person as ${l.name}, never invent quotes, opinions or facts about them, and never claim they would endorse anything. Say "Through the lens of ${l.name}'s work" or similar.`,
+    'Respond to Arch Coach\'s answer below: what this lens would emphasize, what it would question or push further, and one or two concrete, buildable suggestions for the member. Keep code, safety and accessibility requirements intact: a design lens never overrides them.',
+    'Length: 120 to 220 words. Plain text, short paragraphs or a few bullets. No headings.',
+    language ? `Write in ${language} unless the question is clearly in another language.` : 'Write in the language of the question.',
+    '',
+    `MEMBER QUESTION:\n${question.slice(0, 3000)}`,
+    '',
+    `ARCH COACH ANSWER:\n${answer.slice(0, 6000)}`,
+  ].join('\n');
 }

@@ -21,6 +21,14 @@ function linkify(text){
 }
 function uuid(){return (crypto.randomUUID&&crypto.randomUUID())||(Date.now().toString(16)+Math.random().toString(16).slice(2)).padEnd(32,'0').replace(/^(.{8})(.{4})(.{4})(.{4})(.{12}).*/,'$1-$2-4$3-a$4-$5').slice(0,36);}
 
+/* V21: reads the fields of a research answer while its JSON is still being written. Complete string
+   fields are returned as is; the field being written right now is returned so far (marked in _writing). */
+const PARTIAL_KEYS=['title','location','type','summary','answer','architect','engineers','contractor','owner','opened','area','capacity'];
+function partialFields(text){const out={};const re=/"([a-z_]+)"\s*:\s*"((?:[^"\\]|\\.)*)("?)/g;let m;
+  while((m=re.exec(text))){if(!PARTIAL_KEYS.includes(m[1]))continue;let v=m[2];try{v=JSON.parse('"'+v.replace(/\\$/,'')+'"');}catch(_e){}if(v)out[m[1]]=v;if(!m[3])out._writing=m[1];}
+  const names=[...text.matchAll(/"name"\s*:\s*"((?:[^"\\]|\\.)*)"\s*,\s*"role"\s*:\s*"((?:[^"\\]|\\.)*)"/g)].map(x=>x[1]+' · '+x[2]);if(names.length)out._team=names.slice(0,12);
+  const srcs=[...text.matchAll(/"url"\s*:\s*"(https?:[^"]+)"/g)].map(x=>x[1]);if(srcs.length)out._sources=[...new Set(srcs)].slice(0,8);
+  return out;}
 /* =================================================================== research */
 const Research={
   /* V20 speed: POST answers with a saved result, a clarifying question {clarify}, or a running job
@@ -33,13 +41,16 @@ const Research={
     if(data.result&&data.cached){data.result._saved_at=data.saved_at;if(data.match==='similar')data.result._saved_query=data.saved_query;}
     return data;
   },
-  async poll(id,t0,onTick,alive){
-    while(Date.now()-t0<115000){
-      await sleep(2500);if(alive&&!alive())return null;onTick&&onTick(Math.round((Date.now()-t0)/1000));
-      const r=await fetch('/api/project-research?id='+encodeURIComponent(id),{cache:'no-store'});
+  /* V21: a streamed job (stream:{cursor}) returns the text written so far; onPartial gets the fields found so far. */
+  async poll(id,t0,onTick,alive,stream,onPartial){
+    let cursor=stream?Number(stream.cursor)||0:null,text='',lastText=0;
+    while(Date.now()-t0<115000||(text&&Date.now()-lastText<20000&&Date.now()-t0<230000)){
+      await sleep(cursor===null?2500:250);if(alive&&!alive())return null;onTick&&onTick(Math.round((Date.now()-t0)/1000));
+      const r=await fetch('/api/project-research?id='+encodeURIComponent(id)+(cursor!==null?'&after='+cursor:''),{cache:'no-store'});
       const d=await r.json().catch(()=>({}));
       if(d.result)return d.result;
       if(!r.ok)throw new Error(d?.error||'Web research failed.');
+      if(cursor!==null&&typeof d.cursor==='number'){cursor=d.cursor;if(d.delta){text+=d.delta;lastText=Date.now();}onPartial&&onPartial(partialFields(text),d.activity);}
     }
     throw new Error('DrawUp stopped this search at two minutes. Try a more specific search, for example the project name plus its city.');
   },
@@ -52,7 +63,7 @@ const Research={
     if(data.clarify){if(opts.onClarify){opts.onClarify(data.clarify);return null;}return Research.run(query,type,onTick,{...opts,clarified:true});}
     if(data.quick&&opts.onQuick)opts.onQuick(data.quick);
     if(!data.id)throw new Error('Web research did not start.');
-    return Research.poll(data.id,t0,onTick,opts.alive);
+    return Research.poll(data.id,t0,onTick,opts.alive,data.stream,opts.onPartial);
   },
   cityOf(loc){const parts=String(loc||'').split(',').map(x=>x.trim()).filter(Boolean);for(let i=1;i<parts.length;i++){if(/^[A-Z]{2}(\s+\d{5}(-\d{4})?)?$/.test(parts[i])||/^(Alabama|Alaska|Arizona|California|Colorado|Florida|Georgia|Illinois|Maryland|Massachusetts|Michigan|New York|North Carolina|South Carolina|Ohio|Pennsylvania|Tennessee|Texas|Virginia|Washington)$/i.test(parts[i]))return {city:parts[i-1].replace(/^\d+\s.*$/,''),state:parts[i].slice(0,2).toUpperCase()};}const first=parts.find(p=>!/\d/.test(p));return first?{city:first,state:''}:null;},
   names(r){return [r.architect,r.engineers,r.contractor,r.owner].filter(Boolean).join(';').split(/;|,|\/|\band\b|\(|\)|\+/i).map(x=>x.replace(/\b(structural|mep|civil|joint venture|jv|architect|engineer(s)?|general contractor|landscape|interiors?)\b/gi,'').trim()).filter(x=>x.length>2&&x.length<60);},
@@ -145,11 +156,14 @@ function provisionalHTML(q,st,head){
     if(st.quick)h+=`<section class="du-rs-quick"><span class="du-quick-tag">Quick answer · not verified</span><p>${esc(st.quick.answer)}</p></section>`;
   }else{
     const secs=Math.round((Date.now()-st.t0)/1000);
-    h+=`<section class="du-rs-quick${st.quick?'':' waiting'}"><span class="du-quick-tag">${st.quick?`Quick answer, still checking sources · ${(st.quick.ms/1000||0).toFixed(1)}s`:'Drawing up a quick answer…'}</span>${st.quick?`<h2>${esc(st.quick.title||q)}</h2><p>${esc(st.quick.answer)}</p><small>Not verified yet. The full answer with sources replaces this when it is ready.</small>`:''}<div class="du-rs-checking"><i></i><span>Checking live sources for the full answer</span><b data-rs-clock>${secs}s</b></div></section>`;
+    h+=`<section class="du-rs-quick${st.quick?'':' waiting'}"><span class="du-quick-tag">${st.quick?`Quick answer, still checking sources · ${(st.quick.ms/1000||0).toFixed(1)}s`:'Drawing up a quick answer…'}</span>${st.quick?`<h2>${esc(st.quick.title||q)}</h2><p>${esc(st.quick.answer)}</p><small>Not verified yet. The full answer with sources replaces this when it is ready.</small>`:''}<div class="du-rs-checking"><i></i><span>${st.activity==='searching'?'Searching live sources':st.activity==='read_sources'?'Reading the sources it found':st.partial?'Writing up what it found':'Checking live sources for the full answer'}</span><b data-rs-clock>${secs}s</b></div></section>`;
+    if(st.partial&&Object.keys(st.partial).some(k=>k[0]!=='_'))h+=partialHTML(st.partial);
   }
   h+=onDrawupHTML(st.db);
   return h+'</div></div>';
 }
+const PARTIAL_LABEL={title:'Name',location:'Location',type:'Type',summary:'Summary',answer:'Answer',architect:'Architect',engineers:'Engineers',contractor:'Contractor',owner:'Owner',opened:'Opened',area:'Size',capacity:'Capacity'};
+function partialHTML(f){return `<section class="du-rs-found" aria-live="polite"><span class="du-quick-tag">Found so far · from live sources, still writing</span><dl>${PARTIAL_KEYS.filter(k=>f[k]).map(k=>`<div${f._writing===k?' class="writing"':''}><dt>${PARTIAL_LABEL[k]}</dt><dd>${esc(f[k])}${f._writing===k?'<i class="du-caret"></i>':''}</dd></div>`).join('')}${f._team?`<div><dt>Team</dt><dd>${f._team.map(esc).join('<br>')}</dd></div>`:''}${f._sources?`<div><dt>Sources</dt><dd>${f._sources.map(u=>`<a href="${esc(u)}" target="_blank" rel="noopener">${esc(domainOf(u))}</a>`).join(' · ')}</dd></div>`:''}</dl><small>Not final yet. The finished page with every source replaces this.</small></section>`;}
 function searchCss(){if(document.getElementById('du-speed19-css'))return;const s=document.createElement('style');s.id='du-speed19-css';s.textContent=`
 .du-quick-tag{display:inline-block;font-weight:700;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#0b7fa3}
 .du-rs-quick,.du-rs-clarify,.du-rs-ingest{border:1px dashed rgba(11,127,163,.45);border-radius:16px;padding:16px 18px;background:rgba(127,231,255,.08)}
@@ -161,6 +175,7 @@ function searchCss(){if(document.getElementById('du-speed19-css'))return;const s
 .du-rs-clarify .du-clarify-opts button:hover,.du-rs-clarify .du-clarify-opts button:focus-visible{background:#0b7fa3;color:#fff;outline:none}
 .du-rs-clarform{display:flex;gap:8px;flex-wrap:wrap}.du-rs-clarform input{flex:1 1 200px;min-width:0;border:1px solid #c9d6de;border-radius:10px;padding:10px 12px;font:inherit}
 .du-rs-asis{margin-top:10px;background:none;border:0;padding:0;color:#33505f;text-decoration:underline;cursor:pointer;font:inherit;font-size:13px}
+.du-rs-found{margin-top:14px;border:1px solid rgba(11,127,163,.35);border-radius:16px;padding:16px 18px;background:#fff}.du-rs-found dl{margin:8px 0 6px;display:grid;gap:8px}.du-rs-found dl>div{display:grid;grid-template-columns:120px 1fr;gap:10px}.du-rs-found dt{font-weight:700;color:#33505f;font-size:13px}.du-rs-found dd{margin:0;color:#10202b;line-height:1.5;overflow-wrap:anywhere}.du-rs-found small{color:#5b6b78}.du-caret{display:inline-block;width:7px;height:14px;margin-left:2px;background:#0b7fa3;vertical-align:-2px;animation:duBlink 1s steps(2) infinite}@keyframes duBlink{50%{opacity:0}}@media(max-width:520px){.du-rs-found dl>div{grid-template-columns:1fr;gap:2px}}
 .du-rs-ingest{border-style:solid;border-color:rgba(155,93,229,.45);background:rgba(155,93,229,.06)}`;document.head.appendChild(s);}
 
 /* V20 speed: one progressive search into `el`. Shows DrawUp matches instantly, a labeled quick answer
@@ -184,7 +199,7 @@ async function liveSearch(el,q,type,ctx){
   const dbP=(c?c.rpc('drawup_search',{q,kind:type==='person'?'all':(type||'all'),max_rows:6}).then(({data})=>data||{},()=>({})):Promise.resolve({})).then(d=>{st.db=d;if(!st.full)paint();const names=[...(d.projects||[]).map(p=>p.name),...(d.firms||[]).map(f=>f.name)];if(names.length)Tunnel.relations(names,'Possible relations on DrawUp');return d;});
   paint();
   try{
-    const r=await Research.run(q,type,s=>{if(s>20)Tunnel.route('Still reading sources… DrawUp keeps searching until it has a real answer.');},{...(ctx.opts||{}),alive,onQuick:qk=>{st.quick=qk;paint();},onClarify:cl=>{st.clarify=cl;paint();}});
+    const r=await Research.run(q,type,s=>{if(s>20)Tunnel.route('Still reading sources… DrawUp keeps searching until it has a real answer.');},{...(ctx.opts||{}),alive,onQuick:qk=>{st.quick=qk;paint();},onPartial:(f,a)=>{st.partial=f;st.activity=a||st.activity;paint();},onClarify:cl=>{st.clarify=cl;paint();}});
     if(!r||!alive())return st;
     if(r.location)Tunnel.route('Routing to '+r.location+'…');
     const rel=await Research.related(r,q);await dbP;
@@ -377,7 +392,7 @@ let peopleCache=null;
 async function renderPeople(){
   const grid=$('people-grid');if(!grid)return;const c=await db();if(!c)return;
   if(!peopleCache){const {data,error}=await c.from('profiles').select('id,display_name,username,title,avatar_url,primary_affiliation_name,primary_affiliation_type,home_office,current_location,profile_verified,professional_level,account_type').eq('discoverable',true).not('display_name','is',null).order('updated_at',{ascending:false}).limit(400);
-    if(error){grid.innerHTML=`<div class="people-empty" style="grid-column:1/-1">People are unavailable right now: ${esc(error.message)}</div>`;return;}peopleCache=data||[];}
+    if(error){grid.innerHTML=`<div class="people-empty" style="grid-column:1/-1">People are unavailable right now: ${esc(error.message)}</div>`;return;}peopleCache=(data||[]).filter(p=>String(p.display_name||'').trim().length>0);} // V21: never list unnamed (unfinished or test) accounts
   const q=($('people-search')?.value||'').trim().toLowerCase();
   let me='';try{me=(await c.auth.getSession()).data.session?.user?.id||'';}catch(_e){}
   const rows=peopleCache.filter(p=>!q||[p.display_name,p.username,p.title,p.primary_affiliation_name,p.home_office,p.current_location,p.professional_level].join(' ').toLowerCase().includes(q));

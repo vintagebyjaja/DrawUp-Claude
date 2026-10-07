@@ -9,7 +9,7 @@
    Shortcuts never fire while typing in a box, and are not shown on phones. */
 (function(){
 'use strict';
-const DRAW_KEYS={v:'select',w:'wall',p:'partition',d:'door',n:'window',o:'cased',a:'room',c:'column',s:'stair',f:'fixture',t:'text',l:'dim',m:'measure'};
+const DRAW_KEYS={v:'select',w:'wall',p:'partition',d:'door',n:'window',o:'cased',a:'room',c:'column',s:'stair',f:'fixture',t:'text',l:'dim',m:'measure',e:'camera'};
 const GO_KEYS={d:['dashboard','Dashboard'],s:['search','Search'],p:['profile','Profile'],j:['projects','Projects'],w:['draw','Draw'],c:['arch-coach','Arch Coach'],k:['check','Check'],x:['swap','Swap'],e:['details','Details'],v:['discover','Discover'],m:['connect','Connect'],f:['firm','Firm'],t:['team','Team'],a:['account','Account']};
 const TAB_GROUPS='.du-subtabs,.subtabs,.dc-tabs,.du-fp-tabs,[role="tablist"]';
 const typing=t=>!!t&&(t.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName));
@@ -31,7 +31,7 @@ function flash(msg){let el=document.getElementById('du-keys-toast');if(!el){el=d
 function sheet(){
   const old=document.getElementById('du-keys-sheet');if(old){old.remove();return;}
   const row=(k,l)=>`<li><span>${k.split(' ').map(x=>`<kbd>${x}</kbd>`).join(' ')}</span><b>${l}</b></li>`;
-  const draw=[['V','Select'],['W','Exterior wall'],['P','Partition'],['D','Door'],['N','Window'],['O','Opening'],['A','Room'],['C','Column'],['S','Stair'],['F','Fixture'],['T','Text'],['L','Dimension'],['M','Measure'],['R','Rotate selected'],['Del','Delete selected'],['Ctrl Z','Undo'],['Esc','Cancel']];
+  const draw=[['V','Select'],['W','Exterior wall'],['P','Partition'],['D','Door'],['N','Window'],['O','Opening'],['A','Room'],['C','Column'],['S','Stair'],['F','Fixture'],['T','Text'],['L','Dimension'],['M','Measure'],['E','Section / elevation camera'],['R','Rotate selected'],['Del','Delete selected'],['Ctrl Z','Undo'],['Esc','Cancel']];
   document.body.insertAdjacentHTML('beforeend',`<div id="du-keys-sheet" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts"><div class="du-keys-card"><button type="button" class="du-keys-x" aria-label="Close">×</button><span class="du-kicker">DRAWUP</span><h2>Keyboard shortcuts</h2>
   <div class="du-keys-cols"><section><h3>Anywhere</h3><ul>${row('?','Show or hide this sheet')}${row('[ ]','Previous or next tab on this page')}${row('1 – 9','Jump to a tab on this page')}${row('/','Search on this page')}${row('Esc','Close a panel')}</ul>
   <h3>Go to (Portal)</h3><ul>${Object.entries(GO_KEYS).map(([k,[,l]])=>row('G '+k.toUpperCase(),l)).join('')}</ul></section>

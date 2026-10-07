@@ -60,7 +60,7 @@ function continentOf(c){return CONTINENT[normCountry(c)]||'';}
 function firmKind(f){if(f.discipline)return f.discipline;const n=String(f.name||'');if(/construct|builders|contract|turner|skanska|whiting|clark\b|mortenson|gilbane|mccarthy|hensel|balfour/i.test(n))return'Construction';if(/engineer|tomasetti|walter p|arup|aecom|hdr|wsp|stantec|jacobs|kimley|dewberry|stv|hntb|ghd|thornton|moore|henderson|burns|fluor|arcadis/i.test(n))return'Engineering';return'Architecture';}
 function hqOf(f){const o=(f.firm_offices||[]);return o.find(x=>x.is_headquarters)||o[0]||null;}
 function fillStateSelect(sel,rows,getStates){if(!sel||sel.dataset.filled)return;const set=new Set();rows.forEach(r=>getStates(r).forEach(s=>s&&STATES[s]&&set.add(s)));sel.innerHTML='<option value="">All U.S. States</option>'+[...set].sort((x,y)=>STATES[x].localeCompare(STATES[y])).map(s=>`<option value="${s}">${esc(STATES[s])}</option>`).join('');sel.dataset.filled='1';}
-const discoverState={firmChip:'all',firmLimit:48,projects:null};
+const discoverState={firmChip:'all',firmLimit:48,projects:null,firmLetter:'ALL'};
 let myHome=null;
 async function homeState(){if(myHome!==null)return myHome;myHome='';try{const c=await db();const u=(await c.auth.getSession()).data.session?.user;if(u){const {data}=await c.from('profiles').select('home_office,current_location').eq('id',u.id).maybeSingle();const m=/,\s*([A-Za-z]{2})\b/.exec(data?.home_office||data?.current_location||'');myHome=m?m[1].toUpperCase():'';}}catch(_e){}return myHome;}
 function firmMatches(f,opts){
@@ -82,8 +82,16 @@ async function renderDiscoverFirms(){
   let firms;try{firms=await loadFirms();}catch(e){fg.innerHTML=emptyBlock('Firms unavailable.',e.message||String(e),false);return;}
   fillStateSelect($('du-firm-state'),firms,f=>(f.firm_offices||[]).filter(o=>normCountry(o.country)==='US').map(o=>String(o.state||'').toUpperCase()));
   const opts={q:($('du-firm-q')?.value||'').trim().toLowerCase(),scope:$('du-firm-scope')?.value||'all',state:$('du-firm-state')?.value||'',continent:$('du-firm-continent')?.value||'',chip:discoverState.firmChip,home:discoverState.firmChip==='near'?await homeState():''};
-  const shown=firms.filter(f=>firmMatches(f,opts));
-  const cnt=$('du-firm-count');if(cnt)cnt.textContent=opts.chip==='near'&&!opts.home?'Add your home office (City, ST) to your profile to see firms near you.':`${shown.length} of ${firms.length} firms in the DrawUp directory`;
+  const matched=firms.filter(f=>firmMatches(f,opts));
+  // V21: A-Z index, so members can click through firms by first letter (works with every other filter).
+  const first=f=>{const c=String(f.name||'').trim().replace(/^the\s+/i,'').charAt(0).toUpperCase();return /[A-Z]/.test(c)?c:'#';};
+  const have=new Set(matched.map(first));if(discoverState.firmLetter&&discoverState.firmLetter!=='ALL'&&!have.has(discoverState.firmLetter))discoverState.firmLetter='ALL';
+  const L=discoverState.firmLetter||'ALL';
+  let az=$('du-firm-az');if(!az){az=document.createElement('nav');az.id='du-firm-az';az.className='roster-index du-firm-az';az.setAttribute('aria-label','Firms by first letter');fg.parentNode.insertBefore(az,fg);}
+  az.innerHTML=['ALL',...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split(''),'#'].map(x=>x==='ALL'||have.has(x)?`<button type="button" class="has${L===x?' active':''}" data-letter="${x}" aria-pressed="${L===x}">${x==='#'?'0–9':x}</button>`:`<span aria-hidden="true">${x==='#'?'':x}</span>`).join('');
+  az.querySelectorAll('[data-letter]').forEach(b=>b.onclick=()=>{discoverState.firmLetter=b.dataset.letter;discoverState.firmLimit=48;renderDiscoverFirms();});
+  const shown=L==='ALL'?matched:matched.filter(f=>first(f)===L);
+  const cnt=$('du-firm-count');if(cnt)cnt.textContent=opts.chip==='near'&&!opts.home?'Add your home office (City, ST) to your profile to see firms near you.':`${shown.length} of ${firms.length} firms in the DrawUp directory${L!=='ALL'?' · starting with '+(L==='#'?'a number':L):''}`;
   fg.innerHTML=shown.length?shown.slice(0,discoverState.firmLimit).map(firmCardHTML).join('')+(shown.length>discoverState.firmLimit?`<div class="du-show-more"><button class="btn btn-ghost btn-sm" type="button" id="du-firm-more">Show ${Math.min(48,shown.length-discoverState.firmLimit)} more of ${shown.length-discoverState.firmLimit}</button></div>`:''):emptyBlock('No firms match those filters.','Try All World, clear the state, or search a different name or city. Missing a firm? Add it and DrawUp reviews it.');
   const more=$('du-firm-more');if(more)more.onclick=()=>{discoverState.firmLimit+=48;renderDiscoverFirms();};
 }

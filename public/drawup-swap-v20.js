@@ -129,13 +129,14 @@ async function render(w,c){
   const genCard=g=>{if(!g)return'<div class="sw20-gen"><p class="du-muted">This result was removed.</p></div>';
     const after=g.status==='complete'&&g.result_path?`<button type="button" class="du-swap-open" data-open="${g.id}" title="Open preview"><img data-path="${esc(g.result_path)}" alt="After"><span>Preview ⤢</span></button>`
       :`<div class="sw20-wait ${g.status}">${g.status==='failed'?'NO GOOD':g.status==='queued'?'NOT STARTED':`<i class="du-mini-ball"></i>IN PLAY <b data-clock="${g.id}">${mmss(T.limitMs/1000)}</b>`}</div>`;
-    return `<div class="sw20-gen" data-gen="${g.id}"><div class="sw20-pair"><figure><img data-path="${esc(g.source_path)}" alt="Before"><figcaption>Before</figcaption></figure><figure>${after}<figcaption>After</figcaption></figure></div>
+    const modeTag=g.swap_type==='play'?' · 🏀 Let’s Play':g.swap_type==='photoreal'?' · 📷 Photoreal render':''; // V21 modes
+    return `<div class="sw20-gen" data-gen="${g.id}"><div class="sw20-pair"><figure><img data-path="${esc(g.source_path)}" alt="Before"><figcaption>${g.swap_type==='play'?'Your play':'Before'}</figcaption></figure><figure>${after}<figcaption>${g.swap_type==='play'?'The real game':'After'}</figcaption></figure></div>
       ${g.status==='failed'?`<p class="sw20-err">${esc(g.error||'Generation failed.')}</p>`:''}
-      <div class="sw20-gen-foot"><small>${esc(fmtWhen(g.completed_at||g.created_at))}${g.area?' · 📍 '+esc(g.area):''}${g.mask_path&&g.area!=='Marked area'?' · marked area':''}${g.credits_charged&&g.status!=='failed'?' · '+g.credits_charged+' credits':''}</small>
+      <div class="sw20-gen-foot"><small>${esc(fmtWhen(g.completed_at||g.created_at))}${modeTag}${g.area?' · 📍 '+esc(g.area):''}${g.mask_path&&g.area!=='Marked area'?' · marked area':''}${g.credits_charged&&g.status!=='failed'?' · '+g.credits_charged+' credits':''}</small>
       ${g.status==='complete'?`<span><button type="button" class="du-btn primary" data-dl="${g.id}">Download</button><button type="button" class="du-btn ghost" data-open="${g.id}">Preview</button><button type="button" class="du-btn ghost" data-base="${esc(g.result_path)}">Edit from this</button></span>`:g.status==='generating'?`<span><button type="button" class="du-btn ghost" data-watch="${g.id}">Watch</button><button type="button" class="du-btn ghost" data-stop="${g.id}">Stop &amp; refund</button></span>`:''}</div></div>`;};
   const msgHtml=(m,i)=>{
     if(m.role==='user'&&m.image_path)return `<article class="sw20-msg user img"><span>YOU</span><figure><img data-path="${esc(m.image_path)}" alt="Image you added"></figure><small>Image added · <button type="button" class="sw20-link" data-base="${esc(m.image_path)}">Edit this one</button></small></article>`;
-    if(m.role==='user')return `<article class="sw20-msg user"><span>YOU</span><p>${esc(m.body)}</p>${m.area?`<em class="sw20-chip">📍 ${esc(m.area)}</em>`:''}</article>`;
+    if(m.role==='user')return `<article class="sw20-msg user"><span>YOU</span><p>${esc(m.body)}</p>${m.area?`<em class="sw20-chip">${/^(Let’s Play|Photoreal render)$/.test(m.area)?(m.area==='Let’s Play'?'🏀 ':'📷 '):'📍 '}${esc(m.area)}</em>`:''}</article>`;
     if(m.generation_id)return `<article class="sw20-msg bot gen"><span>DRAWUP SWAP</span>${genCard(V.gens.get(m.generation_id))}</article>`;
     const asking=V.pendingAsk&&i===V.msgs.length-1;
     return `<article class="sw20-msg bot"><span>DRAWUP SWAP</span><p>${esc(m.body)}</p>${asking?`<div class="sw20-chips">${AREAS.map(a=>`<button type="button" data-area="${esc(a)}">${esc(a)}</button>`).join('')}<button type="button" data-area-other>Other…</button><button type="button" class="mark" data-area-mark>✎ Mark it on the image</button></div><small class="du-muted">Free — no credits are used until you pick.</small>`:''}</article>`;};
@@ -160,6 +161,7 @@ async function render(w,c){
     root.addEventListener('dragleave',e=>{if(e.target===root||!root.contains(e.relatedTarget))root.classList.remove('drop');});
     root.addEventListener('drop',e=>{root.classList.remove('drop');const f=[...(e.dataTransfer?.files||[])].find(x=>/^image\//.test(x.type));if(f){e.preventDefault();addImage(f);}});
     drawMessages();
+    try{window.DrawUpSwap21?.mount?.(V.api);}catch(e){console.warn('Swap V21 modes',e);} // V21: mode picker
   };
   const remember=id=>{try{id?localStorage.setItem('drawup_swap20_thread',id):localStorage.removeItem('drawup_swap20_thread');}catch(_e){}};
   V.drawMessages=()=>drawMessages();
@@ -205,6 +207,11 @@ async function render(w,c){
   const say=async(role,body,area)=>{const r=await c.client.from('swap_messages').insert({thread_id:V.active.id,owner_id:uid,role,body,area:area||null}).select('*').single();if(r.error)throw r.error;V.msgs.push(r.data);return r.data;};
   const send=async text=>{text=text.trim();const input=w.querySelector('#sw20-input');
     if(!V.active){c.toast('Add an image first: paste, drop or upload one.',true);return;}
+    // V21: Photoreal mode (and any other mode hook) goes straight to generation with its own options.
+    const hk=window.DrawUpSwap21?.beforeSend?.(text);
+    if(hk&&hk.extra){if(V.busy)return;V.busy=true;input.value='';
+      try{V.pendingAsk=null;await say('user',hk.body||hk.text,hk.label||null);if(V.active.title==='New swap')await touch({title:(hk.body||hk.text).slice(0,60)});else await touch();refreshList();drawMessages();V.busy=false;await generate(hk.text,V.mask&&!hk.extra.noMask?'Marked area':null,hk.extra);}
+      catch(e){c.toast(e.message||String(e),true);}finally{V.busy=false;}return;}
     if(V.busy)return;if(text.length<2){c.toast('Say what to change.',true);return;}
     V.busy=true;input.value='';input.placeholder='Describe the change… e.g. make the rug darker';
     try{
@@ -218,17 +225,18 @@ async function render(w,c){
     try{await say('user',area==='Marked area'?'Here (marked on the image)':area,area);drawMessages();await generate(ask.text,area);}catch(e){c.toast(e.message||String(e),true);}};
   const refreshList=()=>{const list=w.querySelector('.sw20-list');if(!list)return;V.threads.sort((a,b)=>String(b.updated_at).localeCompare(String(a.updated_at)));const act=list.querySelector('[data-thread].active b');if(act)act.textContent=V.active.title;const h=w.querySelector('.sw20-head h1');if(h)h.textContent=V.active.title;};
 
-  const generate=async(text,area)=>{if(V.busy)return;V.busy=true;const sendBtn=w.querySelector('#sw20-send');if(sendBtn)sendBtn.disabled=true;
-    let k=null;
+  /* extra (V21 modes, optional): {swapType, sourcePath, maskBlob, options, noMask} */
+  const generate=async(text,area,extra)=>{if(V.busy)return;V.busy=true;const sendBtn=w.querySelector('#sw20-send');if(sendBtn)sendBtn.disabled=true;
+    let k=null;extra=extra||{};
     try{
-      const src=base(),id=uuid();let maskPath=null;const mask=V.mask&&V.mask.path===src?V.mask:null;
+      const src=extra.sourcePath||base(),id=uuid();let maskPath=null;const mask=extra.maskBlob?{blob:extra.maskBlob}:(!extra.noMask&&V.mask&&V.mask.path===src?V.mask:null);
       if(mask){maskPath=`${uid}/swap/${id}-mask.png`;const up=await c.client.storage.from(BUCKET).upload(maskPath,mask.blob,{contentType:'image/png'});if(up.error)throw up.error;}
-      const ins=await c.client.from('swap_generations').insert({id,owner_id:uid,source_path:src,swap_type:inferType(text+' '+(area||'')),prompt:text.slice(0,2000),thread_id:V.active.id,area:area||(mask?'Marked area':null),mask_path:maskPath}).select('*').single();if(ins.error)throw ins.error;
+      const ins=await c.client.from('swap_generations').insert({id,owner_id:uid,source_path:src,swap_type:extra.swapType||inferType(text+' '+(area||'')),prompt:text.slice(0,2000),thread_id:V.active.id,area:area||(mask&&!extra.maskBlob?'Marked area':null),mask_path:maskPath}).select('*').single();if(ins.error)throw ins.error;
       V.gens.set(id,ins.data);
       const gm=await c.client.from('swap_messages').insert({thread_id:V.active.id,owner_id:uid,role:'assistant',body:'',generation_id:id}).select('*').single();if(gm.error)throw gm.error;V.msgs.push(gm.data);
       V.mask=null;V.base=null;await touch();drawMessages();
       const t0=Date.now();k=court(c,{prompt:text,area:area||(mask?'Marked area':''),t0,before:await imgUrl(c,src),onStop:()=>stopGen(c,id,'user')});
-      let d;try{d=await api(c,'/api/swap',{method:'POST',body:JSON.stringify({generation_id:id})});}
+      let d;try{d=await api(c,'/api/swap',{method:'POST',body:JSON.stringify(extra.options?{generation_id:id,options:extra.options}:{generation_id:id})});}
       catch(e){if(e.data?.generation)onGen(e.data.generation);k.done(`<p>${esc(e.message)}</p>`,false,e.data?.code==='INSUFFICIENT_CREDITS'?'Not enough credits for this one.':'No good — it did not start.');k=null;
         const r=await c.client.from('swap_generations').select('*').eq('id',id).single();if(r.data?.status==='queued')await stopGen(c,id,'not-started');else if(r.data)onGen(r.data);return;}
       const g=d.generation||ins.data;onGen(g);document.dispatchEvent(new Event('du-credits'));
@@ -237,12 +245,14 @@ async function render(w,c){
     finally{V.busy=false;if(sendBtn)sendBtn.disabled=false;}};
 
   V.addImage=addImage;
+  // V21: what the mode picker (drawup-swap-v21.js) may use.
+  V.api={c,uid,w,V,base,imgUrl:p=>imgUrl(c,p),urls,BUCKET,uuid,say,touch,refreshList,drawMessages:()=>drawMessages(),generate,isBusy:()=>V.busy};
   if(V.active)await load();
   draw();
 }
 
 /* paste anywhere in the Swap tab (images only — pasted text still goes into the box) */
-document.addEventListener('paste',e=>{if(!view||!view.root||!view.root.isConnected||view.legacy)return;if(document.getElementById('sw20-brush')||document.getElementById('du-swap-lightbox'))return;
+document.addEventListener('paste',e=>{if(!view||!view.root||!view.root.isConnected||view.legacy)return;if(document.getElementById('sw20-brush')||document.getElementById('du-swap-lightbox')||document.getElementById('sw21-play'))return;
   const f=[...(e.clipboardData?.items||[])].filter(i=>i.kind==='file'&&/^image\//.test(i.type)).map(i=>i.getAsFile()).find(Boolean);if(!f)return;e.preventDefault();view.addImage(f);});
 
 /* live clocks on in-play cards */

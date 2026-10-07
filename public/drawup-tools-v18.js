@@ -25,14 +25,15 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-du-open-to
 /* V20: heights, wall types, columns, stairs, fixtures, text, manual dimensions, cased
    openings and a measure tool. The model, drawing and exports live in drawup-draw-core-v18.js. */
 const SCALES=[[96,'1/8" = 1\'-0"'],[48,'1/4" = 1\'-0"'],[24,'1/2" = 1\'-0"']];
-const DRAW_TOOLS=[['select','Select'],['wall','Exterior wall'],['partition','Partition'],['door','Door'],['window','Window'],['cased','Opening'],['room','Room'],['column','Column'],['stair','Stair'],['fixture','Fixture'],['text','Text'],['dim','Dimension'],['measure','Measure']];
-const DRAW_HINTS={select:'Click to select. Drag to move. Arrow keys nudge 1" (Shift: 1\'-0"), R rotates, Delete removes.',wall:'Click a start point, then each corner. Esc ends the run.',partition:'Click a start point, then each corner. Esc ends the run.',door:'Click on a wall to place a door.',window:'Click on a wall to place a window.',cased:'Click on a wall to place a cased opening (no door).',room:'Click inside a room to place its name tag.',column:'Click to place a column.',stair:'Click the bottom of the run, then the top. The arrow points UP.',fixture:'Click near a wall: the fixture backs onto the nearest wall face.',text:'Click where the note goes.',dim:'Click two points. Snaps to wall faces and corners; hold Shift for an aligned dimension.',measure:'Click two points to read the distance. Nothing is saved.'};
+const DRAW_TOOLS=[['select','Select'],['wall','Exterior wall'],['partition','Partition'],['door','Door'],['window','Window'],['cased','Opening'],['room','Room'],['column','Column'],['stair','Stair'],['fixture','Fixture'],['text','Text'],['dim','Dimension'],['measure','Measure'],['camera','Section / Elev']];
+const DRAW_HINTS={select:'Click to select. Drag to move. Arrow keys nudge 1" (Shift: 1\'-0"), R rotates, Delete removes.',wall:'Click a start point, then each corner. Esc ends the run.',partition:'Click a start point, then each corner. Esc ends the run.',door:'Click on a wall to place a door.',window:'Click on a wall to place a window.',cased:'Click on a wall to place a cased opening (no door).',room:'Click inside a room to place its name tag.',column:'Click to place a column.',stair:'Click the bottom of the run, then the top. The arrow points UP.',fixture:'Click near a wall: the fixture backs onto the nearest wall face.',text:'Click where the note goes.',dim:'Click two points. Snaps to wall faces and corners; hold Shift for an aligned dimension.',measure:'Click two points to read the distance. Nothing is saved.',camera:'Click where the camera line starts, then where it ends. The arrow shows which way it looks.'};
 const TEXT_SIZES=[[0.09375,'3/32"'],[0.125,'1/8"'],[0.1875,'3/16"'],[0.25,'1/4"']];
 P.registerTab('draw',async(w,c)=>{
   const D=window.DrawUpDrawCore;if(!D){w.innerHTML='<div class="du-empty"><h1>Draw could not load.</h1></div>';return;}
   const WT=D.WALL_TYPES||{},FX=D.FIXTURES||{};
   const typeOptions=(sel,roleFirst)=>{const keys=Object.keys(WT);const grp=r=>keys.filter(k=>WT[k].role===r).map(k=>`<option value="${k}"${k===sel?' selected':''}>${c.esc(WT[k].name)} · ${c.esc(D.formatFtIn(WT[k].thickness))}</option>`).join('');const g=[['exterior','Exterior walls'],['interior','Partitions']];if(roleFirst==='interior')g.reverse();return g.map(([r,l])=>`<optgroup label="${l}">${grp(r)}</optgroup>`).join('');};
   const params=new URLSearchParams((location.hash.split('?')[1])||'');
+  const X21=window.DrawUpDrawV21;if(X21&&X21.route&&await X21.route(w,c,params))return; // V21: share links and markups
   const {data:list,error}=await c.client.from('drawings').select('id,name,sheet_number,updated_at,revision,project_thread_id').eq('owner_id',c.user.id).order('updated_at',{ascending:false});
   if(error)throw error;
   const projects=await myProjects(c);
@@ -53,12 +54,14 @@ P.registerTab('draw',async(w,c)=>{
     $q(w,'#dn-rect').onclick=()=>{const key=$q(w,'#dn-type').value,W=D.parseFtIn($q(w,'#dn-w').value),H=D.parseFtIn($q(w,'#dn-h').value),T=D.parseFtIn($q(w,'#dn-t').value),HT=D.parseFtIn($q(w,'#dn-ht').value);if(!(W>=24&&H>=24&&T>0&&T<W/2)){c.toast('Enter a width and depth of at least 2\'-0" and a wall thickness, like 20\'-0".',true);return;}if(!(HT>=12&&HT<=1200)){c.toast('Enter a wall height like 9\'-0".',true);return;}const m=D.emptyModel();D.addRectangle(m,0,0,W,H,T).forEach(wl=>{if(WT[key])wl.wtype=key;wl.height=D.snap(HT);});create(m);};
     $q(w,'#dn-sample').onclick=()=>create(D.samplePlan());
     const back=$q(w,'#dn-back');if(back)back.onclick=()=>{history.replaceState(null,'','#portal/draw');c.openPortalTab('draw');};
+    if(X21&&X21.decorateStart)X21.decorateStart(w,c);
     return;
   }
   const {data:row,error:e2}=await c.client.from('drawings').select('*').eq('id',openId).eq('owner_id',c.user.id).maybeSingle();
   if(e2)throw e2;if(!row){history.replaceState(null,'','#portal/draw');w.innerHTML='<div class="du-empty"><h1>Drawing not found.</h1><button class="du-btn primary" data-portal-tab="draw">My drawings</button></div>';return;}
   let model=D.normalizeModel(row.model),scale=row.scale_denominator||48,tool='select',sel=null,pending=null,undo=[],saveTimer=null,saving=false,revision=row.revision||1,hover=null,measure=null,drag=null,suppressClick=false;
   const opt={wall:'wd6',partition:'wd4',column:'square',fixture:'wc'};
+  let ext=null,exactPt=null; // V21 extension (drawup-draw-v21.js) and a typed point being placed
   w.innerHTML=`<div class="du-work-head du-draw-head"><div><span class="du-kicker">DRAW · ${c.esc(row.sheet_number||'A101')}</span><h1 id="dw-title">${c.esc(row.name)}</h1></div>
     <div class="du-head-actions"><select id="dw-list">${list.map(d=>`<option value="${d.id}"${d.id===row.id?' selected':''}>${c.esc(d.name)}${d.sheet_number?' · '+c.esc(d.sheet_number):''}</option>`).join('')}</select><button class="du-btn ghost" id="dw-new">New drawing</button></div></div>
   <div class="du-draw-bar du-draw-bar20">
@@ -87,7 +90,8 @@ P.registerTab('draw',async(w,c)=>{
     if(pending&&hover)rubber(svg,pending,hover,D.formatFtIn(Math.hypot(hover.x-pending.x,hover.y-pending.y)));
     if(measure&&measure.b)rubber(svg,measure.a,measure.b,D.formatFtIn(measure.d));else if(measure&&measure.a&&hover)rubber(svg,measure.a,hover,D.formatFtIn(Math.hypot(hover.x-measure.a.x,hover.y-measure.a.y)));
     const R=D.computeDimensions(model,scale);
-    inspect.innerHTML=inspector(R);bindInspector();
+    if(ext&&ext.afterRender)ext.afterRender(svg,R);
+    inspect.innerHTML=inspector(R)+(ext&&ext.inspectorExtra?ext.inspectorExtra(sel,R):'');bindInspector();if(ext&&ext.bindInspector)ext.bindInspector(inspect);
   }
   function setReadout(t){readout.hidden=!t;readout.textContent=t||'';}
   function toolOptions(){
@@ -98,6 +102,7 @@ P.registerTab('draw',async(w,c)=>{
     else o.innerHTML='';
     const s=$q(o,'select');if(s)s.onchange=e=>{opt[tool==='column'?'column':tool==='fixture'?'fixture':tool]=e.target.value;};
     $q(w,'#dw-hint').textContent=DRAW_HINTS[tool]||'';
+    if(ext&&ext.toolOptions)ext.toolOptions(tool,o);
   }
   const heightField=(id,label,v)=>`<div class="du-field"><label>${label}</label><input id="${id}" value="${v>0?ft(v):''}"></div>`;
   const delBtn='<button class="du-btn ghost" id="di-del">Delete</button>';
@@ -153,9 +158,10 @@ P.registerTab('draw',async(w,c)=>{
   /* Snap targets: wall ends always; for dimensions and measuring also wall face corners and
      opening jambs, so manual dimensions land on real faces. */
   function snapTargets(fine){const t=[];model.walls.forEach(wl=>{t.push(wl.a,wl.b);if(fine){const o=D.wallOutline(model,wl);t.push(o.outerA,o.outerB,o.innerA,o.innerB);}});if(fine){model.openings.forEach(o=>{const g=D.openingGeometry(model,o);t.push(g.outer1,g.outer2,g.inner1,g.inner2);});(model.items||[]).forEach(it=>{if(it.kind==='column')t.push(it.at);});}return t;}
-  function snapPoint(p,from,o){o=o||{};const fine=!!o.fine;let q={x:D.snap(p.x,fine?1:6),y:D.snap(p.y,fine?1:6)};let best=null;snapTargets(fine).forEach(e=>{const dd=Math.hypot(e.x-p.x,e.y-p.y);if(dd<(fine?0.15:0.25)*scale&&(!best||dd<best.d))best={d:dd,p:e};});if(best)q={x:best.p.x,y:best.p.y};if(from&&!o.free){if(best){/* keep the snapped target; align the other axis to it */if(Math.abs(q.x-from.x)<Math.abs(q.y-from.y))return {x:from.x,y:q.y};return {x:q.x,y:from.y};}if(Math.abs(q.x-from.x)<Math.abs(q.y-from.y))q.x=from.x;else q.y=from.y;}return q;}
+  function snapPoint(p,from,o){o=o||{};if(exactPt)return {x:exactPt.x,y:exactPt.y};const S=(ext&&ext.snap)||{};const fine=!!o.fine,gs=S.grid===false?0.125:(fine?1:6);let q={x:D.snap(p.x,gs),y:D.snap(p.y,gs)};let best=null;(S.ends===false?[]:snapTargets(fine)).forEach(e=>{const dd=Math.hypot(e.x-p.x,e.y-p.y);if(dd<(fine?0.15:0.25)*scale&&(!best||dd<best.d))best={d:dd,p:e};});if(best)q={x:best.p.x,y:best.p.y};if(from&&!o.free&&S.ortho!==false){if(best){/* keep the snapped target; align the other axis to it */if(Math.abs(q.x-from.x)<Math.abs(q.y-from.y))return {x:from.x,y:q.y};return {x:q.x,y:from.y};}if(Math.abs(q.x-from.x)<Math.abs(q.y-from.y))q.x=from.x;else q.y=from.y;}return q;}
   function nearestWall(p,extra){let best=null;model.walls.forEach(wl=>{const dx=wl.b.x-wl.a.x,dy=wl.b.y-wl.a.y,L=Math.hypot(dx,dy);const t=((p.x-wl.a.x)*dx+(p.y-wl.a.y)*dy)/L;const px=wl.a.x+dx*t/L,py=wl.a.y+dy*t/L;const d=Math.hypot(p.x-px,p.y-py);if(t>=0&&t<=L&&d<=wl.thickness/2+(extra||0.15*scale)&&(!best||d<best.d))best={d,wall:wl,t,foot:{x:px,y:py}};});return best;}
-  const pickSel=ev=>{const el=ev.target.closest('[data-item],[data-opening],[data-wall],[data-room]');if(!el)return null;if(el.dataset.item)return {type:'item',id:el.dataset.item};if(el.dataset.opening)return {type:'opening',id:el.dataset.opening};if(el.dataset.room)return {type:'room',id:el.dataset.room};if(el.dataset.wall)return {type:'wall',id:el.dataset.wall};return null;};
+  const pickSel0=ev=>{const el=ev.target.closest('[data-item],[data-opening],[data-wall],[data-room]');if(!el)return null;if(el.dataset.item)return {type:'item',id:el.dataset.item};if(el.dataset.opening)return {type:'opening',id:el.dataset.opening};if(el.dataset.room)return {type:'room',id:el.dataset.room};if(el.dataset.wall)return {type:'wall',id:el.dataset.wall};return null;};
+  const pickSel=ev=>{const s=pickSel0(ev);return s&&ext&&ext.locked&&ext.locked(s)?null:s;}; // V21: locked layers can't be picked
   /* Drag to move: items and room tags move freely (1" grid), openings slide along their wall. */
   canvas.addEventListener('pointerdown',ev=>{if(tool!=='select'||ev.button!==0)return;const s=pickSel(ev);if(!s||s.type==='wall')return;sel=s;drag={sel:s,start:toModel(ev),before:JSON.stringify(model),moved:false,id:ev.pointerId};});
   canvas.addEventListener('pointermove',ev=>{
@@ -167,10 +173,11 @@ P.registerTab('draw',async(w,c)=>{
   });
   const endDrag=()=>{if(!drag)return;if(drag.moved){undo.push(drag.before);if(undo.length>80)undo.shift();suppressClick=true;scheduleSave();}drag=null;render();};
   canvas.addEventListener('pointerup',endDrag);canvas.addEventListener('pointercancel',endDrag);
-  canvas.addEventListener('click',ev=>{
+  const onClick=ev=>{
     if(suppressClick){suppressClick=false;return;}
-    const p=toModel(ev);
-    if(tool==='select'){sel=pickSel(ev);if(!sel){/* thin walls are hard to hit on small screens: take the nearest wall within ~12px */const k=host.querySelector('svg').getScreenCTM().a||1,hit=nearestWall(p,12/k);if(hit){const op=model.openings.find(o=>o.wall===hit.wall.id&&Math.abs(o.offset-hit.t)<=o.width/2);sel=op?{type:'opening',id:op.id}:{type:'wall',id:hit.wall.id};}}render();return;}
+    const p=ev.__p||toModel(ev);
+    if(ext&&ext.click&&ext.click(p,ev,tool))return;
+    if(tool==='select'){sel=pickSel(ev);if(!sel){/* thin walls are hard to hit on small screens: take the nearest wall within ~12px */const k=host.querySelector('svg').getScreenCTM().a||1,hit=nearestWall(p,12/k);if(hit&&!(ext&&ext.locked&&ext.locked({type:'wall',id:hit.wall.id}))){const op=model.openings.find(o=>o.wall===hit.wall.id&&Math.abs(o.offset-hit.t)<=o.width/2);sel=op?{type:'opening',id:op.id}:{type:'wall',id:hit.wall.id};}}render();return;}
     if(tool==='wall'||tool==='partition'){const q=snapPoint(p,pending);if(!pending){pending=q;hover=q;render();return;}if(Math.hypot(q.x-pending.x,q.y-pending.y)<12){return;}commit();try{const wl=D.addWall(model,pending,q,{wtype:opt[tool]});sel={type:'wall',id:wl.id};}catch(e){undo.pop();c.toast(e.message,true);}pending=q;render();scheduleSave();return;}
     if(tool==='door'||tool==='window'||tool==='cased'){const hit=nearestWall(p);if(!hit){c.toast('Click on a wall to place the '+(tool==='cased'?'opening':tool)+'.',true);return;}const L=D.wallLength(hit.wall);const width=Math.min(tool==='cased'?42:36,Math.floor(L));const off=Math.min(Math.max(D.snap(hit.t,1),width/2),L-width/2);commit();try{const o=D.addOpening(model,hit.wall.id,tool,off,width,{tag:''});sel={type:'opening',id:o.id};}catch(e){undo.pop();c.toast(e.message,true);}render();scheduleSave();return;}
     if(tool==='room'){const name=(prompt('Room name','ROOM')||'').trim();if(!name)return;commit();const r={id:'r_'+Math.random().toString(36).slice(2,9),name:name.toUpperCase(),number:'',ceiling:96,at:{x:D.snap(p.x,1),y:D.snap(p.y,1)}};model.rooms.push(r);sel={type:'room',id:r.id};render();scheduleSave();return;}
@@ -179,8 +186,10 @@ P.registerTab('draw',async(w,c)=>{
     if(tool==='text'){const t=(prompt('Note text','')||'').trim();if(!t)return;commit();const it=D.addItem(model,'text',{at:{x:D.snap(p.x,1),y:D.snap(p.y,1)},text:t.toUpperCase(),size:0.125});sel={type:'item',id:it.id};render();scheduleSave();return;}
     if(tool==='stair'||tool==='dim'){const fine=tool==='dim';const q=snapPoint(p,pending,{fine,free:ev.shiftKey});if(!pending){pending=q;hover=q;render();return;}const d=Math.hypot(q.x-pending.x,q.y-pending.y);if(d<(tool==='stair'?24:1)){c.toast(tool==='stair'?'Make the run at least 2\'-0" long.':'Pick two different points.',true);return;}commit();try{let it;if(tool==='stair')it=D.addItem(model,'stair',{at:pending,rot:Math.round(Math.atan2(q.y-pending.y,q.x-pending.x)*180/Math.PI),length:D.snap(d,1),width:36,rise:120});else it=D.addItem(model,'dim',{a:pending,b:q,off:-0.3*scale});sel={type:'item',id:it.id};}catch(e){undo.pop();c.toast(e.message,true);}pending=null;hover=null;render();scheduleSave();return;}
     if(tool==='measure'){const q=snapPoint(p,measure&&!measure.b?measure.a:null,{fine:true,free:ev.shiftKey||ev.altKey});if(!measure||measure.b){measure={a:q};hover=q;setReadout('Click the second point');render();return;}measure.b=q;measure.d=Math.hypot(q.x-measure.a.x,q.y-measure.a.y);const dx=Math.abs(q.x-measure.a.x),dy=Math.abs(q.y-measure.a.y);setReadout(`Distance ${D.formatFtIn(measure.d)}${dx>0.01&&dy>0.01?`  (Δx ${D.formatFtIn(dx)} · Δy ${D.formatFtIn(dy)})`:''}`);hover=null;render();return;}
-  });
+  };
+  canvas.addEventListener('click',onClick);
   canvas.addEventListener('keydown',ev=>{
+    if(ext&&ext.keydown&&ext.keydown(ev,tool))return;
     if(ev.key==='Escape'){pending=null;hover=null;measure=null;setReadout('');render();return;}
     if((ev.ctrlKey||ev.metaKey)&&ev.key.toLowerCase()==='z'){ev.preventDefault();$q(w,'#dw-undo').click();return;}
     if(tool!=='select'||!sel)return;
@@ -198,6 +207,12 @@ P.registerTab('draw',async(w,c)=>{
   $q(w,'#dw-pdf').onclick=async()=>{const proj=projects.find(p=>p.id===row.project_thread_id);download(fileBase()+'.pdf',binary(D.toPDF(model,scale,{project:proj?.project_name||'DrawUp',name:row.name,sheet:row.sheet_number||'A101',revision,date:new Date().toLocaleDateString()})),'application/pdf');};
   $q(w,'#dw-dxf').onclick=()=>download(fileBase()+'.dxf',D.toDXF(model,scale),'application/dxf');
   $q(w,'#dw-svg').onclick=()=>download(fileBase()+'.svg',D.toSVG(model,scale,{paperSize:true}),'image/svg+xml');
+  /* V21: more control, views, markups and sharing live in drawup-draw-v21.js; it reaches the editor through this object. */
+  if(X21&&X21.attach)ext=X21.attach({w,c,D,row,projects,canvas,host,inspect,fileBase,render,commit,scheduleSave,toModel,snapPoint,
+    get model(){return model;},set model(v){model=v;},get sel(){return sel;},set sel(v){sel=v;},get scale(){return scale;},get tool(){return tool;},
+    get pending(){return pending;},set pending(v){pending=v;},get hover(){return hover;},set hover(v){hover=v;},get revision(){return revision;},
+    pushUndo:s=>{undo.push(s);if(undo.length>80)undo.shift();},
+    clickAt:pt=>{exactPt=pt;try{onClick({__p:pt,shiftKey:true,altKey:false,target:canvas,preventDefault(){}});}finally{exactPt=null;}}})||null;
   toolOptions();setSave('Saved · rev '+revision);render();
 });
 
@@ -256,7 +271,7 @@ async function renderReview(w,c,id,projects){
     const proj=projects.find(p=>p.id===r.project_thread_id);
     w.innerHTML=`<div class="du-work-head"><div><span class="du-kicker">DRAWUP CHECK · ${c.esc(r.status.toUpperCase())}</span><h1>${c.esc(r.title)}</h1><p>${c.esc(r.file_name||'')}${r.page_count?' · '+r.page_count+' pages':''}${r.jurisdiction?' · '+c.esc(r.jurisdiction):''}${proj?' · '+c.esc(proj.project_name):''}</p></div><div class="du-head-actions"><button class="du-btn ghost" id="cr-back">All reviews</button><button class="du-btn ghost" id="cr-pdf-src">Open drawing set</button>${r.status==='complete'?'<button class="du-btn primary" id="cr-export">Download report (PDF)</button>':''}</div></div>
     ${r.status==='queued'?`<article class="du-glass"><h2>Not started</h2><p>${c.esc(r.error||'This review has not started yet.')}</p><button class="du-btn primary" id="cr-start">Start review</button> <span id="cr-st" class="du-save-status"></span></article>`:''}
-    ${r.status==='reviewing'?`<article class="du-glass"><h2>Reviewing your sheets…</h2><p class="du-muted">This page updates by itself. Large sets can take a few minutes; you can leave and come back.</p><div class="du-loading">READING ${c.esc((r.file_name||'DRAWINGS').toUpperCase())}…</div></article>`:''}
+    ${r.status==='reviewing'?`<article class="du-glass"><h2>Reviewing your sheets…</h2><p class="du-muted">This page updates by itself. Large sets can take a few minutes; you can leave and come back.</p><div class="du-loading">READING ${c.esc((r.file_name||'DRAWINGS').toUpperCase())}…</div><div class="du-check-live" hidden aria-live="polite"><h3>Reading the sheets…</h3><ul class="du-check-found"></ul><p class="du-muted">Not final yet. The full report with locations, fixes and references replaces this list.</p></div></article>`:''}
     ${r.status==='failed'?`<article class="du-glass"><h2>The review did not finish</h2><p>${c.esc(r.error||'Unknown error.')}</p></article>`:''}
     ${r.status==='complete'?`<div class="du-stats">${counts.map(([s,n])=>`<article class="du-stat du-sev-${s}"><span>${s.toUpperCase()}</span><strong>${n}</strong></article>`).join('')}</div>
       <article class="du-glass"><h2>Summary</h2><p style="white-space:pre-wrap">${c.esc(r.summary||'')}</p><p class="du-muted">${r.credits_charged?r.credits_charged+' credits used · ':''}Reviewed ${fmtWhen(r.completed_at)}. DrawUp Check is guidance for the design team; the licensed professional of record and the authority having jurisdiction make final determinations.</p></article>
@@ -267,7 +282,16 @@ async function renderReview(w,c,id,projects){
     const ex=$q(w,'#cr-export');if(ex)ex.onclick=()=>download((r.title||'drawup-check').replace(/[^\w.-]+/g,'-')+'-report.pdf',binary(reportPDF(r,findings,proj)),'application/pdf');
     const sb=$q(w,'#cr-start');if(sb)sb.onclick=async()=>{sb.disabled=true;$q(w,'#cr-st').textContent=' Starting…';try{await api(c,'/api/check',{method:'POST',body:JSON.stringify({review_id:r.id})});r=await load();draw();poll();}catch(e){sb.disabled=false;$q(w,'#cr-st').textContent=' '+e.message;}};
   };
-  const poll=async()=>{while(r.status==='reviewing'&&w.dataset.seq===seq&&document.body.contains(w)){await sleep(4000);if(w.dataset.seq!==seq)return;try{const d=await api(c,'/api/check?id='+encodeURIComponent(r.id));if(d.review&&d.review.status!==r.status){r=await load();draw();}}catch(e){console.warn('check poll',e);}}};
+  // V21: streamed reviews list findings as they are written ("Found so far"), then the finished report replaces them.
+  let cursor=0,streamed=true,text='';
+  const partialFindings=t=>{const out=[];const re=/"severity"\s*:\s*"(critical|major|minor|info)"/g;let m;while((m=re.exec(t))){const rest=t.slice(m.index,m.index+4000);const seg=rest.slice(0,(()=>{const k=rest.slice(12).search(/"severity"\s*:/);return k<0?rest.length:k+12;})());const im=seg.match(/"issue"\s*:\s*"((?:[^"\\]|\\.)*)"/);if(!im)continue;let issue=im[1];try{issue=JSON.parse('"'+issue+'"');}catch(_e){}const sheet=(seg.match(/"sheet"\s*:\s*"([^"]*)"/)||[])[1]||'';out.push({severity:m[1],issue,sheet});}return out;};
+  const showPartial=activity=>{const art=$q(w,'.du-check-live');if(!art)return;const fs=partialFindings(text);art.hidden=false;
+    art.querySelector('h3').textContent=fs.length?'Found so far · '+fs.length+' item'+(fs.length===1?'':'s'):activity==='searching'?'Checking the code sources…':'Reading the sheets…';
+    art.querySelector('ul').innerHTML=fs.map(f=>`<li class="du-sev-${f.severity}"><span class="du-status-pill" data-state="${f.severity}">${f.severity.toUpperCase()}</span> ${f.sheet?'<b>'+c.esc(f.sheet)+'</b> ':''}${c.esc(f.issue)}</li>`).join('');};
+  const poll=async()=>{while(r.status==='reviewing'&&w.dataset.seq===seq&&document.body.contains(w)){await sleep(streamed?400:4000);if(w.dataset.seq!==seq)return;try{const d=await api(c,'/api/check?id='+encodeURIComponent(r.id)+(streamed?'&after='+cursor:''));
+    if(streamed&&typeof d.cursor==='number'){cursor=d.cursor;if(d.delta)text+=d.delta;showPartial(d.activity);continue;}
+    if(streamed&&d.review?.status==='reviewing')streamed=false;
+    if(d.review&&d.review.status!==r.status){r=await load();draw();}}catch(e){console.warn('check poll',e);}}};
   draw();poll();
 }
 /** Plain-text PDF report of a Check review (letter, wrapped, paginated). */

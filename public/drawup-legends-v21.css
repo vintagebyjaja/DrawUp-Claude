@@ -1,0 +1,14 @@
+/* DrawUp V21: Hall of Fame legends (second opinion under Arch Coach answers) */
+.du-hof-ask{margin:4px 0 14px;padding:12px 14px;border-radius:16px;border:1px solid rgba(255,182,72,.45);background:linear-gradient(135deg,rgba(255,138,61,.10),rgba(155,93,229,.10));color:#fff6ea;max-width:860px}
+.du-hof-k{display:block;font-size:11px;font-weight:800;letter-spacing:.12em;color:#ffc061}
+.du-hof-ask p{margin:4px 0 10px;font-size:14px;line-height:1.45;color:rgba(255,246,234,.86)}
+.du-hof-chips{display:flex;flex-wrap:wrap;gap:8px}
+.du-hof-chips button{display:inline-flex;align-items:center;gap:8px;min-height:38px;padding:6px 14px 6px 6px;border-radius:999px;border:1px solid rgba(255,192,97,.6);background:rgba(10,14,24,.65);color:#fff;font:inherit;font-size:13px;font-weight:700;cursor:pointer}
+.du-hof-chips button i{font-style:normal;display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#ff8a3d,#9b5de5);font-size:10px;letter-spacing:.04em}
+.du-hof-chips button em{font-style:normal;font-weight:600;font-size:11px;color:#ffc061}
+.du-hof-chips button:hover,.du-hof-chips button:focus-visible{border-color:#ffc061;background:rgba(255,192,97,.16);outline:none}
+.du-hof-chips button.locked{opacity:.55;cursor:not-allowed}
+.du-coach-messages article.du-hof-msg{border:1px solid rgba(255,192,97,.55);background:linear-gradient(135deg,rgba(255,138,61,.12),rgba(155,93,229,.12));color:#fff6ea}
+.du-coach-messages article.du-hof-msg>span{color:#ffc061;font-weight:800;letter-spacing:.1em}
+.du-coach-messages article.du-hof-msg p{color:#fff6ea}
+@media (max-width:520px){.du-hof-chips{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px}.du-hof-chips button{flex:0 0 auto}}

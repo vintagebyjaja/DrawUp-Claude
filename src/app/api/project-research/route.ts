@@ -1,7 +1,9 @@
 import { NextResponse } from 'next/server';
 import { adminRest, models, openaiCancel, openaiCreate, openaiGet, outputText as responseText, signedInUser } from '@/lib/drawup-server';
+import { streamCreate, streamRead } from '@/lib/drawup-stream';
 import { normQuery, quickCall, quickSearchPrompt, searchKey, type QuickResult } from '@/lib/drawup-quick';
 import { ingestResearch } from '@/lib/drawup-ingest';
+import { recordDetailQuery, recordDetailSources } from '@/lib/drawup-details';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -120,6 +122,7 @@ export async function POST(request: Request) {
     const allowClarify = type !== 'person' && !body?.clarified;
     const user = await signedInUser(request).catch(() => null);
     const base = { query, query_norm: qn, query_key: key, search_type: type, user_id: user?.id || null, parent_norm: parent };
+    if (type !== 'person') await recordDetailQuery(query, 'search', user?.id); // V21 Detail Library: detail searches land in the shared detail database
     if (!body?.refresh && qn) {
       const hit = await cached(qn, key, type);
       if (hit?.result) {
@@ -151,7 +154,17 @@ export async function POST(request: Request) {
       await log({ status: 'clarify', clarify: c, completed_at: new Date().toISOString() });
       return NextResponse.json({ clarify: c });
     }
-    const jobP = create({ background: true, store: true }).then(d => ({ d, e: null as any }), e => ({ d: null as any, e }));
+    // V21: stream the researched answer so the page can show fields as they are written; plain background job as fallback.
+    const streamed = async () => {
+      const go = (p: Record<string, unknown>) => streamCreate(p, MODELS());
+      try { return await go({ ...payload, reasoning: { effort: 'low' } }); }
+      catch (e: any) {
+        if (/reasoning/i.test(e?.message || '')) return await go(payload);
+        if (/tool_choice/i.test(e?.message || '')) { const { tool_choice: _t, ...rest } = payload; return await go(rest); }
+        throw e;
+      }
+    };
+    const jobP = streamed().catch(() => create({ background: true, store: true })).then(d => ({ d, e: null as any }), e => ({ d: null as any, e }));
     const quick = early === undefined ? await quickP : early;
     const job = await jobP;
     if (quick && quick.kind === 'clarify') {
@@ -165,7 +178,7 @@ export async function POST(request: Request) {
     if (job.d) {
       const data = job.d;
       if (data?.status === 'completed') { const result = finish(data); if (result) { const ingest = await ingestResearch(result, query); if (ingest) result._ingest = ingest; await log({ status: 'complete', result, quick: q, ingest, ...summaryFields(result), completed_at: new Date().toISOString() }); return NextResponse.json({ result }); } }
-      if (data?.id) { await log({ status: 'running', response_id: data.id, quick: q }); return NextResponse.json({ id: data.id, status: data.status || 'queued', quick: q }); }
+      if (data?.id) { await log({ status: 'running', response_id: data.id, quick: q }); return NextResponse.json({ id: data.id, status: data.status || 'queued', quick: q, stream: typeof data.cursor === 'number' ? { cursor: data.cursor } : null }); }
     }
     const data = await create({});
     const result = finish(data);
@@ -180,6 +193,12 @@ export async function GET(request: Request) {
   const id = new URL(request.url).searchParams.get('id') || '';
   if (!/^[A-Za-z0-9_-]{6,120}$/.test(id)) return NextResponse.json({ error: 'Unknown research job.' }, { status: 400 });
   try {
+    // V21: streamed jobs hand back the text written since the page's cursor (partial JSON the page reads field by field).
+    const after = new URL(request.url).searchParams.get('after');
+    if (after !== null) {
+      const r = await streamRead(id, Number(after) || 0, 7000).catch(() => null);
+      if (r && !r.final && !r.failed) return NextResponse.json({ id, status: 'in_progress', delta: r.text, cursor: r.cursor, activity: r.activity || null });
+    }
     const data = await openaiGet(id);
     if (data.status === 'queued' || data.status === 'in_progress') return NextResponse.json({ id, status: data.status });
     const rid = `response_id=eq.${encodeURIComponent(id)}&status=eq.running`;
@@ -188,6 +207,7 @@ export async function GET(request: Request) {
     if (!result) { await patchRows(rid, { status: 'failed', completed_at: new Date().toISOString() }); return NextResponse.json({ error: 'Research response could not be structured.' }, { status: 502 }); }
     // Only the request that flips the row from running to complete lists new firms, so a job is ingested once.
     const won = await patchRows(rid, { status: 'complete', result, ...summaryFields(result), completed_at: new Date().toISOString() });
+    if (won.length) await recordDetailSources('search', { text: String(won[0].query || '') }, result.sources); // V21 Detail Library
     if (won.length) {
       const ingest = await ingestResearch(result, String(won[0].query || ''));
       if (ingest) { result._ingest = ingest; await patchRows(`id=eq.${won[0].id}`, { result, ingest }); }
