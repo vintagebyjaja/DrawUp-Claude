@@ -23,21 +23,36 @@ function uuid(){return (crypto.randomUUID&&crypto.randomUUID())||(Date.now().toS
 
 /* =================================================================== research */
 const Research={
-  async run(query,type,onTick){
-    const t0=Date.now();
-    const res=await fetch('/api/project-research',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query,type:type||'all'})});
-    let data=await res.json().catch(()=>({}));
+  /* V20 speed: POST answers with a saved result, a clarifying question {clarify}, or a running job
+     {id, quick}. opts: {clarified, parent, refresh}. */
+  async start(query,type,opts={}){
+    const h={'Content-Type':'application/json'};try{const c=await db();const ses=c&&(await c.auth.getSession()).data.session;if(ses&&!ses.user?.is_anonymous)h.Authorization='Bearer '+ses.access_token;}catch(_e){}
+    const res=await fetch('/api/project-research',{method:'POST',headers:h,body:JSON.stringify({query,type:type||'all',clarified:!!opts.clarified,parent:opts.parent||undefined,refresh:!!opts.refresh})});
+    const data=await res.json().catch(()=>({}));
     if(!res.ok)throw new Error(data?.error||'Web research is unavailable right now.');
-    if(data.result)return data.result;
-    if(!data.id)throw new Error('Web research did not start.');
-    while(Date.now()-t0<240000){
-      await sleep(2500);onTick&&onTick(Math.round((Date.now()-t0)/1000));
-      const r=await fetch('/api/project-research?id='+encodeURIComponent(data.id),{cache:'no-store'});
+    if(data.result&&data.cached){data.result._saved_at=data.saved_at;if(data.match==='similar')data.result._saved_query=data.saved_query;}
+    return data;
+  },
+  async poll(id,t0,onTick,alive){
+    while(Date.now()-t0<115000){
+      await sleep(2500);if(alive&&!alive())return null;onTick&&onTick(Math.round((Date.now()-t0)/1000));
+      const r=await fetch('/api/project-research?id='+encodeURIComponent(id),{cache:'no-store'});
       const d=await r.json().catch(()=>({}));
       if(d.result)return d.result;
       if(!r.ok)throw new Error(d?.error||'Web research failed.');
     }
-    throw new Error('Research is taking too long. Try again in a moment.');
+    throw new Error('DrawUp stopped this search at two minutes. Try a more specific search, for example the project name plus its city.');
+  },
+  /* Resolves to the full result. opts.onQuick(quick) gets the quick answer; opts.onClarify(clarify) takes over
+     a clarifying question (run resolves null); without it the search continues as typed. */
+  async run(query,type,onTick,opts={}){
+    const t0=Date.now();
+    const data=await Research.start(query,type,opts);
+    if(data.result)return data.result;
+    if(data.clarify){if(opts.onClarify){opts.onClarify(data.clarify);return null;}return Research.run(query,type,onTick,{...opts,clarified:true});}
+    if(data.quick&&opts.onQuick)opts.onQuick(data.quick);
+    if(!data.id)throw new Error('Web research did not start.');
+    return Research.poll(data.id,t0,onTick,opts.alive);
   },
   cityOf(loc){const parts=String(loc||'').split(',').map(x=>x.trim()).filter(Boolean);for(let i=1;i<parts.length;i++){if(/^[A-Z]{2}(\s+\d{5}(-\d{4})?)?$/.test(parts[i])||/^(Alabama|Alaska|Arizona|California|Colorado|Florida|Georgia|Illinois|Maryland|Massachusetts|Michigan|New York|North Carolina|South Carolina|Ohio|Pennsylvania|Tennessee|Texas|Virginia|Washington)$/i.test(parts[i]))return {city:parts[i-1].replace(/^\d+\s.*$/,''),state:parts[i].slice(0,2).toUpperCase()};}const first=parts.find(p=>!/\d/.test(p));return first?{city:first,state:''}:null;},
   names(r){return [r.architect,r.engineers,r.contractor,r.owner].filter(Boolean).join(';').split(/;|,|\/|\band\b|\(|\)|\+/i).map(x=>x.replace(/\b(structural|mep|civil|joint venture|jv|architect|engineer(s)?|general contractor|landscape|interiors?)\b/gi,'').trim()).filter(x=>x.length>2&&x.length<60);},
@@ -84,6 +99,8 @@ function pageHTML(r,q,rel,opts={}){
   let h=`<div class="du-rs">${opts.head===false?'':`<header class="du-rs-head"><button type="button" class="du-rs-back" data-rs-back>← Back to DrawUp</button><span class="du-rs-kicker">DRAWUP PROJECT PORTAL</span><h1>${esc(r.title||q)}</h1><p>${esc([r.type,r.location].filter(Boolean).join(' · '))}</p></header>`}<div class="du-rs-body">`;
   if(rel.projects?.length)h+=`<section class="du-rs-ondrawup"><h2>On DrawUp</h2><div class="du-rs-proj">${rel.projects.map(p=>`<button type="button" class="du-rs-projcard" data-project-slug="${esc(p.slug)}">${p.image_url?`<img src="${esc(p.image_url)}" alt="">`:''}<b>${esc(p.name)}</b><small>${esc([p.city,p.state].filter(Boolean).join(', '))}${p.project_type?' · '+esc(p.project_type):''}</small><span>Open DrawUp profile →</span></button>`).join('')}</div></section>`;
   if(hero)h+=`<figure class="du-rs-hero"><img src="${esc(hero)}" alt="${esc(r.title||q)}" onerror="this.parentNode.remove()"><figcaption>Image from the sources below</figcaption></figure>`;
+  if(r._saved_at)h+=`<p class="du-rs-muted">Saved DrawUp research from ${esc(new Date(r._saved_at).toLocaleDateString())}${r._saved_query?` (matched the earlier search “${esc(r._saved_query)}”)`:''}. It loaded instantly because someone searched this before.</p>`;
+  h+=ingestHTML(r._ingest);
   if(r.summary)h+=`<section><h2>About</h2><p>${esc(r.summary)}</p></section>`;
   if(r.answer&&r.answer!==r.summary)h+=`<section><h2>DrawUp answer</h2><p>${esc(r.answer)}</p></section>`;
   if(fields.length)h+=`<section><h2>Project facts</h2><div class="du-rs-facts">${fields.map(x=>`<div><span>${esc(x[0])}</span><b>${linkNames(x[1],rel.credited)}</b></div>`).join('')}</div></section>`;
@@ -98,7 +115,7 @@ function pageHTML(r,q,rel,opts={}){
     h+='</section>';}
   if(sources.length)h+=`<section><h2>Sources</h2><div class="du-rs-sources">${sources.join('')}</div></section>`;
   else h+=`<section><h2>Sources</h2><p class="du-rs-muted">No sources came back with this answer, so treat it as unconfirmed.</p></section>`;
-  h+=`<p class="du-rs-label">Web research by DrawUp from public sources. It is not added to the DrawUp database; check the sources before relying on it.</p><div class="du-rs-actions"><button type="button" class="du-rs-btn" data-rs-coach>Ask Arch Coach about this</button><button type="button" class="du-rs-btn ghost" data-rs-again>New search</button></div></div></div>`;
+  h+=`<p class="du-rs-label">${r._ingest?.project?'Web research by DrawUp from public sources. The project and the firms named in these sources were listed on DrawUp as unconfirmed public-source records; firms can claim and correct them. Check the sources before relying on it.':'Web research by DrawUp from public sources. It is not added to the DrawUp database; check the sources before relying on it.'}</p><div class="du-rs-actions"><button type="button" class="du-rs-btn" data-rs-coach>Ask Arch Coach about this</button><button type="button" class="du-rs-btn ghost" data-rs-again>New search</button></div></div></div>`;
   return h;
 }
 function bindPage(root,{openFirm,openProject,back,again,coach}){
@@ -106,36 +123,107 @@ function bindPage(root,{openFirm,openProject,back,again,coach}){
   root.querySelectorAll('[data-project-slug]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();openProject(a.dataset.projectSlug);},true));
   root.querySelectorAll('[data-rs-back]').forEach(b=>b.onclick=back);root.querySelectorAll('[data-rs-again]').forEach(b=>b.onclick=again);root.querySelectorAll('[data-rs-coach]').forEach(b=>b.onclick=coach);
 }
-async function searchFlow(q,type,{onDb}={}){
+/* V20: firms and the project DrawUp listed from this research (unclaimed, unconfirmed). */
+function ingestHTML(ing){
+  if(!ing||!ing.project||!(ing.firms||[]).length)return '';
+  const fresh=ing.firms.filter(f=>f.created);
+  return `<section class="du-rs-ingest"><h2>${fresh.length?'Added to DrawUp from this search':'Credited on DrawUp from this search'}</h2><p class="du-rs-muted">Listed from public sources. Unconfirmed and not claimed by the firm${ing.firms.length>1?'s':''} yet.</p><div class="du-rs-firms">${ing.firms.map(f=>firmChip(f,(f.created?'New listing · ':'')+f.role)).join('')}</div><p><button type="button" class="du-rs-btn ghost" data-project-slug="${esc(ing.project.slug)}">Open ${esc(ing.project.name)} on DrawUp →</button></p></section>`;
+}
+function onDrawupHTML(d){
+  const projects=d?.projects||[],firms=d?.firms||[];
+  if(!d)return `<section class="du-rs-ondrawup"><h2>On DrawUp</h2><p class="du-rs-muted">Checking DrawUp records…</p></section>`;
+  if(!projects.length&&!firms.length)return `<section class="du-rs-ondrawup"><h2>On DrawUp</h2><p class="du-rs-muted">No DrawUp records match these words yet.</p></section>`;
+  return `<section class="du-rs-ondrawup"><h2>On DrawUp</h2>${projects.length?`<div class="du-rs-proj">${projects.map(p=>`<button type="button" class="du-rs-projcard" data-project-slug="${esc(p.slug)}">${p.image_url?`<img src="${esc(p.image_url)}" alt="">`:''}<b>${esc(p.name)}</b><small>${esc([p.city,p.state].filter(Boolean).join(', '))}${p.project_type?' · '+esc(p.project_type):''}</small><span>Open DrawUp profile →</span></button>`).join('')}</div>`:''}${firms.length?`<div class="du-rs-firms">${firms.slice(0,8).map(f=>firmChip(f)).join('')}</div>`:''}</section>`;
+}
+/* The page while research runs: DrawUp matches right away, then a labeled quick answer or a clarifying question. */
+function provisionalHTML(q,st,head){
+  let h=`<div class="du-rs du-rs-live">${head?`<header class="du-rs-head"><button type="button" class="du-rs-back" data-rs-back>← Back to DrawUp</button><span class="du-rs-kicker">DRAWUP PROJECT PORTAL</span><h1>${esc(st.quick?.title||q)}</h1><p>${esc(st.quick?.location||'')}</p></header>`:''}<div class="du-rs-body">`;
+  if(st.clarify){
+    h+=`<section class="du-rs-clarify"><span class="du-quick-tag">Quick question so DrawUp searches the right thing</span><h2>${esc(st.clarify.question)}</h2><div class="du-clarify-opts">${st.clarify.options.map((o,i)=>`<button type="button" data-rs-clar="${i}">${esc(o.label)}</button>`).join('')}</div><form class="du-rs-clarform"><input type="text" maxlength="160" placeholder="Or add a detail (city, state, program, building type…)" aria-label="Add a detail"><button class="du-rs-btn">Search</button></form><button type="button" class="du-rs-asis" data-rs-asis>Search “${esc(q)}” as typed</button></section>`;
+  }else if(st.err){
+    h+=`<section class="du-rs-error"><h2>Web research could not finish</h2><p>${esc(st.err)}</p><button type="button" class="du-rs-btn" data-rs-retry>Try again</button></section>`;
+    if(st.quick)h+=`<section class="du-rs-quick"><span class="du-quick-tag">Quick answer · not verified</span><p>${esc(st.quick.answer)}</p></section>`;
+  }else{
+    const secs=Math.round((Date.now()-st.t0)/1000);
+    h+=`<section class="du-rs-quick${st.quick?'':' waiting'}"><span class="du-quick-tag">${st.quick?`Quick answer, still checking sources · ${(st.quick.ms/1000||0).toFixed(1)}s`:'Drawing up a quick answer…'}</span>${st.quick?`<h2>${esc(st.quick.title||q)}</h2><p>${esc(st.quick.answer)}</p><small>Not verified yet. The full answer with sources replaces this when it is ready.</small>`:''}<div class="du-rs-checking"><i></i><span>Checking live sources for the full answer</span><b data-rs-clock>${secs}s</b></div></section>`;
+  }
+  h+=onDrawupHTML(st.db);
+  return h+'</div></div>';
+}
+function searchCss(){if(document.getElementById('du-speed19-css'))return;const s=document.createElement('style');s.id='du-speed19-css';s.textContent=`
+.du-quick-tag{display:inline-block;font-weight:700;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#0b7fa3}
+.du-rs-quick,.du-rs-clarify,.du-rs-ingest{border:1px dashed rgba(11,127,163,.45);border-radius:16px;padding:16px 18px;background:rgba(127,231,255,.08)}
+.du-rs-quick small{color:#5b6b78}.du-rs-quick.waiting{border-style:solid}
+.du-rs-checking{display:flex;align-items:center;gap:10px;margin-top:12px;font-size:13px;color:#33505f}.du-rs-checking i{width:14px;height:14px;border-radius:50%;border:2px solid #7fe7ff;border-top-color:#9b5de5;animation:duSpin 0.9s linear infinite}
+.du-rs-checking b{margin-left:auto;font-variant-numeric:tabular-nums}@keyframes duSpin{to{transform:rotate(360deg)}}
+.du-rs-clarify .du-clarify-opts{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.du-rs-clarify .du-clarify-opts button{border:1px solid #0b7fa3;background:#fff;color:#0b5f7a;border-radius:999px;padding:9px 16px;font-weight:600;cursor:pointer;min-height:40px}
+.du-rs-clarify .du-clarify-opts button:hover,.du-rs-clarify .du-clarify-opts button:focus-visible{background:#0b7fa3;color:#fff;outline:none}
+.du-rs-clarform{display:flex;gap:8px;flex-wrap:wrap}.du-rs-clarform input{flex:1 1 200px;min-width:0;border:1px solid #c9d6de;border-radius:10px;padding:10px 12px;font:inherit}
+.du-rs-asis{margin-top:10px;background:none;border:0;padding:0;color:#33505f;text-decoration:underline;cursor:pointer;font:inherit;font-size:13px}
+.du-rs-ingest{border-style:solid;border-color:rgba(155,93,229,.45);background:rgba(155,93,229,.06)}`;document.head.appendChild(s);}
+
+/* V20 speed: one progressive search into `el`. Shows DrawUp matches instantly, a labeled quick answer
+   within seconds (or chips for an ambiguous search), then the full sourced page replaces it.
+   ctx: {head, onPaint(state), bind(root,r), rerun(query,opts), opts:{clarified,parent,refresh}}. Resolves when done. */
+async function liveSearch(el,q,type,ctx){
+  searchCss();
+  const seq=String(Date.now()+Math.random());el.dataset.duSearch=seq;const alive=()=>el.dataset.duSearch===seq;
+  const st={t0:Date.now(),db:null,quick:null,clarify:null,full:null,rel:null,err:null};
+  const paint=()=>{if(!alive())return;
+    if(st.full)el.innerHTML=pageHTML(st.full,q,st.rel,{head:ctx.head});
+    else el.innerHTML=provisionalHTML(q,st,ctx.head);
+    ctx.bind(el,st.full||{title:st.quick?.title||q});
+    el.querySelectorAll('[data-rs-clar]').forEach(b=>b.onclick=()=>{const o=st.clarify.options[+b.dataset.rsClar];ctx.rerun(String(o.value||o.label),{clarified:true,parent:q});});
+    const cf=el.querySelector('.du-rs-clarform');if(cf)cf.onsubmit=e=>{e.preventDefault();const v=cf.querySelector('input').value.trim();if(v)ctx.rerun(q+' '+v,{clarified:true,parent:q});};
+    el.querySelector('[data-rs-asis]')?.addEventListener('click',()=>ctx.rerun(q,{clarified:true}));
+    el.querySelector('[data-rs-retry]')?.addEventListener('click',()=>ctx.rerun(q,ctx.opts||{}));
+    ctx.onPaint&&ctx.onPaint(st);};
+  const clock=setInterval(()=>{if(!alive()||st.full||st.err||st.clarify){clearInterval(clock);return;}const b=el.querySelector('[data-rs-clock]');if(b)b.textContent=Math.round((Date.now()-st.t0)/1000)+'s';},1000);
   const c=await db();
-  const quick=c?c.rpc('drawup_search',{q,kind:'all',max_rows:6}).then(({data})=>data||{},()=>({})):Promise.resolve({});
-  quick.then(d=>{const names=[...(d.projects||[]).map(p=>p.name),...(d.firms||[]).map(f=>f.name)];if(names.length)Tunnel.relations(names,'Possible relations on DrawUp');onDb&&onDb(d);});
-  const r=await Research.run(q,type,s=>{if(s>20)Tunnel.route('Still reading sources… DrawUp keeps searching until it has a real answer.');});
-  if(r?.location)Tunnel.route('Routing to '+r.location+'…');
-  const rel=await Research.related(r,q);
-  if(rel.credited.length||rel.nearby.length)Tunnel.relations([...rel.credited.map(f=>f.name),...rel.nearby.map(f=>f.name)],rel.place?.city?'Connecting firms near '+rel.place.city:'Connecting DrawUp firms');
-  await sleep(900);
-  return {r,rel};
+  const dbP=(c?c.rpc('drawup_search',{q,kind:type==='person'?'all':(type||'all'),max_rows:6}).then(({data})=>data||{},()=>({})):Promise.resolve({})).then(d=>{st.db=d;if(!st.full)paint();const names=[...(d.projects||[]).map(p=>p.name),...(d.firms||[]).map(f=>f.name)];if(names.length)Tunnel.relations(names,'Possible relations on DrawUp');return d;});
+  paint();
+  try{
+    const r=await Research.run(q,type,s=>{if(s>20)Tunnel.route('Still reading sources… DrawUp keeps searching until it has a real answer.');},{...(ctx.opts||{}),alive,onQuick:qk=>{st.quick=qk;paint();},onClarify:cl=>{st.clarify=cl;paint();}});
+    if(!r||!alive())return st;
+    if(r.location)Tunnel.route('Routing to '+r.location+'…');
+    const rel=await Research.related(r,q);await dbP;
+    if(rel.credited.length||rel.nearby.length)Tunnel.relations([...rel.credited.map(f=>f.name),...rel.nearby.map(f=>f.name)],rel.place?.city?'Connecting firms near '+rel.place.city:'Connecting DrawUp firms');
+    st.full=r;st.rel=rel;paint();
+  }catch(e){st.err=e.message||String(e);await dbP;paint();}
+  finally{clearInterval(clock);}
+  return st;
+}
+/* Keeps the portal transition up briefly (it locates the place on the globe), then shows the live page. */
+async function tunnelFor(q,ready,cancelled){
+  const t0=Date.now();
+  const first=await Promise.race([ready,cancelled.then(()=>'cancel')]);
+  if(first==='cancel')return 'cancel';
+  const min=first==='full'||first==='clarify'?500:2800;
+  const left=min-(Date.now()-t0);if(left>0)await Promise.race([sleep(left),cancelled.then(()=>'cancel')]);
+  Tunnel.close();return 'ok';
 }
 
-/* Public site search: DrawUp records + web research behind the portal transition. */
-async function publicSearch(q,type){
+/* Public site search: DrawUp records + quick answer + web research behind the portal transition. */
+async function publicSearch(q,type,opts){
   const portal=$('drawup-v12-portal');if(!portal)return false;
-  const cancelled=Tunnel.open(q);let done=false;
-  try{
-    const out=await Promise.race([searchFlow(q,type),cancelled.then(()=>null)]);if(!out)return true;
-    Tunnel.close();done=true;
-    $('v12-result-title').textContent=out.r.title||q;$('v12-result-sub').textContent=[out.r.type,out.r.location].filter(Boolean).join(' · ');
-    const body=$('v12-result-body');body.innerHTML=pageHTML(out.r,q,out.rel,{head:false});portal.classList.add('open');portal.scrollTop=0;
-    bindPage(body,{openFirm:s=>{portal.classList.remove('open');window.DrawUpLive?.openFirm(s);},openProject:s=>{portal.classList.remove('open');window.DrawUpLive?.openProject(s);},back:()=>portal.classList.remove('open'),again:()=>{portal.classList.remove('open');$('drawup-search-input')?.focus();},coach:()=>{portal.classList.remove('open');document.querySelector('[data-page=coach]')?.click();const i=$('arch-coach-input');if(i)i.value='Tell me about '+(out.r.title||q);}});
-  }catch(e){
-    Tunnel.close();done=true;
-    let d={};try{d=await window.DrawUpLive.searchDb(q,'all');}catch(_e){}
-    $('v12-result-title').textContent='DrawUp search: '+q;$('v12-result-sub').textContent='';
-    const body=$('v12-result-body');body.innerHTML=pageHTML({title:q,summary:'',sources:[]},q,{credited:[],nearby:[],projects:d.projects||[],firms:d.firms||[]},{head:false}).replace('<div class="du-rs-body">',`<div class="du-rs-body"><section class="du-rs-error"><h2>Web research could not finish</h2><p>${esc(e.message||e)}</p><button type="button" class="du-rs-btn" data-rs-retry>Try again</button></section>`);
-    portal.classList.add('open');body.querySelector('[data-rs-retry]').onclick=()=>{portal.classList.remove('open');publicSearch(q,type);};
-    bindPage(body,{openFirm:s=>{portal.classList.remove('open');window.DrawUpLive?.openFirm(s);},openProject:s=>{portal.classList.remove('open');window.DrawUpLive?.openProject(s);},back:()=>portal.classList.remove('open'),again:()=>portal.classList.remove('open'),coach:()=>{portal.classList.remove('open');document.querySelector('[data-page=coach]')?.click();}});
-  }finally{if(!done)Tunnel.close();}
+  const cancelled=Tunnel.open(q);
+  const body=$('v12-result-body');let readyFn;const ready=new Promise(r=>readyFn=r);
+  setTimeout(()=>readyFn('timeout'),6000);
+  const close=()=>portal.classList.remove('open');
+  const bind=(root,r)=>bindPage(root,{openFirm:s=>{close();window.DrawUpLive?.openFirm(s);},openProject:s=>{close();window.DrawUpLive?.openProject(s);},back:close,again:()=>{close();$('drawup-search-input')?.focus();},coach:()=>{close();document.querySelector('[data-page=coach]')?.click();const i=$('arch-coach-input');if(i)i.value='Tell me about '+(r?.title||q);}});
+  $('v12-result-title').textContent=q;$('v12-result-sub').textContent='Checking DrawUp and live sources…';
+  const search=liveSearch(body,q,type,{head:false,opts,bind,
+    rerun:(nq,o)=>{const inp=$('drawup-search-input');if(inp)inp.value=nq;publicSearch(nq,type,o);},
+    onPaint:st=>{
+      if(st.full){$('v12-result-title').textContent=st.full.title||q;$('v12-result-sub').textContent=[st.full.type,st.full.location].filter(Boolean).join(' · ');readyFn('full');}
+      else if(st.clarify){$('v12-result-title').textContent=q;$('v12-result-sub').textContent='One quick question first';readyFn('clarify');}
+      else if(st.err){$('v12-result-title').textContent='DrawUp search: '+q;$('v12-result-sub').textContent='';readyFn('err');}
+      else if(st.quick){$('v12-result-title').textContent=st.quick.title||q;$('v12-result-sub').textContent='Quick answer · checking sources';readyFn('quick');}}});
+  const t=await tunnelFor(q,ready,cancelled);
+  if(t==='cancel'){body.dataset.duSearch='cancelled';return true;}
+  portal.classList.add('open');portal.scrollTop=0;
+  search.finally(()=>Tunnel.close());
   return true;
 }
 window.DrawUpV19={publicSearch,Research,pageHTML,linkify,openPerson};
@@ -148,19 +236,16 @@ whenPortal().then(P=>{if(!P)return;
     let kind='all';const f=w.querySelector('#du-v19-search'),qi=w.querySelector('#du-v19-q'),out=w.querySelector('#du-v19-results');
     w.querySelectorAll('[data-kind]').forEach(b=>b.onclick=()=>{kind=b.dataset.kind;w.querySelectorAll('[data-kind]').forEach(x=>x.classList.toggle('active',x===b));});
     const open=(slug,proj)=>proj?P.openProject(slug):P.openFirm(slug);
-    f.onsubmit=async e=>{e.preventDefault();const q=qi.value.trim();if(!q)return;
-      const cancelled=Tunnel.open(q);let dbHits=null;
-      try{
-        const res=await Promise.race([searchFlow(q,kind,{onDb:d=>dbHits=d}),cancelled.then(()=>null)]);
-        Tunnel.close();if(!res){out.innerHTML='';return;}
-        out.innerHTML=pageHTML(res.r,q,res.rel);
-        bindPage(out,{openFirm:s=>open(s),openProject:s=>open(s,true),back:()=>{out.innerHTML='';qi.focus();},again:()=>{out.innerHTML='';qi.value='';qi.focus();w.scrollIntoView({block:'start'});},coach:()=>{try{sessionStorage.setItem('du-coach-prefill','Tell me about '+(res.r.title||q));}catch(_e){}P.openPortalTab('arch-coach');}});
-        out.scrollIntoView({behavior:'smooth',block:'start'});
-      }catch(err){Tunnel.close();
-        const d=dbHits||{};out.innerHTML=pageHTML({title:q,sources:[]},q,{credited:[],nearby:[],projects:d.projects||[],firms:d.firms||[]}).replace('<div class="du-rs-body">',`<div class="du-rs-body"><section class="du-rs-error"><h2>Web research could not finish</h2><p>${esc(err.message||err)}</p><button type="button" class="du-rs-btn" data-rs-retry>Try again</button></section>`);
-        out.querySelector('[data-rs-retry]').onclick=()=>f.requestSubmit();
-        bindPage(out,{openFirm:s=>open(s),openProject:s=>open(s,true),back:()=>{out.innerHTML='';},again:()=>{out.innerHTML='';qi.focus();},coach:()=>P.openPortalTab('arch-coach')});}
+    // V20 speed: progressive search (DrawUp matches, quick answer or clarifying chips, then the full page).
+    const run=async(q,opts)=>{
+      const cancelled=Tunnel.open(q);let readyFn;const ready=new Promise(r=>readyFn=r);setTimeout(()=>readyFn('timeout'),6000);
+      const bind=(root,r)=>bindPage(root,{openFirm:s=>open(s),openProject:s=>open(s,true),back:()=>{out.innerHTML='';qi.focus();},again:()=>{out.innerHTML='';qi.value='';qi.focus();w.scrollIntoView({block:'start'});},coach:()=>{try{sessionStorage.setItem('du-coach-prefill','Tell me about '+(r?.title||q));}catch(_e){}P.openPortalTab('arch-coach');}});
+      const search=liveSearch(out,q,kind,{head:true,opts,bind,rerun:(nq,o)=>{qi.value=nq;run(nq,o);},onPaint:st=>{if(st.full)readyFn('full');else if(st.clarify)readyFn('clarify');else if(st.err||st.quick)readyFn('x');}});
+      const t=await tunnelFor(q,ready,cancelled);
+      if(t==='cancel'){out.dataset.duSearch='cancelled';out.innerHTML='';return;}
+      out.scrollIntoView({behavior:'smooth',block:'start'});search.finally(()=>Tunnel.close());
     };
+    f.onsubmit=e=>{e.preventDefault();const q=qi.value.trim();if(!q)return;run(q,{});};
     if(initial){qi.value=initial;f.requestSubmit();}
   });
   P.registerTab('firm',renderFirmTab);
@@ -168,6 +253,20 @@ whenPortal().then(P=>{if(!P)return;
 
 /* =================================================================== firm admin */
 const STATUS_OPTS=['Completed','Under construction','In design','Proposed','Open; renovation planned'];
+// V20: pick several photos at once (browse, drag in, or paste), preview them, upload with progress.
+function photoDropHTML(id,label){return `<div class="du-pdrop" id="${id}-zone" tabindex="0"><input type="file" id="${id}" accept="image/jpeg,image/png,image/webp" multiple hidden><b>${label}</b><span>Drag photos here, paste them, or <button type="button" class="du-pdrop-pick">choose files</button>. Pick as many as you like.</span><div class="du-pdrop-list"></div></div>`;}
+function photoDrop(root,id){
+  const zone=root.querySelector('#'+id+'-zone'),input=root.querySelector('#'+id),list=zone.querySelector('.du-pdrop-list');let files=[];
+  const ok=f=>/^image\/(jpeg|png|webp)$/.test(f.type);
+  const draw=()=>{list.innerHTML=files.map((f,i)=>`<figure><img alt="" src="${URL.createObjectURL(f)}"><button type="button" data-rm="${i}" aria-label="Remove">×</button><figcaption>${esc(f.name.slice(0,28))}</figcaption></figure>`).join('');zone.classList.toggle('has',files.length>0);};
+  const add=fl=>{const all=[...fl];const good=all.filter(ok);files=files.concat(good).slice(0,30);zone.dataset.progress=good.length<all.length?'Only JPG, PNG or WebP photos can be added.':'';draw();};
+  zone.querySelector('.du-pdrop-pick').onclick=()=>input.click();input.onchange=()=>{add(input.files);input.value='';};
+  zone.ondragover=e=>{e.preventDefault();zone.classList.add('over');};zone.ondragleave=()=>zone.classList.remove('over');
+  zone.ondrop=e=>{e.preventDefault();zone.classList.remove('over');add(e.dataTransfer.files);};
+  zone.onpaste=e=>{const fl=[...(e.clipboardData?.files||[])];if(fl.length){e.preventDefault();add(fl);}};
+  list.onclick=e=>{const b=e.target.closest('[data-rm]');if(b){files.splice(+b.dataset.rm,1);draw();}};
+  return {files:()=>files.slice(),clear:()=>{files=[];draw();},progress:(n,m)=>{zone.dataset.progress=m?`Uploading ${n} of ${m}…`:'';}};
+}
 async function uploadPublic(c,file,folder){
   if(!/^image\/(jpeg|png|webp)$/.test(file.type))throw new Error('Use a JPG, PNG or WebP image.');
   if(file.size>12*1024*1024)throw new Error('Image is larger than 12 MB.');
@@ -187,7 +286,7 @@ async function renderFirmTab(w,c){
   const firm=admin.find(f=>f.slug===firmSlug)||admin[0];
   const go=(p,extra)=>{history.replaceState(null,'','#portal/firm?firm='+encodeURIComponent(firm.slug)+'&pane='+p+(extra||''));P.openPortalTab('firm');};
   w.innerHTML=`<div class="du-work-head"><div><span class="du-kicker">FIRM ADMIN</span><h1>${esc(firm.name)}</h1><p>You are an admin of this firm on DrawUp. Changes show on the public firm profile right away.</p></div><div class="du-head-actions">${admin.length>1?`<select id="fa-switch">${admin.map(f=>`<option value="${esc(f.slug)}" ${f.slug===firm.slug?'selected':''}>${esc(f.name)}</option>`).join('')}</select>`:''}<button class="du-btn ghost" id="fa-view">View public profile</button></div></div>
-  <div class="du-subtabs du-hq-tabs">${[['details','Firm details'],['offices','Offices'],['projects','Projects'],['library','Library + team']].map(([k,l])=>`<button type="button" data-fa-pane="${k}" class="${k===pane?'active':''}">${l}</button>`).join('')}</div><div id="fa-body"><div class="du-loading">LOADING…</div></div>`;
+  <div class="du-subtabs du-hq-tabs">${[['details','Firm details'],['offices','Offices'],['units','Locations & studios'],['projects','Projects'],['library','Library + team']].map(([k,l])=>`<button type="button" data-fa-pane="${k}" class="${k===pane?'active':''}">${l}</button>`).join('')}</div><div id="fa-body"><div class="du-loading">LOADING…</div></div>`;
   w.querySelectorAll('[data-fa-pane]').forEach(b=>b.onclick=()=>go(b.dataset.faPane));
   w.querySelector('#fa-view').onclick=()=>P.openFirm(firm.slug);
   const sw=w.querySelector('#fa-switch');if(sw)sw.onchange=()=>{history.replaceState(null,'','#portal/firm?firm='+encodeURIComponent(sw.value));P.openPortalTab('firm');};
@@ -195,6 +294,7 @@ async function renderFirmTab(w,c){
   if(pane==='library'){await P.renderFirmBase(body);return;}
   if(pane==='details')return firmDetails(body,c,firm.id,go);
   if(pane==='offices')return firmOffices(body,c,firm.id,go);
+  if(pane==='units'){if(!window.DrawUpFirms){body.innerHTML='<p class="du-muted">Locations & studios needs drawup-firms-v20.js.</p>';return;}return window.DrawUpFirms.adminUnits(body,c,firm,go,params,{photoDrop,photoDropHTML,uploadPublic,fld});}
   if(pane==='projects'){const edit=params.get('edit');return edit?projectEditor(body,c,firm,edit,go):firmProjects(body,c,firm,go);}
 }
 async function firmDetails(body,c,id,go){
@@ -204,12 +304,13 @@ async function firmDetails(body,c,id,go){
   <div class="du-field"><label>About the firm</label><textarea id="fa-desc" rows="5">${esc(f.description||'')}</textarea></div>
   <div class="du-two"><div class="du-field"><label>Logo</label>${f.logo_url?`<img class="du-hq-thumb" src="${esc(f.logo_url)}" alt="">`:''}<input type="file" id="fa-logo" accept="image/jpeg,image/png,image/webp"></div><div class="du-field"><label>Cover image</label>${f.hero_image_url?`<img class="du-hq-thumb" src="${esc(f.hero_image_url)}" alt="">`:''}<input type="file" id="fa-hero" accept="image/jpeg,image/png,image/webp"></div></div>
   <p class="du-muted">Verification, the profile address and the plan are set by DrawUp HQ.</p><p><button class="du-btn primary" id="fa-save">Save details</button> <span id="fa-st" class="du-save-status"></span></p></article>
-  <article class="du-glass"><h2>Firm photos</h2><div class="du-hq-photos">${(photos||[]).map(p=>`<figure><img src="${esc(p.image_url)}" alt=""><figcaption>${esc(p.caption||'')} <button class="du-btn ghost" data-del-photo="${p.id}">Remove</button></figcaption></figure>`).join('')||'<p class="du-muted">No photos yet.</p>'}</div><div class="du-two"><div class="du-field"><label>Add photo</label><input type="file" id="fa-photo" accept="image/jpeg,image/png,image/webp"></div>${fld('Caption / photo credit','fa-cap','','placeholder="Photo: photographer name"')}</div><button class="du-btn ghost" id="fa-addphoto">Upload photo</button></article>`;
+  <article class="du-glass"><h2>Firm photos</h2><div class="du-hq-photos">${(photos||[]).map(p=>`<figure><img src="${esc(p.image_url)}" alt=""><figcaption>${esc(p.caption||'')} <button class="du-btn ghost" data-del-photo="${p.id}">Remove</button></figcaption></figure>`).join('')||'<p class="du-muted">No photos yet.</p>'}</div>${photoDropHTML('fa-photo','Add firm photos')}${fld('Caption / photo credit (applies to this batch)','fa-cap','','placeholder="Photo: photographer name"')}<button class="du-btn" id="fa-addphoto">Upload photos</button></article>`;
   body.querySelector('#fa-save').onclick=async()=>{const st=body.querySelector('#fa-st');st.textContent=' Saving…';try{const name=body.querySelector('#fa-name').value.trim();if(!name)throw new Error('Firm name is required.');const yr=parseInt(body.querySelector('#fa-founded').value,10);const web=body.querySelector('#fa-web').value.trim();
     const row={name,website:web?(/^https?:\/\//i.test(web)?web:'https://'+web):null,discipline:body.querySelector('#fa-disc').value||null,founded_year:yr>1700&&yr<2100?yr:null,description:body.querySelector('#fa-desc').value.trim()||null,updated_at:new Date().toISOString()};
     const lf=body.querySelector('#fa-logo').files[0],hf=body.querySelector('#fa-hero').files[0];if(lf)row.logo_url=await uploadPublic(c,lf,'firm/'+id);if(hf)row.hero_image_url=await uploadPublic(c,hf,'firm/'+id);
     const {error}=await c.client.from('firms').update(row).eq('id',id).select('id').single();if(error)throw error;c.toast('Firm details saved.');go('details');}catch(e){st.textContent=' Not saved — '+(e.message||e);}};
-  body.querySelector('#fa-addphoto').onclick=async()=>{try{const file=body.querySelector('#fa-photo').files[0];if(!file)throw new Error('Choose a photo.');const url=await uploadPublic(c,file,'firm/'+id);const {error}=await c.client.from('firm_photos').insert({firm_id:id,image_url:url,caption:body.querySelector('#fa-cap').value.trim()||null,sort_order:(photos||[]).length});if(error)throw error;c.toast('Photo added.');go('details');}catch(e){c.toast(e.message||String(e),true);}};
+  const faDrop=photoDrop(body,'fa-photo');
+  body.querySelector('#fa-addphoto').onclick=async()=>{const files=faDrop.files();if(!files.length){c.toast('Choose one or more photos.',true);return;}let n=(photos||[]).length,done=0;try{for(const file of files){faDrop.progress(done+1,files.length);const url=await uploadPublic(c,file,'firm/'+id);const {error}=await c.client.from('firm_photos').insert({firm_id:id,image_url:url,caption:body.querySelector('#fa-cap').value.trim()||null,sort_order:n++});if(error)throw error;done++;}faDrop.progress();c.toast(done===1?'Photo added.':done+' photos added.');go('details');}catch(e){faDrop.progress();c.toast((done?done+' of '+files.length+' photos added. ':'')+(e.message||String(e)),true);if(done)go('details');}};
   body.querySelectorAll('[data-del-photo]').forEach(b=>b.onclick=async()=>{const {error}=await c.client.from('firm_photos').delete().eq('id',b.dataset.delPhoto);if(error){c.toast(error.message,true);return;}go('details');});
 }
 async function firmOffices(body,c,id,go){
@@ -232,6 +333,7 @@ async function firmProjects(body,c,firm,go){
   const rows=(data||[]).filter(x=>x.aec_projects);
   body.innerHTML=`<article class="du-glass"><div class="du-section-title"><h2>Projects credited to ${esc(firm.name)}</h2></div>${rows.map(x=>{const p=x.aec_projects;return `<div class="du-row"><div><b>${esc(p.name)}</b><small>${esc([p.city,p.state].filter(Boolean).join(', '))}${p.project_type?' · '+esc(p.project_type):''}${p.completion_year?' · '+p.completion_year:''} · ${esc(x.role)} · ${(p.project_images||[]).length} photo${(p.project_images||[]).length===1?'':'s'}</small></div><div><button class="du-btn ghost" data-open-proj="${esc(p.slug)}">View</button> <button class="du-btn primary" data-edit-proj="${p.id}">Edit</button></div></div>`;}).join('')||'<p class="du-muted">No projects yet. Add your first one below.</p>'}</article>
   <article class="du-glass"><h2>Add a project</h2><div class="du-two">${fld('Project name','np-name','')}${fld('Your firm\'s role','np-role','Architecture','placeholder="Architecture, Interiors, Structural engineering…"')}</div><div class="du-two">${fld('City','np-city','')}${fld('State / region','np-state','')}</div><div class="du-two">${fld('Project type','np-type','','placeholder="Higher education, Healthcare, Arena…"')}${fld('Completion year','np-year','','inputmode="numeric"')}</div><div class="du-field"><label>Status</label><select id="np-status">${STATUS_OPTS.map(s=>`<option>${s}</option>`).join('')}</select></div><div class="du-field"><label>Description</label><textarea id="np-desc" rows="3"></textarea></div><p><button class="du-btn primary" id="np-save">Add project</button> <span id="np-st" class="du-save-status"></span></p></article>`;
+  window.DrawUpFirms?.adminFeatured?.(body,c,firm,rows);
   body.querySelectorAll('[data-open-proj]').forEach(b=>b.onclick=()=>window.DrawUpPortal.openProject(b.dataset.openProj));
   body.querySelectorAll('[data-edit-proj]').forEach(b=>b.onclick=()=>go('projects','&edit='+b.dataset.editProj));
   body.querySelector('#np-save').onclick=async()=>{const st=body.querySelector('#np-st');const v=id=>body.querySelector(id).value.trim();if(!v('#np-name')){st.textContent=' Project name is required.';return;}st.textContent=' Adding…';
@@ -245,21 +347,22 @@ async function projectEditor(body,c,firm,id,go){
   <div class="du-two">${fld('City','pe-city',p.city)}${fld('State / region','pe-state',p.state)}</div><div class="du-two">${fld('Country','pe-country',p.country||'US')}${fld('Project type','pe-type',p.project_type)}</div>
   <div class="du-two"><div class="du-field"><label>Status</label><select id="pe-status">${[...new Set([p.status,...STATUS_OPTS].filter(Boolean))].map(s=>`<option${s===p.status?' selected':''}>${esc(s)}</option>`).join('')}</select></div>${fld('Owner / client','pe-owner',p.owner_name)}</div>
   <div class="du-two">${fld('Opened (year)','pe-opened',p.opened_year,'inputmode="numeric"')}${fld('Completed (year)','pe-year',p.completion_year,'inputmode="numeric"')}</div>
-  <div class="du-two">${fld('Cost','pe-cost',p.cost_text,'placeholder="$192.5 million"')}${fld('Capacity','pe-cap',p.capacity_text)}</div><div class="du-two">${fld('Size','pe-size',p.size_text,'placeholder="780,000 sq ft"')}${fld('Official photo page','pe-imgpage',p.image_page_url,'placeholder="https://"')}</div>
+  <div class="du-two">${fld('Cost','pe-cost',p.cost_text,'placeholder="$192.5 million"')}${fld('Capacity','pe-cap',p.capacity_text)}</div><div class="du-two">${fld('Size','pe-size',p.size_text,'placeholder="780,000 sq ft"')}${fld('Official photo page','pe-imgpage',p.image_page_url,'placeholder="https://"')}</div>${'campus_name' in p?`<div class="du-two">${fld('Campus (if this project is on a university campus)','pe-campus',p.campus_name,'placeholder="Hampton University"')}<p class="du-muted">Tagging a campus shows this project, its photos and your firm on that university's DrawUp profile.</p></div>`:''}
   <div class="du-field"><label>Description</label><textarea id="pe-desc" rows="5">${esc(p.description||'')}</textarea></div>
   <div class="du-field"><label>Key facts <small>one per line</small></label><textarea id="pe-facts" rows="4">${esc((Array.isArray(p.key_facts)?p.key_facts:[]).join('\n'))}</textarea></div>
   <p><button class="du-btn primary" id="pe-save">Save project</button> <button class="du-btn ghost" id="pe-back">Back to projects</button> <button class="du-btn ghost" id="pe-view">View profile</button>${p.created_by===c.user.id?' <button class="du-btn ghost" id="pe-del">Delete project</button>':''} <span id="pe-st" class="du-save-status"></span></p></article>
-  <article class="du-glass"><h2>Photos</h2><p class="du-muted">Upload photos your firm has the right to share, and credit the photographer.</p><div class="du-hq-photos">${(imgs||[]).map(i=>`<figure><img src="${esc(i.image_url)}" alt=""><figcaption>${i.is_hero?'<b>COVER</b> ':''}${esc(i.caption||'')} ${i.is_hero?'':`<button class="du-btn ghost" data-hero="${i.id}">Make cover</button>`} <button class="du-btn ghost" data-del-img="${i.id}">Remove</button></figcaption></figure>`).join('')||'<p class="du-muted">No photos yet.</p>'}</div><div class="du-two"><div class="du-field"><label>Add photo</label><input type="file" id="pe-img" accept="image/jpeg,image/png,image/webp" multiple></div>${fld('Caption / photo credit','pe-capt','','placeholder="Photo: photographer name"')}</div><button class="du-btn ghost" id="pe-addimg">Upload photos</button></article>
+  <article class="du-glass"><h2>Photos</h2><p class="du-muted">Upload photos your firm has the right to share, and credit the photographer.</p><div class="du-hq-photos">${(imgs||[]).map(i=>`<figure><img src="${esc(i.image_url)}" alt=""><figcaption>${i.is_hero?'<b>COVER</b> ':''}${esc(i.caption||'')} ${i.is_hero?'':`<button class="du-btn ghost" data-hero="${i.id}">Make cover</button>`} <button class="du-btn ghost" data-del-img="${i.id}">Remove</button></figcaption></figure>`).join('')||'<p class="du-muted">No photos yet.</p>'}</div>${photoDropHTML('pe-img','Add project photos')}${fld('Caption / photo credit (applies to this batch)','pe-capt','','placeholder="Photo: photographer name"')}<button class="du-btn" id="pe-addimg">Upload photos</button></article>
   <article class="du-glass"><h2>Project team</h2>${(team||[]).map(t=>`<div class="du-row"><div><b>${esc(t.firms?.name||'')}</b><small>${esc(t.role)} · ${esc(String(t.provenance).replace('_',' '))}</small></div><button class="du-btn ghost" data-del-team="${t.id}">Remove</button></div>`).join('')||'<p class="du-muted">No firms linked yet.</p>'}
   <div class="du-two"><div class="du-field"><label>Firm (from the DrawUp directory)</label><input id="pe-firm" list="pe-firm-list" autocomplete="off"><datalist id="pe-firm-list"></datalist></div>${fld('Role','pe-role','','placeholder="Structural engineer, General contractor…"')}</div><button class="du-btn ghost" id="pe-addteam">Add to team</button><p class="du-muted">Firm not listed? Use “Add a firm” on the Connect page and DrawUp reviews it.</p></article>
   <article class="du-glass"><h2>Sources</h2>${(srcs||[]).map(s=>`<div class="du-row"><div><b>${esc(s.source_name)}</b><small>${esc(s.source_url)}</small></div><button class="du-btn ghost" data-del-src="${s.id}">Remove</button></div>`).join('')||'<p class="du-muted">No sources yet.</p>'}<div class="du-two">${fld('Source name','pe-sname','','placeholder="HOK project page"')}${fld('Link','pe-surl','','placeholder="https://"')}</div><button class="du-btn ghost" id="pe-addsrc">Add source</button></article>`;
   const v=s=>body.querySelector(s).value.trim(),num=s=>parseInt(v(s),10)||null;
   body.querySelector('#pe-back').onclick=()=>go('projects');body.querySelector('#pe-view').onclick=()=>window.DrawUpPortal.openProject(p.slug);
   body.querySelector('#pe-save').onclick=async()=>{const st=body.querySelector('#pe-st');st.textContent=' Saving…';if(!v('#pe-name')){st.textContent=' Name is required.';return;}
-    const row={name:v('#pe-name'),street_address:v('#pe-address')||null,city:v('#pe-city')||null,state:v('#pe-state')||null,country:v('#pe-country')||'US',project_type:v('#pe-type')||null,status:v('#pe-status')||null,owner_name:v('#pe-owner')||null,opened_year:num('#pe-opened'),completion_year:num('#pe-year'),cost_text:v('#pe-cost')||null,capacity_text:v('#pe-cap')||null,size_text:v('#pe-size')||null,image_page_url:safeUrl(v('#pe-imgpage'))||null,description:v('#pe-desc')||null,key_facts:v('#pe-facts').split('\n').map(x=>x.trim()).filter(Boolean),updated_at:new Date().toISOString()};
+    const row={name:v('#pe-name'),street_address:v('#pe-address')||null,city:v('#pe-city')||null,state:v('#pe-state')||null,country:v('#pe-country')||'US',project_type:v('#pe-type')||null,status:v('#pe-status')||null,owner_name:v('#pe-owner')||null,opened_year:num('#pe-opened'),completion_year:num('#pe-year'),cost_text:v('#pe-cost')||null,capacity_text:v('#pe-cap')||null,size_text:v('#pe-size')||null,image_page_url:safeUrl(v('#pe-imgpage'))||null,description:v('#pe-desc')||null,key_facts:v('#pe-facts').split('\n').map(x=>x.trim()).filter(Boolean),updated_at:new Date().toISOString()};if('campus_name' in p)row.campus_name=v('#pe-campus')||null;
     const {error}=await c.client.from('aec_projects').update(row).eq('id',id).select('id').single();if(error){st.textContent=' Not saved — '+error.message;return;}c.toast('Project saved.');go('projects','&edit='+id);};
   const del=body.querySelector('#pe-del');if(del)del.onclick=async()=>{if(!confirm('Delete this project, its photos and credits?'))return;const {error}=await c.client.rpc('drawup_firm_delete_project',{p_project_id:id});if(error){c.toast(error.message,true);return;}go('projects');};
-  body.querySelector('#pe-addimg').onclick=async()=>{const files=[...body.querySelector('#pe-img').files];if(!files.length){c.toast('Choose a photo.',true);return;}try{let n=(imgs||[]).length;for(const f of files){const url=await uploadPublic(c,f,'project/'+id);const {error}=await c.client.from('project_images').insert({project_id:id,image_url:url,caption:v('#pe-capt')||null,is_hero:n===0,sort_order:n});if(error)throw error;n++;}c.toast('Photos added.');go('projects','&edit='+id);}catch(e){c.toast(e.message||String(e),true);}};
+  const peDrop=photoDrop(body,'pe-img');
+  body.querySelector('#pe-addimg').onclick=async()=>{const files=peDrop.files();if(!files.length){c.toast('Choose one or more photos.',true);return;}let n=(imgs||[]).length,done=0;try{for(const f of files){peDrop.progress(done+1,files.length);const url=await uploadPublic(c,f,'project/'+id);const {error}=await c.client.from('project_images').insert({project_id:id,image_url:url,caption:v('#pe-capt')||null,is_hero:n===0,sort_order:n});if(error)throw error;n++;done++;}peDrop.progress();c.toast(done===1?'Photo added.':done+' photos added.');go('projects','&edit='+id);}catch(e){peDrop.progress();c.toast((done?done+' of '+files.length+' photos added. ':'')+(e.message||String(e)),true);if(done)go('projects','&edit='+id);}};
   body.querySelectorAll('[data-del-img]').forEach(b=>b.onclick=async()=>{const {error}=await c.client.from('project_images').delete().eq('id',b.dataset.delImg);if(error){c.toast(error.message,true);return;}go('projects','&edit='+id);});
   body.querySelectorAll('[data-hero]').forEach(b=>b.onclick=async()=>{const r1=await c.client.from('project_images').update({is_hero:false}).eq('project_id',id);const r2=await c.client.from('project_images').update({is_hero:true}).eq('id',b.dataset.hero);if(r1.error||r2.error){c.toast((r1.error||r2.error).message,true);return;}go('projects','&edit='+id);});
   const list=body.querySelector('#pe-firm-list');(window.DrawUpLive?.loadFirms?.()||Promise.resolve([])).then(fs=>{list.innerHTML=fs.map(f=>`<option value="${esc(f.name)}">`).join('');},()=>{});
@@ -276,9 +379,56 @@ async function renderPeople(){
   if(!peopleCache){const {data,error}=await c.from('profiles').select('id,display_name,username,title,avatar_url,primary_affiliation_name,primary_affiliation_type,home_office,current_location,profile_verified,professional_level,account_type').eq('discoverable',true).not('display_name','is',null).order('updated_at',{ascending:false}).limit(400);
     if(error){grid.innerHTML=`<div class="people-empty" style="grid-column:1/-1">People are unavailable right now: ${esc(error.message)}</div>`;return;}peopleCache=data||[];}
   const q=($('people-search')?.value||'').trim().toLowerCase();
+  let me='';try{me=(await c.auth.getSession()).data.session?.user?.id||'';}catch(_e){}
   const rows=peopleCache.filter(p=>!q||[p.display_name,p.username,p.title,p.primary_affiliation_name,p.home_office,p.current_location,p.professional_level].join(' ').toLowerCase().includes(q));
-  grid.innerHTML=rows.length?rows.slice(0,120).map(p=>`<button type="button" class="du-person-card" data-person="${p.id}"><span class="du-person-av">${p.avatar_url?`<img src="${esc(p.avatar_url)}" alt="">`:esc((p.display_name||'D').split(/\s+/).map(x=>x[0]).slice(0,2).join('').toUpperCase())}</span><b>${esc(p.display_name)}${p.profile_verified?' <span class="du-check" title="Verified">✓</span>':''}</b><small>${esc(p.title||p.professional_level||'')}</small><small>${esc([p.primary_affiliation_name,p.home_office||p.current_location].filter(Boolean).join(' · '))}</small><span class="du-person-open">View profile →</span></button>`).join(''):`<div class="people-empty" style="grid-column:1/-1">${q?'No members match that search.':'Profiles appear here as DrawUp members complete their public profiles.'}</div>`;
-  grid.querySelectorAll('[data-person]').forEach(b=>b.onclick=()=>openPerson(b.dataset.person));
+  grid.innerHTML=rows.length?rows.slice(0,120).map(p=>`<button type="button" class="du-person-card" data-person="${p.id}"><span class="du-person-av">${p.avatar_url?`<img src="${esc(p.avatar_url)}" alt="">`:esc((p.display_name||'D').split(/\s+/).map(x=>x[0]).slice(0,2).join('').toUpperCase())}</span><b>${esc(p.display_name)}${p.profile_verified?' <span class="du-check" title="Verified">✓</span>':''}</b><small>${esc(p.title||p.professional_level||'')}</small><small>${esc([p.primary_affiliation_name,p.home_office||p.current_location].filter(Boolean).join(' · '))}</small><span class="du-person-open">View profile →${me&&me===p.id?'':`<span class="du-person-msg" role="button" tabindex="0" data-msg="${p.id}" data-name="${esc(p.display_name)}">Message</span>`}</span></button>`).join(''):`<div class="people-empty" style="grid-column:1/-1">${q?'No members match that search.':'Profiles appear here as DrawUp members complete their public profiles.'}</div>`;
+  grid.querySelectorAll('[data-person]').forEach(b=>b.onclick=e=>{if(e.target.closest('[data-msg]'))return;openPerson(b.dataset.person);});
+  grid.querySelectorAll('[data-msg]').forEach(b=>b.onclick=e=>{e.stopPropagation();messageMember(b.dataset.msg,b.dataset.name);});
+  if(q.length>=3)grid.insertAdjacentHTML('beforeend',`<div class="du-pr-cta" style="grid-column:1/-1"><div><span class="eyebrow">Beyond DrawUp members</span><b>Research “${esc(q)}” from public sources</b><small>Look up a well-known architect, designer or engineer. You get their bio, firm and projects with sources. This is outside research, not a DrawUp profile.</small></div><button type="button" class="btn btn-primary" id="du-pr-go">Look up “${esc(q.length>40?q.slice(0,40)+'…':q)}” →</button></div>`);
+  const go=$('du-pr-go');if(go)go.onclick=()=>openResearchedPerson(($('people-search')?.value||'').trim());
+}
+// V20: message a DrawUp member through Connect.
+async function messageMember(id,name){
+  if(window.DrawUpConnect?.messageUser){try{await window.DrawUpConnect.messageUser(id,name);}catch(e){alert(e.message||String(e));}return;}
+  if(window.DrawUpPortal?.isSignedIn?.()){window.DrawUpPortal.openPortal?.('connect');window.DrawUpPortal.openPortalTab('connect');}else $('drawup-signin')?.click();
+}
+// V20: well-known AEC people researched from public sources (saved to drawup_searches like every search).
+async function openResearchedPerson(q){
+  if(!q)return;$('du-v19-person')?.remove();
+  document.body.insertAdjacentHTML('beforeend','<div id="du-v19-person" class="du-v19-overlay"><div class="du-v19-sheet du-pr"><button type="button" class="du-v19-x" aria-label="Close">×</button><div class="du-pr-wait"></div></div></div>');
+  const ov=$('du-v19-person'),sheet=ov.querySelector('.du-v19-sheet');let closed=false;const close=()=>{closed=true;ov.remove();};ov.querySelector('.du-v19-x').onclick=close;ov.onclick=e=>{if(e.target===ov)close();};
+  const wait=sheet.querySelector('.du-pr-wait');
+  const hl=window.DrawUpV20?.holoLoader?window.DrawUpV20.holoLoader(wait):null;if(hl){hl.set('Researching '+q+' from public sources…');const k=wait.querySelector('.du-holo-kicker');if(k)k.textContent='DRAWUP · PEOPLE RESEARCH';}else wait.innerHTML='<div class="du-loading">RESEARCHING…</div>';
+  let r;try{r=await Research.run(q,'person');}catch(e){hl?.done();if(closed)return;wait.innerHTML=`<h2>Could not finish this lookup.</h2><p>${esc(e.message||String(e))}</p>`;return;}
+  hl?.done();if(closed)return;
+  const c=await db();const name=r.title||q;
+  // Link names to DrawUp firm and project pages when DrawUp already has them.
+  let firms=[],projects=[];try{firms=await window.DrawUpLive.loadFirms();}catch(_e){}
+  const firmOf=n=>{const a=String(n||'').toLowerCase().trim();return a?firms.find(f=>f.name.toLowerCase()===a):null;};
+  const pnames=(r.projects||[]).map(p=>p?.name).filter(Boolean).slice(0,12);
+  if(c&&pnames.length){try{const {data}=await c.from('aec_projects').select('slug,name').in('name',pnames).eq('is_demo',false);projects=data||[];}catch(_e){}}
+  const projOf=n=>projects.find(p=>p.name.toLowerCase()===String(n||'').toLowerCase());
+  const members=(peopleCache||[]).filter(p=>p.display_name&&p.display_name.toLowerCase()===String(name).toLowerCase());
+  const link=(u,t)=>safeUrl(u)?`<a href="${esc(u)}" target="_blank" rel="noopener">${t} ↗</a>`:'';
+  const life=[r.born&&('Born '+r.born),r.died&&('Died '+r.died),r.nationality,r.based_in&&('Based in '+r.based_in)].filter(Boolean).join(' · ');
+  const img=safeUrl(r.image)?r.image:'';
+  sheet.innerHTML=`<button type="button" class="du-v19-x" aria-label="Close">×</button>
+  <div class="du-pr-flag">Outside research · compiled from public sources, not a DrawUp member profile${r._saved_at?' · saved '+esc(new Date(r._saved_at).toLocaleDateString()):''}</div>
+  <div class="du-v19-phead">${img?`<span class="du-person-av big"><img src="${esc(img)}" alt="" referrerpolicy="no-referrer" onerror="this.parentNode.textContent='${esc(String(name).split(/\s+/).map(x=>x[0]).slice(0,2).join('').toUpperCase())}'"></span>`:`<span class="du-person-av big">${esc(String(name).split(/\s+/).map(x=>x[0]).slice(0,2).join('').toUpperCase())}</span>`}<div><span class="eyebrow">${esc(r.role||'AEC professional')}</span><h2>${esc(name)}</h2>${life?`<p>${esc(life)}</p>`:''}${link(r.website,'Official website')?`<p>${link(r.website,'Official website')}</p>`:''}</div></div>
+  ${members.length?`<p class="du-pr-member">A DrawUp member is named ${esc(name)}. <button type="button" class="btn btn-ghost btn-sm" data-open-member="${members[0].id}">View their DrawUp profile</button></p>`:''}
+  ${r.summary?`<p><b>${esc(r.summary)}</b></p>`:''}${r.bio&&r.bio!==r.summary?String(r.bio).split(/\n+/).map(x=>`<p>${esc(x)}</p>`).join(''):''}
+  ${(r.known_for||[]).filter(Boolean).length?`<p class="meta">Known for: ${esc(r.known_for.filter(Boolean).join(' · '))}</p>`:''}
+  ${(r.firms||[]).length?`<h3>Firm${r.firms.length>1?'s':''}</h3><ul class="du-v19-tl">${r.firms.map(f=>{const d=firmOf(f.name);return `<li><b>${d?`<a href="#" data-firm-slug="${esc(d.slug)}">${esc(f.name)}</a> <span class="du-pr-on">On DrawUp</span>`:esc(f.name||'')}</b>${f.role?' · '+esc(f.role):''}<small>${esc(f.years||'')} ${link(f.url,'Site')}</small></li>`;}).join('')}</ul>`:''}
+  ${(r.projects||[]).length?`<h3>Notable projects</h3><div class="du-pr-projects">${r.projects.slice(0,12).map(p=>{const d=projOf(p.name);return `<div class="du-pr-proj"><b>${d?`<a href="#" data-project-slug="${esc(d.slug)}">${esc(p.name)}</a> <span class="du-pr-on">On DrawUp</span>`:esc(p.name||'')}</b><small>${esc([p.type,p.location,p.year].filter(Boolean).join(' · '))}</small>${link(p.url,'Source')}</div>`;}).join('')}</div>`:''}
+  ${(r.education||[]).length?`<h3>Education</h3><ul class="du-v19-tl">${r.education.map(e=>`<li><b>${esc(e.school||'')}</b><small>${esc(e.detail||'')}</small></li>`).join('')}</ul>`:''}
+  ${(r.awards||[]).length?`<h3>Awards</h3><ul class="du-v19-tl">${r.awards.map(a=>`<li><b>${esc(a.name||'')}</b><small>${esc(a.year||'')}</small></li>`).join('')}</ul>`:''}
+  <h3>Sources</h3>${(r.sources||[]).length?`<ol class="du-pr-src">${r.sources.map(x=>`<li>${link(x.url,esc(x.title||x.publisher||x.url))}${x.publisher?` <small>${esc(x.publisher)}</small>`:''}</li>`).join('')}</ol>`:'<p class="meta">No sources were returned, so treat this lookup as unconfirmed.</p>'}
+  <p class="meta">Facts come only from the sources listed. If something is wrong, it is wrong at the source or the lookup misread it, so check before you rely on it.</p>`;
+  sheet.querySelector('.du-v19-x').onclick=close;
+  sheet.querySelector('[data-open-member]')?.addEventListener('click',e=>{openPerson(e.target.dataset.openMember);});
+  const inPortal=()=>window.DrawUpPortal?.isSignedIn?.()&&$('du-portal')?.classList.contains('open');
+  sheet.querySelectorAll('[data-firm-slug]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();close();(inPortal()?window.DrawUpPortal.openFirm:window.DrawUpLive.openFirm)(a.dataset.firmSlug);},true));
+  sheet.querySelectorAll('[data-project-slug]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();close();(inPortal()&&window.DrawUpPortal.openProject?window.DrawUpPortal.openProject:window.DrawUpLive.openProject)(a.dataset.projectSlug);},true));
 }
 async function openPerson(id){
   const c=await db();if(!c)return;
@@ -289,11 +439,13 @@ async function openPerson(id){
   if(!p||p.discoverable===false){sheet.innerHTML='<button type="button" class="du-v19-x" aria-label="Close">×</button><h2>This profile is private.</h2>';sheet.querySelector('.du-v19-x').onclick=close;return;}
   let firm=null;if(p.primary_affiliation_name){try{const fs=await window.DrawUpLive.loadFirms();const n=p.primary_affiliation_name.toLowerCase();firm=fs.find(f=>f.name.toLowerCase()===n)||null;}catch(_e){}}
   const yr=d=>d?String(d).slice(0,4):'';
+  let myId='';try{myId=(await c.auth.getSession()).data.session?.user?.id||'';}catch(_e){}
   sheet.innerHTML=`<button type="button" class="du-v19-x" aria-label="Close">×</button><div class="du-v19-phead"><span class="du-person-av big">${p.avatar_url?`<img src="${esc(p.avatar_url)}" alt="">`:esc((p.display_name||'D').split(/\s+/).map(x=>x[0]).slice(0,2).join('').toUpperCase())}</span><div><span class="eyebrow">DrawUp Profile</span><h2>${esc(p.display_name||'DrawUp member')}${p.profile_verified?' <span class="du-check">✓</span>':''}</h2><p>${esc([p.username?'@'+p.username:'',p.pronouns,p.title].filter(Boolean).join(' · '))}</p><p>${p.primary_affiliation_name?(firm?`<a href="#" data-firm-slug="${esc(firm.slug)}">${esc(p.primary_affiliation_name)}</a>`:esc(p.primary_affiliation_name)):''}${p.home_office?' · Home office: '+esc(p.home_office):p.current_location?' · '+esc(p.current_location):''}</p></div></div>
   ${p.bio?`<p>${esc(p.bio)}</p>`:''}${(p.disciplines||[]).length||(p.credentials||[]).length?`<p class="meta">${esc([...(p.credentials||[]),...(p.disciplines||[])].join(' · '))}</p>`:''}
   <h3>Experience</h3>${(car||[]).length?`<ul class="du-v19-tl">${car.map(r=>`<li><b>${esc(r.role)}</b>${r.organization?' · '+esc(r.organization):''}${r.verified?' <span class="du-check" title="Verified by DrawUp">✓</span>':''}<small>${esc([r.location,[yr(r.start_date),r.end_date?yr(r.end_date):'present'].filter(Boolean).join('–')].filter(Boolean).join(' · '))}</small></li>`).join('')}</ul>`:'<p class="meta">No experience listed.</p>'}
   <h3>Education</h3>${(edu||[]).length?`<ul class="du-v19-tl">${edu.map(e=>`<li><b>${esc(e.institution_name)}</b><small>${esc([e.degree_or_certificate,e.program,e.graduation_year].filter(Boolean).join(' · '))}</small></li>`).join('')}</ul>`:'<p class="meta">No education listed.</p>'}
-  <p>${safeUrl(p.website)?`<a class="btn btn-ghost btn-sm" href="${esc(p.website)}" target="_blank" rel="noopener">Website ↗</a> `:''}${safeUrl(p.linkedin_url)?`<a class="btn btn-ghost btn-sm" href="${esc(p.linkedin_url)}" target="_blank" rel="noopener">LinkedIn ↗</a>`:''}</p>`;
+  <p>${safeUrl(p.website)?`<a class="btn btn-ghost btn-sm" href="${esc(p.website)}" target="_blank" rel="noopener">Website ↗</a> `:''}${safeUrl(p.linkedin_url)?`<a class="btn btn-ghost btn-sm" href="${esc(p.linkedin_url)}" target="_blank" rel="noopener">LinkedIn ↗</a>`:''} ${myId&&myId!==p.id?`<button type="button" class="btn btn-primary btn-sm" data-msg-person="${p.id}">Message ${esc((p.display_name||'').split(/\s+/)[0])}</button>`:''}</p>`;
+  sheet.querySelector('[data-msg-person]')?.addEventListener('click',()=>{close();messageMember(p.id,p.display_name);});
   sheet.querySelector('.du-v19-x').onclick=close;
   sheet.querySelectorAll('[data-firm-slug]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();close();(window.DrawUpPortal?.isSignedIn?.()&&$('du-portal')?.classList.contains('open')?window.DrawUpPortal.openFirm:window.DrawUpLive.openFirm)(a.dataset.firmSlug);},true));
 }

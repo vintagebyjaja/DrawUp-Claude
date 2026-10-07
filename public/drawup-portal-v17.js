@@ -487,8 +487,9 @@ async function renderCoach(w){
         const st2=w.querySelector('#dc-status');st2.textContent='Arch Coach is drawing it up…';
         const token=(await client.auth.getSession()).data.session?.access_token||'';
         const history=messages.slice(-16).map(x=>({role:x.role,content:x.content}));
-        const res=await fetch('/api/arch-coach',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},body:JSON.stringify({message:text,history,image:img||undefined,location:currentProfile?.current_location||'',project:projName(active.project_thread_id)||''})});
-        const d=await res.json().catch(()=>({}));if(!res.ok)throw new Error(d.error||'Arch Coach connection issue.');
+        const askBody={message:text,history,image:img||undefined,location:currentProfile?.current_location||'',project:projName(active.project_thread_id)||''};
+        let d;if(window.DrawUpV20?.coachAsk){st2.textContent='';d=await window.DrawUpV20.coachAsk({token,stage:w.querySelector('#dc-messages'),...askBody});}
+        else{const res=await fetch('/api/arch-coach',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},body:JSON.stringify(askBody)});d=await res.json().catch(()=>({}));if(!res.ok)throw new Error(d.error||'Arch Coach connection issue.');}
         const sourcesTxt=(d.sources||[]).length?'\n\nSources:\n'+d.sources.map(s=>'• '+(s.title||'Source')+' — '+s.url).join('\n'):'';
         const am=await client.from('coach_messages').insert({thread_id:active.id,role:'assistant',content:String(d.answer||'')+sourcesTxt}).select('id,role,content,created_at').single();if(am.error)throw am.error;
         messages.push(am.data);await client.from('coach_threads').update({updated_at:new Date().toISOString()}).eq('id',active.id);

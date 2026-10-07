@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { awardXp } from '@/lib/drawup-coach-persona';
 import {
   PRIVATE_BUCKET, adminSelectOne, adminUpdate, bytesToBase64, creditMessage, missingConfig, models,
   openaiCreate, openaiGet, outputText, pathIsOwn, refundCredits, reserveCredits, signedInUser, sourcesFrom,
@@ -31,11 +32,16 @@ const SCHEMA = {
       items: {
         type: 'object',
         additionalProperties: false,
-        required: ['category', 'severity', 'sheet', 'location', 'issue', 'recommendation', 'reference', 'confidence'],
+        required: ['category', 'severity', 'sheet', 'page', 'box', 'location', 'issue', 'recommendation', 'reference', 'confidence'],
         properties: {
           category: { type: 'string', enum: CATEGORIES },
           severity: { type: 'string', enum: ['critical', 'major', 'minor', 'info'] },
           sheet: { type: 'string' },
+          page: { type: 'integer' },
+          box: {
+            type: 'object', additionalProperties: false, required: ['x', 'y', 'w', 'h'],
+            properties: { x: { type: 'number' }, y: { type: 'number' }, w: { type: 'number' }, h: { type: 'number' } },
+          },
           location: { type: 'string' },
           issue: { type: 'string' },
           recommendation: { type: 'string' },
@@ -47,6 +53,8 @@ const SCHEMA = {
     limitations: { type: 'string' },
   },
 };
+
+const clamp01 = (n: number) => Math.max(0, Math.min(0.98, n));
 
 function countPdfPages(bytes: ArrayBuffer) {
   const text = Buffer.from(bytes).toString('latin1');
@@ -63,6 +71,8 @@ Never invent sheets, rooms, dimensions or notes that are not in the file. If the
 Review for: building code (use the jurisdiction and adopted code edition when given; otherwise state the model code you assumed), accessibility (2010 ADA Standards / ICC A117.1), life safety and egress, coordination between plans/sections/elevations/schedules, dimension strings that do not add up or are missing, documentation completeness (title block, scale, north arrow, sheet index, references), and obvious structural/MEP/site coordination gaps.
 Cite the specific code section in "reference" only when you are confident of it; otherwise write the topic (for example "IBC egress width — verify section for adopted edition").
 Severity: critical = life-safety or likely permit rejection; major = must be fixed before issue; minor = drafting/quality; info = note for the designer.
+For every finding also give "page" (the 1-based page number of the PDF where it is) and "box": the region on that page as fractions of the page width and height measured from the TOP-LEFT corner (x, y, w, h each between 0 and 1). The box is used to draw a redline cloud on the sheet, so cover the whole area concerned, a little generously. For a sheet-wide issue (title block, missing note) use the area you would mark up by hand.
+Write "recommendation" as the specific change to make on the drawing (for example: Add 32 in. minimum clear width dimension at Door 101).
 This is guidance for the design team, not a permit approval. Return JSON only, matching the schema.`;
 
 async function loadOwned(id: string, userId: string) {
@@ -127,6 +137,7 @@ export async function POST(request: Request) {
       response_id: data.id, model, page_count: pages, credits_charged: access.credits_charged ?? 0,
       credit_access: access, error: null,
     });
+    await awardXp(user.id, 'upload', review.id);
     return NextResponse.json({ review: updated, credits_charged: access.credits_charged ?? 0, credits_remaining: access.credits_remaining ?? null });
   } catch (e: any) {
     await refundCredits(user.id, access, 'check_' + action);
@@ -163,6 +174,9 @@ export async function GET(request: Request) {
       category: CATEGORIES.includes(f.category) ? f.category : 'documentation',
       severity: ['critical', 'major', 'minor', 'info'].includes(f.severity) ? f.severity : 'info',
       sheet: String(f.sheet || ''), location: String(f.location || ''), issue: String(f.issue),
+      page: Number.isInteger(f.page) && f.page > 0 ? f.page : null,
+      box: f.box && [f.box.x, f.box.y, f.box.w, f.box.h].every((n: any) => typeof n === 'number' && isFinite(n))
+        ? { x: clamp01(f.box.x), y: clamp01(f.box.y), w: Math.max(0.02, Math.min(1, f.box.w)), h: Math.max(0.02, Math.min(1, f.box.h)) } : null,
       recommendation: String(f.recommendation || ''), reference: String(f.reference || ''),
       confidence: ['high', 'medium', 'low'].includes(f.confidence) ? f.confidence : 'medium',
     }));
@@ -174,5 +188,6 @@ export async function GET(request: Request) {
     page_count: Number.isInteger(report?.page_count) && report.page_count > 0 ? report.page_count : review.page_count,
     completed_at: new Date().toISOString(),
   }, 'status=eq.reviewing');
+  if (r) await awardXp(user.id, 'check', review.id);
   return NextResponse.json({ review: r || await loadOwned(review.id, user.id) });
 }

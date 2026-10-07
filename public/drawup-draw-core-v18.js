@@ -1,4 +1,4 @@
-/* DrawUp Draw core — V18
+/* DrawUp Draw core — V18 (V20: heights, wall types, columns, stairs, fixtures, text, dimensions)
  *
  * The drawing is a model, not a picture: walls are segments with a thickness, doors and
  * windows are hosted on walls at an offset, rooms are labels. Every dimension string is
@@ -52,11 +52,113 @@
 
   function uid(prefix) { return (prefix || 'id') + '_' + Math.random().toString(36).slice(2, 9); }
   function clone(o) { return JSON.parse(JSON.stringify(o)); }
-  function emptyModel() { return { units: 'in', walls: [], openings: [], rooms: [] }; }
+  function emptyModel() { return { units: 'in', walls: [], openings: [], rooms: [], items: [] }; }
+
+  /* ----------------------------------------------------------- wall types (V20)
+   * Each type sets a thickness (finish face to finish face), a default height, whether it
+   * behaves as an exterior wall (dimensioned to its outside face) and how it is drawn:
+   * a fill plus a hatch, so types read differently on the plan and in every export.  */
+  const WALL_TYPES = {
+    generic_ext: { name: 'Exterior wall (generic)', thickness: 6, role: 'exterior', height: 108, fill: '#b9c6d3', hatch: 'solid' },
+    generic_int: { name: 'Partition (generic)', thickness: 4.5, role: 'interior', height: 96, fill: '#b9c6d3', hatch: 'solid' },
+    wd4: { name: '2x4 wood stud partition', thickness: 4.5, role: 'interior', height: 96, fill: '#f3e9d4', hatch: 'wood' },
+    wd6: { name: '2x6 wood stud exterior', thickness: 6.5, role: 'exterior', height: 108, fill: '#ecdcbc', hatch: 'wood' },
+    ms358: { name: '3-5/8" metal stud partition', thickness: 4.875, role: 'interior', height: 96, fill: '#e2eaf2', hatch: 'metal' },
+    ms6: { name: '6" metal stud wall', thickness: 7.25, role: 'interior', height: 108, fill: '#d6e1ec', hatch: 'metal' },
+    cmu8: { name: '8" CMU', thickness: 7.625, role: 'exterior', height: 108, fill: '#ffffff', hatch: 'cmu' },
+    cmu12: { name: '12" CMU', thickness: 11.625, role: 'exterior', height: 108, fill: '#ffffff', hatch: 'cmu' },
+    conc8: { name: '8" cast-in-place concrete', thickness: 8, role: 'exterior', height: 108, fill: '#e4e4e1', hatch: 'conc' },
+    brick: { name: 'Brick veneer on 2x6 stud', thickness: 11.125, role: 'exterior', height: 108, fill: '#f1d3c6', hatch: 'brick' },
+    curtain: { name: 'Curtain wall / storefront', thickness: 6, role: 'exterior', height: 108, fill: '#dcf2fb', hatch: 'glass' },
+    rated1: { name: '1-hr fire-rated demising partition', thickness: 4.875, role: 'interior', height: 108, fill: '#c7cfd8', hatch: 'rated' },
+    low: { name: 'Low wall / pony wall', thickness: 4.5, role: 'interior', height: 42, fill: '#ffffff', hatch: 'low' },
+  };
+  function wallTypeKey(w) { return WALL_TYPES[w.wtype] ? w.wtype : (w.type === 'exterior' ? 'generic_ext' : 'generic_int'); }
+  function wallType(w) { return WALL_TYPES[wallTypeKey(w)]; }
+  const DEFAULT_HEAD = 84, DEFAULT_SILL = 36, DEFAULT_CEILING = 96;
+  function defaultWallHeight(w) { return WALL_TYPES[w.wtype] ? WALL_TYPES[w.wtype].height : (w.type === 'exterior' ? 108 : 96); }
+  const ITEM_KINDS = ['column', 'stair', 'text', 'dim', 'fixture'];
+  const FIXTURES = { wc: 'Toilet', lav: 'Lavatory', sink: 'Kitchen sink', tub: 'Bathtub', shower: 'Shower' };
+  const okPt = p => p && isFinite(p.x) && isFinite(p.y);
+
+  /** Fills in anything an older saved drawing does not have (heights, items), so V18/V19
+   *  drawings open unchanged. Geometry is never altered here. */
   function normalizeModel(m) {
     m = m && typeof m === 'object' ? clone(m) : emptyModel();
     m.units = 'in'; m.walls = Array.isArray(m.walls) ? m.walls : []; m.openings = Array.isArray(m.openings) ? m.openings : []; m.rooms = Array.isArray(m.rooms) ? m.rooms : [];
+    m.items = Array.isArray(m.items) ? m.items.filter(it => it && ITEM_KINDS.includes(it.kind) && (it.kind === 'dim' ? okPt(it.a) && okPt(it.b) : okPt(it.at))) : [];
+    m.walls.forEach(w => { if (!(w.height > 0)) w.height = defaultWallHeight(w); });
+    m.openings.forEach(o => { if (!(o.head > 0)) o.head = DEFAULT_HEAD; if (o.kind === 'window') { if (!(o.sill >= 0)) o.sill = DEFAULT_SILL; } else delete o.sill; });
+    m.rooms.forEach(r => { if (!(r.ceiling > 0)) r.ceiling = DEFAULT_CEILING; });
+    m.items.forEach(it => {
+      if (!isFinite(it.rot)) it.rot = 0;
+      if (it.kind === 'column') { it.shape = it.shape === 'round' ? 'round' : 'square'; if (!(it.size > 0)) it.size = 12; }
+      if (it.kind === 'stair') { if (!(it.length > 0)) it.length = 150; if (!(it.width > 0)) it.width = 36; if (!(it.rise > 0)) it.rise = 120; if (!(it.risers > 0)) it.risers = null; }
+      if (it.kind === 'text') { it.text = String(it.text || 'NOTE'); if (!(it.size > 0)) it.size = 0.125; }
+      if (it.kind === 'dim') { if (!isFinite(it.off)) it.off = 12; }
+      if (it.kind === 'fixture') { if (!FIXTURES[it.fixture]) it.fixture = 'wc'; }
+    });
     return m;
+  }
+  /** Changes a wall's type: thickness, exterior/interior behaviour and (if the height was
+   *  still the old type's default) its height follow the new type. */
+  function setWallType(m, id, key) {
+    const w = wallById(m, id), t = WALL_TYPES[key]; if (!w) throw new Error('Wall not found.'); if (!t) throw new Error('Unknown wall type.');
+    const hadDefault = !(w.height > 0) || w.height === defaultWallHeight(w);
+    w.wtype = key; w.type = t.role; w.thickness = t.thickness; if (hadDefault) w.height = t.height;
+    return w;
+  }
+
+  /* ----------------------------------------------------------- items (V20)
+   * Columns, stairs, text, manual dimensions and plumbing fixtures. Each has a position
+   * (dimensions have two points) and a rotation in degrees (plan coordinates, y down). */
+  function addItem(m, kind, props) {
+    if (!ITEM_KINDS.includes(kind)) throw new Error('Unknown item.');
+    m.items = m.items || [];
+    const it = Object.assign({ id: uid('i'), kind, rot: 0 }, props || {});
+    if (kind === 'dim') { if (!okPt(it.a) || !okPt(it.b) || dist(it.a, it.b) < 0.5) throw new Error('A dimension needs two different points.'); it.a = { x: snap(it.a.x), y: snap(it.a.y) }; it.b = { x: snap(it.b.x), y: snap(it.b.y) }; }
+    else { if (!okPt(it.at)) throw new Error('Pick a point on the sheet.'); it.at = { x: snap(it.at.x), y: snap(it.at.y) }; }
+    const n = normalizeModel({ items: [it] }).items[0]; Object.assign(it, n);
+    m.items.push(it); return it;
+  }
+  function moveItem(m, id, dx, dy) {
+    const it = (m.items || []).find(x => x.id === id); if (!it) throw new Error('Item not found.');
+    const mv = p => ({ x: snap(p.x + dx), y: snap(p.y + dy) });
+    if (it.kind === 'dim') { it.a = mv(it.a); it.b = mv(it.b); } else it.at = mv(it.at);
+    return it;
+  }
+  function removeItem(m, id) { m.items = (m.items || []).filter(x => x.id !== id); }
+  function stairRisers(it) { return it.risers > 0 ? Math.round(it.risers) : Math.max(2, Math.ceil(it.rise / 7.75)); }
+  const rotV = (p, deg) => { const a = deg * Math.PI / 180, c = Math.cos(a), s = Math.sin(a); return { x: p.x * c - p.y * s, y: p.x * s + p.y * c }; };
+  const ellipse = (cx, cy, rx, ry, n) => { const o = []; n = n || 28; for (let i = 0; i < n; i++) { const a = i / n * Math.PI * 2; o.push({ x: cx + rx * Math.cos(a), y: cy + ry * Math.sin(a) }); } return o; };
+  const rect = (x0, y0, x1, y1) => [{ x: x0, y: y0 }, { x: x1, y: y0 }, { x: x1, y: y1 }, { x: x0, y: y1 }];
+  /** Fixture outlines in local inches: x across, y out from the wall the fixture backs onto. */
+  function fixtureShapes(kind) {
+    if (kind === 'lav') return { box: rect(-10, 0, 10, 18), polys: [rect(-10, 0, 10, 18), ellipse(0, 10, 7, 5.5)] };
+    if (kind === 'sink') return { box: rect(-16.5, 0, 16.5, 22), polys: [rect(-16.5, 0, 16.5, 22), rect(-14.5, 4, -1, 20), rect(1, 4, 14.5, 20)] };
+    if (kind === 'tub') return { box: rect(-30, 0, 30, 30), polys: [rect(-30, 0, 30, 30), [{ x: -24, y: 3 }, { x: 24, y: 3 }, { x: 27, y: 6 }, { x: 27, y: 24 }, { x: 24, y: 27 }, { x: -24, y: 27 }, { x: -27, y: 24 }, { x: -27, y: 6 }], ellipse(-21, 15, 1.5, 1.5, 12)] };
+    if (kind === 'shower') return { box: rect(-18, 0, 18, 36), polys: [rect(-18, 0, 18, 36), ellipse(0, 18, 2, 2, 12)], lines: [[{ x: -18, y: 0 }, { x: 18, y: 36 }], [{ x: 18, y: 0 }, { x: -18, y: 36 }]] };
+    return { box: rect(-10, 0, 10, 28), polys: [rect(-10, 0, 10, 8), ellipse(0, 18, 7.5, 10)] }; // wc
+  }
+  /** World-space outline of an item, used for picking, bounds and the selection highlight. */
+  function itemOutline(it, scale) {
+    scale = scale || 48;
+    const W = p => add(it.at, rotV(p, it.rot || 0));
+    if (it.kind === 'column') { const s = it.size / 2; return it.shape === 'round' ? ellipse(0, 0, s, s, 24).map(W) : rect(-s, -s, s, s).map(W); }
+    if (it.kind === 'stair') return rect(0, -it.width / 2, it.length, it.width / 2).map(W);
+    if (it.kind === 'fixture') return fixtureShapes(it.fixture).box.map(W);
+    if (it.kind === 'text') { const h = it.size * scale, w = Math.max(1, it.text.length) * h * 0.62; return rect(-w / 2, -h * 0.6, w / 2, h * 0.6).map(W); }
+    if (it.kind === 'dim') { const g = dimGeometry(it, scale), n = g.n, h = PAPER.text * scale; return [add(g.la, mul(n, -h * 0.4)), add(g.lb, mul(n, -h * 0.4)), add(g.lb, mul(n, h * 1.6)), add(g.la, mul(n, h * 1.6))]; }
+    return [];
+  }
+  function dimGeometry(it, scale) {
+    const d = norm(sub(it.b, it.a)); let n = { x: -d.y, y: d.x };
+    const off = it.off || 0; const s = off < 0 ? -1 : 1; const nn = mul(n, s);
+    const la = add(it.a, mul(n, off)), lb = add(it.b, mul(n, off));
+    let ang = Math.atan2(d.y, d.x) * 180 / Math.PI; if (ang > 90.01) ang -= 180; if (ang <= -90.01) ang += 180;
+    if (Math.abs(Math.abs(ang) - 90) < 0.01) ang = -90;
+    const up = rotV({ x: 0, y: -1 }, ang);
+    return { d, n: nn, la, lb, value: dist(it.a, it.b), angle: ang, up };
   }
 
   function wallById(m, id) { return m.walls.find(w => w.id === id); }
@@ -79,14 +181,19 @@
       const hd = wallDir(host), r = sub(p, host.a), along = r.x * hd.x + r.y * hd.y, q = add(host.a, mul(hd, along));
       p.x = snap(q.x); p.y = snap(q.y);
     });
-    const w = { id: opts.id || uid('w'), a, b, thickness: opts.thickness || 6, type: opts.type || 'exterior' };
+    const wt = WALL_TYPES[opts.wtype];
+    const w = { id: opts.id || uid('w'), a, b, thickness: opts.thickness || (wt ? wt.thickness : 6), type: opts.type || (wt ? wt.role : 'exterior') };
+    if (wt) w.wtype = opts.wtype;
+    w.height = opts.height > 0 ? opts.height : defaultWallHeight(w);
     if (wallLength(w) < 1) throw new Error('A wall must be at least 1" long.');
     m.walls.push(w); return w;
   }
   function addOpening(m, wallId, kind, offset, width, opts) {
     opts = opts || {};
     const w = wallById(m, wallId); if (!w) throw new Error('Wall not found.');
-    const o = { id: opts.id || uid(kind === 'door' ? 'd' : 'g'), wall: wallId, kind: kind === 'window' ? 'window' : 'door', offset: snap(offset), width: snap(width), tag: opts.tag || '', swing: opts.swing || 'left', head: opts.head || null };
+    const k = kind === 'window' ? 'window' : kind === 'cased' ? 'cased' : 'door';
+    const o = { id: opts.id || uid(k === 'door' ? 'd' : k === 'cased' ? 'c' : 'g'), wall: wallId, kind: k, offset: snap(offset), width: snap(width), tag: opts.tag || '', swing: opts.swing || 'left', head: opts.head > 0 ? opts.head : DEFAULT_HEAD };
+    if (k === 'window') o.sill = opts.sill >= 0 ? opts.sill : DEFAULT_SILL;
     validateOpening(m, o); m.openings.push(o); return o;
   }
   function validateOpening(m, o) {
@@ -117,6 +224,7 @@
     const opWorld = m.openings.map(o => { const h = wallById(m, o.wall); return { o, c: add(h.a, mul(wallDir(h), o.offset)) }; });
     m.walls.forEach(x => ['a', 'b'].forEach(k => { if (proj(x[k]) >= cut - 0.01) x[k] = { x: snap(x[k].x + shift.x), y: snap(x[k].y + shift.y) }; }));
     m.rooms.forEach(r => { if (proj(r.at) >= cut - 0.01) r.at = add(r.at, shift); });
+    (m.items || []).forEach(it => ['at', 'a', 'b'].forEach(k => { if (it[k] && proj(it[k]) >= cut - 0.01) it[k] = { x: snap(it[k].x + shift.x), y: snap(it[k].y + shift.y) }; }));
     opWorld.forEach(({ o, c }) => {
       const h = wallById(m, o.wall);
       const moved = proj(c) >= cut - 0.01 && h.id !== w.id ? add(c, shift) : c;
@@ -356,7 +464,7 @@
     const h = PAPER.text * 1.3 * scale;
     const taken = dims.map(textBox);
     return m.rooms.map(r => {
-      const lines = [r.name || 'ROOM', r.number || ''].filter(Boolean);
+      const lines = [r.name || 'ROOM', r.number || '', r.ceiling > 0 ? 'CLG ' + formatFtIn(r.ceiling) : ''].filter(Boolean);
       const wdt = Math.max(...lines.map(s => s.length)) * h * 0.62, ht = lines.length * h * 1.2;
       let at = { x: r.at.x, y: r.at.y };
       for (let k = 0; k < 12; k++) {
@@ -369,6 +477,7 @@
   }
   /** Overlapping dimension texts / labels — the sheet should have none. */
   function collisions(m, scale) {
+    m = normalizeModel(m);
     const { dims } = computeDimensions(m, scale), out = [];
     const boxes = dims.map(textBox);
     for (let i = 0; i < boxes.length; i++) for (let j = i + 1; j < boxes.length; j++) if (overlaps(boxes[i], boxes[j])) out.push(`dimension text ${dims[i].text} overlaps ${dims[j].text}`);
@@ -377,20 +486,156 @@
     return out;
   }
 
-  function bounds(m, scale) {
+  function baseBounds(m, scale) {
+    scale = scale || 48;
     const pts = []; m.walls.forEach(w => { const o = wallOutline(m, w); pts.push(o.outerA, o.outerB, o.innerA, o.innerB); });
+    (m.items || []).forEach(it => itemOutline(it, scale).forEach(p => pts.push(p)));
     if (!pts.length) return { x0: 0, y0: 0, x1: 240, y1: 240 };
     const { dims } = computeDimensions(m, scale); dims.forEach(d => { pts.push(d.a, d.b, d.textAt); d.ext.forEach(e => pts.push(e[0], e[1])); });
-    const xs = pts.map(p => p.x), ys = pts.map(p => p.y), pad = 0.4 * (scale || 48);
+    const xs = pts.map(p => p.x), ys = pts.map(p => p.y), pad = 0.4 * scale;
     return { x0: Math.min(...xs) - pad, y0: Math.min(...ys) - pad, x1: Math.max(...xs) + pad, y1: Math.max(...ys) + pad };
+  }
+  /** Sheet extents. With opts.legend the wall-type legend and opening schedule below the
+   *  plan are included. */
+  function bounds(m, scale, opts) {
+    scale = scale || 48; m = normalizeModel(m);
+    const b = baseBounds(m, scale);
+    if (!(opts && opts.legend)) return b;
+    const lp = legendPrims(m, scale, b); if (!lp.length) return b;
+    let x1 = b.x1, y1 = b.y1;
+    lp.forEach(p => { if (p.t === 'text') { x1 = Math.max(x1, p.at.x + p.text.length * p.size * 0.62 + 0.3 * scale); y1 = Math.max(y1, p.at.y + p.size + 0.3 * scale); } else if (p.t === 'poly') p.pts.forEach(q => { y1 = Math.max(y1, q.y + 0.3 * scale); }); });
+    return { x0: b.x0, y0: b.y0, x1, y1 };
+  }
+
+  /* ----------------------------------------------------------- hatching (V20) */
+  function clipToConvex(a, b, poly) {
+    const cen = mul(poly.reduce((s, p) => add(s, p), { x: 0, y: 0 }), 1 / poly.length);
+    let t0 = 0, t1 = 1; const d = sub(b, a);
+    for (let i = 0; i < poly.length; i++) {
+      const p = poly[i], q = poly[(i + 1) % poly.length], e = sub(q, p); let nn = { x: -e.y, y: e.x };
+      if (len(nn) < 1e-9) continue;
+      if ((cen.x - p.x) * nn.x + (cen.y - p.y) * nn.y < 0) nn = mul(nn, -1);
+      const num = (a.x - p.x) * nn.x + (a.y - p.y) * nn.y, den = d.x * nn.x + d.y * nn.y;
+      if (Math.abs(den) < 1e-12) { if (num < 0) return null; continue; }
+      const t = -num / den; if (den > 0) t0 = Math.max(t0, t); else t1 = Math.min(t1, t);
+      if (t0 > t1) return null;
+    }
+    return [t0, t1];
+  }
+  /** Hatch linework for a wall-type pattern inside a convex polygon. origin/dir is the wall
+   *  frame (along = dir); gaps are [from, to] intervals along it (openings) left clear. */
+  function hatch(poly, origin, dir, style, scale, gaps, extra) {
+    const out = [], nrm = { x: -dir.y, y: dir.x }; gaps = gaps || []; extra = extra || {};
+    const along = p => (p.x - origin.x) * dir.x + (p.y - origin.y) * dir.y;
+    const across = p => (p.x - origin.x) * nrm.x + (p.y - origin.y) * nrm.y;
+    const at = (s, t) => add(add(origin, mul(dir, s)), mul(nrm, t));
+    const P = v => v * scale;
+    const seg = (a, b, more) => {
+      const r = clipToConvex(a, b, poly); if (!r) return;
+      const sa = along(a), sb = along(b); let ivs = [[r[0], r[1]]];
+      gaps.forEach(([g0, g1]) => {
+        if (Math.abs(sb - sa) < 1e-9) { if (sa > g0 && sa < g1) ivs = []; return; }
+        let u0 = (g0 - sa) / (sb - sa), u1 = (g1 - sa) / (sb - sa); if (u0 > u1) { const k = u0; u0 = u1; u1 = k; }
+        ivs = ivs.flatMap(([x, y]) => { const o = []; if (u0 > x) o.push([x, Math.min(y, u0)]); if (u1 < y) o.push([Math.max(x, u1), y]); return o.filter(([p, q]) => q - p > 1e-6); });
+      });
+      const d = sub(b, a);
+      ivs.forEach(([x, y]) => { const p = add(a, mul(d, x)), q = add(a, mul(d, y)); if (dist(p, q) > 0.05) out.push(Object.assign({ t: 'line', layer: 'patt', a: p, b: q }, extra, more || {})); });
+    };
+    const ss = poly.map(along), ts = poly.map(across);
+    const s0 = Math.min(...ss), s1 = Math.max(...ss), t0 = Math.min(...ts), t1 = Math.max(...ts), mid = (t0 + t1) / 2;
+    const family = (angle, sp) => {
+      const u = { x: Math.cos(angle), y: Math.sin(angle) }, v = { x: -u.y, y: u.x };
+      const cs = [[s0, t0], [s1, t0], [s0, t1], [s1, t1]].map(([s, t]) => v.x * s + v.y * t);
+      const span = (s1 - s0) + (t1 - t0) + 1, cmax = Math.max(...cs);
+      for (let c = Math.ceil(Math.min(...cs) / sp) * sp; c <= cmax; c += sp) { const s = v.x * c, t = v.y * c; seg(at(s - u.x * span, t - u.y * span), at(s + u.x * span, t + u.y * span)); }
+    };
+    const ticks = sp => { for (let s = Math.ceil(s0 / sp) * sp; s <= s1; s += sp) seg(at(s, t0 - 1), at(s, t1 + 1)); };
+    if (style === 'wood') family(Math.PI / 4, P(0.11));
+    else if (style === 'cmu') family(Math.PI / 4, P(0.045));
+    else if (style === 'rated') family(-Math.PI / 4, P(0.05));
+    else if (style === 'brick') { family(Math.PI / 4, P(0.04)); family(-Math.PI / 4, P(0.04)); }
+    else if (style === 'metal') { const dash = P(0.06), gap = P(0.035); for (let s = s0; s < s1; s += dash + gap) seg(at(s, mid), at(Math.min(s + dash, s1), mid)); }
+    else if (style === 'glass') { seg(at(s0 - 1, mid), at(s1 + 1, mid)); ticks(60); }
+    else if (style === 'low') ticks(P(0.09));
+    else if (style === 'conc') {
+      const sp = P(0.05), r = P(0.007); let row = 0;
+      for (let t = Math.ceil(t0 / sp) * sp; t <= t1; t += sp, row++) for (let s = Math.ceil(s0 / sp) * sp + (row % 2 ? sp / 2 : 0); s <= s1; s += sp) {
+        const p = at(s, t), c = clipToConvex(p, add(p, { x: 1e-4, y: 0 }), poly);
+        if (c && c[0] === 0 && !gaps.some(g => s > g[0] && s < g[1])) out.push(Object.assign({ t: 'circle', layer: 'patt', c: p, r, fill: true }, extra));
+      }
+    }
+    return out;
   }
 
   /* ----------------------------------------------------------- drawing primitives
    * One list of primitives feeds SVG, PDF and DXF, so all three outputs carry the same
    * geometry and the same computed dimensions. Lineweights are paper inches.            */
-  const LAYERS = { wall: { dxf: 'A-WALL', color: 7, lw: 0.024 }, door: { dxf: 'A-DOOR', color: 2, lw: 0.012 }, glaz: { dxf: 'A-GLAZ', color: 4, lw: 0.012 }, dims: { dxf: 'A-ANNO-DIMS', color: 1, lw: 0.007 }, tick: { dxf: 'A-ANNO-DIMS', color: 1, lw: 0.016 }, iden: { dxf: 'A-AREA-IDEN', color: 3, lw: 0.01 }, tags: { dxf: 'A-ANNO-TAGS', color: 6, lw: 0.008 } };
-  function primitives(m, scale) {
-    scale = scale || 48; m = normalizeModel(m);
+  const LAYERS = {
+    wall: { dxf: 'A-WALL', color: 7, lw: 0.024 }, patt: { dxf: 'A-WALL-PATT', color: 8, lw: 0.004 }, door: { dxf: 'A-DOOR', color: 2, lw: 0.012 }, glaz: { dxf: 'A-GLAZ', color: 4, lw: 0.012 },
+    dims: { dxf: 'A-ANNO-DIMS', color: 1, lw: 0.007 }, tick: { dxf: 'A-ANNO-DIMS', color: 1, lw: 0.016 }, iden: { dxf: 'A-AREA-IDEN', color: 3, lw: 0.01 }, tags: { dxf: 'A-ANNO-TAGS', color: 6, lw: 0.008 },
+    cols: { dxf: 'S-COLS', color: 5, lw: 0.016 }, strs: { dxf: 'A-FLOR-STRS', color: 3, lw: 0.009 }, fixt: { dxf: 'P-FIXT', color: 4, lw: 0.008 }, anno: { dxf: 'A-ANNO-TEXT', color: 7, lw: 0.008 }, legend: { dxf: 'A-ANNO-LEGN', color: 7, lw: 0.007 },
+  };
+  function itemPrims(it, scale) {
+    const out = [], X = { item: it.id }, W = p => add(it.at, rotV(p, it.rot || 0));
+    const L = (layer, a, b, more) => out.push(Object.assign({ t: 'line', layer, a, b }, X, more || {}));
+    const poly = (layer, pts, fill) => out.push(Object.assign({ t: 'poly', layer, pts, fill }, X));
+    const T = (layer, at, text, size, angle, more) => out.push(Object.assign({ t: 'text', layer, at, text, size, angle: angle || 0, middle: true }, X, more || {}));
+    if (it.kind === 'column') {
+      const pts = itemOutline(it, scale); poly('cols', pts, '#d5dce3');
+      if (it.shape !== 'round') { L('cols', pts[0], pts[2]); L('cols', pts[1], pts[3]); }
+    } else if (it.kind === 'fixture') {
+      const sh = fixtureShapes(it.fixture); sh.polys.forEach(p => poly('fixt', p.map(W), null)); (sh.lines || []).forEach(([a, b]) => L('fixt', W(a), W(b)));
+    } else if (it.kind === 'stair') {
+      const n = stairRisers(it), treads = Math.max(1, n - 1), td = it.length / treads, hw = it.width / 2;
+      poly('strs', rect(0, -hw, it.length, hw).map(W), null);
+      for (let i = 1; i < treads; i++) L('strs', W({ x: i * td, y: -hw }), W({ x: i * td, y: hw }));
+      const a0 = W({ x: Math.min(td * 0.5, it.length * 0.2), y: 0 }), a1 = W({ x: it.length - Math.min(td * 0.4, it.length * 0.1), y: 0 }), ah = Math.min(0.08 * scale, it.width * 0.25);
+      L('strs', a0, a1); L('strs', a1, W({ x: it.length - Math.min(td * 0.4, it.length * 0.1) - ah, y: -ah * 0.6 })); L('strs', a1, W({ x: it.length - Math.min(td * 0.4, it.length * 0.1) - ah, y: ah * 0.6 }));
+      out.push(Object.assign({ t: 'circle', layer: 'strs', c: a0, r: 0.025 * scale, fill: true }, X));
+      const lab = 'UP ' + n + 'R', ls = PAPER.text * scale, horiz = Math.abs(Math.cos((it.rot || 0) * Math.PI / 180)) > 0.7;
+      T('strs', W({ x: -((horiz ? lab.length * ls * 0.31 : ls * 0.6) + 0.06 * scale), y: 0 }), lab, ls, 0);
+    } else if (it.kind === 'text') {
+      T('anno', it.at, it.text, it.size * scale, it.rot || 0);
+    } else if (it.kind === 'dim') {
+      const g = dimGeometry(it, scale), gap = PAPER.extGap * scale, beyond = PAPER.extBeyond * scale, text = formatFtIn(g.value);
+      L('dims', g.la, g.lb, { dim: true });
+      [[it.a, g.la], [it.b, g.lb]].forEach(([p, q]) => { const s = Math.abs(it.off || 0) > gap ? 1 : 0; L('dims', add(p, mul(g.n, gap * s)), add(q, mul(g.n, beyond)), { dim: true }); });
+      const tk = PAPER.tick * scale / 2, diag = norm({ x: g.d.x - g.d.y, y: g.d.y + g.d.x });
+      [g.la, g.lb].forEach(p => L('tick', sub(p, mul(diag, tk)), add(p, mul(diag, tk)), { dim: true }));
+      out.push(Object.assign({ t: 'text', layer: 'dims', at: add(mul(add(g.la, g.lb), 0.5), mul(g.up, PAPER.textGap * scale)), text, size: PAPER.text * scale, angle: g.angle, dim: true, value: g.value, kind: 'manual', side: 'M' }, X));
+    }
+    return out;
+  }
+  const ascii = s => String(s).replace(/[–—]/g, '-').replace(/[^\x20-\x7e]/g, '');
+  /** Wall-type legend + opening schedule (heights) placed under the plan, for exports. */
+  function legendPrims(m, scale, b) {
+    const out = [], ts = PAPER.text * scale, row = ts * 2.4; const x0 = b.x0 + 0.4 * scale; let y = b.y1 + 0.15 * scale;
+    const T = (x, text, size, more) => out.push(Object.assign({ t: 'text', layer: 'legend', at: { x, y }, text: ascii(text), size, angle: 0, start: true }, more || {}));
+    const used = []; m.walls.forEach(w => { const k = wallTypeKey(w); if (!used.includes(k)) used.push(k); });
+    if (used.length) {
+      T(x0, 'WALL TYPES', ts * 1.2); y += row;
+      used.forEach(k => {
+        const ty = WALL_TYPES[k], sw = 0.5 * scale, sh = 0.16 * scale, poly = rect(x0, y - sh / 2, x0 + sw, y + sh / 2), ws = m.walls.filter(w => wallTypeKey(w) === k);
+        out.push({ t: 'poly', layer: 'legend', pts: poly, fill: ty.fill, legendType: k });
+        hatch(poly, { x: x0, y }, { x: 1, y: 0 }, ty.hatch, scale, [], { legendType: k }).forEach(p => out.push(p));
+        const th = [...new Set(ws.map(w => w.thickness))].sort((a, c) => a - c).map(v => formatFtIn(v)).join(', ');
+        const hs = [...new Set(ws.map(w => w.height))].sort((a, c) => a - c).map(v => formatFtIn(v)).join(', ');
+        T(x0 + sw + 0.12 * scale, `${ty.name.toUpperCase()}, ${th} THICK, HEIGHT ${hs}`, ts, { legendType: k }); y += row;
+      });
+    }
+    if (m.openings.length) {
+      y += row * 0.3; T(x0, 'OPENINGS', ts * 1.2); y += row;
+      const groups = new Map();
+      m.openings.forEach(o => { const key = [o.kind, o.tag || '', o.width, o.head, o.sill == null ? '' : o.sill].join('|'); const g = groups.get(key); if (g) g.n++; else groups.set(key, { o, n: 1 }); });
+      [...groups.values()].sort((a, c) => (a.o.tag || '~').localeCompare(c.o.tag || '~')).forEach(({ o, n }) => {
+        const kind = o.kind === 'cased' ? 'CASED OPENING' : o.kind.toUpperCase();
+        T(x0, `${o.tag || '-'}  ${kind} (${n})  ${formatFtIn(o.width)} WIDE, HEAD ${formatFtIn(o.head)}${o.kind === 'window' ? ', SILL ' + formatFtIn(o.sill) : ''}`, ts, { opening: o.id }); y += row;
+      });
+    }
+    return out;
+  }
+  function primitives(m, scale, opts) {
+    scale = scale || 48; m = normalizeModel(m); opts = opts || {};
     const out = [], L = (layer, a, b, extra) => out.push(Object.assign({ t: 'line', layer, a, b }, extra || {}));
     const T = (layer, at, text, size, angle, extra) => out.push(Object.assign({ t: 'text', layer, at, text, size, angle: angle || 0 }, extra || {}));
     // walls (outline with gaps at openings)
@@ -399,6 +644,9 @@
       const along = p => (p.x - w.a.x) * o.dir.x + (p.y - w.a.y) * o.dir.y;
       const pt = (s, side) => add(add(w.a, mul(o.dir, s)), mul(n, side * t));
       const ops = m.openings.filter(x => x.wall === w.id).map(x => openingGeometry(m, x)).map(g => [along(g.jamb1), along(g.jamb2)].sort((a, b) => a - b));
+      // wall-type hatch, clipped to the wall and kept out of openings
+      const ty = wallType(w);
+      if (ty.hatch !== 'solid') hatch([o.outerA, o.outerB, o.innerB, o.innerA], w.a, o.dir, ty.hatch, scale, ops, { wall: w.id }).forEach(p => out.push(p));
       // partitions butting into this wall break the face they arrive on
       const tees = { 1: [], [-1]: [] };
       m.walls.forEach(x => { if (x === w) return; ['a', 'b'].forEach(k => { const p = x[k]; const tr = endTrim(m, x, k); if (tr.host !== w.id) return; const away = k === 'a' ? wallDir(x) : mul(wallDir(x), -1); const side = away.x * n.x + away.y * n.y > 0 ? 1 : -1; const c = along(p); tees[side].push([c - x.thickness / 2, c + x.thickness / 2]); }); });
@@ -413,13 +661,16 @@
       if (o.capB) L('wall', o.outerB, o.innerB, { wall: w.id });
       ops.forEach(([s0, e0]) => { L('wall', pt(s0, 1), pt(s0, -1), { wall: w.id }); L('wall', pt(e0, 1), pt(e0, -1), { wall: w.id }); });
     });
-    // doors and windows
+    // doors, windows and cased openings
     m.openings.forEach(op => {
       const g = openingGeometry(m, op), w = g.wall, t = w.thickness / 2;
       if (op.kind === 'window') {
         L('glaz', add(g.jamb1, mul(g.normal, t * 0.25)), add(g.jamb2, mul(g.normal, t * 0.25)), { opening: op.id });
         L('glaz', sub(g.jamb1, mul(g.normal, t * 0.25)), sub(g.jamb2, mul(g.normal, t * 0.25)), { opening: op.id });
         L('glaz', g.outer1, g.outer2, { opening: op.id }); L('glaz', g.inner1, g.inner2, { opening: op.id });
+      } else if (op.kind === 'cased') {
+        // head above the cut plane: dashed lines across the opening on both faces
+        L('door', g.outer1, g.outer2, { opening: op.id, dash: true }); L('door', g.inner1, g.inner2, { opening: op.id, dash: true });
       } else {
         const inward = mul(g.normal, -1), hinge = op.swing === 'right' ? g.inner2 : g.inner1, other = op.swing === 'right' ? g.inner1 : g.inner2;
         const leafEnd = add(hinge, mul(inward, op.width));
@@ -428,6 +679,8 @@
       }
       if (op.tag) { const tagAt = add(g.center, mul(g.normal, -(t + 0.28 * scale))); out.push({ t: 'circle', layer: 'tags', c: tagAt, r: 0.09 * scale }); T('tags', tagAt, op.tag, PAPER.text * scale * 0.9, 0, { middle: true }); }
     });
+    // columns, stairs, fixtures, text, manual dimensions
+    m.items.forEach(it => itemPrims(it, scale).forEach(p => out.push(p)));
     // dimensions
     const { dims } = computeDimensions(m, scale);
     dims.forEach(d => {
@@ -438,49 +691,61 @@
       T('dims', d.textAt, d.text, d.textHeight, d.angle, { dim: true, value: d.value, kind: d.kind, side: d.side });
     });
     placeRoomLabels(m, dims, scale).forEach(l => l.lines.forEach((s, i) => T('iden', { x: l.at.x, y: l.at.y + (i - (l.lines.length - 1) / 2) * l.size * 1.2 }, s, l.size * (i ? 0.85 : 1), 0, { middle: true, room: l.room.id })));
+    if (opts.legend) legendPrims(m, scale, baseBounds(m, scale)).forEach(p => out.push(p));
     return out;
   }
 
   /* ----------------------------------------------------------- outputs */
   const xesc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const ptsAttr = pts => pts.map(p => p.x.toFixed(3) + ',' + p.y.toFixed(3)).join(' ');
+  /** opts: ink, poche (generic wall fill), paper, paperSize, legend (wall-type legend and
+   *  opening schedule), hit (transparent pick areas for items, for the editor). */
   function toSVG(m, scale, opts) {
     scale = scale || 48; opts = opts || {}; m = normalizeModel(m);
-    const b = bounds(m, scale), prims = primitives(m, scale), lw = k => (LAYERS[k].lw * scale).toFixed(3);
-    const parts = [];
-    // poche (solid wall fill) under the linework
+    const legend = opts.legend != null ? !!opts.legend : !!opts.paperSize;
+    const b = bounds(m, scale, { legend }), prims = primitives(m, scale, { legend }), lw = k => (LAYERS[k].lw * scale).toFixed(3);
+    const parts = [], color = opts.ink || '#111';
+    // poche / wall-type fill under the linework
     m.walls.forEach(w => {
-      const o = wallOutline(m, w);
-      parts.push(`<polygon class="du-wall-fill" data-wall="${w.id}" points="${[o.outerA, o.outerB, o.innerB, o.innerA].map(p => p.x.toFixed(3) + ',' + p.y.toFixed(3)).join(' ')}" fill="${opts.poche || '#b8c4cf'}" stroke="none"/>`);
+      const o = wallOutline(m, w), ty = wallType(w), key = wallTypeKey(w);
+      const fill = ty.hatch === 'solid' ? (opts.poche || '#b8c4cf') : ty.fill;
+      parts.push(`<polygon class="du-wall-fill" data-wall="${w.id}" data-wtype="${key}" data-height="${w.height}" points="${ptsAttr([o.outerA, o.outerB, o.innerB, o.innerA])}" fill="${fill}" stroke="none"/>`);
     });
-    m.openings.forEach(op => { const g = openingGeometry(m, op); parts.push(`<polygon class="du-opening-fill" data-opening="${op.id}" points="${[g.outer1, g.outer2, g.inner2, g.inner1].map(p => p.x.toFixed(3) + ',' + p.y.toFixed(3)).join(' ')}" fill="${opts.paper || '#fff'}" stroke="none"/>`); });
+    m.openings.forEach(op => { const g = openingGeometry(m, op); parts.push(`<polygon class="du-opening-fill" data-opening="${op.id}" data-kind="${op.kind}" data-head="${op.head}"${op.sill != null ? ` data-sill="${op.sill}"` : ''} points="${ptsAttr([g.outer1, g.outer2, g.inner2, g.inner1])}" fill="${opts.paper || '#fff'}" stroke="none"/>`); });
+    if (opts.hit) m.items.forEach(it => parts.push(`<polygon class="du-item-hit" data-item="${it.id}" points="${ptsAttr(itemOutline(it, scale))}" fill="rgba(0,0,0,0)" stroke="none"/>`));
     prims.forEach(p => {
-      const color = opts.ink || '#111';
-      if (p.t === 'line') parts.push(`<line class="du-${p.layer}"${p.wall ? ` data-wall="${p.wall}"` : ''}${p.opening ? ` data-opening="${p.opening}"` : ''} x1="${p.a.x.toFixed(3)}" y1="${p.a.y.toFixed(3)}" x2="${p.b.x.toFixed(3)}" y2="${p.b.y.toFixed(3)}" stroke="${color}" stroke-width="${lw(p.layer)}" stroke-linecap="square"/>`);
+      const data = `${p.wall ? ` data-wall="${p.wall}"` : ''}${p.opening ? ` data-opening="${p.opening}"` : ''}${p.item ? ` data-item="${p.item}"` : ''}${p.room ? ` data-room="${p.room}"` : ''}${p.legendType ? ` data-legend="${p.legendType}"` : ''}`;
+      if (p.t === 'line') parts.push(`<line class="du-${p.layer}"${data} x1="${p.a.x.toFixed(3)}" y1="${p.a.y.toFixed(3)}" x2="${p.b.x.toFixed(3)}" y2="${p.b.y.toFixed(3)}" stroke="${color}" stroke-width="${lw(p.layer)}" stroke-linecap="square"${p.dash ? ` stroke-dasharray="${(0.05 * scale).toFixed(2)} ${(0.035 * scale).toFixed(2)}"` : ''}/>`);
       else if (p.t === 'arc') { const sw = cross(sub(p.from, p.c), sub(p.to, p.c)) > 0 ? 1 : 0; parts.push(`<path class="du-door" data-opening="${p.opening}" d="M${p.from.x.toFixed(3)} ${p.from.y.toFixed(3)} A${p.r} ${p.r} 0 0 ${sw} ${p.to.x.toFixed(3)} ${p.to.y.toFixed(3)}" fill="none" stroke="${color}" stroke-width="${lw('door')}" stroke-dasharray="${(0.04 * scale).toFixed(2)} ${(0.03 * scale).toFixed(2)}"/>`); }
-      else if (p.t === 'circle') parts.push(`<circle class="du-tags" cx="${p.c.x.toFixed(3)}" cy="${p.c.y.toFixed(3)}" r="${p.r.toFixed(3)}" fill="none" stroke="${color}" stroke-width="${lw('tags')}"/>`);
-      else if (p.t === 'text') parts.push(`<text class="du-${p.layer}"${p.dim ? ` data-dim-kind="${p.kind}" data-dim-side="${p.side}" data-dim-value="${p.value}"` : ''} x="${p.at.x.toFixed(3)}" y="${p.at.y.toFixed(3)}" font-size="${p.size.toFixed(3)}" font-family="Helvetica, Arial, sans-serif" fill="${color}" text-anchor="middle" dominant-baseline="${p.dim ? 'auto' : 'middle'}"${p.angle ? ` transform="rotate(${p.angle} ${p.at.x.toFixed(3)} ${p.at.y.toFixed(3)})"` : ''}>${xesc(p.text)}</text>`);
+      else if (p.t === 'circle') parts.push(`<circle class="du-${p.layer}"${data} cx="${p.c.x.toFixed(3)}" cy="${p.c.y.toFixed(3)}" r="${p.r.toFixed(3)}" fill="${p.fill ? color : 'none'}" stroke="${p.fill ? 'none' : color}" stroke-width="${lw(p.layer)}"/>`);
+      else if (p.t === 'poly') parts.push(`<polygon class="du-${p.layer}"${data} points="${ptsAttr(p.pts)}" fill="${p.fill || 'none'}" stroke="${color}" stroke-width="${lw(p.layer)}"/>`);
+      else if (p.t === 'text') parts.push(`<text class="du-${p.layer}"${data}${p.dim ? ` data-dim-kind="${p.kind}" data-dim-side="${p.side}" data-dim-value="${p.value}"` : ''} x="${p.at.x.toFixed(3)}" y="${p.at.y.toFixed(3)}" font-size="${p.size.toFixed(3)}" font-family="Helvetica, Arial, sans-serif" fill="${color}" text-anchor="${p.start ? 'start' : 'middle'}" dominant-baseline="${p.dim ? 'auto' : 'middle'}"${p.angle ? ` transform="rotate(${p.angle} ${p.at.x.toFixed(3)} ${p.at.y.toFixed(3)})"` : ''}>${xesc(p.text)}</text>`);
     });
     const w = b.x1 - b.x0, h = b.y1 - b.y0;
     const size = opts.paperSize ? ` width="${(w / scale).toFixed(3)}in" height="${(h / scale).toFixed(3)}in"` : '';
-    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${b.x0.toFixed(3)} ${b.y0.toFixed(3)} ${w.toFixed(3)} ${h.toFixed(3)}"${size} data-scale="${scale}">${parts.join('')}</svg>`;
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${b.x0.toFixed(3)} ${b.y0.toFixed(3)} ${w.toFixed(3)} ${h.toFixed(3)}"${size} data-scale="${scale}">${opts.paperSize ? `<rect x="${b.x0.toFixed(3)}" y="${b.y0.toFixed(3)}" width="${w.toFixed(3)}" height="${h.toFixed(3)}" fill="${opts.paper || '#fff'}"/>` : ''}${parts.join('')}</svg>`;
   }
   function cross(p, q) { return p.x * q.y - p.y * q.x; }
 
   /** AutoCAD R12 ASCII DXF in real units (inches). Dimensions are exported as lines and
-   *  text on layer A-ANNO-DIMS (not associative DIMENSION entities). */
-  function toDXF(m, scale) {
-    scale = scale || 48; m = normalizeModel(m);
-    const prims = primitives(m, scale), out = [];
+   *  text on layer A-ANNO-DIMS (not associative DIMENSION entities). Wall hatches are lines
+   *  on A-WALL-PATT; the wall-type legend and opening schedule are on A-ANNO-LEGN. */
+  function toDXF(m, scale, opts) {
+    scale = scale || 48; m = normalizeModel(m); opts = opts || {};
+    const prims = primitives(m, scale, { legend: opts.legend !== false }), out = [];
     const g = (code, v) => out.push(String(code), String(v));
     const Y = y => (-y).toFixed(4); // DXF is y-up
+    const line = (layer, a, b) => { g(0, 'LINE'); g(8, layer); g(10, a.x.toFixed(4)); g(20, Y(a.y)); g(30, 0); g(11, b.x.toFixed(4)); g(21, Y(b.y)); g(31, 0); };
     g(0, 'SECTION'); g(2, 'HEADER'); g(9, '$ACADVER'); g(1, 'AC1009'); g(9, '$INSUNITS'); g(70, 1); g(9, '$MEASUREMENT'); g(70, 0); g(0, 'ENDSEC');
-    g(0, 'SECTION'); g(2, 'TABLES'); g(0, 'TABLE'); g(2, 'LAYER'); g(70, Object.keys(LAYERS).length);
+    const layerNames = [...new Set(Object.values(LAYERS).map(l => l.dxf))];
+    g(0, 'SECTION'); g(2, 'TABLES'); g(0, 'TABLE'); g(2, 'LAYER'); g(70, layerNames.length);
     const seen = new Set(); Object.values(LAYERS).forEach(l => { if (seen.has(l.dxf)) return; seen.add(l.dxf); g(0, 'LAYER'); g(2, l.dxf); g(70, 0); g(62, l.color); g(6, 'CONTINUOUS'); });
     g(0, 'ENDTAB'); g(0, 'ENDSEC');
     g(0, 'SECTION'); g(2, 'ENTITIES');
     prims.forEach(p => {
       const layer = LAYERS[p.layer].dxf;
-      if (p.t === 'line') { g(0, 'LINE'); g(8, layer); g(10, p.a.x.toFixed(4)); g(20, Y(p.a.y)); g(30, 0); g(11, p.b.x.toFixed(4)); g(21, Y(p.b.y)); g(31, 0); }
+      if (p.t === 'line') line(layer, p.a, p.b);
+      else if (p.t === 'poly') p.pts.forEach((q, i) => line(layer, q, p.pts[(i + 1) % p.pts.length]));
       else if (p.t === 'circle') { g(0, 'CIRCLE'); g(8, layer); g(10, p.c.x.toFixed(4)); g(20, Y(p.c.y)); g(30, 0); g(40, p.r.toFixed(4)); }
       else if (p.t === 'arc') {
         const ang = q => (Math.atan2(-(q.y - p.c.y), q.x - p.c.x) * 180 / Math.PI + 360) % 360;
@@ -488,7 +753,8 @@
         g(0, 'ARC'); g(8, layer); g(10, p.c.x.toFixed(4)); g(20, Y(p.c.y)); g(30, 0); g(40, p.r.toFixed(4)); g(50, s.toFixed(4)); g(51, e.toFixed(4));
       } else if (p.t === 'text') {
         const rot = -(p.angle || 0);
-        g(0, 'TEXT'); g(8, layer); g(10, p.at.x.toFixed(4)); g(20, Y(p.at.y)); g(30, 0); g(40, p.size.toFixed(4)); g(1, p.text); if (rot) g(50, rot); g(72, 1); g(11, p.at.x.toFixed(4)); g(21, Y(p.at.y)); g(31, 0);
+        g(0, 'TEXT'); g(8, layer); g(10, p.at.x.toFixed(4)); g(20, Y(p.at.y)); g(30, 0); g(40, p.size.toFixed(4)); g(1, ascii(p.text)); if (rot) g(50, rot);
+        if (!p.start) { g(72, 1); g(11, p.at.x.toFixed(4)); g(21, Y(p.at.y)); g(31, 0); }
       }
     });
     g(0, 'ENDSEC'); g(0, 'EOF');
@@ -499,23 +765,27 @@
    *  Returns a binary string; write it with a Uint8Array of its char codes. */
   function toPDF(m, scale, info) {
     scale = scale || 48; info = info || {}; m = normalizeModel(m);
+    const legend = info.legend !== false;
     const W = 17 * 72, H = 11 * 72, margin = 0.5 * 72, tbH = 1.1 * 72;
-    const b = bounds(m, scale), drawW = (b.x1 - b.x0) / scale * 72, drawH = (b.y1 - b.y0) / scale * 72;
+    const b = bounds(m, scale, { legend }), drawW = (b.x1 - b.x0) / scale * 72, drawH = (b.y1 - b.y0) / scale * 72;
     const areaW = W - 2 * margin, areaH = H - 2 * margin - tbH;
     const fits = drawW <= areaW && drawH <= areaH;
     const k = 72 / scale; // model inches → points
     const ox = margin + (areaW - drawW) / 2 - b.x0 * k, oy = H - margin - (areaH - drawH) / 2 + b.y0 * k;
     const X = x => (ox + x * k).toFixed(2), Yp = y => (oy - y * k).toFixed(2);
     const ps = s => '(' + String(s).replace(/[\\()]/g, c => '\\' + c).replace(/[^\x20-\x7e]/g, '') + ')';
+    const rgb = hex => { const h = String(hex || '#ffffff').replace('#', ''); return [0, 2, 4].map(i => (parseInt(h.substr(i, 2), 16) / 255).toFixed(3)).join(' '); };
+    const path = pts => `${X(pts[0].x)} ${Yp(pts[0].y)} m ` + pts.slice(1).map(p => `${X(p.x)} ${Yp(p.y)} l`).join(' ') + ' h';
     const c = [];
-    c.push('0.72 0.77 0.81 rg');
-    m.walls.forEach(w => { const o = wallOutline(m, w); const pts = [o.outerA, o.outerB, o.innerB, o.innerA]; c.push(`${X(pts[0].x)} ${Yp(pts[0].y)} m ` + pts.slice(1).map(p => `${X(p.x)} ${Yp(p.y)} l`).join(' ') + ' h f'); });
+    m.walls.forEach(w => { const o = wallOutline(m, w), ty = wallType(w); c.push(`${ty.hatch === 'solid' ? '0.72 0.77 0.81' : rgb(ty.fill)} rg ` + path([o.outerA, o.outerB, o.innerB, o.innerA]) + ' f'); });
     c.push('1 1 1 rg');
-    m.openings.forEach(op => { const gg = openingGeometry(m, op); const pts = [gg.outer1, gg.outer2, gg.inner2, gg.inner1]; c.push(`${X(pts[0].x)} ${Yp(pts[0].y)} m ` + pts.slice(1).map(p => `${X(p.x)} ${Yp(p.y)} l`).join(' ') + ' h f'); });
+    m.openings.forEach(op => { const gg = openingGeometry(m, op); c.push(path([gg.outer1, gg.outer2, gg.inner2, gg.inner1]) + ' f'); });
     c.push('0 0 0 RG 0 0 0 rg 2 J');
-    primitives(m, scale).forEach(p => {
+    primitives(m, scale, { legend }).forEach(p => {
       const lwPt = (LAYERS[p.layer].lw * 72).toFixed(2);
-      if (p.t === 'line') c.push(`${lwPt} w [] 0 d ${X(p.a.x)} ${Yp(p.a.y)} m ${X(p.b.x)} ${Yp(p.b.y)} l S`);
+      if (p.t === 'line') c.push(`${lwPt} w ${p.dash ? '[3 2]' : '[]'} 0 d ${X(p.a.x)} ${Yp(p.a.y)} m ${X(p.b.x)} ${Yp(p.b.y)} l S`);
+      else if (p.t === 'poly') c.push(`${lwPt} w [] 0 d ${p.fill ? rgb(p.fill) + ' rg ' + path(p.pts) + ' B 0 0 0 rg' : path(p.pts) + ' S'}`);
+      else if (p.t === 'circle' && p.fill) { const r = Math.max(p.r * k, 0.35); c.push(`${(+X(p.c.x) - r).toFixed(2)} ${(+Yp(p.c.y) - r).toFixed(2)} ${(2 * r).toFixed(2)} ${(2 * r).toFixed(2)} re f`); }
       else if (p.t === 'circle' || p.t === 'arc') {
         const a0 = p.t === 'circle' ? 0 : Math.atan2(p.from.y - p.c.y, p.from.x - p.c.x);
         let a1 = p.t === 'circle' ? Math.PI * 2 : Math.atan2(p.to.y - p.c.y, p.to.x - p.c.x);
@@ -525,7 +795,7 @@
       } else if (p.t === 'text') {
         const size = p.size * k, w = p.text.length * size * 0.55, rad = (p.angle || 0) * Math.PI / 180;
         const cos = Math.cos(-rad), sin = Math.sin(-rad);
-        const dx = -w / 2, dy = p.dim ? 0 : -size * 0.35;
+        const dx = p.start ? 0 : -w / 2, dy = p.dim ? 0 : -size * 0.35;
         const tx = +X(p.at.x) + dx * cos - dy * sin, ty = +Yp(p.at.y) + dx * sin + dy * cos;
         c.push(`BT /F1 ${size.toFixed(2)} Tf ${cos.toFixed(4)} ${sin.toFixed(4)} ${(-sin).toFixed(4)} ${cos.toFixed(4)} ${tx.toFixed(2)} ${ty.toFixed(2)} Tm ${ps(p.text)} Tj ET`);
       }
@@ -559,6 +829,7 @@
     return m;
   }
 
-  const api = { formatFtIn, parseFtIn, snap, emptyModel, normalizeModel, addWall, addRectangle, wallFaceLength, setWallFaceLength, addOpening, moveOpening, removeWall, removeOpening, setWallLength, wallLength, wallById, computeDimensions, collisions, primitives, toSVG, toDXF, toPDF, bounds, samplePlan, outwardNormal, wallOutline, openingGeometry, PAPER };
+  const api = { formatFtIn, parseFtIn, snap, emptyModel, normalizeModel, addWall, addRectangle, wallFaceLength, setWallFaceLength, addOpening, moveOpening, removeWall, removeOpening, setWallLength, wallLength, wallById, computeDimensions, collisions, primitives, toSVG, toDXF, toPDF, bounds, samplePlan, outwardNormal, wallOutline, openingGeometry, PAPER,
+    WALL_TYPES, FIXTURES, wallType, wallTypeKey, setWallType, addItem, moveItem, removeItem, itemOutline, stairRisers, dimGeometry, legendPrims, hatch };
   if (typeof module === 'object' && module.exports) module.exports = api; else root.DrawUpDrawCore = api;
 })(typeof window !== 'undefined' ? window : globalThis);

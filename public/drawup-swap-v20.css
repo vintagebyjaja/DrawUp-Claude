@@ -1,0 +1,112 @@
+/* DrawUp Swap V20 — thread layout (Arch Coach style), where-chips, mark-area brush, court extras */
+.sw20{--sw-ink:#eef7ff;--sw-dim:#a9c3d8;--sw-line:rgba(130,210,255,.16);--sw-cyan:#75e0ff;--sw-orange:#ff8a3d;--sw-red:#ff3b1f;
+  display:grid;grid-template-columns:250px minmax(0,1fr);gap:20px;min-height:calc(100vh - 110px);color:var(--sw-ink);position:relative}
+.sw20.drop:after{content:"Drop the image to add it";position:absolute;inset:0;display:grid;place-items:center;border:2px dashed var(--sw-cyan);border-radius:22px;background:rgba(4,16,28,.82);font:800 22px/1.2 Archivo,system-ui,sans-serif;color:#fff;z-index:5;pointer-events:none}
+.sw20 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.sw20-threads{border-right:1px solid var(--sw-line);padding:8px 18px 20px 0;min-width:0}
+.sw20-threads>.du-btn{width:100%;margin-bottom:12px}
+.sw20-list{display:grid;gap:8px}
+.sw20-list button{display:flex;gap:10px;align-items:center;width:100%;text-align:left;padding:8px;border-radius:14px;border:1px solid transparent;background:rgba(16,38,58,.55);color:var(--sw-ink);cursor:pointer;min-width:0}
+.sw20-list button:hover{border-color:var(--sw-line)}
+.sw20-list button.active{border-color:rgba(255,138,61,.6);background:rgba(40,24,14,.65);box-shadow:0 0 0 1px rgba(255,138,61,.25)}
+.sw20-list img,.sw20-list i{width:46px;height:46px;flex:none;border-radius:10px;object-fit:cover;background:#0b1d2e;display:grid;place-items:center;font-style:normal;color:var(--sw-cyan)}
+.sw20-list span{display:grid;min-width:0}
+.sw20-list b{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sw20-list small{font-size:12px;color:var(--sw-dim)}
+.sw20-main{min-width:0;display:flex;flex-direction:column}
+.sw20-head h1{font-size:clamp(24px,2.2vw,34px)!important;line-height:1.15;overflow-wrap:anywhere}
+.sw20-head p{color:var(--sw-dim)}
+.sw20-msgs{flex:1;min-height:340px;max-height:58vh;overflow:auto;overflow-x:hidden;display:grid;align-content:start;gap:14px;padding:18px;border:1px solid var(--sw-line);border-radius:20px;background:rgba(4,16,28,.65)}
+.sw20-msg{max-width:min(760px,88%);padding:13px 15px;border-radius:17px;min-width:0}
+.sw20-msg>span{display:block;font:700 10.5px/1.4 "IBM Plex Mono",monospace;letter-spacing:.16em;margin-bottom:6px}
+.sw20-msg p{margin:0;font-size:15.5px;line-height:1.6;overflow-wrap:anywhere;white-space:pre-wrap}
+.sw20-msg.user{justify-self:end;background:#fff;color:#14223a;border:1px solid #d8e3f2}
+.sw20-msg.user>span{color:#3c5d8a}
+.sw20-msg.bot{justify-self:start;background:#fff6ef;color:#1d2433;border:1px solid #f3dcc9}
+.sw20-msg.bot>span{color:#9a5a2e}
+.sw20-msg.gen{background:#0d1b29;color:var(--sw-ink);border:1px solid rgba(255,138,61,.35);box-shadow:0 10px 30px rgba(0,0,0,.25);width:min(760px,100%);max-width:100%}
+.sw20-msg.gen>span{color:#ffb27a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sw20-msg.img figure{margin:0}
+.sw20-msg.img img{display:block;max-width:min(320px,100%);max-height:240px;border-radius:12px;object-fit:cover}
+.sw20-msg small{display:block;margin-top:6px;font-size:12.5px;color:inherit;opacity:.8}
+.sw20-link{background:none;border:0;padding:0;color:#0a5bd8;text-decoration:underline;cursor:pointer;font:inherit}
+.sw20-basebar .sw20-link{color:var(--sw-cyan)}
+.sw20-chip{display:inline-flex;align-items:center;gap:6px;margin-top:8px;padding:4px 10px;border-radius:999px;background:rgba(255,138,61,.14);border:1px solid rgba(255,138,61,.45);color:#b04f12;font:600 12.5px/1.3 "IBM Plex Sans",system-ui,sans-serif;font-style:normal}
+.sw20-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.sw20-chips button{padding:8px 14px;border-radius:999px;border:1px solid #e3b48f;background:#fff;color:#5a2d0c;font:600 14px/1.2 "IBM Plex Sans",system-ui,sans-serif;cursor:pointer;min-height:38px}
+.sw20-chips button:hover,.sw20-chips button:focus-visible{background:#ff8a3d;color:#fff;border-color:#ff8a3d;outline:none}
+.sw20-chips button.mark{border-style:dashed}
+.sw20-gen{display:grid;gap:10px}
+.sw20-pair{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.sw20-pair figure{margin:0;min-width:0}
+.sw20-pair img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:10px;display:block;background:#08131f}
+.sw20-pair figcaption{font:700 10.5px/1.4 "IBM Plex Mono",monospace;letter-spacing:.14em;color:var(--sw-dim);margin-top:5px;text-transform:uppercase}
+.sw20-wait{aspect-ratio:4/3;display:grid;place-content:center;justify-items:center;gap:6px;border:1px dashed rgba(255,170,110,.45);border-radius:10px;font:700 11px "IBM Plex Mono",monospace;letter-spacing:.14em;color:#ffcfaa;background:repeating-linear-gradient(90deg,rgba(214,140,70,.10) 0 18px,rgba(190,120,60,.05) 18px 36px)}
+.sw20-wait b{font:800 26px/1 "Courier New",monospace;color:var(--sw-red);text-shadow:0 0 10px rgba(255,59,31,.7);letter-spacing:0}
+.sw20-wait.failed{color:#ff9d8a;border-color:rgba(255,120,100,.5)}
+.sw20-err{color:#ffb4a6!important;font-size:14px!important}
+.sw20-gen-foot{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
+.sw20-gen-foot small{color:var(--sw-dim);opacity:1;margin:0}
+.sw20-gen-foot span{display:flex;flex-wrap:wrap;gap:8px}
+.sw20-gen-foot .du-btn{padding:8px 14px;font-size:14px;min-height:38px}
+.sw20-drop{display:grid;gap:10px;place-content:center;text-align:center;min-height:300px;padding:24px;border:2px dashed rgba(117,224,255,.4);border-radius:18px;cursor:pointer;color:var(--sw-dim);background:radial-gradient(circle at 50% 30%,rgba(255,138,61,.10),transparent 60%)}
+.sw20-drop b{font:800 clamp(20px,2.4vw,28px)/1.2 Archivo,system-ui,sans-serif;color:#fff}
+.sw20-drop span{max-width:520px;margin:0 auto;font-size:15px;line-height:1.55}
+.sw20-drop kbd{background:#0b1d2e;border:1px solid var(--sw-line);border-radius:6px;padding:1px 6px;color:#fff;font:600 12px "IBM Plex Mono",monospace}
+.sw20-compose{margin-top:12px;display:grid;gap:8px}
+.sw20-compose>small{color:var(--sw-dim)}
+.sw20-basebar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;color:var(--sw-dim);font-size:14px}
+.sw20-basebar:empty{display:none}
+.sw20-basebar>img{width:42px;height:42px;border-radius:8px;object-fit:cover;border:1px solid var(--sw-line)}
+.sw20-basebar b{color:#fff}
+.sw20-basebar .du-btn{padding:7px 14px;font-size:14px;min-height:36px}
+.sw20-chip.mask{margin:0;color:#ffd7bd;background:rgba(255,59,31,.16)}
+.sw20-chip.mask img{width:28px;height:20px;object-fit:cover;border-radius:4px}
+.sw20-chip.mask button{background:none;border:0;color:#fff;font-size:16px;cursor:pointer;padding:0 2px}
+#sw20-form{display:flex;gap:10px;align-items:stretch}
+#sw20-form textarea{flex:1;min-width:0;background:#061523;color:#fff;border:1px solid rgba(130,210,255,.25);border-radius:16px;padding:12px 14px;font:inherit;font-size:15.5px;resize:vertical;min-height:52px}
+#sw20-form textarea::placeholder{color:#8fa9bf}
+.sw20-attach{display:grid;place-items:center;width:52px;flex:none;border-radius:16px;border:1px solid rgba(130,210,255,.3);background:#0b1d2e;color:var(--sw-cyan);font-size:24px;cursor:pointer}
+.sw20-attach:hover{border-color:var(--sw-cyan)}
+/* court extras: the image being worked on, scanned like a hologram */
+.sw20-holo{position:relative;width:min(260px,70%);margin:8px auto 10px;border-radius:12px;overflow:hidden;border:1px solid rgba(117,224,255,.45);box-shadow:0 0 30px rgba(99,221,255,.25)}
+.sw20-holo img{display:block;width:100%;max-height:170px;object-fit:cover;filter:saturate(.6) brightness(.9) sepia(.25) hue-rotate(160deg)}
+.sw20-holo i{position:absolute;left:0;right:0;top:0;height:28%;background:linear-gradient(180deg,transparent,rgba(117,224,255,.45),transparent);animation:sw20scan 2.2s linear infinite}
+.sw20-court-req{font-size:15px}
+.sw20-court .sw20-chip{color:#ffd7bd;margin:0 0 0 6px}
+.du-court-made .sw20-holo,.du-court-miss .sw20-holo{display:none}
+@keyframes sw20scan{from{transform:translateY(-100%)}to{transform:translateY(360%)}}
+/* mark-area brush */
+.sw20-brush{position:fixed;inset:0;z-index:12900;background:rgba(2,6,12,.95);display:flex;flex-direction:column;color:#e8f4ff}
+.sw20-brush-bar{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;padding:12px 16px;border-bottom:1px solid rgba(150,210,255,.15)}
+.sw20-brush-bar>span{color:#bcd7ea;font-size:14px;flex:1;min-width:180px}
+.sw20-brush-tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.sw20-brush-tools .du-btn{padding:8px 14px;font-size:14px;min-height:38px}
+.sw20-brush-tools .du-btn.on{background:#ff8a3d;color:#fff;border-color:#ff8a3d}
+.sw20-brush-tools label{display:flex;gap:6px;align-items:center;font-size:14px}
+.sw20-brush-stage{flex:1;min-height:0;display:grid;place-items:center;padding:14px;overflow:auto}
+.sw20-brush-frame{position:relative;display:inline-block;line-height:0;max-width:100%}
+.sw20-brush-frame img{max-width:100%;max-height:calc(100vh - 150px);display:block;border-radius:8px;user-select:none;-webkit-user-drag:none}
+.sw20-brush-frame canvas{position:absolute;inset:0;width:100%;height:100%;opacity:.55;cursor:crosshair;touch-action:none;border-radius:8px}
+@media (prefers-reduced-motion:reduce){.sw20-holo i{animation:none}}
+@media (max-width:860px){
+  .sw20{grid-template-columns:minmax(0,1fr);gap:12px;min-height:0}
+  .sw20-threads{border-right:0;border-bottom:1px solid var(--sw-line);padding:0 0 12px}
+  .sw20-list{display:flex;overflow-x:auto;gap:8px;padding-bottom:4px;scrollbar-width:thin}
+  .sw20-list button{flex:0 0 200px}
+  .sw20-msgs{max-height:none;min-height:260px;padding:12px}
+  .sw20-msg{max-width:100%}
+  .sw20-gen-foot{flex-direction:column;align-items:stretch}
+  .sw20-gen-foot span .du-btn{flex:1 1 auto}
+  .sw20-head{flex-wrap:wrap}
+}
+@media (max-width:480px){
+  #sw20-form{gap:8px}.sw20-attach{width:44px}
+  #sw20-form .du-btn{padding:10px 14px}
+  .sw20-brush-bar>span{display:none}
+}
+.sw20-court .du-court-actions .du-btn.ghost{color:#fff!important;border:1px solid rgba(255,190,140,.55)!important;background:rgba(255,138,61,.12)!important;padding:10px 16px;font-size:15px}
+.sw20-court .du-court-actions .du-btn.ghost:hover{background:rgba(255,138,61,.3)!important}
+.sw20-brush{background:rgba(2,6,12,.97)}
+.sw20-brush-tools .du-btn.ghost{color:#fff!important;border:1px solid rgba(150,210,255,.45)!important;background:rgba(16,38,58,.8)!important}
+.sw20-brush-tools .du-btn.ghost.on{background:#ff8a3d!important;border-color:#ff8a3d!important}

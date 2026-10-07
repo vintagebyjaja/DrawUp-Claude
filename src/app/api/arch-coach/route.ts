@@ -1,5 +1,8 @@
 import { NextResponse } from 'next/server';
-import { creditMessage, missingConfig, outputText, refundCredits, reserveCredits, signedInUser, sourcesFrom, type CreditAccess } from '@/lib/drawup-server';
+import { creditMessage, missingConfig, models as modelList, openaiCancel, openaiCreate, openaiGet, outputText, readTicket, refundCredits, refundOnce, reserveCredits, signTicket, signedInUser, sourcesFrom, type CreditAccess } from '@/lib/drawup-server';
+import { quickCall, quickCoachPrompt, type QuickResult } from '@/lib/drawup-quick';
+import { createHash } from 'node:crypto';
+import { awardXp, coachPersona } from '@/lib/drawup-coach-persona';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -18,6 +21,24 @@ function questionCost(text: string, hasImage: boolean) {
   if (/\bibc\b|\bicc\b|\bada\b|accessib|building code|egress|occupancy|fire rating|code section|zoning/i.test(text)) return { action: 'code_ada_question', cost: 8 };
   return { action: 'basic_question', cost: 3 };
 }
+
+const STATES = 'al|ak|az|ar|ca|co|ct|de|dc|fl|ga|hi|id|il|in|ia|ks|ky|la|me|md|ma|mi|mn|ms|mo|mt|ne|nv|nh|nj|nm|ny|nc|nd|oh|ok|or|pa|ri|sc|sd|tn|tx|ut|vt|va|wa|wv|wi|wy|alabama|alaska|arizona|arkansas|california|colorado|connecticut|delaware|florida|georgia|hawaii|idaho|illinois|indiana|iowa|kansas|kentucky|louisiana|maine|maryland|massachusetts|michigan|minnesota|mississippi|missouri|montana|nebraska|nevada|new hampshire|new jersey|new mexico|new york|north carolina|north dakota|ohio|oklahoma|oregon|pennsylvania|rhode island|south carolina|south dakota|tennessee|texas|utah|vermont|virginia|washington|west virginia|wisconsin|wyoming|ontario|quebec|british columbia|alberta|canada|mexico|uk|united kingdom|england|usa|us';
+// "City, ST" / "City, State" / "City, Country" in any letter case, e.g. "richmond, va".
+const PLACE = new RegExp(`\\b[a-z][a-z .'-]{1,40},\\s*(?:${STATES})\\b`, 'i');
+
+/**
+ * Builds the full Arch Coach prompt. Keep ALL coach prompt text here: personalization
+ * (src/lib/drawup-coach-persona.ts, added later) hooks in by extending `extra`.
+ */
+export function buildCoachPrompt({ message, transcript, location, extra = '' }: { message: string; transcript: string; location: string; extra?: string }) {
+  const instructions = `You are Arch Coach, DrawUp's AEC copilot. Be useful, concise, professional, and practical. Preserve context from the entire conversation. Never ask for information the user already supplied in the conversation. If a user gives a location as a follow-up, connect it to the earlier question automatically. For jurisdiction-specific zoning, code, ADA, permitting, standards, firms, projects, products, or other current facts, research current sources and answer from them. Prefer official government/AHJ/code/institutional sources first, then authoritative AEC sources. Clearly distinguish a binding requirement from guidance or a recommendation. Do not claim a design is code compliant; note that final interpretation/approval belongs to the applicable licensed professionals and AHJ when relevant. Do not tell the user to Google something. Answer the question first, then give the useful details. Do not mention internal model names, API keys, credits, or implementation details.`;
+  return `${instructions}${extra ? '\n\n' + extra : ''}\n\nCONVERSATION:\n${transcript || `USER: ${message}`}\n${location ? `\nPROJECT LOCATION: ${location}` : ''}\n\nRespond to the user's latest message in context.`;
+}
+
+const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
+const QUICK_HEAD_START_MS = 3000;
+const quickOut = (q: QuickResult | null) => q && q.kind === 'answer' ? { answer: q.answer, ms: q.ms, label: 'Quick answer, still checking sources' } : null;
+const clarifyOut = (q: QuickResult) => q.kind === 'clarify' ? { question: q.question, options: q.options } : null;
 
 export async function POST(request: Request) {
   let user: Awaited<ReturnType<typeof signedInUser>> = null;
@@ -42,43 +63,101 @@ export async function POST(request: Request) {
     const combined = `${transcript}\nPROJECT LOCATION FIELD: ${location || '(not separately supplied)'}`;
     const research = needsCurrentResearch(combined);
     const jurisdictionSpecific = /\b(zoning|udo|building code|ibc|ada|permit|ordinance|jurisdiction|occupancy|egress|fire code|energy code|setback|parking requirement)\b/i.test(combined);
-    const locationClue = Boolean(location) || /\b(?:in|at|for)\s+[A-Z][A-Za-z .'-]{2,}(?:,\s*[A-Z]{2})?\b/.test(transcript) || /\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*,\s*[A-Z]{2}\b/.test(transcript);
+    // A location counts if it is in the field, anywhere in the conversation (any letter case, e.g. "richmond, va"),
+    // or if Coach just asked where the project is and this message is the reply.
+    const askedWhere = /where is the project located/i.test(history.filter(t => t.role === 'assistant').slice(-1)[0]?.content || '');
+    const locationClue = Boolean(location) || (askedWhere && message.length <= 120) || PLACE.test(transcript) || PLACE.test(message) || /\b(?:in|at)\s+[A-Z][a-z]+/.test(transcript + '\n' + message);
     if (jurisdictionSpecific && !locationClue) {
       return NextResponse.json({ answer: 'Where is the project located (city, state/province, and country)? I need the project jurisdiction before I give you a zoning, code, accessibility, egress, or permitting answer.', sources: [], needs_location: true, researched: false });
     }
+    // V20 speed: a fast call answers first (or asks one clarifying question with options) while the
+    // full researched answer runs. A clarifying question found early is free; one found after the
+    // full job started cancels that job and refunds it, so a question is never charged twice.
+    const useQuick = !!body?.async && !image;
+    const allowClarify = useQuick && !body?.clarified;
+    // V20: the member's own Arch Coach (blueprint, skills, legend, language). Never blocks an answer.
+    const persona = await coachPersona(user.id).catch(() => '');
+    const quickP: Promise<QuickResult | null> = useQuick ? quickCall(quickCoachPrompt(transcript || `USER: ${message}`, location, allowClarify) + (persona ? `\nSTYLE GUIDANCE (keep the JSON format exactly as required):\n${persona}` : ''), allowClarify) : Promise.resolve(null);
+    const early = useQuick ? await Promise.race([quickP, sleep(QUICK_HEAD_START_MS).then(() => undefined)]) : null;
+    const clarifyReply = (q: QuickResult) => { const c = clarifyOut(q)!; return NextResponse.json({ answer: c.question, clarify: c, needs_clarification: true, sources: [], researched: false, credits_charged: 0 }); };
+    if (early && early.kind === 'clarify') return clarifyReply(early);
+
     const priced = questionCost(message, !!image);
     action = priced.action;
     access = await reserveCredits(user, priced.cost, action);
     if (!access.ok) return NextResponse.json({ error: creditMessage(access, priced.cost), ...access }, { status: 402 });
+    if (image) await awardXp(user.id, 'upload', 'img:' + createHash('sha1').update(image).digest('hex'));
 
-    const instructions = `You are Arch Coach, DrawUp's AEC copilot. Be useful, concise, professional, and practical. Preserve context from the entire conversation. Never ask for information the user already supplied in the conversation. If a user gives a location as a follow-up, connect it to the earlier question automatically. For jurisdiction-specific zoning, code, ADA, permitting, standards, firms, projects, products, or other current facts, research current sources and answer from them. Prefer official government/AHJ/code/institutional sources first, then authoritative AEC sources. Clearly distinguish a binding requirement from guidance or a recommendation. Do not claim a design is code compliant; note that final interpretation/approval belongs to the applicable licensed professionals and AHJ when relevant. Do not tell the user to Google something. Answer the question first, then give the useful details. Do not mention internal model names, API keys, credits, or implementation details.`;
+    const input = buildCoachPrompt({ message, transcript, location, extra: persona });
+    const models = modelList(process.env.DRAWUP_COACH_MODEL, process.env.DRAWUP_SEARCH_MODEL, 'gpt-5.6-sol');
+    const payload: any = image ? { input: [{ role: 'user', content: [{ type: 'input_text', text: input }, { type: 'input_image', image_url: image }] }] } : { input };
+    if (research) payload.tools = [{ type: 'web_search' }];
+    const done = (data: any) => NextResponse.json({ answer: outputText(data), sources: sourcesFrom(data), researched: research, credits_charged: access?.credits_charged ?? 0, credits_remaining: access?.credits_remaining ?? null });
 
-    const input = `${instructions}\n\nCONVERSATION:\n${transcript || `USER: ${message}`}\n${location ? `\nPROJECT LOCATION: ${location}` : ''}\n\nRespond to the user's latest message in context.`;
-    const configured = process.env.DRAWUP_COACH_MODEL || process.env.DRAWUP_SEARCH_MODEL;
-    const models = [...new Set([configured, 'gpt-5.6-sol', 'gpt-5'].filter(Boolean))] as string[];
-    let lastError = 'Arch Coach request failed.';
-
-    const base = (process.env.OPENAI_BASE_URL || 'https://api.openai.com/v1').replace(/\/$/, '');
-    const apiKey = process.env.OPENAI_API_KEY;
-    for (const model of models) {
-      const payload: any = image ? { model, input: [{ role: 'user', content: [{ type: 'input_text', text: input }, { type: 'input_image', image_url: image }] }] } : { model, input };
-      if (research) payload.tools = [{ type: 'web_search' }];
-      const response = await fetch(base + '/responses', {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-      const data = await response.json().catch(() => ({}));
-      if (!response.ok) { lastError = data?.error?.message || `OpenAI returned ${response.status}.`; continue; }
-      const answer = outputText(data);
-      if (!answer) { lastError = 'Arch Coach returned an empty response.'; continue; }
-      return NextResponse.json({ answer, sources: sourcesFrom(data), researched: research, credits_charged: access.credits_charged ?? 0, credits_remaining: access.credits_remaining ?? null });
+    // V20: answer as a background job so long researched answers never hit the host's request time limit.
+    // The page polls GET ?ticket=… ; the ticket is signed so only this user can read or refund the job.
+    if (body?.async) {
+      try {
+        const { data } = await openaiCreate({ ...payload, background: true, store: true }, models);
+        if (data?.status === 'completed' && outputText(data)) { await awardXp(user.id, 'ask', data.id || 'sync:' + Date.now()); return done(data); }
+        const quick = early === undefined ? await quickP : early;
+        if (quick && quick.kind === 'clarify' && data?.id) {
+          await openaiCancel(data.id);
+          await refundOnce(user.id, access, action, data.id);
+          return clarifyReply(quick);
+        }
+        if (data?.id) {
+          const ticket = signTicket({ id: data.id, uid: user.id, action, research, access: { ok: access.ok, hq: access.hq, access_type: access.access_type, monthly_used: access.monthly_used, purchased_used: access.purchased_used, is_anonymous: access.is_anonymous, credits_charged: access.credits_charged, credits_remaining: access.credits_remaining } });
+          return NextResponse.json({ ticket, status: data.status || 'queued', quick: quickOut(quick) });
+        }
+      } catch (e: any) {
+        if (!/background|store/i.test(e?.message || '')) throw e;
+      }
     }
-    await refundCredits(user.id, access, action);
-    return NextResponse.json({ error: lastError + ' You were not charged.' }, { status: 502 });
+    const { data } = await openaiCreate(payload, models);
+    if (!outputText(data)) {
+      await refundCredits(user.id, access, action);
+      return NextResponse.json({ error: 'Arch Coach returned an empty response. You were not charged.' }, { status: 502 });
+    }
+    await awardXp(user.id, 'ask', data?.id || 'sync:' + Date.now());
+    return done(data);
   } catch (error: any) {
     console.error('Arch Coach API error', error);
     if (user && access) await refundCredits(user.id, access, action);
     return NextResponse.json({ error: error?.message || 'Arch Coach request failed.' }, { status: 500 });
   }
+}
+
+async function jobFor(request: Request) {
+  const user = await signedInUser(request);
+  const t = readTicket<{ id: string; uid: string; action: string; research: boolean; access: CreditAccess }>(new URL(request.url).searchParams.get('ticket') || '');
+  if (!user || !t || t.uid !== user.id) return null;
+  return t;
+}
+
+export async function GET(request: Request) {
+  const t = await jobFor(request);
+  if (!t) return NextResponse.json({ error: 'This Arch Coach answer belongs to another session.' }, { status: 403 });
+  try {
+    const data = await openaiGet(t.id);
+    if (data.status === 'queued' || data.status === 'in_progress') return NextResponse.json({ status: data.status });
+    const answer = data.status === 'completed' ? outputText(data) : '';
+    if (!answer) {
+      await refundOnce(t.uid, t.access, t.action, t.id);
+      return NextResponse.json({ error: 'Arch Coach could not finish that answer. You were not charged.' }, { status: 502 });
+    }
+    await awardXp(t.uid, 'ask', t.id);
+    return NextResponse.json({ status: 'completed', answer, sources: sourcesFrom(data), researched: t.research, credits_charged: t.access?.credits_charged ?? 0, credits_remaining: t.access?.credits_remaining ?? null });
+  } catch (error: any) {
+    return NextResponse.json({ status: 'in_progress', note: error?.message || 'Still checking.' });
+  }
+}
+
+/** Stops a job the page gave up on (the two-minute limit) and refunds it once. */
+export async function DELETE(request: Request) {
+  const t = await jobFor(request);
+  if (!t) return NextResponse.json({ error: 'Not your job.' }, { status: 403 });
+  await openaiCancel(t.id);
+  await refundOnce(t.uid, t.access, t.action, t.id);
+  return NextResponse.json({ ok: true, refunded: true });
 }

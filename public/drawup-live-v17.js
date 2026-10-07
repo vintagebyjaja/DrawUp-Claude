@@ -21,7 +21,7 @@ let firmCache=null;
 async function loadFirms(){
   if(firmCache)return firmCache;
   const c=await db();if(!c)throw new Error('DrawUp database is not connected.');
-  const {data,error}=await c.from('firms').select('id,slug,name,description,website,logo_url,hero_image_url,is_verified,discipline,firm_offices(city,state,country,is_headquarters,is_confirmed,source)').eq('is_demo',false).order('name').limit(2000);
+  const {data,error}=await c.from('firms').select('*,firm_offices(city,state,country,is_headquarters,is_confirmed,source)').eq('is_demo',false).order('name').limit(2000);
   if(error)throw error;firmCache=data||[];return firmCache;
 }
 
@@ -76,7 +76,7 @@ function firmMatches(f,opts){
   return true;
 }
 function firmCardHTML(f){const hq=hqOf(f),n=(f.firm_offices||[]).length;const site=f.website?String(f.website).replace(/^https?:\/\/(www\.)?/,'').replace(/\/.*$/,''):'';
-  return `<div class="gallery-card du-firm-card" data-page="firm-profile" data-firm-slug="${esc(f.slug)}" tabindex="0" role="button">${f.logo_url?`<img class="gallery-logo" src="${esc(f.logo_url)}" alt="">`:`<div class="gallery-mark">${esc(String(f.name).replace(/[^A-Za-z0-9 ]/g,'').split(/\s+/).filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase()||'DU')}</div>`}<h3>${esc(f.name)}</h3><span class="meta">${esc(hq?officeLine(hq).toUpperCase():'LOCATION NOT LISTED YET')}</span><span class="du-firm-card-sub">${esc(firmKind(f))}${n>1?' · '+n+' offices':''}${site?' · '+esc(site):''}</span>${f.is_verified?'<span class="pill pill-verified">Verified</span>':''}</div>`;}
+  return `<div class="gallery-card du-firm-card" data-page="firm-profile" data-firm-slug="${esc(f.slug)}" tabindex="0" role="button">${f.logo_url?`<img class="gallery-logo" src="${esc(f.logo_url)}" alt="">`:`<div class="gallery-mark">${esc(String(f.name).replace(/[^A-Za-z0-9 ]/g,'').split(/\s+/).filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase()||'DU')}</div>`}<h3>${esc(f.name)}</h3><span class="meta">${esc(hq?officeLine(hq).toUpperCase():'LOCATION NOT LISTED YET')}</span><span class="du-firm-card-sub">${esc(firmKind(f))}${n>1?' · '+n+' offices':''}${site?' · '+esc(site):''}</span>${f.is_verified?'<span class="pill pill-verified">Verified</span>':f.listed_via==='drawup_search'?'<span class="pill pill-listed" title="Added from public sources found by DrawUp Search. Not confirmed by the firm.">From public sources · unconfirmed</span>':''}</div>`;}
 async function renderDiscoverFirms(){
   const fg=$('du-live-discover-firms');if(!fg)return;
   let firms;try{firms=await loadFirms();}catch(e){fg.innerHTML=emptyBlock('Firms unavailable.',e.message||String(e),false);return;}
@@ -114,34 +114,60 @@ async function renderDiscover(){bindDiscoverControls();await Promise.all([render
 /* ---------- profiles ---------- */
 function domainOf(u){try{return new URL(u).hostname.replace(/^www\./,'');}catch(_e){return '';}}
 function officeTag(o){if(o.source==='member_reported'&&!o.is_confirmed)return '<span class="du-office-tag">Reported by a DrawUp member</span>';if(o.source==='public_research'&&!o.is_confirmed)return '<span class="du-office-tag">Unconfirmed</span>';return '';}
+/* Used only when the roster SQL is not installed: rebuild it from public work history and profiles. */
+async function rosterFallback(c,f){
+  try{
+    const pat=String(f.name).replace(/[%_,()]/g,' ').trim();
+    const [{data:car},{data:aff}]=await Promise.all([
+      c.from('career_timeline').select('user_id,role,location,start_date,end_date,verified').ilike('organization',pat).limit(300),
+      c.from('profiles').select('id,title,home_office').ilike('primary_affiliation_name',pat).limit(300)]);
+    const rows=(car||[]).map(r=>({user_id:r.user_id,role:r.role,location:r.location,start_year:r.start_date?+String(r.start_date).slice(0,4):null,end_year:r.end_date?+String(r.end_date).slice(0,4):null,is_current:!r.end_date,verified:!!r.verified}));
+    const have=new Set(rows.map(r=>r.user_id));(aff||[]).forEach(p=>{if(!have.has(p.id))rows.push({user_id:p.id,role:p.title,location:p.home_office,start_year:null,end_year:null,is_current:true,verified:false});});
+    const ids=[...new Set(rows.map(r=>r.user_id))];if(!ids.length)return {data:[]};
+    const {data:ps}=await c.from('profiles').select('id,display_name,username,avatar_url,discoverable,is_public').in('id',ids);
+    const pm=new Map((ps||[]).filter(p=>p.display_name&&p.discoverable!==false&&p.is_public!==false).map(p=>[p.id,p]));
+    return {data:rows.filter(r=>pm.has(r.user_id)).map(r=>({...r,display_name:pm.get(r.user_id).display_name,username:pm.get(r.user_id).username,avatar_url:pm.get(r.user_id).avatar_url})).sort((a,b)=>(b.is_current-a.is_current)||((b.end_year||9999)-(a.end_year||9999))||((a.start_year||9999)-(b.start_year||9999)))};
+  }catch(_e){return {data:[]};}
+}
 function rosterHTML(rows){
   const cur=rows.filter(r=>r.is_current),past=rows.filter(r=>!r.is_current),now=new Date().getFullYear();
   const ini=n=>esc(String(n||'D').split(/\s+/).map(x=>x[0]).slice(0,2).join('').toUpperCase());
   const yrs=r=>r.start_year?(!r.is_current&&r.end_year===r.start_year?String(r.start_year):`${r.start_year}–${r.is_current?'Present':(r.end_year||'')}`):(r.is_current?'Present':(r.end_year?'Until '+r.end_year:'—'));
   const ten=r=>{if(!r.start_year)return '—';const n=(r.is_current?now:(r.end_year||now))-r.start_year;return n<1?'<1 yr':n+' yr'+(n===1?'':'s');};
   const table=(title,list,empty)=>`<div class="du-roster-block"><div class="du-roster-title"><b>${title}</b><span>${list.length}</span></div>${list.length?`<div class="du-roster-scroll"><table class="du-roster"><thead><tr><th>Name</th><th>Position</th><th>Office</th><th>Years</th><th class="num">Tenure</th></tr></thead><tbody>${list.map(r=>`<tr data-du-person="${esc(r.user_id)}" tabindex="0"><td class="who"><div class="du-roster-who"><span class="du-roster-av">${r.avatar_url?`<img src="${esc(r.avatar_url)}" alt="">`:ini(r.display_name)}</span><span><a href="#">${esc(r.display_name)}</a>${r.verified?' <span class="du-check" title="Verified by DrawUp">✓</span>':''}${r.username?`<small>@${esc(r.username)}</small>`:''}</span></div></td><td>${esc(r.role||'—')}</td><td>${esc(r.location||'—')}</td><td class="yrs">${esc(yrs(r))}</td><td class="num">${esc(ten(r))}</td></tr>`).join('')}</tbody></table></div>`:`<p class="meta">${empty}</p>`}</div>`;
-  return `<h3 style="margin-top:22px">Roster</h3><div class="du-roster-wrap">${table('Current team',cur,'No DrawUp members list this firm as their current workplace yet.')}${table('Former team',past,'No DrawUp members list this firm as a past workplace yet.')}</div><p class="meta du-source-note">Built from DrawUp members’ work history. Members choose whether their profile is public.</p>`;
+  return `<h2>Roster</h2><div class="du-roster-wrap">${table('Current team',cur,'No DrawUp members list this firm as their current workplace yet.')}${table('Former team',past,'No DrawUp members list this firm as a past workplace yet.')}</div><p class="meta du-source-note">Built from DrawUp members’ work history. Members choose whether their profile is public.</p>`;
 }
 async function firmProfileHTML(slug){
   const c=await db();if(!c)return null;
   const {data:f,error}=await c.from('firms').select('*,firm_offices(*),firm_photos(image_url,caption,sort_order),firm_services(service),firm_markets(market)').eq('slug',slug).eq('is_demo',false).maybeSingle();
   if(error)return `<article class="du-glass"><h2>Firm unavailable.</h2><p>${esc(error.message)}</p></article>`;if(!f)return null;
-  const [{data:pf},{data:roster},adm]=await Promise.all([
-    c.from('project_firms').select('role,provenance,aec_projects(slug,name,city,state,country,project_type,completion_year,opened_year,description,image_page_url,is_demo,project_images(image_url,is_hero,sort_order))').eq('firm_id',f.id),
-    c.rpc('drawup_firm_roster',{p_firm_id:f.id}).then(r=>({data:r.error?[]:(r.data||[])}),()=>({data:[]})),
-    c.rpc('is_firm_admin',{target_firm_id:f.id}).then(r=>r,()=>({data:false}))]);
+  const [{data:pf},{data:roster},adm,ex]=await Promise.all([
+    c.from('project_firms').select('role,provenance,aec_projects(id,created_at,slug,name,city,state,country,project_type,completion_year,opened_year,description,image_page_url,is_demo,project_images(image_url,is_hero,sort_order))').eq('firm_id',f.id),
+    c.rpc('drawup_firm_roster',{p_firm_id:f.id}).then(r=>r.error?rosterFallback(c,f):{data:r.data||[]},()=>rosterFallback(c,f)),
+    c.rpc('is_firm_admin',{target_firm_id:f.id}).then(r=>r,()=>({data:false})),
+    window.DrawUpFirms?.firmExtras?window.DrawUpFirms.firmExtras(c,f):null]);
   const seen=new Set(),projects=(pf||[]).filter(x=>x.aec_projects&&!x.aec_projects.is_demo&&!seen.has(x.aec_projects.slug)&&seen.add(x.aec_projects.slug));
   const photos=[...(f.hero_image_url?[{image_url:f.hero_image_url}]:[]),...(f.firm_photos||[]).sort((a,b)=>a.sort_order-b.sort_order)];
   const offices=(f.firm_offices||[]).slice().sort((a,b)=>(b.is_headquarters?1:0)-(a.is_headquarters?1:0)||(normCountry(a.country)==='US'?0:1)-(normCountry(b.country)==='US'?0:1)||String(a.state||'').localeCompare(String(b.state||''))||String(a.city).localeCompare(String(b.city)));
   const hq=offices.find(o=>o.is_headquarters);
-  return `<div class="du-live-profile du-firm-profile"><div class="du-live-profile-head">${f.logo_url?`<img class="du-live-logo" src="${esc(f.logo_url)}" alt="">`:''}<div><span class="eyebrow">DrawUp Firm Profile${f.discipline?' · '+esc(f.discipline):''}</span><h1>${esc(f.name)}</h1><p>${hq?'Headquarters: '+esc(officeLine(hq))+' · ':''}${offices.length} office${offices.length===1?'':'s'}${f.founded_year?' · Founded '+esc(f.founded_year):''} ${tag(f)}</p></div><div class="du-firm-actions">${f.website?`<a class="btn btn-ghost btn-sm" href="${esc(f.website)}" target="_blank" rel="noopener">${esc(domainOf(f.website)||'Firm website')} ↗</a>`:''}${adm?.data===true?`<button class="btn btn-primary btn-sm" type="button" data-du-manage-firm="${esc(f.slug)}">Manage this firm</button>`:''}</div></div>
-  ${photos.length?`<div class="du-live-photos">${photos.slice(0,6).map(p=>`<figure><img src="${esc(p.image_url)}" alt="${esc(p.caption||f.name)}" loading="lazy">${p.caption?`<figcaption>${esc(p.caption)}</figcaption>`:''}</figure>`).join('')}</div>`:''}
-  ${f.description?`<p class="du-live-desc">${esc(f.description)}</p>`:''}
-  ${(f.firm_services||[]).length||(f.firm_markets||[]).length?`<p class="meta">${esc([...(f.firm_services||[]).map(x=>x.service),...(f.firm_markets||[]).map(x=>x.market)].join(' · '))}</p>`:''}
-  <h3 style="margin-top:22px">Offices</h3>${offices.length?`<div class="du-office-grid">${offices.map(o=>`<div class="du-office"><b>${esc(officeLine(o)||o.city)}</b>${o.is_headquarters?'<span class="du-office-hq">Headquarters</span>':''}${o.address?`<small>${esc(o.address)}</small>`:''}${o.phone?`<a href="tel:${esc(o.phone)}">${esc(o.phone)}</a>`:''}${officeTag(o)}</div>`).join('')}</div>${f.source_url?`<p class="meta du-source-note">Office list from ${esc(domainOf(f.source_url))}${/^Unconfirmed/.test(f.research_note||'')?' and other public sources (not yet confirmed by the firm)':''}. Members add offices automatically when they list this firm in their work history.</p>`:''}`:'<p class="meta">No offices on file yet. Members add them automatically when they list this firm and its city in their work history.</p>'}
-  ${rosterHTML(roster||[])}
-  <h3 style="margin-top:22px">Projects on DrawUp</h3>${projects.length?`<div class="card-grid du-firm-projects">${projects.map(x=>projectCard({...x.aec_projects,project_firms:[{role:x.role,firms:{name:f.name,slug:f.slug}}]})).join('')}</div>`:'<p class="meta">No projects are attributed to this firm in DrawUp yet.</p>'}
-  ${f.is_verified?'':'<p class="disclaimer">This firm has not claimed its DrawUp profile. Details shown come from DrawUp\'s directory record and public sources.</p>'}</div>`;
+  const cur=(roster||[]).filter(r=>r.is_current).length,hero=photos[0]?.image_url||'',firstPhoto=hero?1:0;
+  const services=[...(f.firm_services||[]).map(x=>x.service),...(f.firm_markets||[]).map(x=>x.market)];
+  const stat=(n,l)=>`<div class="du-fp-stat"><b>${esc(n)}</b><span>${esc(l)}</span></div>`;
+  const FX=ex&&window.DrawUpFirms,plist=projects.map(x=>({...x.aec_projects,role:x.role}));
+  return `<div class="du-live-profile du-firm-profile du-fp" data-firm="${esc(f.slug)}">
+  <header class="du-fp-hero${hero?'':' plain'}"${hero?` style="--fp-hero:url('${esc(hero).replace(/'/g,'%27')}')"`:''}><div class="du-fp-hero-in">
+    <div class="du-fp-logo">${f.logo_url?`<img src="${esc(f.logo_url)}" alt="${esc(f.name)} logo">`:`<span>${esc(String(f.name).split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase())}</span>`}</div>
+    <div class="du-fp-id"><span class="du-fp-kicker">DrawUp Firm Profile${f.discipline?' · '+esc(f.discipline):''}</span><h1>${esc(f.name)}</h1><p>${hq?esc(officeLine(hq))+' headquarters':''}${f.founded_year?(hq?' · ':'')+'Founded '+esc(f.founded_year):''} ${tag(f)}</p></div>
+  </div></header>
+  <div class="du-fp-bar"><div class="du-fp-stats">${stat(offices.length,offices.length===1?'Office':'Offices')}${stat(projects.length,projects.length===1?'Project on DrawUp':'Projects on DrawUp')}${stat(cur,'Team on DrawUp')}${f.founded_year?stat(f.founded_year,'Founded'):''}</div>
+    <div class="du-fp-actions"><button class="du-fp-btn primary" type="button" data-du-showcase="${esc(f.slug)}">View firm showcase</button>${f.website?`<a class="du-fp-btn" href="${esc(f.website)}" target="_blank" rel="noopener">${esc(domainOf(f.website)||'Website')} ↗</a>`:''}${adm?.data===true?`<button class="du-fp-btn accent" type="button" data-du-manage-firm="${esc(f.slug)}">Manage this firm</button>`:''}</div></div>
+  ${FX?FX.tabsHTML(f,ex):''}<div class="du-fp-body" data-fp-pane="overview">
+  <section class="du-fp-about"><div><h2>About</h2>${f.description?`<p class="du-live-desc">${esc(f.description)}</p>`:'<p class="meta">This firm has not added a description yet.</p>'}${services.length?`<div class="du-fp-tags">${services.map(x=>`<span>${esc(x)}</span>`).join('')}</div>`:''}</div>
+    ${photos.length>firstPhoto?`<div class="du-fp-photos">${photos.slice(firstPhoto,firstPhoto+4).map(p=>`<figure><img src="${esc(p.image_url)}" alt="${esc(p.caption||f.name)}" loading="lazy">${p.caption?`<figcaption>${esc(p.caption)}</figcaption>`:''}</figure>`).join('')}</div>`:''}</section>
+  ${FX?FX.projectsHTML(f,plist,ex):`<section><h2>Projects</h2>${projects.length?`<div class="card-grid du-firm-projects">${projects.slice(0,6).map(x=>projectCard({...x.aec_projects,project_firms:[{role:x.role,firms:{name:f.name,slug:f.slug}}]})).join('')}</div>${projects.length>6?`<p><button class="du-fp-btn" type="button" data-du-showcase="${esc(f.slug)}">See all ${projects.length} projects in the showcase</button></p>`:''}`:'<p class="meta">No projects are attributed to this firm on DrawUp yet.</p>'}</section>`}
+  <section><h2>Offices</h2>${offices.length?`<div class="du-office-grid">${offices.map(o=>`<div class="du-office"><b>${esc(officeLine(o)||o.city)}</b>${o.is_headquarters?'<span class="du-office-hq">Headquarters</span>':''}${o.address?`<small>${esc(o.address)}</small>`:''}${o.phone?`<a href="tel:${esc(o.phone)}">${esc(o.phone)}</a>`:''}${officeTag(o)}</div>`).join('')}</div>${f.source_url?`<p class="meta du-source-note">Office list from ${esc(domainOf(f.source_url))}${/^Unconfirmed/.test(f.research_note||'')?' and other public sources (not yet confirmed by the firm)':''}. Members add offices automatically when they list this firm in their work history.</p>`:''}`:'<p class="meta">No offices on file yet. Members add them automatically when they list this firm and its city in their work history.</p>'}</section>
+  <section>${rosterHTML(roster||[])}</section>
+  ${f.is_verified?'':'<p class="disclaimer">This firm has not claimed its DrawUp profile. Details shown come from DrawUp\'s directory record and public sources.</p>'}</div>${FX?`<div class="du-fp-body" data-fp-pane="locations" hidden>${FX.locationsHTML(f,ex)}</div>`:''}</div>`;
 }
 async function projectProfileHTML(slug){
   const c=await db();if(!c)return null;
@@ -166,6 +192,8 @@ function bindProfileLinks(root,openFirm,openProj){
   root.querySelectorAll('[data-firm-slug]').forEach(a=>a.onclick=e=>{e.preventDefault();e.stopPropagation();openFirm(a.dataset.firmSlug);});
   root.querySelectorAll('[data-project-slug]').forEach(a=>a.onclick=e=>{e.preventDefault();e.stopPropagation();openProj(a.dataset.projectSlug);});
   root.querySelectorAll('[data-du-person]').forEach(tr=>{const go=e=>{if(e.type==='keydown'&&e.key!=='Enter')return;e.preventDefault();e.stopPropagation();window.DrawUpV19?.openPerson?.(tr.dataset.duPerson);};tr.onclick=go;tr.onkeydown=go;});
+  root.querySelectorAll('[data-du-showcase]').forEach(b=>b.onclick=e=>{e.preventDefault();e.stopPropagation();window.DrawUpV20?.openShowcase?.(b.dataset.duShowcase);});
+  window.DrawUpFirms?.bind?.(root);
   root.querySelectorAll('[data-du-manage-firm]').forEach(b=>b.onclick=e=>{e.preventDefault();e.stopPropagation();try{sessionStorage.setItem('du-manage-firm',b.dataset.duManageFirm);}catch(_e){}if(window.DrawUpPortal?.isSignedIn?.()){window.DrawUpPortal.openPortal('firm');window.DrawUpPortal.openPortalTab('firm');}});
 }
 function showPublicPage(id){const link=document.querySelector(`[data-page="${id}"]`);document.querySelectorAll('.page').forEach(p=>p.hidden=p.id!=='page-'+id);history.replaceState(null,'','#'+id);window.scrollTo(0,0);}
@@ -174,6 +202,7 @@ async function openFirm(slug){
   document.querySelectorAll('.v12-portal.open').forEach(x=>x.classList.remove('open'));
   const host=$('du-live-firm-profile');if(!host)return;host.innerHTML='<p class="meta">Loading firm…</p>';showPublicPage('firm-profile');
   host.innerHTML=(await firmProfileHTML(slug))||emptyBlock('Firm not found.','This firm is not in the DrawUp directory.',false);bindProfileLinks(host,openFirm,openProject);
+  if(/^[a-z0-9-]+$/.test(slug||''))history.replaceState(null,'','#firm/'+slug);
 }
 async function openProject(slug){
   if(window.DrawUpPortal?.isSignedIn?.()&&document.getElementById('du-portal')?.classList.contains('open'))return window.DrawUpPortal.openProject(slug);

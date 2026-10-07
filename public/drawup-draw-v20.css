@@ -1,0 +1,33 @@
+/* DrawUp Draw V20 — more tools, wall types, heights (pairs with drawup-draw-core-v18.js + drawup-tools-v18.js) */
+.du-draw-bar20{flex-direction:column;align-items:stretch;gap:8px}
+.du-draw-bar20 .du-draw-tools{gap:5px}
+.du-draw-bar20 .du-draw-tools button{padding:6px 9px}
+.du-draw-opts{min-height:34px}
+.du-draw-opt:empty{display:none}
+.du-draw-opt label{color:#9fb8cc;font-size:12.5px;display:flex;gap:6px;align-items:center}
+.du-draw-opt select{max-width:300px}
+.du-draw-hint{color:#8fb0c6;font-size:12px;line-height:1.35;flex:1 1 260px;min-width:0}
+.du-draw-spacer{flex:0 0 0}
+.du-draw-canvas{position:relative}
+.du-draw-svghost{width:100%;height:100%}
+.du-draw-canvas .du-item-hit{cursor:move}
+.du-draw-canvas [data-room]{cursor:move}
+.du-draw-readout{position:absolute;left:12px;top:12px;background:rgba(8,27,45,.92);color:#eaf7ff;border:1px solid rgba(117,224,255,.35);border-radius:9px;padding:6px 10px;font:600 13px 'IBM Plex Mono',ui-monospace,monospace;pointer-events:none}
+.du-draw-legend{display:grid;gap:6px;margin:10px 0;font-size:12.5px;color:#cfe9f7}
+.du-draw-legend b{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#9fb8cc}
+.du-draw-legend span{display:flex;align-items:center;gap:8px}
+.du-wt-sw{display:inline-block;width:30px;height:12px;border:1px solid #0d1b2a;flex:0 0 auto}
+.du-wt-sw[data-hatch=wood]{background-image:repeating-linear-gradient(45deg,transparent 0 6px,#0d1b2a 6px 7px)!important}
+.du-wt-sw[data-hatch=cmu]{background-image:repeating-linear-gradient(45deg,transparent 0 3px,#0d1b2a 3px 4px)!important}
+.du-wt-sw[data-hatch=rated]{background-image:repeating-linear-gradient(-45deg,transparent 0 3px,#0d1b2a 3px 4px)!important}
+.du-wt-sw[data-hatch=brick]{background-image:repeating-linear-gradient(45deg,transparent 0 2px,#0d1b2a 2px 3px),repeating-linear-gradient(-45deg,transparent 0 2px,#0d1b2a 2px 3px)!important}
+.du-wt-sw[data-hatch=conc]{background-image:radial-gradient(#0d1b2a .8px,transparent 1px)!important;background-size:4px 4px!important}
+.du-wt-sw[data-hatch=metal]{background-image:linear-gradient(transparent 5px,#0d1b2a 5px 6px,transparent 6px)!important}
+.du-wt-sw[data-hatch=glass]{background-image:linear-gradient(transparent 5px,#0d1b2a 5px 6px,transparent 6px)!important}
+.du-wt-sw[data-hatch=low]{background-image:repeating-linear-gradient(90deg,transparent 0 4px,#0d1b2a 4px 5px)!important}
+.du-draw-inspect .du-two{gap:8px}
+@media (max-width:640px){
+  .du-draw-bar20 .du-draw-tools button{padding:6px 8px;font-size:12px}
+  .du-draw-hint{flex-basis:100%}
+  .du-draw-canvas{min-height:420px;height:60vh}
+}

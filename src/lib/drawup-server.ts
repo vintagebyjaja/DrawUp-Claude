@@ -2,6 +2,8 @@
 // Nothing here is ever sent to the browser: it uses the Supabase service role and
 // the OpenAI key, so it must only be imported from src/app/api/**.
 
+import { createHmac, timingSafeEqual } from 'node:crypto';
+
 export const SB_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 export const SB_ANON = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || '';
 const SB_SERVICE = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
@@ -211,4 +213,38 @@ export function bytesToBase64(bytes: ArrayBuffer | Uint8Array) {
 /** Owner folder check for storage paths ("<uid>/..."), mirrors storage_path_is_own() in SQL. */
 export function pathIsOwn(path: string, userId: string) {
   return typeof path === 'string' && path.split('/')[0] === userId && !path.includes('..');
+}
+
+/* ------------------------------------------------------------------ background job tickets */
+/** Signs a small JSON payload so a background job can only be read (and refunded) by the user who started it. */
+export function signTicket(payload: Record<string, unknown>) {
+  const body = Buffer.from(JSON.stringify(payload)).toString('base64url');
+  const mac = createHmac('sha256', SB_SERVICE || OPENAI_KEY || 'drawup').update(body).digest('base64url');
+  return body + '.' + mac;
+}
+export function readTicket<T = any>(ticket: string): T | null {
+  const [body, mac] = String(ticket || '').split('.');
+  if (!body || !mac) return null;
+  const want = createHmac('sha256', SB_SERVICE || OPENAI_KEY || 'drawup').update(body).digest('base64url');
+  const a = Buffer.from(mac), b = Buffer.from(want);
+  if (a.length !== b.length || !timingSafeEqual(a, b)) return null;
+  try { return JSON.parse(Buffer.from(body, 'base64url').toString()); } catch { return null; }
+}
+
+/** Refunds a background job at most once, using the credit ledger as the record. Never throws. */
+export async function refundOnce(userId: string, access: CreditAccess | null | undefined, action: string, jobId: string) {
+  if (!access?.ok || access.hq || !access.access_type) return;
+  const tag = action + ':' + jobId;
+  try {
+    const seen = await adminRest(`arch_coach_credit_ledger?user_id=eq.${userId}&metadata->>action=eq.${encodeURIComponent(tag)}&select=id&limit=1`);
+    if (seen.ok && (await seen.json()).length) return;
+    await refundCredits(userId, access, tag);
+    if (access.is_anonymous) await adminRest('arch_coach_credit_ledger', { method: 'POST', body: JSON.stringify({ user_id: userId, delta: 0, reason: 'arch_coach_guest_refund', metadata: { action: tag } }) });
+  } catch (e) {
+    console.error('[drawup] refundOnce failed', tag, e);
+  }
+}
+
+export async function openaiCancel(id: string) {
+  try { await fetch(`${OPENAI_BASE}/responses/${encodeURIComponent(id)}/cancel`, { method: 'POST', headers: { Authorization: `Bearer ${OPENAI_KEY}` } }); } catch {}
 }

@@ -1,0 +1,67 @@
+/* DrawUp v20: firm featured work, Locations & Studios tab, unit (office / studio) profile pages.
+   White professional layout, same family as the .du-fp firm profile in drawup-v20.css. */
+.du-fp-tabs{display:flex;gap:4px;padding:0 32px;border-bottom:1px solid #e5e7eb;background:#fff;overflow-x:auto;scrollbar-width:none}
+.du-fp-tabs::-webkit-scrollbar{display:none}
+.du-fp-tabs button{flex:0 0 auto;appearance:none;border:0;background:none;font:inherit;font-weight:700;font-size:15px;color:#475569;padding:15px 14px 13px;border-bottom:3px solid transparent;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.du-fp-tabs button:hover{color:#0f172a}
+.du-fp-tabs button.on{color:#0f172a;border-bottom-color:#ff6a2b}
+.du-fp-tabs button span{background:#f1f5f9;border-radius:99px;padding:2px 8px;font-size:12px;color:#334155}
+.du-fp-sechead{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.du-fp-sechead h2{margin:0!important}
+.du-fp-count{color:#64748b;font-weight:600}
+.du-fp-plist{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:0 28px}
+.du-fp-plist li{padding:10px 0;border-bottom:1px solid #eef0f3;min-width:0}
+.du-fp-plist li a{font-weight:700;color:#0f172a!important;text-decoration:none}
+.du-fp-plist li a:hover{text-decoration:underline}
+.du-fp-plist small{display:block;color:#64748b;font-size:13px;margin-top:2px;overflow-wrap:anywhere}
+.du-fp-star,.du-sc-feat{display:inline-block;margin-left:8px;font:700 10px/1 ui-monospace,Menlo,monospace;letter-spacing:.12em;text-transform:uppercase;color:#9a3412;background:#fff1e8;border:1px solid #fed7aa;border-radius:99px;padding:4px 7px;vertical-align:middle}
+.du-sc-feat{margin:0 0 6px;display:inline-block}
+/* unit cards */
+.du-fu-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
+.du-fu-card{display:flex;flex-direction:column;border:1px solid #e2e8f0;border-radius:14px;overflow:hidden;background:#fff;color:#0f172a!important;text-decoration:none;transition:box-shadow .15s,transform .15s}
+.du-fu-card:hover{box-shadow:0 8px 26px rgba(15,23,42,.12);transform:translateY(-1px)}
+.du-fu-img{display:block;position:relative;overflow:hidden;aspect-ratio:16/9;background:#f1f5f9}
+.du-fu-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.du-fu-img.none{display:grid;place-items:center;background:linear-gradient(120deg,#0f172a,#1e293b 60%,#334155)}
+.du-fu-img.none b{color:#bfe9ff;font:700 12px/1 ui-monospace,Menlo,monospace;letter-spacing:.18em;text-transform:uppercase}
+.du-fu-txt{display:flex;flex-direction:column;gap:4px;padding:14px 16px 16px}
+.du-fu-kind{font:700 10.5px/1.2 ui-monospace,Menlo,monospace;letter-spacing:.14em;text-transform:uppercase;color:#c2410c}
+.du-fu-txt b{font-size:17px;line-height:1.25}
+.du-fu-txt small{color:#475569;font-size:13px}
+.du-fu-txt p{margin:4px 0 0;color:#334155;font-size:14px;line-height:1.5}
+.du-fu-meta{margin-top:6px;color:#64748b!important}
+/* unit page */
+.du-fu-crumb{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:12px 32px;font-size:14px;background:#f8fafc;border-bottom:1px solid #e5e7eb;color:#475569}
+.du-fu-crumb a{color:#0b5bd3!important;text-decoration:none;font-weight:600}
+.du-fu-crumb a:hover{text-decoration:underline}
+.du-fu-crumb b{color:#0f172a;overflow-wrap:anywhere}
+.du-fu-lead{margin:12px 0 0;color:#1f2937}
+.du-fu-office{display:flex;flex-wrap:wrap;gap:10px 16px;margin-top:12px;color:#334155;font-size:14px}
+.du-fp-photos figure button,.du-fu-gallery button{all:unset;cursor:zoom-in;display:block;width:100%}
+.du-fu-gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px}
+.du-fu-gallery img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:10px;display:block}
+.du-fu-team{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px}
+.du-fu-person{display:flex;align-items:center;gap:10px;text-align:left;border:1px solid #e2e8f0;border-radius:12px;background:#fff;padding:10px 12px;font:inherit;color:#0f172a;cursor:pointer}
+.du-fu-person:disabled{cursor:default}
+.du-fu-person:not(:disabled):hover{background:#f8fafc}
+.du-fu-person b{display:block;font-size:15px}
+.du-fu-person small{display:block;color:#64748b;font-size:12.5px}
+.du-fu .du-roster-av{flex:0 0 38px;width:38px;height:38px;border-radius:50%;background:#e2e8f0;display:grid;place-items:center;font-weight:800;font-size:13px;color:#334155;overflow:hidden}
+.du-fu .du-roster-av img{width:100%;height:100%;object-fit:cover}
+/* firm admin (dark portal) */
+.du-fa-fcount{font:700 12px/1 ui-monospace,Menlo,monospace;color:#7fe7ff;letter-spacing:.08em}
+.du-fa-feat{list-style:none;margin:10px 0;padding:0;display:grid;gap:6px}
+.du-fa-feat li{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 12px;border:1px solid rgba(127,231,255,.25);border-radius:12px;background:rgba(127,231,255,.06)}
+.du-fa-feat li b{flex:1 1 220px;min-width:0}
+.du-fa-feat li small{opacity:.75}
+.du-fa-feat li span{display:flex;gap:6px}
+.du-fa-pick{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.du-fa-fmsg.bad{color:#ffb4a8;font-weight:700}
+.du-fa-check{display:flex;align-items:baseline;gap:8px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.08);cursor:pointer}
+.du-fa-check small{opacity:.7}
+@media (max-width:820px){
+  .du-fp-tabs{padding:0 12px}.du-fu-crumb{padding:10px 18px}
+  .du-fp-plist{grid-template-columns:1fr}
+  .du-fu-grid,.du-fu-team{grid-template-columns:1fr}
+  .du-fu-gallery{grid-template-columns:repeat(2,1fr)}
+}

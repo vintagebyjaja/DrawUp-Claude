@@ -1,0 +1,114 @@
+/* DrawUp V20 — phone app shell (<=820px). One bottom tab bar for the public site and the Portal,
+   scrollable screens that end above the bar, no sideways scroll, iOS-safe inputs.
+   Desktop (>820px) is untouched: every rule below lives inside the phone media query except #du-mbar{display:none}. */
+#du-mbar,#du-more-sheet,#du-more-backdrop{display:none}
+
+@media (max-width:820px){
+  :root{--du-mbar-h:62px;--du-mbar-total:calc(var(--du-mbar-h) + env(safe-area-inset-bottom,0px))}
+
+  /* ---------- the bar ---------- */
+  #du-mbar{display:block;position:fixed;left:0;right:0;bottom:0;z-index:12850;height:var(--du-mbar-total);
+    padding:0 max(4px,env(safe-area-inset-right,0px)) env(safe-area-inset-bottom,0px) max(4px,env(safe-area-inset-left,0px));
+    background:rgba(6,10,17,.96);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);
+    border-top:1px solid rgba(127,231,255,.16);box-shadow:0 -10px 30px rgba(0,0,0,.35);
+    font-family:"IBM Plex Sans",Inter,system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-tap-highlight-color:transparent}
+  #du-mbar .du-mbar-row{display:grid;height:var(--du-mbar-h);align-items:stretch}
+  #du-mbar .du-mbar-public{grid-template-columns:repeat(6,minmax(0,1fr))}
+  #du-mbar .du-mbar-portal{grid-template-columns:repeat(5,minmax(0,1fr))}
+  html.du-in-portal #du-mbar .du-mbar-public,html:not(.du-in-portal) #du-mbar .du-mbar-portal{display:none}
+  #du-mbar a,#du-mbar button{position:relative;display:flex;min-width:0;min-height:48px;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+    margin:0;padding:6px 2px 4px;border:0;background:transparent;color:#93a3b8;text-decoration:none;cursor:pointer;
+    font-family:inherit;font-size:10.5px;font-weight:600;line-height:1.1;letter-spacing:.01em;white-space:nowrap}
+  #du-mbar a span,#du-mbar button span{max-width:100%;overflow:hidden;text-overflow:ellipsis}
+  #du-mbar svg{width:23px;height:23px;flex:0 0 auto;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+  #du-mbar .active{color:#7fe7ff}
+  #du-mbar .active svg{filter:drop-shadow(0 0 7px rgba(127,231,255,.65))}
+  #du-mbar .active::before{content:"";position:absolute;top:0;left:28%;right:28%;height:2px;border-radius:0 0 3px 3px;background:linear-gradient(90deg,#ff9a62,#7fe7ff,#a98bff)}
+  #du-mbar a:focus-visible,#du-mbar button:focus-visible{outline:2px solid #7fe7ff;outline-offset:-4px;border-radius:12px}
+
+  /* ---------- Portal "More" sheet ---------- */
+  #du-more-backdrop{display:block;position:fixed;inset:0;z-index:12840;background:rgba(2,6,12,.55);opacity:0;pointer-events:none;transition:opacity .18s}
+  #du-more-backdrop.open{opacity:1;pointer-events:auto}
+  #du-more-sheet{display:block;position:fixed;left:0;right:0;bottom:var(--du-mbar-total);z-index:12845;max-height:calc(100dvh - var(--du-mbar-total) - 56px);overflow-y:auto;overscroll-behavior:contain;
+    padding:10px 16px 16px;border-radius:22px 22px 0 0;background:linear-gradient(180deg,#0c1a2a,#07121f);border:1px solid rgba(127,231,255,.18);border-bottom:0;
+    color:#eef7ff;transform:translateY(calc(100% + var(--du-mbar-total) + 10px));transition:transform .22s ease;visibility:hidden}
+  #du-more-sheet.open{transform:none;visibility:visible}
+  #du-more-sheet .du-more-grip{width:42px;height:4px;border-radius:4px;background:rgba(255,255,255,.22);margin:2px auto 12px}
+  #du-more-sheet h2{margin:0 2px 12px;font:800 13px/1 "IBM Plex Mono",ui-monospace,monospace;letter-spacing:.16em;text-transform:uppercase;color:#7fe7ff}
+  #du-more-sheet .du-more-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+  #du-more-sheet button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:76px;padding:10px 4px;border-radius:16px;
+    border:1px solid rgba(127,231,255,.14);background:rgba(255,255,255,.04);color:#e8f4ff;font:650 13px/1.1 inherit;cursor:pointer}
+  #du-more-sheet button[hidden]{display:none}
+  #du-more-sheet button .du-more-ic{font-size:21px;line-height:1;color:#7fe7ff}
+  #du-more-sheet button.active{border-color:rgba(127,231,255,.55);background:rgba(127,231,255,.12)}
+  #du-more-sheet .du-more-out{grid-column:1/-1;min-height:46px;flex-direction:row;color:#ffb38a;border-color:rgba(255,154,98,.25)}
+
+  /* ---------- replace the old bars ---------- */
+  .mobile-bottom-nav{display:none!important}
+  #du-portal .du-side{display:none!important}
+  #du-portal .du-portal-shell{grid-template-columns:minmax(0,1fr)!important;min-height:0!important}
+
+  /* ---------- public shell ---------- */
+  html,body{overflow-x:hidden}
+  body{padding-bottom:calc(var(--du-mbar-total) + 12px)!important}
+  footer{padding-bottom:calc(var(--du-mbar-total) + 18px)!important}
+  .nav-links,.nav-search{display:none!important}
+  .mobile-menu-btn{display:grid!important;width:42px;height:42px;place-items:center;border:1px solid rgba(191,224,247,.25);border-radius:50%;background:#11131a;color:#dfeaff;font-size:20px;cursor:pointer}
+  .mobile-drawer{padding-bottom:calc(var(--du-mbar-total) + 24px)!important;max-height:100dvh}
+  .mobile-drawer-backdrop,.mobile-drawer{z-index:12860!important}
+  .chat-drawer{bottom:var(--du-mbar-total)!important;max-height:calc(100dvh - var(--du-mbar-total))}
+  /* signed in on the public site: keep the account/Portal button in the top bar */
+  html.du-authenticated #drawup-signin{display:inline-flex!important;align-items:center;min-height:40px;padding:0 14px;border-radius:999px;border:1px solid rgba(127,231,255,.45);color:#bfefff;font-weight:700;font-size:13px;white-space:nowrap;text-decoration:none}
+
+  /* ---------- full-screen layers end above the bar and scroll inside ---------- */
+  #du-portal,.v12-portal,.du-sc{bottom:var(--du-mbar-total)!important;height:auto!important;overflow-y:auto!important;overflow-x:hidden!important;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+  #du-portal .du-workspace{padding-bottom:28px!important;min-width:0}
+  #du-portal .du-portal-embedded-page{padding-bottom:12px!important}
+  .du-v19-overlay,.du-swap-lightbox{bottom:var(--du-mbar-total)!important}
+  .du-v19-overlay{padding:12px!important;place-items:center}
+  .du-v19-sheet{max-height:calc(100dvh - var(--du-mbar-total) - 24px)!important;overscroll-behavior:contain;padding:22px 18px!important}
+  .du-sc-body{padding-bottom:28px!important}
+  .du-swap-lb-stage img{max-height:calc(100dvh - var(--du-mbar-total) - 110px)!important}
+  .sw20-brush-frame img{max-height:calc(100dvh - 150px)!important}
+  .du-coach-shell{min-height:calc(100dvh - 90px - var(--du-mbar-total))!important}
+
+  /* Arch Coach "create your coach" card (drawup-coach-v20) floats above the tab bar, not over it */
+  .ac-prompt{left:12px!important;right:12px!important;width:auto!important;bottom:calc(var(--du-mbar-total) + 10px)!important;max-height:calc(100dvh - var(--du-mbar-total) - 90px);overflow-y:auto}
+
+  /* ---------- nothing wider than the screen ---------- */
+  #du-portal .du-workspace,#du-portal #du-workspace-content,.v12-portal-inner,.du-sc-body{max-width:100%;overflow-wrap:anywhere}
+  img,video,canvas,iframe{max-width:100%}
+  pre,table{max-width:100%;overflow-x:auto}
+
+  /* ---------- iOS: 16px inputs never zoom ---------- */
+  input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]):not([type=color]),textarea,select{font-size:16px!important}
+
+  /* ---------- tab strips scroll sideways instead of squeezing ---------- */
+  .du-subtabs{flex-wrap:nowrap!important;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;max-width:100%}
+  .du-subtabs::-webkit-scrollbar{display:none}
+  .du-subtabs>button,.du-subtabs>a{flex:0 0 auto!important;white-space:nowrap}
+
+  /* ---------- tap targets ---------- */
+  .subtab,.gallery-chip,.btn,.du-btn,#du-portal button:not(.du-avatar),[id^="page-"] button,.v12-portal button,.du-sc button,.du-v19-sheet button{min-height:40px}
+  #back-btn,.back-bar button{min-height:40px;padding-inline:14px}
+  #university-regions button{display:inline-flex;align-items:center;min-height:40px}
+
+  /* ---------- home: hero art fills the hero, no empty dark band under it ---------- */
+  html body #page-home>.hero{background-size:auto 100%!important;background-position:58% top!important}
+  html body #page-home>.countdown-band{padding-top:22px}
+}
+
+/* tablets 701–820 also use the phone top bar (the old phone rules stop at 700px) */
+@media (min-width:701px) and (max-width:820px){
+  .nav-inner{min-height:66px;display:grid!important;grid-template-columns:1fr auto auto;gap:10px;padding:10px 18px}
+  .nav-right{display:contents}.nav-signin{display:none!important}
+  .nav-right .btn-primary{grid-column:2;border-radius:999px;white-space:nowrap}
+  .mobile-menu-btn{grid-column:3}
+  .mobile-drawer-backdrop{position:fixed;display:block;inset:0;background:rgba(0,0,0,.58);opacity:0;pointer-events:none;transition:.2s}.mobile-drawer-backdrop.open{opacity:1;pointer-events:auto}
+  .mobile-drawer{position:fixed;display:block;top:0;right:0;bottom:0;width:min(86vw,360px);padding:calc(18px + env(safe-area-inset-top)) 18px 90px;background:#0c0e14;border-left:1px solid rgba(191,224,247,.16);transform:translateX(102%);transition:transform .24s ease;overflow-y:auto}.mobile-drawer.open{transform:translateX(0)}
+  .mobile-drawer-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}.mobile-drawer-head strong{font-size:22px;color:#fff}.mobile-drawer-close{width:40px;height:40px;border-radius:50%;border:1px solid rgba(255,255,255,.12);background:#151821;color:#fff;font-size:20px}
+  .mobile-drawer-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.mobile-drawer-grid a{display:flex;min-height:64px;align-items:flex-end;padding:12px;border:1px solid rgba(191,224,247,.12);border-radius:15px;background:#12151d;color:#e8edf6;text-decoration:none;font-weight:650}
+  #page-home .hero-copy{position:relative;z-index:4;max-width:540px;margin-left:22px;padding:22px 22px;border:1px solid rgba(191,224,247,.15);border-radius:22px;background:linear-gradient(180deg,rgba(8,9,13,.5),rgba(8,9,13,.9));-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+  .mobile-drawer .drawer-cta{display:block;margin-top:14px;text-align:center;padding:13px;border-radius:999px;background:var(--panel-grad);color:#07111c;text-decoration:none;font-weight:800}
+}
+@media (max-width:360px){#du-mbar a,#du-mbar button{font-size:9.5px}#du-mbar svg{width:21px;height:21px}}
