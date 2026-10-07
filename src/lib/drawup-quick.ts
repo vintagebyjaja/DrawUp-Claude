@@ -12,7 +12,7 @@ export function fastModels() {
 
 export type QuickOption = { label: string; value: string };
 export type QuickResult =
-  | { kind: 'answer'; answer: string; title?: string; entity_type?: string; location?: string; model: string; ms: number }
+  | { kind: 'answer'; answer: string; final?: boolean; title?: string; entity_type?: string; location?: string; model: string; ms: number }
   | { kind: 'clarify'; question: string; options: QuickOption[]; model: string; ms: number };
 
 function parseJson(text: string) {
@@ -41,7 +41,7 @@ export function readQuick(obj: any, allowClarify: boolean, model: string, ms: nu
   }
   const answer = String(obj.answer || '').trim().slice(0, 1500);
   if (!answer) return null;
-  return { kind: 'answer', answer, title: clip(obj.title, 200) || undefined, entity_type: clip(obj.entity_type, 40) || undefined, location: clip(obj.location, 160) || undefined, model, ms };
+  return { kind: 'answer', answer, final: obj.final === true, title: clip(obj.title, 200) || undefined, entity_type: clip(obj.entity_type, 40) || undefined, location: clip(obj.location, 160) || undefined, model, ms };
 }
 
 /** One fast call with a hard timeout. Never throws: returns null on timeout or any error. */
@@ -89,8 +89,9 @@ export function quickCoachPrompt(conversation: string, location: string, allowCl
 ${conversation}
 ${location ? `PROJECT LOCATION: ${location}\n` : ''}${allowClarify ? CLARIFY_RULES + `
 If you must clarify, return {"clarify":true,"question":"<one short question>","options":[{"label":"<2-5 words>","value":"<short clue to add to the question>"}]} with 2 to 5 options.` : 'Do not ask a clarifying question.'}
-Otherwise return {"clarify":false,"answer":"<a short, practical first answer to the latest USER message in 2-5 sentences>"}.
-Rules: this is a preliminary answer while Arch Coach checks current sources, so state only what you are confident about, flag anything jurisdiction-specific as to be confirmed, never invent code section numbers or facts, and do not mention models or credits.`;
+Otherwise return {"clarify":false,"answer":"<a short, practical first answer to the latest USER message in 2-5 sentences>","final":<true or false>}.
+Set "final":true when this short answer fully and confidently answers the question and browsing/deeper research would add no meaningful value. Examples: simple arithmetic, basic definitions, straightforward explanations, casual conversation, or stable general knowledge. Set "final":false for code/ADA/zoning/jurisdiction questions, current facts, standards, products, firms/projects, citations, uploaded-document analysis, uncertain facts, or anything where live sources/deeper verification materially improves the answer.
+Rules: when final is false this is a preliminary answer while Arch Coach checks current sources; state only what you are confident about, flag anything jurisdiction-specific as to be confirmed, never invent code section numbers or facts, and do not mention models or credits.`;
 }
 
 /* ------------------------------------------------------------------ saved-search keys */
