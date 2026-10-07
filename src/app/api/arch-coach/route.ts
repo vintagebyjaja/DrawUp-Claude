@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { creditMessage, missingConfig, models as modelList, openaiCancel, openaiCreate, openaiGet, outputText, readTicket, refundCredits, refundOnce, reserveCredits, signTicket, signedInUser, sourcesFrom, type CreditAccess } from '@/lib/drawup-server';
+import { adminRest, adminSelectOne, creditMessage, missingConfig, models as modelList, openaiCancel, openaiCreate, openaiGet, outputText, readTicket, refundCredits, refundOnce, reserveCredits, signTicket, signedInUser, sourcesFrom, type CreditAccess } from '@/lib/drawup-server';
 import { quickCall, quickCoachPrompt, type QuickResult } from '@/lib/drawup-quick';
 import { createHash } from 'node:crypto';
 import { recordDetailQuery, recordDetailSources } from '@/lib/drawup-details';
@@ -38,6 +38,23 @@ export function buildCoachPrompt({ message, transcript, location, extra = '' }: 
   return `${instructions}${extra ? '\n\n' + extra : ''}\n\nCONVERSATION:\n${transcript || `USER: ${message}`}\n${location ? `\nPROJECT LOCATION: ${location}` : ''}\n\nRespond to the user's latest message in context.`;
 }
 
+
+async function adminInsert(table: string, body: Record<string, unknown>) {
+  const r = await adminRest(table, { method: 'POST', body: JSON.stringify(body) });
+  const out = await r.json().catch(() => null);
+  if (!r.ok) throw new Error(out?.message || `Could not insert ${table}.`);
+  return Array.isArray(out) ? out[0] : out;
+}
+async function persistQuick(userId:string, threadId:string, quick:string){
+  if(!threadId || !quick) return null;
+  const thread=await adminSelectOne<any>('coach_threads',`id=eq.${encodeURIComponent(threadId)}&owner_id=eq.${encodeURIComponent(userId)}&select=id`);
+  if(!thread) return null;
+  return adminInsert('coach_messages',{thread_id:threadId,role:'assistant',content:quick,quick_content:quick,answer_status:'quick_available_full_processing'});
+}
+async function createDurableJob(args:{ownerId:string;threadId:string;messageId?:string;responseId:string;quick?:string;research:boolean;action:string;access:CreditAccess}){
+  return adminInsert('arch_coach_jobs',{owner_id:args.ownerId,thread_id:args.threadId||null,assistant_message_id:args.messageId||null,response_id:args.responseId,status:'processing',quick_answer:args.quick||null,research:args.research,action:args.action,access:args.access});
+}
+
 const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
 const QUICK_HEAD_START_MS = 3000;
 const quickOut = (q: QuickResult | null) => q && q.kind === 'answer' ? { answer: q.answer, ms: q.ms, final: q.final === true, label: q.final ? 'Answer' : 'Quick answer, still checking sources' } : null;
@@ -51,6 +68,7 @@ export async function POST(request: Request) {
     user = await signedInUser(request);
     if (!user) return NextResponse.json({ error: 'Sign in to use Arch Coach.' }, { status: 401 });
     const body = await request.json();
+    const threadId = typeof body?.thread_id === 'string' ? body.thread_id : '';
     const message = String(body?.message || '').trim();
     const location = String(body?.location || '').trim();
     const image = typeof body?.image === 'string' && /^data:image\/(png|jpeg|webp);base64,/.test(body.image) ? body.image : '';
@@ -146,8 +164,11 @@ export async function POST(request: Request) {
           return clarifyReply(quick);
         }
         if (data?.id) {
-          const ticket = signTicket({ id: data.id, uid: user.id, action, research, s: streamed ? 1 : 0, access: { ok: access.ok, hq: access.hq, access_type: access.access_type, monthly_used: access.monthly_used, purchased_used: access.purchased_used, is_anonymous: access.is_anonymous, credits_charged: access.credits_charged, credits_remaining: access.credits_remaining, free_questions_remaining: access.free_questions_remaining, guest_keys: access.guest_keys } });
-          return NextResponse.json({ ticket, status: data.status || 'queued', free_questions_remaining: access.free_questions_remaining ?? null, quick: quickOut(quick), stream: streamed ? { cursor: data.cursor || 0 } : null });
+          const quickText = quick && quick.kind === 'answer' ? quick.answer : '';
+          const savedMessage = await persistQuick(user.id, threadId, quickText).catch(() => null);
+          const job = await createDurableJob({ ownerId:user.id, threadId, messageId:savedMessage?.id, responseId:data.id, quick:quickText, research, action, access }).catch(() => null);
+          const ticket = signTicket({ id: data.id, uid: user.id, action, research, s: streamed ? 1 : 0, job: job?.id || '', msg: savedMessage?.id || '', access: { ok: access.ok, hq: access.hq, access_type: access.access_type, monthly_used: access.monthly_used, purchased_used: access.purchased_used, is_anonymous: access.is_anonymous, credits_charged: access.credits_charged, credits_remaining: access.credits_remaining, free_questions_remaining: access.free_questions_remaining, guest_keys: access.guest_keys } });
+          return NextResponse.json({ ticket, job_id:job?.id||null, assistant_message_id:savedMessage?.id||null, server_persisted:!!savedMessage, status: data.status || 'queued', free_questions_remaining: access.free_questions_remaining ?? null, quick: quickOut(quick), stream: streamed ? { cursor: data.cursor || 0 } : null });
         }
       } catch (e: any) {
         if (!/background|store/i.test(e?.message || '')) throw e;
@@ -169,7 +190,7 @@ export async function POST(request: Request) {
 
 async function jobFor(request: Request) {
   const user = await signedInUser(request);
-  const t = readTicket<{ id: string; uid: string; action: string; research: boolean; s?: number; access: CreditAccess }>(new URL(request.url).searchParams.get('ticket') || '');
+  const t = readTicket<{ id: string; uid: string; action: string; research: boolean; s?: number; job?: string; msg?: string; access: CreditAccess }>(new URL(request.url).searchParams.get('ticket') || '');
   if (!user || !t || t.uid !== user.id) return null;
   return t;
 }
@@ -190,7 +211,9 @@ export async function GET(request: Request) {
       if (r && !r.final && !r.failed) return NextResponse.json({ status: 'in_progress', delta: r.text, cursor: r.cursor, activity: r.activity || null });
       if (r?.failed && !r.final) {
         await refundOnce(t.uid, t.access, t.action, t.id);
-        return NextResponse.json({ error: 'Arch Coach could not finish that answer. You were not charged.' }, { status: 502 });
+        if(t.job) await adminRest(`arch_coach_jobs?id=eq.${encodeURIComponent(t.job)}`,{method:'PATCH',body:JSON.stringify({status:'failed',error:r.failed,updated_at:new Date().toISOString(),completed_at:new Date().toISOString()})}).catch(()=>{});
+        if(t.msg) await adminRest(`coach_messages?id=eq.${encodeURIComponent(t.msg)}`,{method:'PATCH',body:JSON.stringify({answer_status:'quick_available_full_failed'})}).catch(()=>{});
+        return NextResponse.json({ error: 'Arch Coach could not finish the deeper answer. Your quick answer is still saved.', quick_preserved:!!t.msg }, { status: 502 });
       }
       // finished (or the stream could not be read): fall through to the normal read of the stored answer
     }
@@ -199,11 +222,16 @@ export async function GET(request: Request) {
     const answer = data.status === 'completed' || data.status === 'incomplete' ? outputText(data) : '';
     if (!answer) {
       await refundOnce(t.uid, t.access, t.action, t.id);
-      return NextResponse.json({ error: 'Arch Coach could not finish that answer. You were not charged.' }, { status: 502 });
+      if(t.job) await adminRest(`arch_coach_jobs?id=eq.${encodeURIComponent(t.job)}`,{method:'PATCH',body:JSON.stringify({status:'failed',error:'Full answer did not complete.',updated_at:new Date().toISOString(),completed_at:new Date().toISOString()})}).catch(()=>{});
+      if(t.msg) await adminRest(`coach_messages?id=eq.${encodeURIComponent(t.msg)}`,{method:'PATCH',body:JSON.stringify({answer_status:'quick_available_full_failed'})}).catch(()=>{});
+      return NextResponse.json({ error: 'Arch Coach could not finish the deeper answer. Your quick answer is still saved.', quick_preserved:!!t.msg }, { status: 502 });
     }
     await awardXp(t.uid, 'ask', t.id);
-    await recordDetailSources('arch_coach', { userId: t.uid }, sourcesFrom(data)); // V21 Detail Library
-    return NextResponse.json({ status: 'completed', answer, sources: sourcesFrom(data), researched: t.research, credits_charged: t.access?.credits_charged ?? 0, credits_remaining: t.access?.credits_remaining ?? null, free_questions_remaining: t.access?.free_questions_remaining ?? null });
+    const finalSources=sourcesFrom(data);
+    await recordDetailSources('arch_coach', { userId: t.uid }, finalSources); // V21 Detail Library
+    if(t.job) await adminRest(`arch_coach_jobs?id=eq.${encodeURIComponent(t.job)}`,{method:'PATCH',body:JSON.stringify({status:'completed',full_answer:answer,sources:finalSources,updated_at:new Date().toISOString(),completed_at:new Date().toISOString()})}).catch(()=>{});
+    if(t.msg){const sourceText=finalSources.length?'\n\nSources:\n'+finalSources.map((s:any)=>`• ${s.title||'Source'} — ${s.url}`).join('\n'):'';await adminRest(`coach_messages?id=eq.${encodeURIComponent(t.msg)}`,{method:'PATCH',body:JSON.stringify({content:answer+sourceText,answer_status:'full_complete',sources:finalSources})}).catch(()=>{});}
+    return NextResponse.json({ status: 'completed', answer, sources: finalSources, researched: t.research, server_persisted:!!t.msg, assistant_message_id:t.msg||null, credits_charged: t.access?.credits_charged ?? 0, credits_remaining: t.access?.credits_remaining ?? null, free_questions_remaining: t.access?.free_questions_remaining ?? null });
   } catch (error: any) {
     return NextResponse.json({ status: 'in_progress', note: error?.message || 'Still checking.' });
   }

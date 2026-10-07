@@ -487,12 +487,17 @@ async function renderCoach(w){
         const st2=w.querySelector('#dc-status');st2.textContent='Arch Coach is drawing it up…';
         const token=(await client.auth.getSession()).data.session?.access_token||'';
         const history=messages.slice(-16).map(x=>({role:x.role,content:x.content}));
-        const askBody={message:text,history,image:img||undefined,location:currentProfile?.current_location||'',project:projName(active.project_thread_id)||''};
+        const askBody={message:text,history,image:img||undefined,location:currentProfile?.current_location||'',project:projName(active.project_thread_id)||'',thread_id:active.id};
         let d;if(window.DrawUpV20?.coachAsk){st2.textContent='';d=await window.DrawUpV20.coachAsk({token,stage:w.querySelector('#dc-messages'),...askBody});}
         else{const res=await fetch('/api/arch-coach',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},body:JSON.stringify(askBody)});d=await res.json().catch(()=>({}));if(!res.ok)throw new Error(d.error||'Arch Coach connection issue.');}
-        const sourcesTxt=(d.sources||[]).length?'\n\nSources:\n'+d.sources.map(s=>'• '+(s.title||'Source')+' — '+s.url).join('\n'):'';
-        const am=await client.from('coach_messages').insert({thread_id:active.id,role:'assistant',content:String(d.answer||'')+sourcesTxt}).select('id,role,content,created_at').single();if(am.error)throw am.error;
-        messages.push(am.data);await client.from('coach_threads').update({updated_at:new Date().toISOString()}).eq('id',active.id);
+        if(d.server_persisted){
+          await loadMessages();
+        }else{
+          const sourcesTxt=(d.sources||[]).length?'\n\nSources:\n'+d.sources.map(s=>'• '+(s.title||'Source')+' — '+s.url).join('\n'):'';
+          const am=await client.from('coach_messages').insert({thread_id:active.id,role:'assistant',content:String(d.answer||'')+sourcesTxt}).select('id,role,content,created_at').single();if(am.error)throw am.error;
+          messages.push(am.data);
+        }
+        await client.from('coach_threads').update({updated_at:new Date().toISOString()}).eq('id',active.id);
         draw();loadPlanPill();
         const s3=w.querySelector('#dc-status');if(s3&&d.credits_charged)s3.textContent=`${d.credits_charged} credits used${d.credits_remaining!=null?' · '+d.credits_remaining+' left':''}.`;
       }catch(err){draw();const s=w.querySelector('#dc-status');if(s)s.textContent='Your question is saved; the answer did not arrive: '+(err.message||err);}

@@ -1,0 +1,5 @@
+{
+  "crons": [
+    { "path": "/api/arch-coach/reconcile", "schedule": "* * * * *" }
+  ]
+}

@@ -119,19 +119,42 @@ async function coachAsk({token,stage,label,endpoint,...body}){
       if(!r.ok){
         // A later full-answer failure must never destroy a successful quick answer.
         const fallback=text||d.quick?.answer;
-        if(fallback)return {answer:fallback,sources:[],partial:true,quick_preserved:true,full_answer_status:'failed',credits_charged:0,notice:'Quick answer available. Deeper verification could not finish.'};
+        if(fallback)return {answer:fallback,sources:[],partial:true,quick_preserved:true,job_id:d.job_id||null,server_persisted:!!d.server_persisted,assistant_message_id:d.assistant_message_id||null,full_answer_status:'failed',credits_charged:0,notice:'Quick answer available. Deeper verification could not finish.'};
         throw new Error(p.error||'Arch Coach could not finish that answer. You were not charged.');
       }
-      if(p.status==='completed')return {...p,clarified_message:body.clarified?body.message:undefined};
+      if(p.status==='completed')return {...p,job_id:d.job_id||null,server_persisted:p.server_persisted||d.server_persisted,assistant_message_id:p.assistant_message_id||d.assistant_message_id,clarified_message:body.clarified?body.message:undefined};
       if(cursor!==null&&typeof p.cursor==='number'){cursor=p.cursor;if(p.delta){text+=p.delta;lastText=Date.now();}loader.live(text,p.activity);}
     }
-    fetch('/api/arch-coach?ticket='+encodeURIComponent(d.ticket),{method:'DELETE',headers:h}).catch(()=>{});
-    // Never leave the member with nothing: keep the quick answer (or what was written) and say it was not fully checked.
+    // Do NOT cancel at the page time limit. The OpenAI background response and DrawUp durable job
+    // continue after the user leaves; the reconciler saves the final answer and creates a notification.
     const partial=text||d.quick?.answer;
-    if(partial)return {answer:partial,sources:[],partial:true,quick_preserved:true,full_answer_status:'timed_out',credits_charged:0,notice:'Quick answer available. Deeper verification is not complete.'};
+    if(partial)return {answer:partial,sources:[],partial:true,quick_preserved:true,job_id:d.job_id||null,server_persisted:!!d.server_persisted,assistant_message_id:d.assistant_message_id||null,background_continues:true,full_answer_status:'processing',credits_charged:d.credits_charged||0,notice:'Quick answer saved. Deeper verification is continuing in the background; DrawUp will notify you when it is ready.'};
     throw new Error('That answer took longer than two minutes, so DrawUp stopped it. You were not charged. Try asking a narrower question.');
   }finally{loader.done();}
 }
+
+
+/* V21.2: in-app Arch Coach completion notifications. Works on public + portal pages for the
+   current Supabase user (including anonymous guest sessions). It never asks for browser notification
+   permission on its own; if the user already granted permission, DrawUp mirrors the in-app notice there. */
+async function pollCoachNotifications(){
+  const c=window.drawupSupabaseClient;if(!c)return;
+  try{
+    const ses=(await c.auth.getSession()).data.session;if(!ses)return;
+    // Reconcile this user's durable jobs first. This makes completed answers appear even when
+    // the deployment has no scheduler: OpenAI keeps working while they are away, and the next
+    // DrawUp visit saves the result before notifications are read.
+    await fetch('/api/arch-coach/reconcile',{headers:{Authorization:'Bearer '+ses.access_token},cache:'no-store'}).catch(()=>{});
+    const {data}=await c.from('drawup_notifications').select('id,title,body,href,created_at').is('read_at',null).eq('kind','arch_coach').order('created_at',{ascending:true}).limit(5);
+    for(const n of data||[]){
+      let box=document.getElementById('du-coach-notice');if(!box){box=document.createElement('button');box.id='du-coach-notice';box.type='button';box.style.cssText='position:fixed;right:20px;bottom:20px;z-index:100000;max-width:360px;padding:14px 16px;border:1px solid #62d9ff;border-radius:14px;background:#071827;color:#fff;text-align:left;box-shadow:0 14px 50px #0008;font:inherit;cursor:pointer';document.body.appendChild(box);}
+      box.innerHTML='<b style="display:block;color:#7fe7ff;margin-bottom:4px">'+esc(n.title)+'</b><span>'+esc(n.body)+'</span>';
+      box.onclick=async()=>{await c.from('drawup_notifications').update({read_at:new Date().toISOString()}).eq('id',n.id);box.remove();if(n.href)location.hash=n.href.replace(/^#/,'');};
+      if(window.Notification&&Notification.permission==='granted')try{new Notification(n.title,{body:n.body,tag:'drawup-'+n.id});}catch(_e){}
+    }
+  }catch(_e){}
+}
+setTimeout(pollCoachNotifications,1800);setInterval(pollCoachNotifications,60000);
 
 /* =================================================================== DrawUp Check: progress, markups, Ask Coach */
 const SEV=['critical','major','minor','info'];
