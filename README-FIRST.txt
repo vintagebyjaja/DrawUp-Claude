@@ -1,20 +1,27 @@
-DrawUp V21.4 — Discover project image backfill
+DrawUp V21.5 — Search Match + Canonical Project + Back Button Fix
 
-WHY THIS FIX EXISTS
-DrawUp Search could already find and display a real image for a known building (for example SoFi Stadium), while Discover still showed the blue placeholder. The missing link was cached search results: cached results were returned to the Search UI without re-running the project ingest that saves the image into project_images.
+Replace these 3 files in your project:
 
-REPLACE THESE TWO FILES
-1. src/app/api/project-research/route.ts
-2. src/lib/drawup-ingest.ts
+public/drawup-live-v17.js
+public/drawup-v19.js
+public/drawup-preview.html
 
-NO SQL REQUIRED.
+No SQL migration is required for this patch.
 
-WHAT CHANGES
-- Fresh project research: saves a legitimate web-discovered project image into project_images when the project has no image.
-- Cached project research: now ALSO runs the same idempotent ingest/backfill. This is the key fix for projects DrawUp already knows, such as SoFi Stadium.
-- Existing firm/project photos always win; web imagery is only added when project_images is empty.
-- A project does NOT need a known architect, engineer, contractor, or firm in order to receive an image.
-- DrawUp does not invent an image of a real building; it uses the real image returned by project research and keeps the source page URL.
+WHAT THIS PATCH FIXES
+1. Fuzzy project matching
+   - Searches like "CarMax Park Baseball Field" can match the existing "CarMax Park" project.
+   - Generic building words such as field, park, stadium, arena, building, project, sports, baseball, etc. no longer force DrawUp to treat a known project as a new unknown item.
 
-AFTER DEPLOY
-Search/open a known project through DrawUp Search/Arch Coach once. If that result contains a valid real project image, the ingest will attach it to the existing Discover project record. Refresh Discover and the image should appear on the card and project profile.
+2. One canonical answer
+   - A strong existing DrawUp project match wins before web/AI research.
+   - DrawUp does not show a separate Quick Answer that can contradict the existing project profile.
+   - The existing DrawUp project record is opened as the canonical result.
+   - Web research remains for searches that do not already have a strong DrawUp match.
+
+3. Internal Back button
+   - Public firm/project profile pages now have an internal DrawUp Back button.
+   - It returns to the DrawUp page the user came from when possible, with Discover as the safe fallback.
+   - This avoids relying on the browser Back button, which may leave DrawUp.
+
+This patch is designed to sit on top of the V21/V21.4 Discover image work.

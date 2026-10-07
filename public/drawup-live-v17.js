@@ -204,7 +204,7 @@ function bindProfileLinks(root,openFirm,openProj){
   window.DrawUpFirms?.bind?.(root);
   root.querySelectorAll('[data-du-manage-firm]').forEach(b=>b.onclick=e=>{e.preventDefault();e.stopPropagation();try{sessionStorage.setItem('du-manage-firm',b.dataset.duManageFirm);}catch(_e){}if(window.DrawUpPortal?.isSignedIn?.()){window.DrawUpPortal.openPortal('firm');window.DrawUpPortal.openPortalTab('firm');}});
 }
-function showPublicPage(id){const link=document.querySelector(`[data-page="${id}"]`);document.querySelectorAll('.page').forEach(p=>p.hidden=p.id!=='page-'+id);history.replaceState(null,'','#'+id);window.scrollTo(0,0);}
+function showPublicPage(id){const current=[...document.querySelectorAll('.page')].find(p=>!p.hidden);if(id==='firm-profile'&&current&&current.id!=='page-firm-profile')window.__duProfileBackPage=current.id.replace(/^page-/,'');document.querySelectorAll('.page').forEach(p=>p.hidden=p.id!=='page-'+id);history.replaceState(null,'','#'+id);window.scrollTo(0,0);const back=document.getElementById('du-global-profile-back');if(back)back.hidden=id!=='firm-profile';}
 async function openFirm(slug){
   if(window.DrawUpPortal?.isSignedIn?.()&&document.getElementById('du-portal')?.classList.contains('open'))return window.DrawUpPortal.openFirm(slug);
   document.querySelectorAll('.v12-portal.open').forEach(x=>x.classList.remove('open'));
@@ -232,7 +232,19 @@ async function openFirmSubmission(prefill){
 }
 
 /* ---------- database search for the public search bar ---------- */
-async function searchDb(q,kind){const c=await db();if(!c)throw new Error('DrawUp database is not connected.');const {data,error}=await c.rpc('drawup_search',{q,kind:kind||'all',max_rows:12});if(error)throw error;return data||{firms:[],projects:[]};}
+const DU_GENERIC_PROJECT_WORDS=new Set(['the','a','an','of','at','in','on','for','and','project','building','facility','venue','field','park','stadium','arena','center','centre','campus','complex','baseball','basketball','football','soccer','sports','indoor','outdoor']);
+function duNormName(v){return String(v||'').toLowerCase().replace(/&/g,' and ').replace(/[^a-z0-9]+/g,' ').trim();}
+function duCoreTokens(v){return duNormName(v).split(/\s+/).filter(x=>x&&x.length>1&&!DU_GENERIC_PROJECT_WORDS.has(x));}
+function duProjectScore(q,p){const nq=duNormName(q),nn=duNormName(p?.name);if(!nq||!nn)return 0;if(nq===nn)return 100;if(nq.includes(nn)||nn.includes(nq))return 96;const qt=duCoreTokens(q),nt=duCoreTokens(p?.name);if(!qt.length||!nt.length)return 0;const hit=nt.filter(t=>qt.includes(t)).length;const recall=hit/nt.length,precision=hit/qt.length;let score=70*recall+25*precision;if(recall===1)score+=8;const place=duNormName([p?.city,p?.state].filter(Boolean).join(' '));if(place&&nq.includes(place))score+=3;return Math.min(99,score);}
+async function fuzzyProjects(c,q,maxRows){
+  const {data,error}=await c.from('aec_projects').select('slug,name,city,state,country,project_type,completion_year,opened_year,description,image_page_url,project_images(image_url,is_hero,sort_order)').eq('is_demo',false).limit(500);
+  if(error)return [];
+  return (data||[]).map(p=>({...p,_match_score:duProjectScore(q,p),image_url:projectMedia(p)})).filter(p=>p._match_score>=78).sort((a,b)=>b._match_score-a._match_score).slice(0,maxRows||12);
+}
+async function searchDb(q,kind){const c=await db();if(!c)throw new Error('DrawUp database is not connected.');const {data,error}=await c.rpc('drawup_search',{q,kind:kind||'all',max_rows:12});if(error)throw error;const out=data||{firms:[],projects:[]};if(kind!=='firms'){
+  const fuzzy=await fuzzyProjects(c,q,12);const seen=new Set((out.projects||[]).map(p=>p.slug));for(const p of fuzzy)if(!seen.has(p.slug)){(out.projects||(out.projects=[])).push(p);seen.add(p.slug);}out.projects=(out.projects||[]).map(p=>({...p,_match_score:Math.max(Number(p._match_score)||0,duProjectScore(q,p))})).sort((a,b)=>(b._match_score||0)-(a._match_score||0));
+  out.strong_project=out.projects.find(p=>(p._match_score||0)>=88)||null;
+}return out;}
 
 function refresh(pageId){
   if(!pageId||pageId==='page-connect')renderConnect();

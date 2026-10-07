@@ -522,8 +522,8 @@
   /* ---------- ARCH COACH: STUDENT PORTFOLIO REVIEW ---------- */
   .student-review{margin-top:28px;padding:28px;border:1px solid var(--line);border-radius:24px;background:linear-gradient(135deg,rgba(143,211,255,.14),rgba(167,139,255,.10),rgba(255,179,107,.10));}
   .student-review-head{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;flex-wrap:wrap;margin-bottom:20px}.student-review-head h2{margin:5px 0 8px}.student-badge{display:inline-flex;padding:8px 12px;border-radius:999px;background:var(--lab-navy);color:white;font-family:var(--font-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase}
-  .review-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.review-card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px;color:#102033}.review-card .eyebrow{color:#63b9ef}.review-card h3{margin:0 0 7px;color:#102033}.review-card p{margin:0 0 16px;color:#334155}
-  .portfolio-drop{display:block;border:1.5px dashed #8da0b5;border-radius:14px;padding:18px;text-align:center;cursor:pointer;background:#f8fafc;color:#102033;transition:.2s}.portfolio-drop:hover{border-color:var(--blue-deep);background:#f1f7fb}.portfolio-drop input{display:none}.portfolio-drop strong{display:block;margin-bottom:4px;color:#102033}.portfolio-drop>span:not(.portfolio-file){color:#64748b}.portfolio-file{display:block;margin-top:8px;font-family:var(--font-mono);font-size:11px;color:#475569}.review-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:12px}.review-note{font-size:12px;color:var(--muted);margin-top:12px!important}.review-status{font-size:12px;font-weight:700;color:#174f73}
+  .review-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.review-card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px}.review-card h3{margin:0 0 7px}.review-card p{margin:0 0 16px;color:var(--muted)}
+  .portfolio-drop{display:block;border:1.5px dashed #9aa9ba;border-radius:14px;padding:18px;text-align:center;cursor:pointer;background:#f8fafc;transition:.2s}.portfolio-drop:hover{border-color:var(--blue-deep);background:#f1f7fb}.portfolio-drop input{display:none}.portfolio-drop strong{display:block;margin-bottom:4px}.portfolio-file{display:block;margin-top:8px;font-family:var(--font-mono);font-size:11px;color:var(--muted)}.review-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:12px}.review-note{font-size:12px;color:var(--muted);margin-top:12px!important}.review-status{font-size:12px;font-weight:700;color:var(--blue-deep)}
   @media(max-width:720px){.student-review{padding:18px;margin-top:20px;border-radius:20px}.review-grid{grid-template-columns:1fr}.review-card{padding:18px}.student-review-head{display:block}.student-badge{margin-top:10px}}
 
 
@@ -1685,7 +1685,8 @@
 
 <!-- ========== FIRM PROFILE ========== -->
 <section class="page world-gallery" id="page-firm-profile" hidden>
-  <div class="wrap" id="du-live-firm-profile" style="padding:40px 0 50px;max-width:860px;"><p class="meta">Choose a firm or project from Discover or Connect.</p></div>
+  <div class="wrap" style="padding-top:18px;max-width:860px;"><button id="du-global-profile-back" class="drawup-search-back" type="button">← Back</button></div>
+  <div class="wrap" id="du-live-firm-profile" style="padding:18px 0 50px;max-width:860px;"><p class="meta">Choose a firm or project from Discover or Connect.</p></div>
 </section>
 
 
@@ -2145,6 +2146,7 @@ busy=true;button.disabled=true;button.textContent='Drawing it up…';tunnel.clas
   button?.addEventListener('click',search);input?.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();search()}});$('v12-portal-close')?.addEventListener('click',()=>portal.classList.remove('open'));
   document.querySelectorAll('.recent-project-card').forEach(card=>card.addEventListener('click',()=>{input.value=card.dataset.query||card.querySelector('h3')?.textContent||''; activeType='projects'; search();}));
   document.querySelectorAll('.resource-launch').forEach(b=>b.addEventListener('click',()=>{$('resource-portal-title').textContent=b.dataset.resource;$('resource-portal-copy').textContent=b.dataset.copy||'';$('resource-official-link').href=b.dataset.url;$('drawup-resource-portal').classList.add('open')}));$('resource-portal-close')?.addEventListener('click',()=>$('drawup-resource-portal').classList.remove('open'));
+  $('du-global-profile-back')?.addEventListener('click',()=>{const page=window.__duProfileBackPage||'discover';const link=document.querySelector('[data-page="'+page+'"]');if(link)link.click();else{document.querySelectorAll('.page').forEach(p=>p.hidden=p.id!=='page-discover');history.replaceState(null,'','#discover');window.scrollTo(0,0);}});
   document.querySelectorAll('.drawup-school-profile').forEach(b=>b.addEventListener('click',()=>{const c=b.closest('.university-card');$('school-profile-name').textContent=c?.dataset.name||c?.querySelector('h3')?.textContent||'University';$('school-profile-meta').textContent=c?.querySelector('.meta')?.textContent||'';$('school-user-count').textContent='DrawUp members · live count when profiles connect';$('drawup-school-portal').classList.add('open')}));$('school-portal-close')?.addEventListener('click',()=>$('drawup-school-portal').classList.remove('open'));
 })();
 </script>

@@ -196,9 +196,16 @@ async function liveSearch(el,q,type,ctx){
     ctx.onPaint&&ctx.onPaint(st);};
   const clock=setInterval(()=>{if(!alive()||st.full||st.err||st.clarify){clearInterval(clock);return;}const b=el.querySelector('[data-rs-clock]');if(b)b.textContent=Math.round((Date.now()-st.t0)/1000)+'s';},1000);
   const c=await db();
-  const dbP=(c?c.rpc('drawup_search',{q,kind:type==='person'?'all':(type||'all'),max_rows:6}).then(({data})=>data||{},()=>({})):Promise.resolve({})).then(d=>{st.db=d;if(!st.full)paint();const names=[...(d.projects||[]).map(p=>p.name),...(d.firms||[]).map(f=>f.name)];if(names.length)Tunnel.relations(names,'Possible relations on DrawUp');return d;});
+  const dbP=(c&&window.DrawUpLive?.searchDb?window.DrawUpLive.searchDb(q,type==='person'?'all':(type||'all')):(c?c.rpc('drawup_search',{q,kind:type==='person'?'all':(type||'all'),max_rows:6}).then(({data})=>data||{},()=>({})):Promise.resolve({}))).then(d=>{st.db=d||{};if(!st.full)paint();const names=[...(st.db.projects||[]).map(p=>p.name),...(st.db.firms||[]).map(f=>f.name)];if(names.length)Tunnel.relations(names,'Matches on DrawUp');return st.db;});
   paint();
   try{
+    const firstDb=await dbP;
+    const canonical=firstDb?.strong_project||((firstDb?.projects||[]).length===1&&(firstDb.projects[0]._match_score||0)>=88?firstDb.projects[0]:null);
+    if(canonical){
+      // A strong existing DrawUp project is the answer. Do not create a competing AI quick answer.
+      st.quick=null;st.partial=null;st.activity=null;paint();Tunnel.route('Found on DrawUp · opening the existing project record…');
+      st.canonical=canonical;ctx.onPaint&&ctx.onPaint(st);clearInterval(clock);return st;
+    }
     const r=await Research.run(q,type,s=>{if(s>20)Tunnel.route('Still reading sources… DrawUp keeps searching until it has a real answer.');},{...(ctx.opts||{}),alive,onQuick:qk=>{st.quick=qk;paint();},onPartial:(f,a)=>{st.partial=f;st.activity=a||st.activity;paint();},onClarify:cl=>{st.clarify=cl;paint();}});
     if(!r||!alive())return st;
     if(r.location)Tunnel.route('Routing to '+r.location+'…');
@@ -233,12 +240,15 @@ async function publicSearch(q,type,opts){
     onPaint:st=>{
       if(st.full){$('v12-result-title').textContent=st.full.title||q;$('v12-result-sub').textContent=[st.full.type,st.full.location].filter(Boolean).join(' · ');readyFn('full');}
       else if(st.clarify){$('v12-result-title').textContent=q;$('v12-result-sub').textContent='One quick question first';readyFn('clarify');}
+      else if(st.canonical){$('v12-result-title').textContent=st.canonical.name||q;$('v12-result-sub').textContent='Found on DrawUp';readyFn('full');}
       else if(st.err){$('v12-result-title').textContent='DrawUp search: '+q;$('v12-result-sub').textContent='';readyFn('err');}
       else if(st.quick){$('v12-result-title').textContent=st.quick.title||q;$('v12-result-sub').textContent='Quick answer · checking sources';readyFn('quick');}}});
   const t=await tunnelFor(q,ready,cancelled);
   if(t==='cancel'){body.dataset.duSearch='cancelled';return true;}
+  const finalState=await Promise.race([search,Promise.resolve(null)]);
+  if(finalState?.canonical?.slug){Tunnel.close();window.DrawUpLive?.openProject(finalState.canonical.slug);return true;}
   portal.classList.add('open');portal.scrollTop=0;
-  search.finally(()=>Tunnel.close());
+  search.then(st=>{if(st?.canonical?.slug){portal.classList.remove('open');window.DrawUpLive?.openProject(st.canonical.slug);}}).finally(()=>Tunnel.close());
   return true;
 }
 window.DrawUpV19={publicSearch,Research,pageHTML,linkify,openPerson};
