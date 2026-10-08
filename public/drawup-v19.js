@@ -315,19 +315,20 @@ async function renderFirmTab(w,c){
   const P=window.DrawUpPortal;
   const {data:mine}=await c.client.rpc('drawup_my_firms');
   const admin=(mine||[]).filter(x=>x.role==='admin');
-  if(!admin.length){await P.renderFirmBase(w);w.insertAdjacentHTML('beforeend',`<article class="du-glass du-v19-note"><span class="du-kicker">FIRM ADMIN</span><p>Firm admins can add projects, photos, offices and team credits for their firm. Ask your firm's admin on DrawUp, or DrawUp HQ, to make you one.</p></article>`);return;}
+  if(!admin.length){await P.renderFirmBase(w);w.insertAdjacentHTML('beforeend',`<article class="du-glass du-v19-note"><span class="du-kicker">FIRM ADMIN</span><p>Firm admins can add projects, photos, offices and team credits for their firm. Ask your firm's admin on DrawUp, or DrawUp HQ, to make you one.</p></article>`);await window.DrawUpFirmKit?.memberSection?.(w,c,mine||[]);return;}
   let want='';try{want=sessionStorage.getItem('du-manage-firm')||'';sessionStorage.removeItem('du-manage-firm');}catch(_e){}
   const params=new URLSearchParams((location.hash.split('?')[1])||'');
   const firmSlug=params.get('firm')||want||admin[0].slug,pane=params.get('pane')||'details';
   const firm=admin.find(f=>f.slug===firmSlug)||admin[0];
   const go=(p,extra)=>{history.replaceState(null,'','#portal/firm?firm='+encodeURIComponent(firm.slug)+'&pane='+p+(extra||''));P.openPortalTab('firm');};
   w.innerHTML=`<div class="du-work-head"><div><span class="du-kicker">FIRM ADMIN</span><h1>${esc(firm.name)}</h1><p>You are an admin of this firm on DrawUp. Changes show on the public firm profile right away.</p></div><div class="du-head-actions">${admin.length>1?`<select id="fa-switch">${admin.map(f=>`<option value="${esc(f.slug)}" ${f.slug===firm.slug?'selected':''}>${esc(f.name)}</option>`).join('')}</select>`:''}<button class="du-btn ghost" id="fa-view">View public profile</button></div></div>
-  <div class="du-subtabs du-hq-tabs">${[['details','Firm details'],['offices','Offices'],['units','Locations & studios'],['projects','Projects'],['library','Library + team']].map(([k,l])=>`<button type="button" data-fa-pane="${k}" class="${k===pane?'active':''}">${l}</button>`).join('')}</div><div id="fa-body"><div class="du-loading">LOADING…</div></div>`;
+  <div class="du-subtabs du-hq-tabs">${[['details','Firm details'],['offices','Offices'],['units','Locations & studios'],['projects','Projects'],['library','Library + team']].concat(window.DrawUpFirmKit?.panes||[]).map(([k,l])=>`<button type="button" data-fa-pane="${k}" class="${k===pane?'active':''}">${l}</button>`).join('')}</div><div id="fa-body"><div class="du-loading">LOADING…</div></div>`;
   w.querySelectorAll('[data-fa-pane]').forEach(b=>b.onclick=()=>go(b.dataset.faPane));
   w.querySelector('#fa-view').onclick=()=>P.openFirm(firm.slug);
   const sw=w.querySelector('#fa-switch');if(sw)sw.onchange=()=>{history.replaceState(null,'','#portal/firm?firm='+encodeURIComponent(sw.value));P.openPortalTab('firm');};
   const body=w.querySelector('#fa-body');
   if(pane==='library'){await P.renderFirmBase(body);return;}
+  if(window.DrawUpFirmKit?.owns?.(pane))return window.DrawUpFirmKit.mount(body,c,firm,pane,{admin:true});
   if(pane==='details')return firmDetails(body,c,firm.id,go);
   if(pane==='offices')return firmOffices(body,c,firm.id,go);
   if(pane==='units'){if(!window.DrawUpFirms){body.innerHTML='<p class="du-muted">Locations & studios needs drawup-firms-v20.js.</p>';return;}return window.DrawUpFirms.adminUnits(body,c,firm,go,params,{photoDrop,photoDropHTML,uploadPublic,fld});}

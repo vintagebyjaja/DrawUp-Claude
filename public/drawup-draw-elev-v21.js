@@ -237,6 +237,12 @@
       bands(c.h, c.holes.map(hh => [hh.z0, hh.z1])).forEach(([z0, z1]) => { rect(c.u0, z0, c.u1, z1, { fill: '#9fb0bf', lw: LW.cut, data }); hatchRect(c.u0, z0, c.u1, z1, data); });
       c.holes.forEach(hh => { if (hh.kind === 'window') line({ x: (c.u0 + c.u1) / 2, y: Z(hh.z0) }, { x: (c.u0 + c.u1) / 2, y: Z(hh.z1) }, LW.beyond, { data: { cut: 'glass', id: hh.id } }); });
     });
+    // V22: shapes drawn on this view (notes, sketch lines, arcs, curves), stored on the camera in view coordinates
+    (Array.isArray(V.cam.shapes) ? V.cam.shapes : []).forEach(sh => {
+      const it = C.normalizeModel({ items: [sh] }).items[0]; if (!it) return;
+      const lw = { fine: LW.fine, medium: LW.beyond, heavy: LW.cut }[it.weight] || LW.beyond;
+      C.shapeLines(it).forEach(l => { for (let i = 0; i + 1 < l.length; i++) line(l[i], l[i + 1], lw, { dash: it.dash, data: { shape: it.id } }); });
+    });
     // extents
     const all = V.cuts.concat(V.beyond);
     const u0 = all.length ? Math.min(...all.map(e => e.u0)) : 0, u1 = all.length ? Math.max(...all.map(e => e.u1)) : V.frame.L;

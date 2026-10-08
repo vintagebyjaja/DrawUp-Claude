@@ -17,8 +17,13 @@ const mono=l=>(l.name||'').split(/[\s.]+/).filter(w=>/^[A-Z]/.test(w)).map(w=>w[
 function styleLegendMessages(box){
   box.querySelectorAll('article.assistant:not([data-hof])').forEach(a=>{
     const p=a.querySelector('p');const t=p?.textContent||'';a.dataset.hof=t.startsWith(TAG)?'1':'0';
-    if(a.dataset.hof==='1'){const nl=t.indexOf('\n');const name=t.slice(TAG.length,nl>0?nl:undefined).trim();a.classList.add('du-hof-msg');
-      const head=a.querySelector('span');if(head)head.textContent='HALL OF FAME · '+name.toUpperCase();if(p&&nl>0)p.textContent=t.slice(nl).trim();}
+    if(a.dataset.hof==='1'){const nl=t.indexOf('\n');const name=t.slice(TAG.length,nl>0?nl:undefined).trim();a.classList.add('du-hof-msg');a.dataset.legend=name;
+      const head=a.querySelector('span');if(head)head.textContent='HALL OF FAME · '+name.toUpperCase()+' · SECOND OPINION';if(p&&nl>0)p.textContent=t.slice(nl).trim();}
+  });
+  // V22: a legend reply is its own message with the legend's monogram, never the member's coach avatar.
+  box.querySelectorAll('article.du-hof-msg').forEach(a=>{
+    a.classList.add('ac-has-ava');a.querySelectorAll('.ac-chat-ava').forEach(x=>x.remove());
+    if(!a.querySelector('.du-hof-ava')){const i=document.createElement('i');i.className='du-hof-ava';i.setAttribute('aria-hidden','true');i.textContent=mono({name:a.dataset.legend||''})||'HOF';a.prepend(i);}
   });
 }
 
@@ -36,6 +41,24 @@ function bar(box){
     ${locked.slice(0,3).map(l=>`<button type="button" disabled aria-disabled="true" class="locked"><i>${esc(mono(l))}</i>${esc(l.name)} <em>🔒 ${l.xp_required} XP</em></button>`).join('')}</div>`;
   const arts=box.querySelectorAll('article');(arts[arts.length-1]||last).after(el);el.querySelector('.du-hof-k').textContent=box.querySelector('article.du-hof-msg')&&arts[arts.length-1]!==last?'HALL OF FAME · ASK ANOTHER LEGEND':'HALL OF FAME · SECOND OPINION';
   el.querySelectorAll('[data-hof]').forEach(b=>b.onclick=()=>ask(box,last,legends.find(l=>l.key===b.dataset.hof)));
+  autoAsk(box,last,unlocked,go);
+}
+
+/* V22: when the member asks Arch Coach for a legend's opinion ("what would Zaha Hadid think?"), the coach
+   answers first and the legend follows automatically as its own message. Once per answer. */
+const surname=n=>String(n||'').split(/\s+/).filter(w=>w.length>2&&!/^[A-Z]\.$/.test(w)).pop()||'';
+function autoAsk(box,last,unlocked,go){
+  if(busy||!unlocked.length)return;
+  const after=[];for(let n=last.nextElementSibling;n;n=n.nextElementSibling)if(n.matches?.('article'))after.push(n);
+  if(after.some(a=>a.classList.contains('du-hof-msg')||a.classList.contains('user')))return;
+  const prev=[...box.querySelectorAll('article.user')].filter(a=>a.compareDocumentPosition(last)&Node.DOCUMENT_POSITION_FOLLOWING).pop();
+  const q=(prev?.querySelector('p')?.textContent||'').toLowerCase();if(!q)return;
+  let pick=unlocked.find(l=>q.includes(l.name.toLowerCase())||(surname(l.name).length>3&&new RegExp('\\b'+surname(l.name).toLowerCase()+'\\b').test(q)));
+  if(!pick&&/\b(my|the) (go-to )?legend\b|hall of fame/.test(q))pick=unlocked.find(l=>l.key===go);
+  if(!pick)return;
+  const key='duHofAuto:'+((last.querySelector('p')?.textContent||'').length)+':'+q.slice(0,80);
+  try{if(sessionStorage.getItem(key))return;sessionStorage.setItem(key,'1');}catch{}
+  ask(box,last,pick);
 }
 
 async function ask(box,answerEl,legend){

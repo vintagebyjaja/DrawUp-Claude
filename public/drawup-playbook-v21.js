@@ -206,7 +206,7 @@ function viewDashboard(root){
 }
 
 /* =================================================================== Playbook hub */
-function hubTabs(active){const t=[['pb','Paths'],['pb=watch','Watch & Learn'],['pb=challenges','Challenges + Sims'],['pb=board','Board']];if(S.isHq)t.push(['pb=studio','HQ Studio']);
+function hubTabs(active){const t=[['pb','Paths'],['pb=watch','Watch & Learn'],['pb=challenges','Challenges + Sims'],['pb=board','Board']];if(S.isHq)t.push(['pb=studio','HQ Studio']);(window.DrawUpPlaybookTabs||[]).forEach(x=>t.push([x.q,x.name]));
   return `<div class="pb-tabs" role="tablist">${t.map(([q,n])=>`<button type="button" role="tab" aria-selected="${q===active}" class="${q===active?'on':''}" data-go="${q}">${n}</button>`).join('')}</div>`;}
 function viewHub(root,pb){
   const head=`${crumbs([['Learning','learn'],['DrawUp Playbook']])}<header class="pb-hero"><div><span class="du-kicker">📖 DRAWUP PLAYBOOK</span><h1>Choose your position. Learn the playbook.</h1><p class="pb-flow">Choose Your Position → Learn the Playbook → Run Drills → Get Coached → Play Real Scenarios → Level Up</p></div>
@@ -215,6 +215,7 @@ function viewHub(root,pb){
   if(pb==='challenges')return viewChallenges(root,head);
   if(pb==='board')return viewBoard(root,head);
   if(pb==='studio'&&S.isHq)return viewStudio(root,head);
+  const ext=(window.DrawUpPlaybookTabs||[]).find(x=>x.q==='pb='+pb);if(ext){root.innerHTML=head+hubTabs(ext.q);nav(root);bindPosition(root);ext.render(root);return;}
   const rec=posRow(),act=pb.startsWith('path:')?pb.slice(5):rec[1];const path=pathOf(act)||PATHS[0];
   const order=[...path.channels].sort((a,b)=>{const ia=rec[2].indexOf(a),ib=rec[2].indexOf(b);return (ia<0?99:ia)-(ib<0?99:ib);});
   root.innerHTML=`${head}${hubTabs('pb')}

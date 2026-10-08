@@ -267,7 +267,7 @@ function enhanceComplete(w,id){
   });
 }
 let ckPending=false;
-function ckScan(){ckPending=false;const id=checkCtx();if(!id)return;const w=document.getElementById('du-workspace-content');if(!w)return;enhanceReviewing(w,id);enhanceComplete(w,id);}
+function ckScan(){ckPending=false;if(window.DrawUpCheckV22&&!window.DrawUpCheckV22.disabled)return;/* V22 draws its own Check page */const id=checkCtx();if(!id)return;const w=document.getElementById('du-workspace-content');if(!w)return;enhanceReviewing(w,id);enhanceComplete(w,id);}
 new MutationObserver(()=>{if(!ckPending){ckPending=true;requestAnimationFrame(ckScan);}}).observe(document.documentElement,{childList:true,subtree:true});
 
 /* =================================================================== Search portal: timer + globe pin */

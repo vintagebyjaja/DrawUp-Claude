@@ -1,0 +1,27 @@
+/* DrawUp V22 — two accounts per person (sign-up note, blocked banner, founder list). */
+.du-acct-note{margin:8px 0 2px;padding:10px 12px;border-radius:12px;border:1px solid rgba(127,231,255,.28);background:rgba(127,231,255,.06);color:rgba(238,247,255,.86);font-size:13px;line-height:1.45;display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}
+.du-acct-note[hidden]{display:none}
+.du-acct-note b{color:#7fe7ff;font-weight:700}
+.du-acct-kind{display:inline-block;padding:2px 9px;border-radius:999px;font-size:11.5px;font-weight:700;letter-spacing:.02em;color:#071321;background:linear-gradient(90deg,#7fe7ff,#b99cff)}
+.du-acct-note.du-acct-block{display:block;border-color:rgba(255,154,74,.55);background:linear-gradient(135deg,rgba(255,138,61,.14),rgba(150,95,255,.12))}
+.du-acct-block b{color:#ffb27a;font-size:14px}
+.du-acct-block p{margin:4px 0 6px;color:#fff;font-size:14px}
+.du-acct-block small{display:block;color:rgba(238,247,255,.7);font-size:12px}
+.du-acct-banner{position:fixed;z-index:13000;left:50%;top:calc(12px + env(safe-area-inset-top,0px));transform:translateX(-50%);width:min(560px,calc(100vw - 24px));box-sizing:border-box;display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:16px;border:1px solid rgba(255,154,74,.5);background:rgba(7,19,33,.94);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 18px 50px rgba(0,0,0,.45),0 0 0 1px rgba(127,231,255,.08);color:#eef7ff}
+.du-acct-banner b{color:#ffb27a;font-size:14px}
+.du-acct-banner p{margin:4px 0 0;font-size:13px;line-height:1.45;color:rgba(238,247,255,.88)}
+.du-acct-banner button{flex:none;margin-left:auto;background:none;border:0;color:#fff;font-size:22px;line-height:1;cursor:pointer;min-width:32px;min-height:32px}
+.du-acct-pairs{margin-top:16px;padding:14px 16px;border-radius:16px}
+.du-acct-pairs summary{cursor:pointer;display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;list-style:none}
+.du-acct-pairs summary::-webkit-details-marker{display:none}
+.du-acct-pairs summary b{font-size:16px}
+.du-acct-pairs summary em{font-style:normal;padding:1px 9px;border-radius:999px;background:rgba(127,231,255,.15);color:#7fe7ff;font-weight:700;font-size:12px}
+.du-acct-sub{font-size:12.5px;opacity:.75;margin:8px 0}
+.du-acct-group{border-top:1px solid rgba(127,231,255,.14);padding:8px 0}
+.du-acct-group>small{display:block;font-family:ui-monospace,Menlo,monospace;font-size:11px;opacity:.6;margin-bottom:4px;word-break:break-all}
+.du-acct-row{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:center;padding:3px 0;font-size:13px}
+.du-acct-row span{min-width:0;overflow-wrap:anywhere;flex:1 1 180px}
+.du-acct-row i{font-style:normal;font-size:11px;padding:1px 8px;border-radius:999px;background:rgba(255,255,255,.08)}
+.du-acct-row i.k-personal{color:#7fe7ff}.du-acct-row i.k-school{color:#b99cff}.du-acct-row i.k-work{color:#ffb27a}
+.du-acct-row i.s-blocked{background:rgba(255,120,80,.2);color:#ffb27a}
+@media (max-width:480px){.du-acct-note{font-size:12.5px}.du-acct-banner{top:calc(8px + env(safe-area-inset-top,0px))}}

@@ -77,7 +77,10 @@
   function wallType(w) { return WALL_TYPES[wallTypeKey(w)]; }
   const DEFAULT_HEAD = 84, DEFAULT_SILL = 36, DEFAULT_CEILING = 96;
   function defaultWallHeight(w) { return WALL_TYPES[w.wtype] ? WALL_TYPES[w.wtype].height : (w.type === 'exterior' ? 108 : 96); }
-  const ITEM_KINDS = ['column', 'stair', 'text', 'dim', 'fixture'];
+  const ITEM_KINDS = ['column', 'stair', 'text', 'dim', 'fixture', 'shape'];
+  /* V22: free-angle shapes. Points are local to `at` and turn with `rot`, so move / rotate / copy work like any item. */
+  const SHAPES = ['line', 'polyline', 'arc', 'circle', 'rect', 'polygon', 'curve'];
+  const SHAPE_WEIGHTS = { fine: 'shpf', medium: 'shpm', heavy: 'shph' };
   const FIXTURES = { wc: 'Toilet', lav: 'Lavatory', sink: 'Kitchen sink', tub: 'Bathtub', shower: 'Shower' };
   const okPt = p => p && isFinite(p.x) && isFinite(p.y);
 
@@ -97,7 +100,9 @@
       if (it.kind === 'text') { it.text = String(it.text || 'NOTE'); if (!(it.size > 0)) it.size = 0.125; }
       if (it.kind === 'dim') { if (!isFinite(it.off)) it.off = 12; }
       if (it.kind === 'fixture') { if (!FIXTURES[it.fixture]) it.fixture = 'wc'; }
+      if (it.kind === 'shape') { if (!SHAPES.includes(it.shape)) it.shape = 'line'; it.pts = (Array.isArray(it.pts) ? it.pts : []).filter(okPt).map(p => ({ x: +p.x, y: +p.y })); if (!SHAPE_WEIGHTS[it.weight]) it.weight = 'medium'; it.dash = !!it.dash; if (it.shape === 'circle' && !(it.r > 0)) it.r = 12; }
     });
+    m.items = m.items.filter(it => it.kind !== 'shape' || (it.shape === 'circle' ? it.r > 0 : it.pts.length >= 2));
     return m;
   }
   /** Changes a wall's type: thickness, exterior/interior behaviour and (if the height was
@@ -149,8 +154,52 @@
     if (it.kind === 'fixture') return fixtureShapes(it.fixture).box.map(W);
     if (it.kind === 'text') { const h = it.size * scale, w = Math.max(1, it.text.length) * h * 0.62; return rect(-w / 2, -h * 0.6, w / 2, h * 0.6).map(W); }
     if (it.kind === 'dim') { const g = dimGeometry(it, scale), n = g.n, h = PAPER.text * scale; return [add(g.la, mul(n, -h * 0.4)), add(g.lb, mul(n, -h * 0.4)), add(g.lb, mul(n, h * 1.6)), add(g.la, mul(n, h * 1.6))]; }
+    if (it.kind === 'shape') { const L = shapeLocal(it).flat(); const xs = L.map(p => p.x), ys = L.map(p => p.y), pad = 2; return rect(Math.min(...xs) - pad, Math.min(...ys) - pad, Math.max(...xs) + pad, Math.max(...ys) + pad).map(W); }
     return [];
   }
+  /** Circle through three points (null when they are in a line). */
+  function circle3(a, b, c) {
+    const d = 2 * (a.x * (b.y - c.y) + b.x * (c.y - a.y) + c.x * (a.y - b.y)); if (Math.abs(d) < 1e-9) return null;
+    const A = a.x * a.x + a.y * a.y, B = b.x * b.x + b.y * b.y, C2 = c.x * c.x + c.y * c.y;
+    const cen = { x: (A * (b.y - c.y) + B * (c.y - a.y) + C2 * (a.y - b.y)) / d, y: (A * (c.x - b.x) + B * (a.x - c.x) + C2 * (b.x - a.x)) / d };
+    return { c: cen, r: dist(cen, a) };
+  }
+  /** Points of a 3-point arc from a through m to b. */
+  function arcPoints(a, m, b, n) {
+    const k = circle3(a, m, b); if (!k) return [a, m, b];
+    const ang = p => Math.atan2(p.y - k.c.y, p.x - k.c.x), a0 = ang(a), am = ang(m), ab = ang(b), TAU = Math.PI * 2;
+    const norm0 = t => ((t - a0) % TAU + TAU) % TAU; let sweep = norm0(ab); if (norm0(am) > sweep) sweep -= TAU;
+    n = n || Math.max(12, Math.ceil(Math.abs(sweep) / (Math.PI / 24))); const o = [];
+    for (let i = 0; i <= n; i++) { const t = a0 + sweep * i / n; o.push({ x: k.c.x + k.r * Math.cos(t), y: k.c.y + k.r * Math.sin(t) }); }
+    return o;
+  }
+  /** Smooth curve (centripetal-free Catmull-Rom) through the points. */
+  function curvePoints(P, closed, per) {
+    per = per || 12; if (P.length < 3) return P.slice(); const n = P.length, o = [], at = i => closed ? P[(i + n) % n] : P[Math.max(0, Math.min(n - 1, i))];
+    const segs = closed ? n : n - 1;
+    for (let i = 0; i < segs; i++) { const p0 = at(i - 1), p1 = at(i), p2 = at(i + 1), p3 = at(i + 2);
+      for (let j = 0; j < per; j++) { const t = j / per, t2 = t * t, t3 = t2 * t; o.push({ x: 0.5 * (2 * p1.x + (-p0.x + p2.x) * t + (2 * p0.x - 5 * p1.x + 4 * p2.x - p3.x) * t2 + (-p0.x + 3 * p1.x - 3 * p2.x + p3.x) * t3), y: 0.5 * (2 * p1.y + (-p0.y + p2.y) * t + (2 * p0.y - 5 * p1.y + 4 * p2.y - p3.y) * t2 + (-p0.y + 3 * p1.y - 3 * p2.y + p3.y) * t3) }); } }
+    o.push(closed ? P[0] : P[n - 1]); return o;
+  }
+  /** A shape as polylines in its local frame (before `at` / `rot`). Closed shapes repeat the first point. */
+  function shapeLocal(it) {
+    const P = it.pts || [], close = a => a.length ? a.concat([a[0]]) : a;
+    if (it.shape === 'circle') { const c = P[0] || { x: 0, y: 0 }; return [close(ellipse(c.x, c.y, it.r, it.r, 64))]; }
+    if (it.shape === 'arc') return [P.length >= 3 ? arcPoints(P[0], P[1], P[2]) : P];
+    if (it.shape === 'curve') return [curvePoints(P, !!it.closed)];
+    if (it.shape === 'rect' || it.shape === 'polygon' || it.closed) return [close(P)];
+    return [P];
+  }
+  /** World-space polylines of a shape item (plan, or view coordinates for elevation / section notes). */
+  function shapeLines(it) { const W = p => add(it.at || { x: 0, y: 0 }, rotV(p, it.rot || 0)); return shapeLocal(it).map(l => l.map(W)); }
+  /** Makes a shape item from world points (first point becomes `at`). */
+  function makeShape(kind, world, opts) {
+    opts = opts || {}; const at = { x: snap(world[0].x), y: snap(world[0].y) };
+    const it = Object.assign({ id: opts.id || uid('i'), kind: 'shape', shape: kind, at, rot: 0, weight: opts.weight || 'medium', dash: !!opts.dash }, kind === 'circle' ? { pts: [{ x: 0, y: 0 }], r: snap(opts.r || dist(world[0], world[1] || world[0])) } : { pts: world.map(p => ({ x: snap(p.x - at.x), y: snap(p.y - at.y) })) });
+    if (opts.closed) it.closed = true; return normalizeModel({ items: [it] }).items[0] || null;
+  }
+  /** Regular polygon points: center, radius to a vertex, first vertex angle (radians), sides. */
+  function regularPolygon(c, r, a0, n) { const o = []; for (let i = 0; i < n; i++) { const a = a0 + i * Math.PI * 2 / n; o.push({ x: c.x + r * Math.cos(a), y: c.y + r * Math.sin(a) }); } return o; }
   function dimGeometry(it, scale) {
     const d = norm(sub(it.b, it.a)); let n = { x: -d.y, y: d.x };
     const off = it.off || 0; const s = off < 0 ? -1 : 1; const nn = mul(n, s);
@@ -176,9 +225,11 @@
     const d0 = norm(sub(b, a));
     [a, b].forEach(p => {
       if (m.walls.some(x => same(x.a, p) || same(x.b, p))) return;
-      const host = m.walls.find(x => pointOnWall(p, x, x.thickness / 2 + 0.01) && Math.abs(wallDir(x).x * d0.x + wallDir(x).y * d0.y) < 0.01);
+      const host = m.walls.find(x => pointOnWall(p, x, x.thickness / 2 + 0.01) && Math.abs(wallDir(x).x * d0.x + wallDir(x).y * d0.y) < 0.98);
       if (!host) return;
-      const hd = wallDir(host), r = sub(p, host.a), along = r.x * hd.x + r.y * hd.y, q = add(host.a, mul(hd, along));
+      const hd = wallDir(host), perp = Math.abs(hd.x * d0.x + hd.y * d0.y) < 0.01;
+      // square: project onto the centerline (V20); angled (V22): slide along the new wall to the centerline
+      let q; if (perp) { const r = sub(p, host.a), along = r.x * hd.x + r.y * hd.y; q = add(host.a, mul(hd, along)); } else { const k = lineHit(p, d0, host.a, hd); if (k == null) return; q = add(p, mul(d0, k)); }
       p.x = snap(q.x); p.y = snap(q.y);
     });
     const wt = WALL_TYPES[opts.wtype];
@@ -284,17 +335,34 @@
   /** How far each face runs past (or stops short of) a wall end so joints close cleanly:
    *  at a corner the outside face runs to the outside corner and the inside face stops at
    *  the inside corner; a partition that butts into a wall stops at that wall's face. */
+  /* V22: joints at any angle. Each face line of the wall runs to where it meets the matching
+   * face of the other wall (a true miter for L corners, the host face for T joints), so angled
+   * walls close as cleanly as square ones. Square joints give exactly the V20 numbers. */
+  function lineHit(p, d, q, e) { const den = d.x * e.y - d.y * e.x; if (Math.abs(den) < 1e-9) return null; const r = sub(q, p); return (r.x * e.y - r.y * e.x) / den; }
   function endTrim(m, w, end) {
-    const p = w[end], d = wallDir(w), n = wallNormal(m, w);
+    const p = w[end], d = wallDir(w), n = wallNormal(m, w), t = w.thickness / 2;
+    const out = end === 'a' ? mul(d, -1) : d, into = mul(out, -1);
     const other = m.walls.find(x => x !== w && (same(x.a, p) || same(x.b, p)));
     if (other) {
       const away = same(other.a, p) ? wallDir(other) : mul(wallDir(other), -1), tx = other.thickness / 2;
-      if (Math.abs(away.x * d.x + away.y * d.y) > 0.99) return { plus: 0, minus: 0, joint: true };
+      const cos = away.x * d.x + away.y * d.y;
+      if (Math.abs(cos) > 0.99) return { plus: 0, minus: 0, joint: true };
       const side = away.x * n.x + away.y * n.y;
-      return { plus: side > 0 ? -tx : tx, minus: side > 0 ? tx : -tx, joint: true };
+      if (Math.abs(cos) < 1e-9) return { plus: side > 0 ? -tx : tx, minus: side > 0 ? tx : -tx, joint: true };
+      let no = { x: -away.y, y: away.x }; if (no.x * into.x + no.y * into.y < 0) no = mul(no, -1);
+      const cap = 6 * Math.max(t, tx);
+      const ext = s => { const inner = (s > 0) === (side > 0); const k = lineHit(add(p, mul(n, s * t)), out, add(p, mul(no, inner ? tx : -tx)), away); return k == null ? 0 : Math.max(-cap, Math.min(cap, k)); };
+      return { plus: ext(1), minus: ext(-1), joint: true };
     }
     const host = m.walls.find(x => x !== w && pointOnWall(p, x, x.thickness / 2 + 0.01));
-    if (host) return { plus: -host.thickness / 2, minus: -host.thickness / 2, joint: true, host: host.id };
+    if (host) {
+      const hd = wallDir(host), th = host.thickness / 2, cos = hd.x * d.x + hd.y * d.y;
+      if (Math.abs(cos) < 1e-9 || Math.abs(cos) > 0.99) return { plus: -th, minus: -th, joint: true, host: host.id };
+      let nh = { x: -hd.y, y: hd.x }; if (nh.x * into.x + nh.y * into.y < 0) nh = mul(nh, -1);
+      const q = add(host.a, mul(nh, th)), cap = 6 * Math.max(t, th);
+      const ext = s => { const k = lineHit(add(p, mul(n, s * t)), out, q, hd); return k == null ? -th : Math.max(-cap, Math.min(cap, k)); };
+      return { plus: ext(1), minus: ext(-1), joint: true, host: host.id };
+    }
     return { plus: 0, minus: 0, joint: false };
   }
   /** The wall's four corners: outer = the +normal face (outside face for exterior walls). */
@@ -399,6 +467,17 @@
       });
     });
 
+    // V22: angled exterior walls get an aligned dimension (true length) along their outside face
+    ext.filter(w => !isHorizontal(w) && !isVertical(w)).forEach(w => {
+      const o = outlines.get(w.id), nrm = o.normal, a = o.outerA, b = o.outerB, value = dist(a, b); if (value < 0.01) return;
+      const off = P('firstOffset'), la = add(a, mul(nrm, off)), lb = add(b, mul(nrm, off)), text = formatFtIn(value);
+      const g = dimGeometry({ a: la, b: lb, off: 0 }, scale), tw = text.length * P('text') * 0.62;
+      const up = g.up; // text reads from the bottom / right, like every other string
+      dims.push({ kind: 'aligned', side: 'A', row: 0, wall: w.id, value, text, fits: tw + P('tick') * 1.5 <= value, a: la, b: lb,
+        ext: [[add(a, mul(nrm, P('extGap'))), add(la, mul(nrm, P('extBeyond')))], [add(b, mul(nrm, P('extGap'))), add(lb, mul(nrm, P('extBeyond')))]],
+        textAt: add(mul(add(la, lb), 0.5), mul(up, P('textGap'))), up, textWidth: tw, textHeight: P('text'), angle: g.angle });
+    });
+
     // interior strings along walls that host openings
     m.walls.filter(w => w.type !== 'exterior').forEach(w => {
       const ops = m.openings.filter(o => o.wall === w.id); if (!ops.length) return;
@@ -432,11 +511,12 @@
       const p = add(w.a, mul(d, s[i])), q = add(w.a, mul(d, s[i + 1]));
       const lp = add(p, mul(n, off)), lq = add(q, mul(n, off));
       const text = formatFtIn(v), tw = text.length * P('text') * 0.62;
-      const up = Math.abs(d.y) > 0.7 ? { x: -1, y: 0 } : { x: 0, y: -1 };
+      const orth = Math.abs(d.x) < 1e-9 || Math.abs(d.y) < 1e-9, g = orth ? null : dimGeometry({ a: lp, b: lq, off: 0 }, 1); // V22: angled partitions read along the wall
+      const up = g ? g.up : Math.abs(d.y) > 0.7 ? { x: -1, y: 0 } : { x: 0, y: -1 };
       const textAt = add(mul(add(lp, lq), 0.5), mul(up, P('textGap')));
       out.push({ kind: 'interior', side: 'I', wall: w.id, value: v, text, fits: tw + P('tick') * 1.5 <= v, a: lp, b: lq,
         ext: [[add(p, mul(n, w.thickness / 2 + P('extGap'))), add(lp, mul(n, P('extBeyond')))], [add(q, mul(n, w.thickness / 2 + P('extGap'))), add(lq, mul(n, P('extBeyond')))]],
-        textAt, up, textWidth: tw, textHeight: P('text'), angle: Math.abs(d.y) > 0.7 ? -90 : 0 });
+        textAt, up, textWidth: tw, textHeight: P('text'), angle: g ? g.angle : Math.abs(d.y) > 0.7 ? -90 : 0 });
     }
     return out;
   }
@@ -574,6 +654,7 @@
     wall: { dxf: 'A-WALL', color: 7, lw: 0.024 }, patt: { dxf: 'A-WALL-PATT', color: 8, lw: 0.004 }, door: { dxf: 'A-DOOR', color: 2, lw: 0.012 }, glaz: { dxf: 'A-GLAZ', color: 4, lw: 0.012 },
     dims: { dxf: 'A-ANNO-DIMS', color: 1, lw: 0.007 }, tick: { dxf: 'A-ANNO-DIMS', color: 1, lw: 0.016 }, iden: { dxf: 'A-AREA-IDEN', color: 3, lw: 0.01 }, tags: { dxf: 'A-ANNO-TAGS', color: 6, lw: 0.008 },
     cols: { dxf: 'S-COLS', color: 5, lw: 0.016 }, strs: { dxf: 'A-FLOR-STRS', color: 3, lw: 0.009 }, fixt: { dxf: 'P-FIXT', color: 4, lw: 0.008 }, anno: { dxf: 'A-ANNO-TEXT', color: 7, lw: 0.008 }, legend: { dxf: 'A-ANNO-LEGN', color: 7, lw: 0.007 },
+    shpf: { dxf: 'A-ANNO-SKCH', color: 8, lw: 0.006 }, shpm: { dxf: 'A-ANNO-SKCH', color: 7, lw: 0.012 }, shph: { dxf: 'A-ANNO-SKCH', color: 7, lw: 0.022 },
   };
   function itemPrims(it, scale) {
     const out = [], X = { item: it.id }, W = p => add(it.at, rotV(p, it.rot || 0));
@@ -594,6 +675,10 @@
       out.push(Object.assign({ t: 'circle', layer: 'strs', c: a0, r: 0.025 * scale, fill: true }, X));
       const lab = 'UP ' + n + 'R', ls = PAPER.text * scale, horiz = Math.abs(Math.cos((it.rot || 0) * Math.PI / 180)) > 0.7;
       T('strs', W({ x: -((horiz ? lab.length * ls * 0.31 : ls * 0.6) + 0.06 * scale), y: 0 }), lab, ls, 0);
+    } else if (it.kind === 'shape') {
+      const layer = SHAPE_WEIGHTS[it.weight] || 'shpm';
+      if (it.shape === 'circle' && !it.rot) out.push(Object.assign({ t: 'circle', layer, c: add(it.at, it.pts[0] || { x: 0, y: 0 }), r: it.r, dash: it.dash }, X));
+      else shapeLines(it).forEach(l => { for (let i = 0; i + 1 < l.length; i++) if (dist(l[i], l[i + 1]) > 1e-6) L(layer, l[i], l[i + 1], { dash: it.dash }); });
     } else if (it.kind === 'text') {
       T('anno', it.at, it.text, it.size * scale, it.rot || 0);
     } else if (it.kind === 'dim') {
@@ -649,7 +734,9 @@
       if (ty.hatch !== 'solid') hatch([o.outerA, o.outerB, o.innerB, o.innerA], w.a, o.dir, ty.hatch, scale, ops, { wall: w.id }).forEach(p => out.push(p));
       // partitions butting into this wall break the face they arrive on
       const tees = { 1: [], [-1]: [] };
-      m.walls.forEach(x => { if (x === w) return; ['a', 'b'].forEach(k => { const p = x[k]; const tr = endTrim(m, x, k); if (tr.host !== w.id) return; const away = k === 'a' ? wallDir(x) : mul(wallDir(x), -1); const side = away.x * n.x + away.y * n.y > 0 ? 1 : -1; const c = along(p); tees[side].push([c - x.thickness / 2, c + x.thickness / 2]); }); });
+      m.walls.forEach(x => { if (x === w) return; ['a', 'b'].forEach(k => { const p = x[k]; const tr = endTrim(m, x, k); if (tr.host !== w.id) return; const away = k === 'a' ? wallDir(x) : mul(wallDir(x), -1); const side = away.x * n.x + away.y * n.y > 0 ? 1 : -1; const c = along(p);
+        const xo = wallOutline(m, x), c1 = along(k === 'a' ? xo.outerA : xo.outerB), c2 = along(k === 'a' ? xo.innerA : xo.innerB); // V22: angled tees open the face by their real width
+        tees[side].push(Math.abs(Math.abs(c2 - c1) - x.thickness) < 1e-6 || !isFinite(c1 + c2) ? [c - x.thickness / 2, c + x.thickness / 2] : [Math.min(c1, c2), Math.max(c1, c2)]); }); });
       [1, -1].forEach(side => {
         const from = along(side === 1 ? o.outerA : o.innerA), to = along(side === 1 ? o.outerB : o.innerB);
         const gaps = ops.concat(tees[side]).sort((a, b) => a[0] - b[0]);
@@ -713,12 +800,12 @@
       parts.push(`<polygon class="du-wall-fill" data-wall="${w.id}" data-wtype="${key}" data-height="${w.height}" points="${ptsAttr([o.outerA, o.outerB, o.innerB, o.innerA])}" fill="${fill}" stroke="none"/>`);
     });
     m.openings.forEach(op => { const g = openingGeometry(m, op); parts.push(`<polygon class="du-opening-fill" data-opening="${op.id}" data-kind="${op.kind}" data-head="${op.head}"${op.sill != null ? ` data-sill="${op.sill}"` : ''} points="${ptsAttr([g.outer1, g.outer2, g.inner2, g.inner1])}" fill="${opts.paper || '#fff'}" stroke="none"/>`); });
-    if (opts.hit) m.items.forEach(it => parts.push(`<polygon class="du-item-hit" data-item="${it.id}" points="${ptsAttr(itemOutline(it, scale))}" fill="rgba(0,0,0,0)" stroke="none"/>`));
+    if (opts.hit) m.items.forEach(it => parts.push(it.kind === 'shape' ? shapeLines(it).map(l => `<polyline class="du-item-hit du-shape-hit" data-item="${it.id}" points="${ptsAttr(l)}" fill="none" stroke="rgba(0,0,0,0)" stroke-width="${(0.12 * scale).toFixed(3)}" stroke-linecap="round" stroke-linejoin="round"/>`).join('') : `<polygon class="du-item-hit" data-item="${it.id}" points="${ptsAttr(itemOutline(it, scale))}" fill="rgba(0,0,0,0)" stroke="none"/>`));
     prims.forEach(p => {
       const data = `${p.wall ? ` data-wall="${p.wall}"` : ''}${p.opening ? ` data-opening="${p.opening}"` : ''}${p.item ? ` data-item="${p.item}"` : ''}${p.room ? ` data-room="${p.room}"` : ''}${p.legendType ? ` data-legend="${p.legendType}"` : ''}`;
       if (p.t === 'line') parts.push(`<line class="du-${p.layer}"${data} x1="${p.a.x.toFixed(3)}" y1="${p.a.y.toFixed(3)}" x2="${p.b.x.toFixed(3)}" y2="${p.b.y.toFixed(3)}" stroke="${color}" stroke-width="${lw(p.layer)}" stroke-linecap="square"${p.dash ? ` stroke-dasharray="${(0.05 * scale).toFixed(2)} ${(0.035 * scale).toFixed(2)}"` : ''}/>`);
       else if (p.t === 'arc') { const sw = cross(sub(p.from, p.c), sub(p.to, p.c)) > 0 ? 1 : 0; parts.push(`<path class="du-door" data-opening="${p.opening}" d="M${p.from.x.toFixed(3)} ${p.from.y.toFixed(3)} A${p.r} ${p.r} 0 0 ${sw} ${p.to.x.toFixed(3)} ${p.to.y.toFixed(3)}" fill="none" stroke="${color}" stroke-width="${lw('door')}" stroke-dasharray="${(0.04 * scale).toFixed(2)} ${(0.03 * scale).toFixed(2)}"/>`); }
-      else if (p.t === 'circle') parts.push(`<circle class="du-${p.layer}"${data} cx="${p.c.x.toFixed(3)}" cy="${p.c.y.toFixed(3)}" r="${p.r.toFixed(3)}" fill="${p.fill ? color : 'none'}" stroke="${p.fill ? 'none' : color}" stroke-width="${lw(p.layer)}"/>`);
+      else if (p.t === 'circle') parts.push(`<circle class="du-${p.layer}"${data} cx="${p.c.x.toFixed(3)}" cy="${p.c.y.toFixed(3)}" r="${p.r.toFixed(3)}" fill="${p.fill ? color : 'none'}" stroke="${p.fill ? 'none' : color}" stroke-width="${lw(p.layer)}"${p.dash ? ` stroke-dasharray="${(0.05 * scale).toFixed(2)} ${(0.035 * scale).toFixed(2)}"` : ''}/>`);
       else if (p.t === 'poly') parts.push(`<polygon class="du-${p.layer}"${data} points="${ptsAttr(p.pts)}" fill="${p.fill || 'none'}" stroke="${color}" stroke-width="${lw(p.layer)}"/>`);
       else if (p.t === 'text') parts.push(`<text class="du-${p.layer}"${data}${p.dim ? ` data-dim-kind="${p.kind}" data-dim-side="${p.side}" data-dim-value="${p.value}"` : ''} x="${p.at.x.toFixed(3)}" y="${p.at.y.toFixed(3)}" font-size="${p.size.toFixed(3)}" font-family="Helvetica, Arial, sans-serif" fill="${color}" text-anchor="${p.start ? 'start' : 'middle'}" dominant-baseline="${p.dim ? 'auto' : 'middle'}"${p.angle ? ` transform="rotate(${p.angle} ${p.at.x.toFixed(3)} ${p.at.y.toFixed(3)})"` : ''}>${xesc(p.text)}</text>`);
     });
@@ -831,6 +918,7 @@
   }
 
   const api = { formatFtIn, parseFtIn, snap, emptyModel, normalizeModel, addWall, addRectangle, wallFaceLength, setWallFaceLength, addOpening, moveOpening, removeWall, removeOpening, setWallLength, wallLength, wallById, computeDimensions, collisions, primitives, toSVG, toDXF, toPDF, bounds, samplePlan, outwardNormal, wallOutline, openingGeometry, PAPER,
-    WALL_TYPES, FIXTURES, wallType, wallTypeKey, setWallType, addItem, moveItem, removeItem, itemOutline, stairRisers, dimGeometry, legendPrims, hatch };
+    WALL_TYPES, FIXTURES, wallType, wallTypeKey, setWallType, addItem, moveItem, removeItem, itemOutline, stairRisers, dimGeometry, legendPrims, hatch,
+    SHAPES, shapeLines, shapeLocal, makeShape, regularPolygon, arcPoints, curvePoints, circle3, endTrim, LAYERS };
   if (typeof module === 'object' && module.exports) module.exports = api; else root.DrawUpDrawCore = api;
 })(typeof window !== 'undefined' ? window : globalThis);

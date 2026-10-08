@@ -12,3 +12,9 @@
 .du-coach-messages article.du-hof-msg>span{color:#ffc061;font-weight:800;letter-spacing:.1em}
 .du-coach-messages article.du-hof-msg p{color:#fff6ea}
 @media (max-width:520px){.du-hof-chips{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px}.du-hof-chips button{flex:0 0 auto}}
+/* V22: legend replies read as a separate message from a different speaker */
+#du-portal .du-coach-messages article.du-hof-msg,#du-portal .du-coach-messages article.assistant.du-hof-msg,#dc-messages article.du-hof-msg,.du-coach-messages article.du-hof-msg{position:relative;margin-left:28px;padding-left:64px;border:1px solid rgba(255,192,97,.7)!important;background:linear-gradient(135deg,#1d1426,#2a1a12)!important;max-width:min(820px,calc(100% - 28px))!important;color:#fff6ea!important;box-shadow:0 0 0 1px rgba(255,192,97,.12),0 10px 28px rgba(0,0,0,.35)}
+#du-portal .du-coach-messages article.du-hof-msg>span,#dc-messages article.du-hof-msg>span,.du-coach-messages article.du-hof-msg>span{color:#ffc061!important;font-weight:800;letter-spacing:.1em}
+#du-portal .du-coach-messages article.du-hof-msg p,#dc-messages article.du-hof-msg p,.du-coach-messages article.du-hof-msg p{color:#fff6ea!important;white-space:pre-wrap}
+.du-hof-ava{position:absolute;left:14px;top:16px;display:grid;place-items:center;width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#ff8a3d,#9b5de5);color:#fff;font-style:normal;font-size:11px;font-weight:800;letter-spacing:.04em;box-shadow:0 0 0 2px rgba(255,192,97,.55)}
+@media (max-width:520px){#dc-messages article.du-hof-msg,.du-coach-messages article.du-hof-msg{margin-left:10px;padding-left:56px}.du-hof-ava{left:10px;width:34px;height:34px}}

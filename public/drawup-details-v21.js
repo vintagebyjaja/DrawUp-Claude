@@ -157,7 +157,7 @@ async function render(w,publicPage){
   host=w;w.innerHTML='<div class="du-loading">DRAWING IT UP…</div>';
   if(!CAT().length||!KIT()){w.innerHTML='<p class="dd21-empty">The detail drawings did not load. Refresh the page.</p>';return;}
   await loadData().catch(()=>{});if(host!==w)return;
-  w.innerHTML=shell(publicPage);bindShell(publicPage);rerender();
+  w.innerHTML=shell(publicPage);bindShell(publicPage);rerender();(window.DrawUpDetailTabs||[]).forEach(f=>{try{f(w,{publicPage})}catch(e){console.warn(e)}});
 }
 
 /* ---------------------------------------------------------------- uploads (firm + member) */

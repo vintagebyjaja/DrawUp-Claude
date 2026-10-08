@@ -435,6 +435,7 @@ async function renderProject(w,p){
   w.querySelector('#dp-del').onclick=async()=>{if(!confirm('Delete “'+p.project_name+'”? Its Arch Coach threads are kept but unlinked.'))return;const r=await client.from('project_threads').delete().eq('id',p.id).eq('owner_id',currentUser.id);if(r.error){toast(r.error.message,true);return;}toast('Project deleted.');openPortalTab('projects');};
   w.querySelector('#dp-coach').onclick=()=>{coachIntent={projectId:p.id,newThread:true};openPortalTab('arch-coach');};
   w.querySelectorAll('[data-open-thread]').forEach(b=>b.onclick=()=>{coachIntent={threadId:b.dataset.openThread};openPortalTab('arch-coach');});
+  try{window.DrawUpSets?.mount?.(w,p);}catch(e){console.warn('Drawing sets',e);}
 }
 async function renderStarter(w,proj){
   const save=async step=>{proj.progress={...(proj.progress||{}),step};const r=await client.from('project_threads').update({progress:proj.progress,updated_at:new Date().toISOString()}).eq('id',proj.id).eq('owner_id',currentUser.id);if(r.error)toast('Progress not saved: '+r.error.message,true);};

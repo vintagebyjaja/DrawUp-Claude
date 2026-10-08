@@ -41,14 +41,19 @@
     bar.insertAdjacentHTML('afterbegin', `<div class="dw21-row">
       <div class="dw21-seg" role="group" aria-label="View"><button type="button" data-view="plan" class="on">Floor plan</button><button type="button" data-view="elevation">Elevation</button><button type="button" data-view="section">Section</button></div>
       <div class="dw21-seg dw21-snaps" role="group" aria-label="Snapping"><span>Snap</span><button type="button" data-snap="grid">Grid</button><button type="button" data-snap="ortho">Ortho</button><button type="button" data-snap="ends">Ends</button></div>
+      <div class="dw21-seg dw21-snaps dw22-angle" role="group" aria-label="Angle snap"><span>Angle</span><button type="button" data-angle="15">15°</button><button type="button" data-angle="45">45°</button><button type="button" data-angle="0">Off</button></div>
       <div class="dw21-layers-wrap"><button type="button" class="dw21-btn" id="dw21-layers-btn" aria-expanded="false">Layers</button><div class="dw21-pop" id="dw21-layers" hidden><b>Layers</b><table><thead><tr><th></th><th>Show</th><th>Lock</th></tr></thead><tbody>${LAYERS.map(([k, l]) => `<tr><td>${l}</td><td><input type="checkbox" data-lshow="${k}" aria-label="Show ${l}"></td><td><input type="checkbox" data-llock="${k}" aria-label="Lock ${l}"></td></tr>`).join('')}</tbody></table><p>Hidden layers still print. Locked layers can't be picked or moved.</p></div></div>
       <span class="dw21-flex"></span>
       <button type="button" class="dw21-btn" id="dw21-markup">Markup a file</button><button type="button" class="dw21-btn primary" id="dw21-share">Share</button></div>`);
     const split = $q(w, '.du-draw-split');
     split.insertAdjacentHTML('afterbegin', '<div class="dw21-view" id="dw21-view" hidden><div class="dw21-view-svg" id="dw21-view-svg"></div></div>');
     canvasNumBox();
-    const syncSnap = () => w.querySelectorAll('[data-snap]').forEach(b => { b.classList.toggle('on', snap[b.dataset.snap] !== false); b.setAttribute('aria-pressed', String(snap[b.dataset.snap] !== false)); });
-    w.querySelectorAll('[data-snap]').forEach(b => b.onclick = () => { snap[b.dataset.snap] = snap[b.dataset.snap] === false; store.set('du21-snap', snap); syncSnap(); });
+    // V22: angle snap. Ortho = 90°; picking 15° or 45° turns Ortho off, turning Ortho on clears the angle step.
+    if (!(snap.angle >= 0)) snap.angle = 0;
+    const syncSnap = () => { w.querySelectorAll('[data-snap]').forEach(b => { b.classList.toggle('on', snap[b.dataset.snap] !== false); b.setAttribute('aria-pressed', String(snap[b.dataset.snap] !== false)); });
+      w.querySelectorAll('[data-angle]').forEach(b => { const on = snap.ortho === false && +b.dataset.angle === (snap.angle || 0); b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); }); };
+    w.querySelectorAll('[data-snap]').forEach(b => b.onclick = () => { snap[b.dataset.snap] = snap[b.dataset.snap] === false; if (b.dataset.snap === 'ortho' && snap.ortho !== false) snap.angle = 0; store.set('du21-snap', snap); syncSnap(); });
+    w.querySelectorAll('[data-angle]').forEach(b => b.onclick = () => { snap.angle = +b.dataset.angle; snap.ortho = false; store.set('du21-snap', snap); syncSnap(); });
     syncSnap();
     const lb = $q(w, '#dw21-layers-btn'), lp = $q(w, '#dw21-layers');
     lb.onclick = () => { lp.hidden = !lp.hidden; lb.setAttribute('aria-expanded', String(!lp.hidden)); };
@@ -62,23 +67,29 @@
 
     /* ---- typed lengths while drawing */
     function canvasNumBox() {
-      api.canvas.insertAdjacentHTML('beforeend', '<form class="dw21-num" id="dw21-num" hidden><label>Length <input id="dw21-num-in" autocomplete="off" inputmode="decimal" placeholder="12\'-6&quot;"></label><button type="submit">Place</button><small>Enter places the point, Esc cancels</small></form>');
+      api.canvas.insertAdjacentHTML('beforeend', '<form class="dw21-num" id="dw21-num" hidden><label>Length <input id="dw21-num-in" autocomplete="off" inputmode="decimal" placeholder="12\'-6&quot;"></label><label>Angle <input id="dw21-num-ang" autocomplete="off" inputmode="decimal" placeholder="mouse" aria-label="Angle in degrees, counterclockwise from east"></label><button type="submit">Place</button><small>Angle in degrees from east, counterclockwise (90 = north). Blank follows the mouse. Or type 12\'6&lt;30. Enter places, Esc cancels.</small></form>');
       numBox = $q(api.canvas, '#dw21-num');
-      const inp = $q(numBox, 'input');
-      numBox.onsubmit = e => { e.preventDefault(); placeTyped(inp.value); };
-      inp.addEventListener('keydown', e => { if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); closeNum(); api.canvas.focus(); } e.stopPropagation(); });
+      const inp = $q(numBox, '#dw21-num-in'), ang = $q(numBox, '#dw21-num-ang');
+      numBox.onsubmit = e => { e.preventDefault(); placeTyped(inp.value, ang.value); };
+      [inp, ang].forEach(el => el.addEventListener('keydown', e => { if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); closeNum(); api.canvas.focus(); } e.stopPropagation(); }));
       numBox.addEventListener('pointerdown', e => e.stopPropagation()); numBox.addEventListener('click', e => e.stopPropagation());
     }
     const startPt = () => (api.tool === 'camera' ? camPending : api.pending);
-    function openNum(first) { numBox.hidden = false; const inp = $q(numBox, 'input'); inp.value = first || ''; inp.focus(); }
+    function openNum(first) { numBox.hidden = false; const inp = $q(numBox, '#dw21-num-in'); inp.value = first || ''; $q(numBox, '#dw21-num-ang').value = ''; inp.focus(); }
     function closeNum() { numBox.hidden = true; }
-    function placeTyped(text) {
+    function placeTyped(text, angText) {
+      // V22: a typed angle (degrees, counterclockwise from east, so 90 points up the sheet) or "12'6<30"
+      const mm = /^(.*?)<\s*(-?\d*\.?\d+)\s*°?\s*$/.exec(String(text || '')); if (mm) { text = mm[1]; angText = mm[2]; }
+      const A = String(angText == null ? '' : angText).trim() === '' ? NaN : parseFloat(angText);
       const L = D.parseFtIn(text), a = startPt();
       if (!(L > 0) || !a) { c.toast('Type a length like 12\'-6" and press Enter.', true); return; }
       const h = api.tool === 'camera' ? camHover : api.hover;
       let d = h ? { x: h.x - a.x, y: h.y - a.y } : { x: 1, y: 0 }; const l = Math.hypot(d.x, d.y);
       d = l > 0.01 ? { x: d.x / l, y: d.y / l } : { x: 1, y: 0 };
-      if (snap.ortho !== false) d = Math.abs(d.x) >= Math.abs(d.y) ? { x: Math.sign(d.x) || 1, y: 0 } : { x: 0, y: Math.sign(d.y) };
+      if (isFinite(A)) d = { x: Math.cos(A * Math.PI / 180), y: -Math.sin(A * Math.PI / 180) };
+      else if (snap.ortho !== false) d = Math.abs(d.x) >= Math.abs(d.y) ? { x: Math.sign(d.x) || 1, y: 0 } : { x: 0, y: Math.sign(d.y) };
+      else if (snap.angle > 0) { const st = snap.angle * Math.PI / 180, t = Math.round(Math.atan2(d.y, d.x) / st) * st; d = { x: Math.cos(t), y: Math.sin(t) }; }
+      if (Math.abs(d.x) < 1e-9) d.x = 0; if (Math.abs(d.y) < 1e-9) d.y = 0;
       // a run that starts inside a wall starts on that wall's centerline (as addWall does)
       let a0 = a;
       if (api.tool === 'wall' || api.tool === 'partition') api.model.walls.forEach(wl => { const WL = D.wallLength(wl), u = { x: (wl.b.x - wl.a.x) / WL, y: (wl.b.y - wl.a.y) / WL }, rx = a.x - wl.a.x, ry = a.y - wl.a.y, along = rx * u.x + ry * u.y, perp = Math.abs(rx * u.y - ry * u.x); if (along >= 0 && along <= WL && perp <= wl.thickness / 2 + 0.01 && Math.abs(u.x * d.x + u.y * d.y) < 0.01) a0 = { x: wl.a.x + u.x * along, y: wl.a.y + u.y * along }; });
@@ -295,7 +306,7 @@
         o.innerHTML = `<label>Camera <select id="dw21-camtool"><option value="section"${k === 'section' ? ' selected' : ''}>Section (cuts through)</option><option value="elevation"${k === 'elevation' ? ' selected' : ''}>Elevation (looks at)</option></select></label>`;
         $q(o, 'select').onchange = e => store.set('du21-camkind', e.target.value);
       }
-      if (['wall', 'partition', 'stair', 'dim', 'camera'].includes(tool)) o.insertAdjacentHTML('beforeend', '<span class="dw21-tip">After the first click, type a length (12\'6) and press Enter.</span>');
+      if (['wall', 'partition', 'stair', 'dim', 'camera', 'shape'].includes(tool)) o.insertAdjacentHTML('beforeend', '<span class="dw21-tip">After the first click, type a length (12\'6) or a length and angle (12\'6&lt;30) and press Enter.</span>');
       if (tool !== 'camera') { camPending = null; camHover = null; }
       closeNum();
     }
@@ -308,7 +319,7 @@
     function keydown(ev, tool) {
       if (ev.ctrlKey || ev.metaKey || ev.altKey) return false;
       if (ev.key === 'Escape') { camPending = null; camHover = null; closeNum(); return false; }
-      if (/^[0-9.]$/.test(ev.key) && ['wall', 'partition', 'stair', 'dim', 'camera'].includes(tool) && startPt()) { ev.preventDefault(); openNum(ev.key); return true; }
+      if (/^[0-9.]$/.test(ev.key) && ['wall', 'partition', 'stair', 'dim', 'camera', 'shape'].includes(tool) && startPt()) { ev.preventDefault(); openNum(ev.key); return true; }
       const cam = selCam();
       if (cam && tool === 'select') {
         if (ev.key === 'Delete' || ev.key === 'Backspace') { ev.preventDefault(); const id = cam.id; change(() => { api.model.cameras = cams().filter(x => x.id !== id); api.sel = null; }); return true; }
