@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { adminRest, adminSelectOne, creditMessage, missingConfig, models as modelList, openaiCancel, openaiCreate, openaiGet, outputText, readTicket, refundCredits, refundOnce, reserveCredits, signTicket, signedInUser, sourcesFrom, type CreditAccess } from '@/lib/drawup-server';
+import { accountGate, adminRest, adminSelectOne, creditMessage, missingConfig, models as modelList, openaiCancel, openaiCreate, openaiGet, outputText, readTicket, refundCredits, refundOnce, reserveCredits, signTicket, signedInUser, sourcesFrom, type CreditAccess } from '@/lib/drawup-server';
 import { quickCall, quickCoachPrompt, type QuickResult } from '@/lib/drawup-quick';
 import { createHash } from 'node:crypto';
 import { recordDetailQuery, recordDetailSources } from '@/lib/drawup-details';
@@ -80,6 +80,10 @@ export async function POST(request: Request) {
 
     const notReady = missingConfig();
     if (notReady) return NextResponse.json({ error: 'Arch Coach is not connected yet: ' + notReady }, { status: 503 });
+    // V22: two accounts per person. Checked before ANY AI call, because the quick-final and clarify paths
+    // below answer for free and return before reserveCredits.
+    const gated = await accountGate(user);
+    if (gated) return NextResponse.json({ error: creditMessage(gated, 0), ...gated }, { status: 402 });
 
     const transcript = history.map(t => `${t.role === 'user' ? 'USER' : 'ARCH COACH'}: ${t.content}`).join('\n');
     const combined = `${transcript}\nPROJECT LOCATION FIELD: ${location || '(not separately supplied)'}`;

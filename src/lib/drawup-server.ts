@@ -101,6 +101,7 @@ export type CreditAccess = {
   is_anonymous?: boolean;
   free_questions_remaining?: number;
   guest_keys?: string[]; // V21: hashed device / network keys of a guest question
+  reason?: string; // V22: two-account rule code when code is ACCOUNT_LIMIT
 };
 
 export async function isHqAccount(userId: string) {
@@ -112,8 +113,28 @@ export async function isHqAccount(userId: string) {
  * Takes the credits for one action BEFORE the AI runs (the 0013 server gate).
  * DrawUp HQ accounts (founder / drawup_admin) are not charged.
  */
+/**
+ * V22: two accounts per person (migration 0044). A signed-in account that was never linked to a device
+ * (e.g. made by calling Supabase sign up directly) or that breaks the personal + school/firm/business rule
+ * gets no free answers, free credits, trials or plan credits. Returns null when allowed. Guests and HQ pass.
+ */
+export async function accountGate(user: DrawUpUser): Promise<CreditAccess | null> {
+  if (user.is_anonymous) return null;
+  let gate: { ok?: boolean; code?: string; reason?: string } | null = null;
+  try {
+    gate = await adminRpc('drawup_account_allowance', { p_user_id: user.id, p_strict: process.env.DRAWUP_ACCOUNT_FP_ALONE === '1' });
+  } catch (e: any) {
+    // Only a missing 0044 migration is let through (so a deploy before the SQL never blocks everyone).
+    if (!/drawup_account_allowance|PGRST202|schema cache/i.test(String(e?.message || ''))) throw e;
+    console.error('[drawup] 0044 account limit not installed; allowance not checked');
+  }
+  return gate && !gate.ok ? { ok: false, code: gate.code || 'ACCOUNT_LIMIT', reason: gate.reason, credits_charged: 0 } : null;
+}
+
 export async function reserveCredits(user: DrawUpUser, cost: number, action: string): Promise<CreditAccess> {
   if (await isHqAccount(user.id)) return { ok: true, access_type: 'hq', credits_charged: 0, hq: true };
+  const blocked = await accountGate(user);
+  if (blocked) return blocked;
   const access = await adminRpc<CreditAccess>('reserve_arch_coach_v11_access', {
     p_user_id: user.id,
     p_is_anonymous: !!user.is_anonymous,
@@ -143,9 +164,18 @@ export async function refundCredits(userId: string, access: CreditAccess | null 
   }
 }
 
+const ACCOUNT_RULE: Record<string, string> = {
+  same_personal: 'This device already has a personal DrawUp account. A second account must use a school, firm or business email.',
+  same_work: 'This device already has a school, firm or business DrawUp account. A second account must use a personal email.',
+  two_accounts: 'This device already has two DrawUp accounts (one personal, one school, firm or business). Each person can have two.',
+  default: 'Each person can have two DrawUp accounts: one personal email and one school, firm or business email.',
+};
+
 export function creditMessage(access: CreditAccess, cost: number) {
   if (access.code === 'INSUFFICIENT_CREDITS') return `This needs ${cost} credits and you have ${access.credits_remaining ?? 0}. Add credits from Account to continue.`;
   if (access.code === 'GUEST_LIMIT_REACHED') return 'Your guest questions are used. Create a free DrawUp account to keep going.';
+  if (access.code === 'ACCOUNT_NOT_LINKED') return 'This account is not set up for free DrawUp credits yet. Sign in on the DrawUp site to finish setting it up. Each person can have two accounts: one personal email and one school, firm or business email.';
+  if (access.code === 'ACCOUNT_LIMIT') return 'This account has no free DrawUp credits. ' + (ACCOUNT_RULE[access.reason || ''] || ACCOUNT_RULE.default);
   return 'Your DrawUp allowance does not cover this action.';
 }
 
