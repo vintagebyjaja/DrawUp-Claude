@@ -436,6 +436,7 @@ async function renderProject(w,p){
   w.querySelector('#dp-coach').onclick=()=>{coachIntent={projectId:p.id,newThread:true};openPortalTab('arch-coach');};
   w.querySelectorAll('[data-open-thread]').forEach(b=>b.onclick=()=>{coachIntent={threadId:b.dataset.openThread};openPortalTab('arch-coach');});
   try{window.DrawUpSets?.mount?.(w,p);}catch(e){console.warn('Drawing sets',e);}
+  try{window.DrawUpProjectStudio?.mount?.(w,p,client,currentUser,toast);}catch(e){console.warn('Project development studio',e);}
 }
 async function renderStarter(w,proj){
   const save=async step=>{proj.progress={...(proj.progress||{}),step};const r=await client.from('project_threads').update({progress:proj.progress,updated_at:new Date().toISOString()}).eq('id',proj.id).eq('owner_id',currentUser.id);if(r.error)toast('Progress not saved: '+r.error.message,true);};

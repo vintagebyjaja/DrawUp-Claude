@@ -112,6 +112,39 @@ async function uploadKit(c,firm,file,kind,extra){
 async function fileBytes(c,path){const r=await c.client.storage.from(BUCKET).download(path);if(r.error)throw r.error;return new Uint8Array(await r.data.arrayBuffer());}
 async function signed(c,f,download){const r=await c.client.storage.from(BUCKET).createSignedUrl(f.storage_path,600,download?{download:f.file_name}:undefined);if(r.error)throw r.error;return r.data.signedUrl;}
 async function readPdfInfo(bytes){const L=await pdfjs();const doc=await L.getDocument({data:bytes.slice()}).promise;const p=await doc.getPage(1);const v=p.getViewport({scale:1});return {doc,pages:doc.numPages,w:v.width/72,h:v.height/72};}
+/* DrawUp v22 combined: Extract only recognizable statements. Never treat an upload as parsed merely because it exists. */
+const PLAYBOOK_TERMS={
+ fonts:/font|typeface|text size|lettering|typograph/i,
+ lines:/lineweight|line weight|pen weight|line type|linetype/i,
+ sheets:/sheet size|sheet setup|margin|paper size|arch d|arch e|24.?x.?36/i,
+ titleblock:/title ?block|titleblock|drawing border/i,
+ sheetids:/sheet nam|sheet number|sheet index|sheet identification/i,
+ layers:/layer nam|workset|cad layer/i,
+ dimensions:/dimension|annotation|keynote|tagging/i,
+ presentation:/rendering|visualization|presentation style|image resolution/i
+};
+async function extractFirmPdf(bytes){
+ const info=await readPdfInfo(bytes),matches={},unmapped=[];
+ for(let i=1;i<=Math.min(info.pages,120);i++){
+  const page=await info.doc.getPage(i),content=await page.getTextContent();
+  const strings=content.items.map(x=>({s:(x.str||'').trim(),y:Math.round(x.transform?.[5]||0)})).filter(x=>x.s);
+  const lines=[];let prev=null;
+  for(const item of strings){if(prev&&Math.abs(item.y-prev.y)<=3){prev.text+=' '+item.s;}else{prev={y:item.y,text:item.s};lines.push(prev);}}
+  for(const line of lines){const value=line.text.replace(/\s+/g,' ').trim();if(value.length<18||value.length>450)continue;
+   const keys=Object.keys(PLAYBOOK_TERMS).filter(k=>PLAYBOOK_TERMS[k].test(value));
+   if(keys.length===1){const k=keys[0];(matches[k]??=[]).push({text:value,page:i});}
+   else if(keys.length>1)unmapped.push({text:value,page:i});
+  }
+ }
+ return {matches,unmapped,pageCount:info.pages};
+}
+function firmExtractOverrides(extraction){const sections={};
+ for(const [key,items] of Object.entries(extraction.matches)){
+  const uniq=[...new Map(items.map(x=>[x.text.toLowerCase(),x])).values()].slice(0,12);
+  if(uniq.length)sections[key]={title:DEF[key].title,intro:'Candidate firm requirements extracted from the uploaded playbook. Firm administrator must review and confirm before use.',rows:uniq.map(x=>['PDF page '+x.page,x.text])};
+ }
+ return sections;
+}
 async function readPptx(bytes){await pptxLib();const JSZip=window.JSZip;if(!JSZip)throw new Error('The PowerPoint reader could not load.');
   const zip=await JSZip.loadAsync(bytes);const num=n=>+(n.match(/(\d+)\.xml$/)||[0,0])[1];
   const names=Object.keys(zip.files).filter(n=>/^ppt\/slides\/slide\d+\.xml$/.test(n)).sort((a,b)=>num(a)-num(b));
@@ -273,9 +306,10 @@ async function renderPlaybook(body,c,firm,admin){
    <p class="du-muted">Fonts, text sizes, line weights, margins, sheet sizes, title block, sheet and layer naming, dimensions and presentation style. ${admin?'You can edit any section or upload your firm\'s own playbook as a PDF or PowerPoint.':'Only firm admins can change it.'}</p></div>
    ${admin?`<div class="fk-actions"><button class="du-btn primary" type="button" data-fk-act="edit">Edit standards</button><label class="du-btn ghost fk-file">Upload firm playbook<input type="file" id="fk-pb-file" accept=".pdf,.pptx,application/pdf,${PPTX_MIME}" hidden></label><label class="fk-check"><input type="checkbox" id="fk-pb-replace" checked> Replace the DrawUp playbook with the upload</label><span class="fk-st" id="fk-pb-st" role="status"></span></div>`:''}</article>
   ${primary?`<article class="du-glass fk-viewer-card"><div class="fk-row-head"><div><span class="du-kicker">FIRM PLAYBOOK FILE</span><h3>${esc(primary.file_name)}</h3></div>${admin?`<button class="du-btn ghost" type="button" data-fk-act="use-drawup">Show DrawUp standards instead</button>`:''}</div><div class="fk-viewer" data-file="${primary.id}"></div></article>`:''}
+  ${admin&&primary&&/\.pdf$/i.test(primary.file_name)?`<article class="du-glass fk-extract"><h3>Read firm standards from PDF</h3><p class="du-muted">Extract candidate requirements with page references, review them, then confirm. Unspecified categories retain DrawUp General.</p><button class="du-btn ghost" type="button" data-fk-act="extract">Analyze uploaded PDF</button><div id="fk-extraction" role="status"></div></article>`:''}
   <div class="fk-chips">${secs.map(s=>`<button type="button" data-fk-jump="${esc(s.key)}">${esc(s.title)}</button>`).join('')}</div>
-  ${primary?`<p class="fk-sub">${esc(DEFAULT_LABEL)}. Shown for reference below your firm's file.</p>`:''}
-  <div class="fk-secs">${secs.map(s=>`<article class="du-glass fk-sec" id="fk-sec-${esc(s.key)}" data-key="${esc(s.key)}"><div class="fk-row-head"><h3>${esc(s.title)}</h3><span class="fk-tag ${s.edited?'firm':''}">${s.edited?'Firm standard':'DrawUp general'}</span></div>${s.intro?`<p class="du-muted">${esc(s.intro)}</p>`:''}<dl class="fk-dl">${s.rows.map(r=>`<div><dt>${esc(r[0])}</dt><dd>${esc(r[1])}</dd></div>`).join('')}</dl></article>`).join('')}</div>
+  ${primary?`<p class="fk-sub">Uploaded playbook retained. Only administrator-confirmed extracted standards replace DrawUp General; unspecified categories continue using DrawUp General.</p>`:''}
+  <div class="fk-secs">${secs.map(s=>`<article class="du-glass fk-sec" id="fk-sec-${esc(s.key)}" data-key="${esc(s.key)}"><div class="fk-row-head"><h3>${esc(s.title)}</h3><span class="fk-tag ${s.edited?'firm':''}">${s.edited?"Firm's Playbook":'DrawUp general'}</span></div>${s.intro?`<p class="du-muted">${esc(s.intro)}</p>`:''}<dl class="fk-dl">${s.rows.map(r=>`<div><dt>${esc(r[0])}</dt><dd>${esc(r[1])}</dd></div>`).join('')}</dl></article>`).join('')}</div>
   <p class="fk-src">${esc(DEFAULT_LABEL)}. Written from widely used US practice and the US National CAD Standard (NCS) conventions. It makes no claim about any particular firm. Confirm details against the current NCS edition and your firm's own standards.</p>
   <article class="du-glass fk-files"><span class="du-kicker">PLAYBOOK FILES</span><h3>${files.length?files.length+' file'+(files.length===1?'':'s'):'No playbook files yet'}</h3>
    ${files.map(f=>`<div class="fk-file-row" data-id="${f.id}"><div><b>${esc(f.file_name)}</b><small>${/pdf/.test(f.mime_type||'')?'PDF':'PowerPoint'} · ${kb(f.size_bytes||0)}${f.page_count?' · '+f.page_count+(/pdf/.test(f.mime_type||'')?' pages':' slides'):''} · ${day(f.created_at)}${primary&&primary.id===f.id?' · <span class="fk-tag firm">Firm playbook</span>':''}</small></div><div class="fk-btns"><button class="du-btn ghost" type="button" data-fk-view="${f.id}">View</button><button class="du-btn ghost" type="button" data-fk-dl="${f.id}">Download</button>${admin&&!(primary&&primary.id===f.id)?`<button class="du-btn ghost" type="button" data-fk-primary="${f.id}">Use as firm playbook</button>`:''}${admin?`<button class="du-btn ghost" type="button" data-fk-del="${f.id}">Remove</button>`:''}</div><div class="fk-viewer fk-inline" hidden></div></div>`).join('')||`<p class="du-muted">${admin?'Upload your firm\'s playbook (PDF or PowerPoint) to replace or sit alongside the DrawUp standards.':'Your firm has not uploaded a playbook file.'}</p>`}
@@ -286,6 +320,22 @@ async function renderPlaybook(body,c,firm,admin){
   body.querySelectorAll('[data-fk-view]').forEach(b=>b.onclick=()=>{const row=b.closest('.fk-file-row'),v=row.querySelector('.fk-inline');if(!v.hidden){v.hidden=true;v.innerHTML='';b.textContent='View';return;}v.hidden=false;b.textContent='Hide';viewFile(c,files.find(f=>f.id===b.dataset.fkView),v);});
   body.querySelectorAll('[data-fk-dl]').forEach(b=>b.onclick=async()=>{try{location.assign(await signed(c,files.find(f=>f.id===b.dataset.fkDl),true));}catch(e){c.toast(e.message||String(e),true);}});
   if(!admin)return;
+  body.querySelector('[data-fk-act="extract"]')?.addEventListener('click',async()=>{
+    const panel=body.querySelector('#fk-extraction');panel.textContent='Reading text from PDF pages…';
+    try{
+      const extraction=await extractFirmPdf(await fileBytes(c,primary.storage_path));
+      const ov=firmExtractOverrides(extraction),keys=Object.keys(ov);
+      if(!keys.length){panel.textContent='No confident category matches found. Enter standards manually; the original PDF remains available.';return;}
+      panel.innerHTML=`<p>Found candidate text in ${keys.length} categories. These are not approved standards until confirmed by a firm administrator.</p>`+
+       keys.map(k=>`<details><summary>${esc(DEF[k].title)} · ${ov[k].rows.length} candidates</summary>${ov[k].rows.map(r=>`<p><small>${esc(r[0])}</small> ${esc(r[1])}</p>`).join('')}</details>`).join('')+
+       '<label class="fk-check"><input type="checkbox" id="fk-confirm"> I reviewed these candidate requirements and approve them as firm standards.</label><button class="du-btn primary" type="button" id="fk-apply-extracted">Apply approved standards</button>';
+      panel.querySelector('#fk-apply-extracted').onclick=async()=>{
+        if(!panel.querySelector('#fk-confirm').checked){c.toast('Review and confirm the extracted standards first.',true);return;}
+        const merged={...(pb?.standards?.sections||{}),...ov};
+        try{await savePb({standards:{version:1,sections:merged},mode:'upload'});c.toast('Approved firm standards saved.');reload();}catch(e){c.toast(e.message||String(e),true);}
+      };
+    }catch(e){panel.textContent='Extraction failed: '+(e.message||e);}
+  });
   const st=body.querySelector('#fk-pb-st');
   const savePb=async patch=>{const row={firm_id:firm.id,mode:pb?.mode||'drawup',standards:pb?.standards||{},primary_file_id:pb?.primary_file_id||null,...patch,updated_at:new Date().toISOString(),updated_by:c.user.id};const r=await c.client.from('firm_playbooks').upsert(row,{onConflict:'firm_id'}).select('*').single();if(r.error)throw r.error;return r.data;};
   body.querySelector('#fk-pb-file').onchange=async e=>{const file=e.target.files[0];e.target.value='';if(!file)return;

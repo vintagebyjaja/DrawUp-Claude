@@ -129,3 +129,5 @@
   .fk-modal-card{padding:18px 14px}
   .fk-thumbstrip{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
+
+.fk-extract{padding:18px}.fk-extract details{padding:9px 0;border-bottom:1px solid rgba(127,231,255,.18)}.fk-extract summary{cursor:pointer;font-weight:700}.fk-extract details p{font-size:12px;color:#d5e7f3}.fk-extract details small{color:#7fe7ff;margin-right:8px}

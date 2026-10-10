@@ -957,14 +957,53 @@
     $$(host, '[data-unpub]').forEach(b => b.onclick = async e => { e.stopPropagation(); const { error: e2 } = await sb().from('draw_details').update({ [flag]: false }).eq('id', b.dataset.unpub).eq('owner_id', u.id); if (e2) { toast(null, e2.message, true); return; } cards3D(host, flag, opts); });
     $$(host, '[data-dd22-new]').forEach(b => b.onclick = () => { history.replaceState(null, '', '#portal/draw?detail=list'); window.DrawUpPortal?.openPortalTab?.('draw'); });
   }
-  /* Detail Library hook: a "3D details" tab next to the library (drawup-details-v21.js calls this after it renders). */
+  /* Four library views. Existing catalog/search/downloads are untouched. */
   function detailsTab(host, o) {
-    if (o && o.publicPage) return; if (!host || host.querySelector('.dd22-libtabs')) return;
+    if (o && o.publicPage) return;
+    if (!host || host.querySelector('.dd22-libtabs')) return;
     const head = host.querySelector('.dd21-head'); if (!head) return;
-    head.insertAdjacentHTML('afterend', `<div class="dd22-libtabs" role="tablist" aria-label="Detail Library views"><button type="button" role="tab" data-lt="lib">Library</button><button type="button" role="tab" data-lt="3d">3D details</button></div><div class="dd22-libpane" id="dd22-libpane" hidden></div>`);
-    const pane = host.querySelector('#dd22-libpane'), libEls = () => ['.dd21-disc', '.dd21-filters', '.dd21-chips', '#dd21-count', '#dd21-results'].map(s => host.querySelector(s)).filter(Boolean);
-    const set = t => { store.set('dd22-libtab', t); $$(host, '[data-lt]').forEach(b => { b.classList.toggle('on', b.dataset.lt === t); b.setAttribute('aria-selected', String(b.dataset.lt === t)); }); libEls().forEach(el => { el.hidden = t === '3d'; }); pane.hidden = t !== '3d'; if (t === '3d') cards3D(pane, 'in_library', { intro: '<p class="dd22-tabintro">Your plan and section details as 3D holograms: turn them, explode the layers, flip to the realistic render, or ask Arch Coach.</p>' }); };
-    $$(host, '[data-lt]').forEach(b => b.onclick = () => set(b.dataset.lt)); set(store.get('dd22-libtab', 'lib') === '3d' ? '3d' : 'lib');
+    head.insertAdjacentHTML('afterend', `<div class="dd22-libtabs" role="tablist" aria-label="Detail Library views"><button type="button" role="tab" data-lt="2d">DrawUp 2D</button><button type="button" role="tab" data-lt="public3d">DrawUp 3D</button><button type="button" role="tab" data-lt="mine">My 3D</button><button type="button" role="tab" data-lt="firm">Firm</button></div><div class="dd22-libpane" id="dd22-libpane" hidden></div>`);
+    const pane = host.querySelector('#dd22-libpane');
+    const libEls = () => ['.dd21-disc', '.dd21-filters', '.dd21-chips', '#dd21-count', '#dd21-results'].map(s => host.querySelector(s)).filter(Boolean);
+    const catalog = () => window.DrawUpDetailCatalog || [];
+    function public3D() {
+      const list = catalog();
+      pane.innerHTML = `<section class="dd22-public3d"><h2>DrawUp 3D · Public assembly library</h2><div class="dd23-target"><img src="/drawup-v23/four-detail-visual-reference.png" alt="Design target: four sample holographic assembly detail screens" loading="lazy"><p><strong>V23 design target:</strong> 3D assembly and 2D drawing side by side, with Hologram, Exploded, Section, Layers and Realistic views, materials, specifications and site-learning notes. These four are visual concepts, not verified construction geometry or 35 finished models.</p></div><p>Browse the ${list.length} existing 2D detail references by their original categories. Each reference remains available in DrawUp 2D. Interactive 3D geometry must be modeled and verified before it is marked available.</p><div class="dd22-3d-filters"><input type="search" aria-label="Search 3D detail references" placeholder="Search roof, parapet, wall section…" data-p3-search><select aria-label="Category" data-p3-cat><option value="">All categories</option>${[...new Set(list.map(x=>x.cat))].map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join('')}</select></div><div class="dd22-grid" id="dd22-p3-grid"></div></section>`;
+      const grid = pane.querySelector('#dd22-p3-grid');
+      const paint = () => {
+        const q = pane.querySelector('[data-p3-search]').value.toLowerCase().trim(), cat = pane.querySelector('[data-p3-cat]').value;
+        const matches = list.filter(d=>(!cat||d.cat===cat)&&(!q||[d.title,d.code,d.cat,d.mat,d.asm].join(' ').toLowerCase().includes(q)));
+        grid.innerHTML = matches.map(d=>`<article class="dd22-card"><div class="dd22-refimg"><img src="${window.DrawUpDetails.urlOf(d)}" alt="2D reference for ${esc(d.title)}" loading="lazy"></div><div><span class="dd22-kick">${esc(d.code)} · ${esc(d.cat)}</span><h3>${esc(d.title)}</h3><small>2D reference available · 3D model pending</small></div><div class="dd22-acts"><button type="button" class="du-btn ghost" data-ref="${esc(d.id)}">View 2D reference</button></div></article>`).join('')||'<p>No matching references.</p>';
+        grid.querySelectorAll('[data-ref]').forEach(b=>b.onclick=()=>window.DrawUpDetails.viewer(b.dataset.ref));
+      };
+      pane.querySelector('[data-p3-search]').oninput=paint;
+      pane.querySelector('[data-p3-cat]').onchange=paint;
+      paint();
+    }
+    function firmView() {
+      pane.innerHTML = `<section class="dd22-public3d"><h2>Firm · Authorized libraries</h2><p>Firm-owned details are governed by each firm’s access rules. This view does not expose private files from former employers without explicit authorization.</p><div id="dd22-firm-list" class="dd22-grid"></div></section>`;
+      const box=pane.querySelector('#dd22-firm-list');
+      const client=window.drawupSupabaseClient;
+      if (!client) {box.textContent='Sign in to browse firm libraries.';return;}
+      (async()=>{
+        const {data:{user}}=await client.auth.getUser();
+        if(!user){box.textContent='Sign in to browse your authorized firm libraries.';return;}
+        // Only firm details whose visibility is granted by Supabase RLS can be returned.
+        const {data,error}=await client.from('details').select('id,title,category,description,firm_id,firms(name),detail_assets(file_name,file_ext,public_url)').not('firm_id','is',null).eq('status','published').order('created_at',{ascending:false}).limit(150);
+        if(!pane.isConnected)return;
+        if(error){box.textContent='Firm library unavailable: '+error.message;return;}
+        box.innerHTML=(data||[]).length?(data||[]).map(d=>`<article class="dd22-card"><div><span class="dd22-kick">${esc(d.firms?.name||'Firm')} · ${esc(d.category||'Detail')}</span><h3>${esc(d.title)}</h3><small>${esc(d.description||'Firm detail')}</small></div><div class="dd22-acts">${(d.detail_assets||[]).filter(a=>a.public_url).map(a=>`<a class="du-btn ghost" href="${esc(a.public_url)}" target="_blank" rel="noopener noreferrer">${esc(a.file_ext||'File')}</a>`).join('')}</div></article>`).join(''):'<p>No firm details are currently accessible to this account.</p>';
+      })().catch(e=>{box.textContent='Firm library could not load: '+e.message;});
+    }
+    const set = t => {
+      if(!['2d','public3d','mine','firm'].includes(t))t='2d';
+      store.set('dd22-libtab',t);
+      $$(host,'[data-lt]').forEach(b=>{b.classList.toggle('on',b.dataset.lt===t);b.setAttribute('aria-selected',String(b.dataset.lt===t));});
+      libEls().forEach(el=>{el.hidden=t!=='2d';});pane.hidden=t==='2d';
+      if(t==='public3d')public3D();else if(t==='mine')cards3D(pane,'in_library',{intro:'<p class="dd22-tabintro">Your personal interactive hologram models. Rotate, explode, and study your uploaded assemblies.</p>'});else if(t==='firm')firmView();
+    };
+    $$(host,'[data-lt]').forEach(b=>b.onclick=()=>set(b.dataset.lt));
+    const saved=store.get('dd22-libtab','2d');set(saved==='lib'?'2d':saved==='3d'?'mine':saved);
   }
   (window.DrawUpDetailTabs = window.DrawUpDetailTabs || []).push(detailsTab);
   /* Playbook hook: a "3D" hub tab (#portal/arch-coach?pb=3d). */
