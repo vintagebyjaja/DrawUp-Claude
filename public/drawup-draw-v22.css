@@ -165,3 +165,15 @@
 
 /* V23: individual assembly art, never an image of the entire dashboard */
 .dd23-detail{background:#071b2c;border:1px solid #2c6b84;border-radius:14px;padding:18px;margin:16px 0 24px}.dd23-detail-head span{color:#70e9f5;font-size:12px;font-weight:700}.dd23-detail-head h3{margin:8px 0 16px;color:#f0fbff}.dd23-side-by-side{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:12px}.dd23-side-by-side figure{margin:0;background:#061421;border:1px solid #22495c;border-radius:10px;overflow:hidden}.dd23-side-by-side figcaption{font-size:11px;letter-spacing:.07em;color:#8ed9e6;padding:10px}.dd23-side-by-side img{display:block;width:100%;height:420px;object-fit:contain}.dd23-detail-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}.dd23-assembly-card .dd22-refimg img{object-fit:contain;width:100%;height:220px;background:#061421}@media(max-width:850px){.dd23-side-by-side{grid-template-columns:1fr}.dd23-side-by-side img{height:310px}}
+
+/* V23 selected-detail hero: entire thumbnail is clickable; chosen drawing expands above grid. */
+.dd22-public3d #dd23-selected{scroll-margin-top:84px}
+.dd22-public3d .dd23-detail{width:100%;box-sizing:border-box;padding:clamp(12px,2vw,24px);box-shadow:0 12px 44px rgba(0,0,0,.22)}
+.dd22-public3d .dd23-detail-head h3{font-size:clamp(20px,2.1vw,32px);line-height:1.15}
+.dd22-public3d .dd23-side-by-side{grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:16px}
+.dd22-public3d .dd23-side-by-side img{height:clamp(400px,48vw,720px);object-fit:contain}
+.dd22-public3d .dd23-assembly-card{cursor:pointer;transition:border-color .18s,box-shadow .18s,transform .18s;outline-offset:3px}
+.dd22-public3d .dd23-assembly-card:hover,.dd22-public3d .dd23-assembly-card:focus-visible{border-color:#43dafa;transform:translateY(-2px)}
+.dd22-public3d .dd23-assembly-card.dd23-active{border:2px solid #39dafa;box-shadow:0 0 0 2px rgba(57,218,250,.15),0 0 20px rgba(57,218,250,.14)}
+.dd22-public3d .dd23-open-label{pointer-events:none;display:inline-block}
+@media(max-width:850px){.dd22-public3d .dd23-side-by-side{grid-template-columns:1fr}.dd22-public3d .dd23-side-by-side img{height:clamp(300px,70vw,540px)}}

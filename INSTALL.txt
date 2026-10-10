@@ -1,0 +1,1 @@
+Copy the public/ folder from this ZIP into your existing V23 project, replacing the two files. Clicking any DrawUp 3D detail card now updates a large selected-detail hero above the thumbnails, with the matching original 2D detail alongside it. Keyboard Enter/Space works. No changes to the artwork files.
