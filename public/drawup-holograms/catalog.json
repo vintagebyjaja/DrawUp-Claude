@@ -1,0 +1,212 @@
+[
+  {
+    "code": "WS-01",
+    "category": "Wall Sections",
+    "title": "Exterior Wall Section - Wood Frame on Stem Wall",
+    "asset": "/drawup-holograms/WS-01.svg"
+  },
+  {
+    "code": "EW-01",
+    "category": "Exterior Walls",
+    "title": "Wood Wall Base at Thickened Slab Edge",
+    "asset": "/drawup-holograms/EW-01.svg"
+  },
+  {
+    "code": "EW-02",
+    "category": "Exterior Walls",
+    "title": "CMU Control Joint - Plan",
+    "asset": "/drawup-holograms/EW-02.svg"
+  },
+  {
+    "code": "RF-01",
+    "category": "Roofs",
+    "title": "Parapet with Metal Coping at Low-Slope Roof",
+    "asset": "/drawup-holograms/RF-01.svg"
+  },
+  {
+    "code": "RF-02",
+    "category": "Roofs",
+    "title": "Eave + Gutter at Asphalt Shingle Roof",
+    "asset": "/drawup-holograms/RF-02.svg"
+  },
+  {
+    "code": "RF-03",
+    "category": "Roofs",
+    "title": "Roof Drain at Low-Slope Membrane Roof",
+    "asset": "/drawup-holograms/RF-03.svg"
+  },
+  {
+    "code": "FD-01",
+    "category": "Foundations",
+    "title": "Foundation Wall + Footing with Footing Drain",
+    "asset": "/drawup-holograms/FD-01.svg"
+  },
+  {
+    "code": "FD-02",
+    "category": "Foundations",
+    "title": "Spread Footing + Pier at Steel Column",
+    "asset": "/drawup-holograms/FD-02.svg"
+  },
+  {
+    "code": "SL-01",
+    "category": "Slabs",
+    "title": "Slab on Grade with Vapor Retarder + Control Joint",
+    "asset": "/drawup-holograms/SL-01.svg"
+  },
+  {
+    "code": "SL-02",
+    "category": "Slabs",
+    "title": "Slab Construction Joint with Smooth Dowels",
+    "asset": "/drawup-holograms/SL-02.svg"
+  },
+  {
+    "code": "DR-01",
+    "category": "Doors",
+    "title": "Hollow Metal Frame Head + Jamb at Steel Stud Wall",
+    "asset": "/drawup-holograms/DR-01.svg"
+  },
+  {
+    "code": "DR-02",
+    "category": "Doors",
+    "title": "Accessible Exterior Door Threshold",
+    "asset": "/drawup-holograms/DR-02.svg"
+  },
+  {
+    "code": "WN-01",
+    "category": "Windows",
+    "title": "Window Sill with Sill Pan Flashing - Wood Frame",
+    "asset": "/drawup-holograms/WN-01.svg"
+  },
+  {
+    "code": "WN-02",
+    "category": "Windows",
+    "title": "Window Head Flashing - Wood Frame",
+    "asset": "/drawup-holograms/WN-02.svg"
+  },
+  {
+    "code": "SF-01",
+    "category": "Storefront / Curtain Wall",
+    "title": "Aluminum Storefront Sill with Subsill",
+    "asset": "/drawup-holograms/SF-01.svg"
+  },
+  {
+    "code": "SF-02",
+    "category": "Storefront / Curtain Wall",
+    "title": "Aluminum Storefront Head with Deflection Receptor",
+    "asset": "/drawup-holograms/SF-02.svg"
+  },
+  {
+    "code": "CW-01",
+    "category": "Storefront / Curtain Wall",
+    "title": "Curtain Wall at Slab Edge - Perimeter Fire Safing",
+    "asset": "/drawup-holograms/CW-01.svg"
+  },
+  {
+    "code": "ST-01",
+    "category": "Stairs",
+    "title": "Stair Tread + Riser - Concrete-Filled Steel Pan",
+    "asset": "/drawup-holograms/ST-01.svg"
+  },
+  {
+    "code": "RL-01",
+    "category": "Railings",
+    "title": "Stair Guard + Handrail Elevation",
+    "asset": "/drawup-holograms/RL-01.svg"
+  },
+  {
+    "code": "RL-02",
+    "category": "Railings",
+    "title": "Wall-Mounted Handrail Bracket",
+    "asset": "/drawup-holograms/RL-02.svg"
+  },
+  {
+    "code": "AD-01",
+    "category": "Restrooms / ADA",
+    "title": "Accessible Water Closet + Grab Bars",
+    "asset": "/drawup-holograms/AD-01.svg"
+  },
+  {
+    "code": "AD-02",
+    "category": "Restrooms / ADA",
+    "title": "Accessible Lavatory + Mirror Section",
+    "asset": "/drawup-holograms/AD-02.svg"
+  },
+  {
+    "code": "MW-01",
+    "category": "Millwork",
+    "title": "Base Cabinet + Countertop Section",
+    "asset": "/drawup-holograms/MW-01.svg"
+  },
+  {
+    "code": "MW-02",
+    "category": "Millwork",
+    "title": "Accessible Transaction Counter Section",
+    "asset": "/drawup-holograms/MW-02.svg"
+  },
+  {
+    "code": "IN-01",
+    "category": "Interiors",
+    "title": "Interior Partition Base - Steel Stud on Slab",
+    "asset": "/drawup-holograms/IN-01.svg"
+  },
+  {
+    "code": "CL-01",
+    "category": "Ceilings",
+    "title": "Suspended Acoustical Ceiling at Wall Angle",
+    "asset": "/drawup-holograms/CL-01.svg"
+  },
+  {
+    "code": "CL-02",
+    "category": "Ceilings",
+    "title": "Gypsum Board Soffit at Acoustical Ceiling",
+    "asset": "/drawup-holograms/CL-02.svg"
+  },
+  {
+    "code": "SR-01",
+    "category": "Structural",
+    "title": "Steel Beam to Column Shear Tab Connection",
+    "asset": "/drawup-holograms/SR-01.svg"
+  },
+  {
+    "code": "SR-02",
+    "category": "Structural",
+    "title": "Steel Lintel at Brick Veneer Opening",
+    "asset": "/drawup-holograms/SR-02.svg"
+  },
+  {
+    "code": "MP-01",
+    "category": "MEP Coordination",
+    "title": "Ceiling Plenum Coordination Section",
+    "asset": "/drawup-holograms/MP-01.svg"
+  },
+  {
+    "code": "SI-01",
+    "category": "Site",
+    "title": "Concrete Curb + Gutter at Sidewalk",
+    "asset": "/drawup-holograms/SI-01.svg"
+  },
+  {
+    "code": "SI-02",
+    "category": "Site",
+    "title": "Concrete-Filled Steel Pipe Bollard",
+    "asset": "/drawup-holograms/SI-02.svg"
+  },
+  {
+    "code": "FL-01",
+    "category": "Fire / Life Safety",
+    "title": "Fire-Rated Head-of-Wall Joint at Steel Deck",
+    "asset": "/drawup-holograms/FL-01.svg"
+  },
+  {
+    "code": "FL-02",
+    "category": "Fire / Life Safety",
+    "title": "Metallic Pipe Penetration Firestop - Rated Wall",
+    "asset": "/drawup-holograms/FL-02.svg"
+  },
+  {
+    "code": "TY-01",
+    "category": "Typical Details",
+    "title": "Typical Interior Partition Types - Plan",
+    "asset": "/drawup-holograms/TY-01.svg"
+  }
+]
