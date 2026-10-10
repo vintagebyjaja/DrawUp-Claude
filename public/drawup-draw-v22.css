@@ -162,3 +162,6 @@
 
 /* V23: reference visual while structured 3D geometry is under development */
 .dd23-target{border:1px solid #1d6685;border-radius:16px;overflow:hidden;background:#041322;margin:16px 0 24px}.dd23-target img{display:block;width:100%;height:auto}.dd23-target p{color:#b6d5e5;padding:12px 16px;margin:0;font-size:13px;line-height:1.5}
+
+/* V23: individual assembly art, never an image of the entire dashboard */
+.dd23-detail{background:#071b2c;border:1px solid #2c6b84;border-radius:14px;padding:18px;margin:16px 0 24px}.dd23-detail-head span{color:#70e9f5;font-size:12px;font-weight:700}.dd23-detail-head h3{margin:8px 0 16px;color:#f0fbff}.dd23-side-by-side{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:12px}.dd23-side-by-side figure{margin:0;background:#061421;border:1px solid #22495c;border-radius:10px;overflow:hidden}.dd23-side-by-side figcaption{font-size:11px;letter-spacing:.07em;color:#8ed9e6;padding:10px}.dd23-side-by-side img{display:block;width:100%;height:420px;object-fit:contain}.dd23-detail-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}.dd23-assembly-card .dd22-refimg img{object-fit:contain;width:100%;height:220px;background:#061421}@media(max-width:850px){.dd23-side-by-side{grid-template-columns:1fr}.dd23-side-by-side img{height:310px}}

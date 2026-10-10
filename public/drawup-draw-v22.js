@@ -968,13 +968,21 @@
     const catalog = () => window.DrawUpDetailCatalog || [];
     function public3D() {
       const list = catalog();
-      pane.innerHTML = `<section class="dd22-public3d"><h2>DrawUp 3D · Public assembly library</h2><div class="dd23-target"><img src="/drawup-v23/four-detail-visual-reference.png" alt="Design target: four sample holographic assembly detail screens" loading="lazy"><p><strong>V23 design target:</strong> 3D assembly and 2D drawing side by side, with Hologram, Exploded, Section, Layers and Realistic views, materials, specifications and site-learning notes. These four are visual concepts, not verified construction geometry or 35 finished models.</p></div><p>Browse the ${list.length} existing 2D detail references by their original categories. Each reference remains available in DrawUp 2D. Interactive 3D geometry must be modeled and verified before it is marked available.</p><div class="dd22-3d-filters"><input type="search" aria-label="Search 3D detail references" placeholder="Search roof, parapet, wall section…" data-p3-search><select aria-label="Category" data-p3-cat><option value="">All categories</option>${[...new Set(list.map(x=>x.cat))].map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join('')}</select></div><div class="dd22-grid" id="dd22-p3-grid"></div></section>`;
-      const grid = pane.querySelector('#dd22-p3-grid');
-      const paint = () => {
-        const q = pane.querySelector('[data-p3-search]').value.toLowerCase().trim(), cat = pane.querySelector('[data-p3-cat]').value;
-        const matches = list.filter(d=>(!cat||d.cat===cat)&&(!q||[d.title,d.code,d.cat,d.mat,d.asm].join(' ').toLowerCase().includes(q)));
-        grid.innerHTML = matches.map(d=>`<article class="dd22-card"><div class="dd22-refimg"><img src="${window.DrawUpDetails.urlOf(d)}" alt="2D reference for ${esc(d.title)}" loading="lazy"></div><div><span class="dd22-kick">${esc(d.code)} · ${esc(d.cat)}</span><h3>${esc(d.title)}</h3><small>2D reference available · 3D model pending</small></div><div class="dd22-acts"><button type="button" class="du-btn ghost" data-ref="${esc(d.id)}">View 2D reference</button></div></article>`).join('')||'<p>No matching references.</p>';
-        grid.querySelectorAll('[data-ref]').forEach(b=>b.onclick=()=>window.DrawUpDetails.viewer(b.dataset.ref));
+      pane.innerHTML = `<section class="dd22-public3d"><h2>DrawUp 3D · Public assembly library</h2><p>Individual, proportionate educational assembly illustrations. Select a detail to view its 3D hologram beside the actual 2D technical drawing. Illustrations are not to scale and are not construction documents.</p><div class="dd22-3d-filters"><input type="search" aria-label="Search 3D details" placeholder="Search roof, parapet, wall section…" data-p3-search><select aria-label="Category" data-p3-cat><option value="">All categories</option>${[...new Set(list.map(x=>x.cat))].map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join('')}</select></div><div id="dd23-selected"></div><div class="dd22-grid" id="dd22-p3-grid"></div></section>`;
+      const grid = pane.querySelector('#dd22-p3-grid'), selected=pane.querySelector('#dd23-selected');
+      const imageUrl=d=>'/drawup-holograms/'+encodeURIComponent(d.code)+'.svg';
+      const show=d=>{
+        if(!d)return;
+        selected.innerHTML=`<div class="dd23-detail"><div class="dd23-detail-head"><span>${esc(d.code)} · ${esc(d.cat)}</span><h3>${esc(d.title)}</h3></div><div class="dd23-side-by-side"><figure><figcaption>3D HOLOGRAM · EDUCATIONAL / NOT TO SCALE</figcaption><img src="${imageUrl(d)}" alt="Individual 3D assembly illustration for ${esc(d.title)}" loading="eager"></figure><figure><figcaption>2D TECHNICAL DETAIL · REFERENCE</figcaption><img src="${window.DrawUpDetails.urlOf(d)}" alt="Original 2D construction drawing for ${esc(d.title)}" loading="eager"></figure></div><div class="dd23-detail-actions"><button type="button" class="du-btn ghost" data-ref="${esc(d.id)}">Open original 2D detail</button><a class="du-btn ghost" href="${imageUrl(d)}" download="${esc(d.code)}-3D-hologram.svg">Download individual 3D illustration</a></div></div>`;
+        selected.querySelector('[data-ref]').onclick=()=>window.DrawUpDetails.viewer(d.id);
+        selected.scrollIntoView({behavior:'smooth',block:'nearest'});
+      };
+      const paint=()=>{
+        const q=pane.querySelector('[data-p3-search]').value.toLowerCase().trim(),cat=pane.querySelector('[data-p3-cat]').value;
+        const matches=list.filter(d=>(!cat||d.cat===cat)&&(!q||[d.title,d.code,d.cat,d.mat,d.asm].join(' ').toLowerCase().includes(q)));
+        grid.innerHTML=matches.map(d=>`<article class="dd22-card dd23-assembly-card"><div class="dd22-refimg"><img src="${imageUrl(d)}" alt="3D hologram for ${esc(d.title)}" loading="lazy"></div><div><span class="dd22-kick">${esc(d.code)} · ${esc(d.cat)}</span><h3>${esc(d.title)}</h3><small>Individual 3D educational illustration</small></div><div class="dd22-acts"><button type="button" class="du-btn ghost" data-show3d="${esc(d.code)}">View 3D + 2D</button></div></article>`).join('')||'<p>No matching details.</p>';
+        grid.querySelectorAll('[data-show3d]').forEach(btn=>btn.onclick=()=>show(list.find(d=>d.code===btn.dataset.show3d)));
+        if(!selected.querySelector('.dd23-detail')&&matches.length)show(matches[0]);
       };
       pane.querySelector('[data-p3-search]').oninput=paint;
       pane.querySelector('[data-p3-cat]').onchange=paint;

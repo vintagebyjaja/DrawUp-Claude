@@ -1,0 +1,1 @@
+35 separate SVG illustrations at public/drawup-holograms/{detail-code}.svg. DrawUp 3D now shows actual standalone assembly illustrations and the corresponding 2D drawing, never the screenshot of a page. These are conceptual diagrams, not precise BIM geometry or independently validated construction assemblies. No automatic application to Projects or DrawUp Ready.
