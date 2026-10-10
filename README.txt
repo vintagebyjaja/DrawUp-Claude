@@ -1,13 +1,1 @@
-DrawUp Student Portfolio Contrast Fix
-
-Replace:
-  public/drawup-preview.html
-with the included file.
-
-Fixes only the white Student Portfolio Review cards:
-- dark navy card titles
-- dark charcoal description text
-- readable upload text
-- medium gray PDF/file helper text
-- keeps light-blue category labels
-- keeps orange review buttons unchanged
+10 individually cropped 3D construction assembly artworks from one generated composite. These are illustrative concepts, not verified against the source 2D drawings and not construction documents. Crops exclude navigation tabs and thumbnail bars. Not yet integrated into application code.
