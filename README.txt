@@ -1,1 +1,13 @@
-DrawUp V23 — 35 standalone 3D holographic educational assembly illustrations. Open HOLOGRAM-GALLERY.html. Copy public/drawup-holograms into the DrawUp public folder. Files are diagrammatic conceptual SVGs (NOT geometrically verified and NOT exact 2D-to-3D translations). The existing 2D catalog is the technical reference. Each asset uses the same detail code.
+DrawUp Student Portfolio Contrast Fix
+
+Replace:
+  public/drawup-preview.html
+with the included file.
+
+Fixes only the white Student Portfolio Review cards:
+- dark navy card titles
+- dark charcoal description text
+- readable upload text
+- medium gray PDF/file helper text
+- keeps light-blue category labels
+- keeps orange review buttons unchanged

@@ -1,31 +1,33 @@
-DRAWUP v22 SHEET-BY-SHEET PROGRESS PATCH
-========================================
-Based on the uploaded DrawUp-v22.zip. This is NOT the previous 90-minute timeout hotfix.
+DRAWUP V21.6 — CANONICAL / ALIAS PROJECT MATCH PATCH
 
-INSTALL (source code deployment, not a Netlify drag-and-drop static build):
-1. Back up the existing DrawUp v22 repository and Supabase database.
-2. In Supabase SQL Editor, run supabase/migrations/0051_check_sheet_progress.sql.
-   Existing v22 migration 0046 must already be installed.
-3. Replace src/app/api/check/route.ts in your existing source repository with the supplied file.
-4. Add "pdf-lib": "^1.17.1" to dependencies in package.json.
-5. Run npm install (regenerates your lockfile if one is used), npm run build, then deploy.
-6. Start a NEW plan-set review. Existing in-progress reviews use the legacy job path.
+Fixes the remaining case where DrawUp already has a project but a natural-language or former-name search misses it.
 
-WHAT IT DOES:
-- Reviews ONE original PDF page per OpenAI background job; commits findings and progress to Supabase after each completed page.
-- Failed individual pages retry up to twice, then get marked as unreviewed while other pages continue.
-- Results are saved incrementally in check_reviews.findings, sheet_completed, sheet_failed and sheet_index.
-- Reports can finish partially (e.g., 75% of pages) with explicit coverage notice; no false claim of complete review.
-- Drawing-set jobs are advanced by existing GET /api/check?id=... polling and GET /api/check?reconcile=1.
-- Narrative modes and approved rewrite path are unchanged.
-- If incomplete, existing partial-refund behavior is preserved (full refund), pending your desired billing policy.
+Example now handled:
+  "NFL Saints stadium" -> existing "Caesars Superdome" DrawUp record
 
-IMPORTANT LIMITATIONS:
-- A review progresses only while the client polls or another authorized process calls the reconcile endpoint.
-  It resumes when the user returns. This is not a fully autonomous worker/cron deployment.
-- Individual-page analysis cannot fully verify cross-sheet coordination or missing items across the set.
-  A later cross-sheet synthesis pass is recommended before advertising full coordination checking.
-- Large sets can generate MANY AI requests and higher API cost. Test on a small PDF first.
-- The page-count is read using pdf-lib; encrypted or corrupt PDFs may fail safely.
-- The frontend is unchanged; progress is persisted in API responses and summary/notice fields.
-- No live environment, build, deployment or real API test was performed here.
+What changed:
+- Existing-project matching now checks the whole known project record, not only the current project name.
+- Uses description, city/state/country, project type, owner, project tags and source names as identity context.
+- Common league/type words (NFL, NBA, MLB, stadium, arena, field, etc.) are treated as descriptors instead of forcing a false mismatch.
+- A strong contextual match becomes the canonical DrawUp result, so Arch Coach does not create a second competing project answer.
+- Existing V21.5 fuzzy matching, internal Back behavior, and image behavior remain intact.
+
+NO SQL REQUIRED.
+
+Replace the included public files with these versions, preserving your existing deployment structure.
+
+
+V21.7 SEARCH UX PATCH
+- Shows the exact question/search the user asked.
+- Never tells the user to make a search more specific after a timeout/failure.
+- Keeps a usable quick answer visible instead of replacing it with a failure state.
+- If clarification is genuinely needed, the existing clarification choices still ask the user a targeted question.
+- When a sourced report cannot complete in-session, tells the user they can use the current answer and view the DrawUp profile later for the full report.
+- Does not falsely claim a background job is running when the backend has not confirmed one.
+
+
+V21.8 PORTFOLIO CONTRAST REGRESSION FIX
+- Restores dark navy headings/body copy inside white Student Portfolio Review cards.
+- Restores readable upload/drop-zone and filename/helper text.
+- Keeps blue Architecture / Interior Design eyebrow labels and orange review buttons.
+- Layered directly on V21.7 so Search Answer Continuity remains intact.
