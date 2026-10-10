@@ -1,3 +1,4 @@
+import { PDFDocument } from 'pdf-lib';
 import { NextResponse } from 'next/server';
 import { streamCreate, streamRead } from '@/lib/drawup-stream';
 import { awardXp } from '@/lib/drawup-coach-persona';
@@ -325,6 +326,100 @@ async function startJob(payload: Record<string, unknown>) {
     .catch(() => openaiCreate({ ...payload, background: true, store: true }, list));
 }
 
+/* V22.1: one-page durable jobs. Every completed page is committed before advancing.
+   A browser poll/reconcile advances work; a scheduled poller can call the same endpoint.
+   No page is marked reviewed unless the response was successfully parsed. */
+const SHEET_TIMEOUT_MS = 8 * 60 * 1000;
+const SHEET_RETRIES = 2;
+async function startSheet(review: any, userId: string) {
+  const index = Number(review.sheet_index || 0);
+  const total = Number(review.sheet_total || 0);
+  if (index >= total) return finalizeSheets(review, userId);
+  // Compare-and-swap lease: concurrent browser polls cannot start the same page twice.
+  const claim = await adminUpdate('check_reviews', review.id, { sheet_state: 'starting', sheet_started_at: new Date().toISOString() },
+    `status=eq.reviewing&sheet_state=eq.idle&sheet_index=eq.${index}`);
+  if (!claim) return loadOwned(review.id, userId);
+  try {
+    const doc = await readDoc(review.file_path);
+    const original = await PDFDocument.load(doc.bytes);
+    const one = await PDFDocument.create();
+    const [page] = await one.copyPages(original, [index]);
+    one.addPage(page);
+    const bytes = await one.save();
+    const context = `This is ONLY ORIGINAL PDF PAGE ${index + 1} of ${total}. Report every finding with page=${index + 1}. Never infer compliance on other pages. Project: ${review.title || 'unknown'}. Jurisdiction: ${review.jurisdiction || 'not supplied'}. Building type: ${review.building_type || 'not supplied'}. Review focus: ${(review.focus || CATEGORIES).join(', ')}.`;
+    const payload = { instructions: INSTRUCTIONS + '\nIMPORTANT: Review this SINGLE sheet only. page_count=1; use original PDF page number for findings. Do not claim to have checked the rest of the set.',
+      input: [{ role: 'user', content: [{ type: 'input_file', filename: `sheet-${index + 1}.pdf`, file_data: 'data:application/pdf;base64,' + Buffer.from(bytes).toString('base64') }, { type: 'input_text', text: context }] }],
+      text: { format: { type: 'json_schema', name: 'drawup_check_report', strict: true, schema: SCHEMA } } };
+    const { data, model } = await startJob(payload);
+    return await adminUpdate('check_reviews', review.id, { response_id: data.id, model, sheet_state: 'running', sheet_started_at: new Date().toISOString(), error: null }, 'sheet_state=eq.starting');
+  } catch (e: any) {
+    const attempts = Number(review.sheet_attempts || 0) + 1;
+    const skip = attempts > SHEET_RETRIES;
+    await adminUpdate('check_reviews', review.id, { sheet_state: 'idle', sheet_index: skip ? index + 1 : index,
+      sheet_attempts: skip ? 0 : attempts, sheet_failed: skip ? [...(review.sheet_failed || []), { page: index + 1, reason: String(e.message) }] : (review.sheet_failed || []),
+      error: `Page ${index + 1}: ${e.message}` }, 'sheet_state=eq.starting');
+    return loadOwned(review.id, userId);
+  }
+}
+async function finalizeSheets(review: any, userId: string) {
+  const ok = (review.sheet_completed || []).length;
+  const total = Number(review.sheet_total || 0);
+  const failed = review.sheet_failed || [];
+  const notice = ok < total ? `PARTIAL REVIEW: ${ok}/${total} pages reviewed (${Math.round(ok / Math.max(total, 1) * 100)}%). ${failed.length} pages could not be reviewed. Unreviewed pages are NOT verified.` : null;
+  const updated = await adminUpdate('check_reviews', review.id, { status: ok ? 'complete' : 'failed', sheet_state: 'finished', response_id: null,
+    summary: `${ok} of ${total} pages reviewed. ${review.findings?.length || 0} findings saved. ${notice || 'All pages processed.'}`,
+    notice, error: ok ? null : 'No sheets could be reviewed.', completed_at: new Date().toISOString() }, 'status=eq.reviewing&sheet_state=eq.idle');
+  if (updated && ok < total) await refundCredits(userId, review.credit_access, 'check_partial_refund');
+  if (updated && ok) await awardXp(userId, 'check', review.id);
+  return updated || loadOwned(review.id, userId);
+}
+async function advanceSheets(review: any, userId: string) {
+  if (review.sheet_state === 'idle') return startSheet(review, userId);
+  if (review.sheet_state === 'starting') {
+    // Recover a lease abandoned during deployment or function termination.
+    if (Date.now() - new Date(review.sheet_started_at || review.started_at).getTime() > 120000)
+      await adminUpdate('check_reviews', review.id, { sheet_state: 'idle' }, `sheet_state=eq.starting&sheet_index=eq.${review.sheet_index}`);
+    return loadOwned(review.id, userId);
+  }
+  if (review.sheet_state !== 'running' || !review.response_id) return review;
+  const id = review.response_id;
+  const index = Number(review.sheet_index || 0);
+  let result: any = null;
+  let failure = '';
+  try {
+    const j = await readJob(id, null);
+    if (j.pending) {
+      if (Date.now() - new Date(review.sheet_started_at || review.started_at).getTime() < SHEET_TIMEOUT_MS) return review;
+      failure = 'Sheet timed out';
+      await openaiCancel(id).catch(() => {});
+    } else if (j.data?.status === 'completed') {
+      const parsed = parseReport(outputText(j.data), ['findings'], ['summary', 'code_basis', 'limitations']);
+      if (parsed && !parsed.partial) result = parsed.report;
+      else failure = 'Incomplete or unreadable sheet result';
+    } else failure = j.data?.error?.message || 'AI sheet review did not complete';
+  } catch (e: any) { failure = e.message || 'Sheet processing error'; }
+  // Serialize commits via a response-id CAS; only one poll can advance this page.
+  const nextAttempt = Number(review.sheet_attempts || 0) + 1;
+  if (!result && nextAttempt <= SHEET_RETRIES) {
+    const r = await adminUpdate('check_reviews', review.id, { sheet_state: 'idle', response_id: null, sheet_attempts: nextAttempt, error: `Retrying page ${index + 1}: ${failure}` }, `status=eq.reviewing&sheet_state=eq.running&response_id=eq.${encodeURIComponent(id)}`);
+    return r || loadOwned(review.id, userId);
+  }
+  const completed = [...(review.sheet_completed || [])];
+  const failed = [...(review.sheet_failed || [])];
+  let findings = [...(review.findings || [])];
+  if (result) {
+    completed.push(index + 1);
+    findings = findings.concat(normFindings(result.findings).map((f: any) => ({ ...f, page: index + 1 })));
+  } else failed.push({ page: index + 1, reason: failure });
+  const r = await adminUpdate('check_reviews', review.id, { sheet_state: 'idle', sheet_index: index + 1, response_id: null, sheet_attempts: 0,
+    sheet_completed: completed, sheet_failed: failed, findings, page_count: review.sheet_total,
+    summary: `${completed.length}/${review.sheet_total} pages reviewed; ${findings.length} findings saved.`,
+    notice: `IN PROGRESS: ${completed.length}/${review.sheet_total} pages reviewed. Findings are preliminary; remaining pages are unreviewed.`,
+    error: result ? null : `Page ${index + 1} could not be reviewed: ${failure}` },
+    `status=eq.reviewing&sheet_state=eq.running&response_id=eq.${encodeURIComponent(id)}`);
+  return r || loadOwned(review.id, userId);
+}
+
 /* ---------------------------------------------------------------- POST */
 export async function POST(request: Request) {
   const user = await signedInUser(request);
@@ -364,6 +459,24 @@ export async function POST(request: Request) {
   if (!access.ok) {
     await adminUpdate('check_reviews', review.id, { status: 'queued', started_at: null });
     return NextResponse.json({ error: creditMessage(access, cost), ...access }, { status: 402 });
+  }
+
+  if (mode === 'plans') {
+    try {
+      const parsedPdf = await PDFDocument.load(doc.bytes);
+      const total = parsedPdf.getPageCount();
+      if (!total) throw new Error('PDF has no pages.');
+      const updated = await adminUpdate('check_reviews', review.id, { sheet_total: total, sheet_index: 0, sheet_state: 'idle', sheet_completed: [], sheet_failed: [], sheet_attempts: 0,
+        findings: [], page_count: total, credits_charged: access.credits_charged ?? 0, credit_access: access, error: null,
+        notice: `IN PROGRESS: 0/${total} pages reviewed.`, summary: 'Review queued sheet by sheet.' });
+      await awardXp(user.id, 'upload', review.id);
+      const started = await startSheet(updated, user.id);
+      return NextResponse.json({ review: started, credits_charged: access.credits_charged ?? 0, credits_remaining: access.credits_remaining ?? null });
+    } catch (e: any) {
+      await refundCredits(user.id, access, 'check_start_failed');
+      await adminUpdate('check_reviews', review.id, { status: 'failed', error: `Unable to start sheet review: ${e.message}. Credits refunded.`, completed_at: new Date().toISOString() });
+      return NextResponse.json({ error: e.message }, { status: 502 });
+    }
   }
 
   const context = [
@@ -563,7 +676,10 @@ async function finishRewrite(userId: string, review: any, data: any) {
 async function reconcileRow(userId: string, row: any) {
   let done = false;
   try {
-    if (row.status === 'reviewing' && row.response_id) {
+    if (row.status === 'reviewing' && row.mode === 'plans' && row.sheet_state) {
+      const r = await advanceSheets(row, userId);
+      if (r?.status === 'complete' || r?.status === 'failed') { done = true; await notify(userId, r, 'DrawUp Check review finished', r.summary || 'Sheet review finished.'); }
+    } else if (row.status === 'reviewing' && row.response_id) {
       const j = await readJob(row.response_id, null);
       const old = Date.now() - new Date(row.started_at || row.created_at).getTime() > MAX_RUN_MS;
       let r: any = null;
@@ -605,6 +721,10 @@ export async function GET(request: Request) {
     return NextResponse.json({ review: r || await loadOwned(review.id, user.id) });
   }
 
+  if (review.status === 'reviewing' && review.mode === 'plans' && review.sheet_state) {
+    const r = await advanceSheets(review, user.id);
+    return NextResponse.json({ review: r || await loadOwned(review.id, user.id) });
+  }
   if (review.status !== 'reviewing' || !review.response_id) return NextResponse.json({ review });
   let j: JobRead;
   try { j = await readJob(review.response_id, after); }
