@@ -1,6 +1,6 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
-  "name": "drawup-claude",
+  "name": "drawup-aec",
   "main": ".open-next/worker.js",
   "compatibility_date": "2026-10-16",
   "compatibility_flags": [
