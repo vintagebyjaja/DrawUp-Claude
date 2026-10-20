@@ -10,6 +10,9 @@
     "directory": ".open-next/assets",
     "binding": "ASSETS"
   },
+  // V23.2: keep the Variables set in the Cloudflare dashboard. Without this, every deploy deletes them
+  // (secrets are kept), which is what removed NEXT_PUBLIC_SUPABASE_URL / _ANON_KEY and broke sign-in.
+  "keep_vars": true,
   "observability": {
     "enabled": true
   }
