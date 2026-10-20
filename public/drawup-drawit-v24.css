@@ -1,0 +1,87 @@
+/* DrawUp V24 Draw it up + Arch Coach attachments + Projects quick access. Dark glass + hologram cyan. */
+.du-dit24{margin:0 0 18px;border:1px solid rgba(127,231,255,.4);display:grid;gap:12px}
+.du-dit24 h2{margin:4px 0}
+.du-dit24-drop{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:110px;padding:18px;border:2px dashed rgba(127,231,255,.45);border-radius:16px;background:rgba(127,231,255,.05);cursor:pointer;text-align:center}
+.du-dit24-drop input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+.du-dit24-drop b{font-size:18px;color:#fff}
+.du-dit24-drop span{color:#9fb3c8}
+.du-dit24-drop.over,.du-dit24-drop:focus-within,.du-dit24-drop:focus{background:rgba(127,231,255,.12);border-color:#7fe7ff;outline:none}
+.du-dit24-drop.has{border-style:solid}
+.du-dit24-pics{display:flex;flex-wrap:wrap;gap:10px}
+.du-dit24-pics:empty{display:none}
+.du-dit24-pics figure{position:relative;margin:0;width:120px;display:grid;gap:4px}
+.du-dit24-pics img{width:120px;height:84px;object-fit:cover;border-radius:10px;border:1px solid rgba(127,231,255,.3);background:#fff}
+.du-dit24-pics figcaption{font-size:11px;color:#9fb3c8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.du-dit24-pics button{position:absolute;top:4px;right:4px;width:28px;height:28px;border-radius:50%;border:0;background:rgba(4,18,32,.85);color:#fff;font-size:18px;cursor:pointer}
+.du-dit24-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}
+.du-dit24-grid label{display:grid;gap:4px;color:#cfe9f5;font-size:13px}
+.du-dit24-grid label.wide{grid-column:1/-1}
+.du-dit24-grid input,.du-dit24-grid select,.du-dit24-grid textarea{width:100%;box-sizing:border-box;min-height:40px;padding:8px 10px;border-radius:10px;border:1px solid rgba(127,231,255,.25);background:rgba(4,18,32,.55);color:#fff;font:inherit}
+.du-dit24-more summary{cursor:pointer;color:#8edcff;min-height:36px;display:flex;align-items:center}
+.du-dit24-go{display:flex;flex-wrap:wrap;align-items:center;gap:12px}
+.du-dit24-go .du-btn{min-height:44px;padding:10px 22px;font-size:16px}
+.du-dit24-progress{display:grid;gap:8px}
+.du-dit24-bar{height:8px;border-radius:8px;background:rgba(127,231,255,.12);overflow:hidden}
+.du-dit24-bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#3fd0ff,#7fe7ff);transition:width .4s}
+.du-dit24-progress ol{display:flex;flex-wrap:wrap;gap:8px;list-style:none;margin:0;padding:0}
+.du-dit24-progress li{padding:6px 10px;border-radius:10px;border:1px solid rgba(127,231,255,.2);color:#9fb3c8;font-size:13px}
+.du-dit24-progress li.on{color:#06121e;background:#e4f8ff;border-color:#e4f8ff;font-weight:700}
+.du-dit24-progress li.done{color:#7fe7ff}
+.du-dit24-out:empty{display:none}
+.du-dit24-out{display:grid;gap:16px}
+.du-dit24-head{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px}
+.du-dit24-head>div:first-child{flex:1 1 380px}
+.du-dit24-head p{color:#cfe9f5;margin:4px 0}
+.du-dit24-warn{color:#ffd23f!important}
+.du-dit24-acts{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-start}
+.du-dit24-sheets{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.du-dit24-sheet{margin:0;display:grid;gap:6px}
+.du-dit24-sheet>button{padding:0;border:1px solid rgba(127,231,255,.3);border-radius:10px;overflow:hidden;background:#fff;cursor:zoom-in;display:block}
+.du-dit24-sheet img{display:block;width:100%;aspect-ratio:3/2;object-fit:contain;background:#fff}
+.du-dit24-sheet figcaption{display:flex;flex-wrap:wrap;align-items:center;gap:6px;color:#cfe9f5;font-size:13px}
+.du-dit24-sheet figcaption b{color:#fff}
+.du-dit24-dl{margin-left:auto;display:flex;gap:4px}
+.du-dit24-dl button{min-height:32px;padding:4px 8px;border-radius:8px;border:1px solid rgba(127,231,255,.3);background:rgba(4,18,32,.5);color:#8edcff;font:inherit;font-size:12px;cursor:pointer}
+.du-dit24-cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
+.du-dit24-cols h3{margin:0 0 6px}
+.du-dit24-list{margin:0 0 10px;padding-left:20px;display:grid;gap:8px;color:#cfe9f5}
+.du-dit24-list li{line-height:1.4}
+.du-dit24-list b{display:block;color:#fff;font-weight:600}
+.du-dit24-list span{display:block;color:#7fe7ff;font-size:12px}
+.du-dit24-list small{display:block;color:#9fb3c8}
+.du-dit24-list em{font-style:normal;font-size:11px;letter-spacing:.08em;padding:2px 6px;border-radius:6px;margin-right:4px;background:rgba(255,255,255,.1)}
+.du-dit24-list em.sev-critical{background:#5a1020;color:#ffb3c0}
+.du-dit24-list em.sev-major{background:#4a3a10;color:#ffd98a}
+.du-dit24-recent-wrap h3{margin:6px 0}
+.du-dit24-set{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border-radius:12px;border:1px solid rgba(127,231,255,.18);background:rgba(4,18,32,.4);margin-bottom:8px}
+.du-dit24-set b{display:block;color:#fff}
+.du-dit24-set small{color:#9fb3c8}
+.du-dit24-view{position:fixed;inset:0;z-index:2147483000;background:rgba(2,8,16,.94);display:grid;grid-template-rows:auto 1fr}
+.du-dit24-vbar{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 14px;color:#fff}
+.du-dit24-vbar span{display:flex;gap:6px}
+.du-dit24-vbar button{min-width:44px;min-height:44px;border-radius:10px;border:1px solid rgba(127,231,255,.35);background:rgba(4,18,32,.8);color:#fff;font-size:20px;cursor:pointer}
+.du-dit24-vbody{overflow:auto;padding:0 14px 14px}
+.du-dit24-vbody img{display:block;width:100%;max-width:none;background:#fff;margin:0 auto}
+/* Projects: quick access + sidebar sub-links */
+.du-dit24-quick{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:0 0 18px}
+.du-dit24-quick button{display:grid;gap:6px;text-align:left;padding:16px;border-radius:16px;border:1px solid rgba(127,231,255,.3);background:rgba(4,18,32,.55);color:#cfe9f5;font:inherit;cursor:pointer;min-height:44px}
+.du-dit24-quick button:hover,.du-dit24-quick button:focus-visible{border-color:#7fe7ff;background:rgba(127,231,255,.1)}
+.du-dit24-quick b{color:#fff;font-size:17px}
+.du-dit24-sub{display:grid;gap:2px;margin:-2px 0 4px 18px}
+.du-side .du-dit24-sub button{min-height:34px;font-size:13px;opacity:.9}
+/* Arch Coach: modes + attachments */
+.du-ac24-modes{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px}
+.du-ac24-modes button{min-height:40px;padding:8px 14px;border-radius:999px;border:1px solid rgba(127,231,255,.3);background:rgba(4,18,32,.5);color:#cfe9f5;font:inherit;cursor:pointer}
+.du-ac24-modes button[aria-pressed="true"]{background:#e4f8ff;color:#06121e;border-color:#e4f8ff;font-weight:700}
+.du-ac24-chips{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0}
+.du-ac24-chips:empty{display:none}
+.du-ac24-chip{display:flex;align-items:center;gap:6px;max-width:260px;padding:4px 6px 4px 4px;border-radius:10px;border:1px solid rgba(127,231,255,.3);background:rgba(4,18,32,.55);color:#cfe9f5;font-size:12px}
+.du-ac24-chip img{width:44px;height:44px;object-fit:cover;border-radius:7px;background:#fff}
+.du-ac24-chip i{font-style:normal;display:grid;place-items:center;width:44px;height:44px;border-radius:7px;background:rgba(127,231,255,.12);color:#7fe7ff;font-weight:700;font-size:11px}
+.du-ac24-chip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.du-ac24-chip button{border:0;background:none;color:#fff;font-size:18px;min-width:28px;min-height:28px;cursor:pointer}
+.du-ac24-att{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.du-ac24-att a,.du-ac24-att button{display:flex;align-items:center;gap:6px;padding:4px;border-radius:10px;border:1px solid rgba(127,231,255,.25);background:rgba(4,18,32,.45);color:#8edcff;font:inherit;font-size:12px;text-decoration:none;cursor:pointer}
+.du-ac24-att img{width:96px;height:72px;object-fit:cover;border-radius:7px;background:#fff}
+.du-ac24-drawbtn{border-style:dashed!important}
+@media (max-width:640px){.du-dit24-sheets{grid-template-columns:1fr}.du-dit24-dl{margin-left:0}.du-dit24-go .du-btn{width:100%}}

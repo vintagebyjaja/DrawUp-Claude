@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { accountGate, adminRest, adminSelectOne, creditMessage, missingConfig, models as modelList, openaiCancel, openaiCreate, openaiGet, outputText, readTicket, refundCredits, refundOnce, reserveCredits, signTicket, signedInUser, sourcesFrom, type CreditAccess } from '@/lib/drawup-server';
 import { quickCall, quickCoachPrompt, type QuickResult } from '@/lib/drawup-quick';
 import { createHash } from 'node:crypto';
-import { recordDetailQuery, recordDetailSources } from '@/lib/drawup-details';
+import { recordDetailQuery, recordDetailSources, recordDetailsFromAnswer } from '@/lib/drawup-details';
 import { awardXp, coachPersona } from '@/lib/drawup-coach-persona';
 import { guestKeys, guestLeft, reserveGuest, GUEST_LIMIT } from '@/lib/drawup-guest';
 import { streamCreate, streamRead, withoutSpeedHints } from '@/lib/drawup-stream';
@@ -72,6 +72,12 @@ export async function POST(request: Request) {
     const message = String(body?.message || '').trim();
     const location = String(body?.location || '').trim();
     const image = typeof body?.image === 'string' && /^data:image\/(png|jpeg|webp);base64,/.test(body.image) ? body.image : '';
+    // V24: pictures, PDFs and text files attached to a thread message (up to 5; the page keeps the originals in storage).
+    const attachments = (Array.isArray(body?.attachments) ? body.attachments : []).slice(0, 5).map((a: any) => ({
+      kind: String(a?.kind || ''), name: String(a?.name || 'file').replace(/[^\w .()-]/g, '_').slice(0, 120), data: String(a?.data || '') }))
+      .filter((a: any) => (a.kind === 'image' && /^data:image\/(png|jpeg|webp);base64,/.test(a.data)) || (a.kind === 'pdf' && /^data:application\/pdf;base64,/.test(a.data)) || (a.kind === 'text' && a.data.length <= 300000));
+    if (attachments.reduce((n: number, a: any) => n + a.data.length, 0) > 22 * 1024 * 1024) return NextResponse.json({ error: 'Those attachments are too large together. Attach fewer or smaller files.' }, { status: 413 });
+    const hasFiles = !!image || attachments.length > 0;
     const history = (Array.isArray(body?.history) ? body.history : [])
       .filter((x: any) => (x?.role === 'user' || x?.role === 'assistant') && typeof x?.content === 'string')
       .slice(-16) as ChatTurn[];
@@ -99,7 +105,7 @@ export async function POST(request: Request) {
     // V20 speed: a fast call answers first (or asks one clarifying question with options) while the
     // full researched answer runs. A clarifying question found early is free; one found after the
     // full job started cancels that job and refunds it, so a question is never charged twice.
-    const useQuick = !!body?.async && !image;
+    const useQuick = !!body?.async && !hasFiles;
     const allowClarify = useQuick && !body?.clarified;
     // V20: the member's own Arch Coach (blueprint, skills, legend, language). Never blocks an answer.
     const persona = await coachPersona(user.id).catch(() => '');
@@ -114,7 +120,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ answer: early.answer, sources: [], researched: false, quick_final: true, credits_charged: 0, credits_remaining: null });
     }
 
-    const priced = questionCost(message, !!image);
+    const priced = questionCost(message, hasFiles);
     action = priced.action;
     access = await reserveCredits(user, priced.cost, action);
     if (!access.ok) return NextResponse.json({ error: creditMessage(access, priced.cost), ...access }, { status: 402 });
@@ -130,13 +136,21 @@ export async function POST(request: Request) {
       access.guest_keys = keys;
       access.free_questions_remaining = Math.min(left, Number.isInteger(access.free_questions_remaining) ? access.free_questions_remaining! : left);
     }
-    if (image) await awardXp(user.id, 'upload', 'img:' + createHash('sha1').update(image).digest('hex'));
+    if (hasFiles) await awardXp(user.id, 'upload', 'img:' + createHash('sha1').update(image || attachments.map((a: any) => a.data.slice(0, 2000)).join('')).digest('hex'));
 
-    const input = buildCoachPrompt({ message, transcript, location, extra: persona });
+    const fileNote = hasFiles ? `ATTACHMENTS: the user attached ${attachments.map((a: any) => a.name).join(', ') || 'a picture'}. Read them. If an attachment shows a building, drawing or construction condition, answer the question, point out problems and code items to confirm, and end with a section titled "Details to draw" listing each construction detail this project still needs drawn as "- Detail name: why it is needed". Mention that Draw it up (in Arch Coach) can turn a picture into a drawing set.` : '';
+    const input = buildCoachPrompt({ message, transcript, location, extra: [persona, fileNote].filter(Boolean).join('\n\n') });
     const models = modelList(process.env.DRAWUP_COACH_MODEL, process.env.DRAWUP_SEARCH_MODEL, 'gpt-5.6-sol');
-    const payload: any = image ? { input: [{ role: 'user', content: [{ type: 'input_text', text: input }, { type: 'input_image', image_url: image }] }] } : { input };
+    const parts: any[] = [{ type: 'input_text', text: input }];
+    if (image) parts.push({ type: 'input_image', image_url: image });
+    for (const a of attachments) {
+      if (a.kind === 'image') parts.push({ type: 'input_text', text: `ATTACHMENT: ${a.name}` }, { type: 'input_image', image_url: a.data });
+      else if (a.kind === 'pdf') parts.push({ type: 'input_file', filename: a.name.endsWith('.pdf') ? a.name : a.name + '.pdf', file_data: a.data });
+      else parts.push({ type: 'input_text', text: `ATTACHMENT ${a.name}:\n${a.data.slice(0, 120000)}` });
+    }
+    const payload: any = parts.length > 1 ? { input: [{ role: 'user', content: parts }] } : { input };
     if (research) payload.tools = [{ type: 'web_search' }];
-    const done = (data: any) => NextResponse.json({ answer: outputText(data), sources: sourcesFrom(data), researched: research, credits_charged: access?.credits_charged ?? 0, credits_remaining: access?.credits_remaining ?? null, free_questions_remaining: access?.free_questions_remaining ?? null });
+    const done = async (data: any) => { if (hasFiles) await recordDetailsFromAnswer(outputText(data), user!.id); return NextResponse.json({ answer: outputText(data), sources: sourcesFrom(data), researched: research, credits_charged: access?.credits_charged ?? 0, credits_remaining: access?.credits_remaining ?? null, free_questions_remaining: access?.free_questions_remaining ?? null }); };
 
     // V20: answer as a background job so long researched answers never hit the host's request time limit.
     // The page polls GET ?ticket=… ; the ticket is signed so only this user can read or refund the job.
@@ -171,7 +185,7 @@ export async function POST(request: Request) {
           const quickText = quick && quick.kind === 'answer' ? quick.answer : '';
           const savedMessage = await persistQuick(user.id, threadId, quickText).catch(() => null);
           const job = await createDurableJob({ ownerId:user.id, threadId, messageId:savedMessage?.id, responseId:data.id, quick:quickText, research, action, access }).catch(() => null);
-          const ticket = signTicket({ id: data.id, uid: user.id, action, research, s: streamed ? 1 : 0, job: job?.id || '', msg: savedMessage?.id || '', access: { ok: access.ok, hq: access.hq, access_type: access.access_type, monthly_used: access.monthly_used, purchased_used: access.purchased_used, is_anonymous: access.is_anonymous, credits_charged: access.credits_charged, credits_remaining: access.credits_remaining, free_questions_remaining: access.free_questions_remaining, guest_keys: access.guest_keys } });
+          const ticket = signTicket({ id: data.id, uid: user.id, action, research, f: hasFiles ? 1 : 0, s: streamed ? 1 : 0, job: job?.id || '', msg: savedMessage?.id || '', access: { ok: access.ok, hq: access.hq, access_type: access.access_type, monthly_used: access.monthly_used, purchased_used: access.purchased_used, is_anonymous: access.is_anonymous, credits_charged: access.credits_charged, credits_remaining: access.credits_remaining, free_questions_remaining: access.free_questions_remaining, guest_keys: access.guest_keys } });
           return NextResponse.json({ ticket, job_id:job?.id||null, assistant_message_id:savedMessage?.id||null, server_persisted:!!savedMessage, status: data.status || 'queued', free_questions_remaining: access.free_questions_remaining ?? null, quick: quickOut(quick), stream: streamed ? { cursor: data.cursor || 0 } : null });
         }
       } catch (e: any) {
@@ -194,7 +208,7 @@ export async function POST(request: Request) {
 
 async function jobFor(request: Request) {
   const user = await signedInUser(request);
-  const t = readTicket<{ id: string; uid: string; action: string; research: boolean; s?: number; job?: string; msg?: string; access: CreditAccess }>(new URL(request.url).searchParams.get('ticket') || '');
+  const t = readTicket<{ id: string; uid: string; action: string; research: boolean; f?: number; s?: number; job?: string; msg?: string; access: CreditAccess }>(new URL(request.url).searchParams.get('ticket') || '');
   if (!user || !t || t.uid !== user.id) return null;
   return t;
 }
@@ -233,6 +247,7 @@ export async function GET(request: Request) {
     await awardXp(t.uid, 'ask', t.id);
     const finalSources=sourcesFrom(data);
     await recordDetailSources('arch_coach', { userId: t.uid }, finalSources); // V21 Detail Library
+    if (t.f) await recordDetailsFromAnswer(answer, t.uid); // V24: "Details to draw" from an attachment review
     if(t.job) await adminRest(`arch_coach_jobs?id=eq.${encodeURIComponent(t.job)}`,{method:'PATCH',body:JSON.stringify({status:'completed',full_answer:answer,sources:finalSources,updated_at:new Date().toISOString(),completed_at:new Date().toISOString()})}).catch(()=>{});
     if(t.msg){const sourceText=finalSources.length?'\n\nSources:\n'+finalSources.map((s:any)=>`• ${s.title||'Source'} — ${s.url}`).join('\n'):'';await adminRest(`coach_messages?id=eq.${encodeURIComponent(t.msg)}`,{method:'PATCH',body:JSON.stringify({content:answer+sourceText,answer_status:'full_complete',sources:finalSources})}).catch(()=>{});}
     return NextResponse.json({ status: 'completed', answer, sources: finalSources, researched: t.research, server_persisted:!!t.msg, assistant_message_id:t.msg||null, credits_charged: t.access?.credits_charged ?? 0, credits_remaining: t.access?.credits_remaining ?? null, free_questions_remaining: t.access?.free_questions_remaining ?? null });
