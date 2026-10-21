@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DrawUp Season 1</title>
+<meta name="description" content="Draw it up. See it through.">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/icons/drawup-icon-512.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<!--
+  V25.1: the home page is a static file. Cloudflare serves it straight from the Worker's static assets, so GET /
+  never starts the Worker (it used to render src/app/page.tsx on every visit, about 30 ms of Worker CPU each time,
+  and 1102 errors on the Free plan's 10 ms limit). Same behavior as page.tsx: the site in drawup-preview.html runs
+  in a full-screen frame, and the address-bar query and hash are passed through so Supabase sign-in links
+  (#access_token=… or ?code=…) and deep links like #portal/profile reach it.
+-->
+<style>html,body{margin:0;width:100%;height:100%;background:#0a0a0c;overflow:hidden}iframe{width:100%;height:100vh;height:100dvh;border:0;display:block}</style>
+</head>
+<body>
+<script>
+(function () {
+  var suffix = location.search + location.hash;
+  var f = document.createElement('iframe');
+  f.title = 'DrawUp Season 1';
+  f.src = '/drawup-preview.html' + suffix;
+  document.body.appendChild(f);
+  // Don't leave one-time auth tokens sitting in the address bar.
+  if (/access_token|refresh_token|[?&]code=/.test(suffix)) history.replaceState(null, '', location.pathname);
+})();
+</script>
+</body>
+</html>

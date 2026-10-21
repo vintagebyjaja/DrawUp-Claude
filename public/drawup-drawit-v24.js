@@ -7,6 +7,9 @@
  *   what was marked and keeps the rest; the previous set is kept as the prior revision and the changes are clouded in
  *   red (pixel compare of the two renders). Views: Clean set, Redlines, My markups; each downloads as a PDF set.
  * - Saved in drawing_generations (SQL v24-02 + 0065); project to-dos in project_todos (0065).
+ * - v25.1: the AI runs as a background job. The pictures (and comment crops) are sent as the Storage copies uploaded
+ *   here, the server answers with a ticket at once, and the page polls it every few seconds. The ticket is kept in
+ *   localStorage, so a set that finishes after the page was closed is collected the next time Draw it up opens.
  * Used by: Arch Coach tab (Draw it up mode), Projects tab, project pages (Redlines + revisions, project to-dos),
  * and the AI Design Team chat through open() / latest().
  * window.DrawUpDrawIt = { mount, recent, quickAccess, openInCoach, open, latest, sideLinks, readPictures, imageToJpeg }
@@ -182,11 +185,34 @@
     g.strokeStyle = RED; g.lineWidth = 5; g.beginPath(); g.arc(px - sx, py - sy, 34, 0, Math.PI * 2); g.stroke();
     return o.toDataURL('image/jpeg', 0.82);
   }
-  /** Reads the NDJSON stream from /api/drawings/generate. */
+  const PENDING_KEY = 'du-dit25-pending', POLL_MS = 4000;
+  const pendingJob = () => { try { const j = JSON.parse(localStorage.getItem(PENDING_KEY) || 'null'); return j && Date.now() - j.at < 6 * 3600 * 1000 ? j : null; } catch (_e) { return null; } };
+  const setPending = j => { try { j ? localStorage.setItem(PENDING_KEY, JSON.stringify(j)) : localStorage.removeItem(PENDING_KEY); } catch (_e) { /* private window */ } };
+  const generate = async body => fetch('/api/drawings/generate', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + await token() }, body: JSON.stringify(body) });
+  /** v25.1: polls a background drawing job until the set is saved. Progress moves with the time it has been running. */
+  async function pollJob(ticket, onProgress, startedAt = Date.now()) {
+    let misses = 0;
+    for (;;) {
+      await new Promise(r => setTimeout(r, POLL_MS));
+      onProgress?.(Math.min(6800, (Date.now() - startedAt) / 1000 * 75));
+      let res, d;
+      try { res = await generate({ poll: ticket }); d = await res.json(); }
+      catch (_e) { if (++misses > 15) throw new Error('DrawUp lost the connection while the set was being made. It keeps going: open Draw it up again later to collect it.'); continue; }
+      misses = 0;
+      if (d.status === 'done') { setPending(null); return d; }
+      if (!res.ok || d.final) { setPending(null); throw new Error(d.error || 'The drawing set could not be made (' + res.status + ').'); }
+    }
+  }
+  /** Starts a set or revision. v25.1 servers answer with a ticket (background job); v25 servers stream NDJSON. */
   async function runStream(body, onProgress) {
-    const res = await fetch('/api/drawings/generate', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + await token() }, body: JSON.stringify(body) });
+    const res = await generate(body.develop_from ? body : { ...body, background: true });
     if (!res.ok || !res.body) { const d = await res.json().catch(() => ({})); throw new Error(d.error || 'Drawing generation could not start (' + res.status + ').'); }
-    if (/application\/json/.test(res.headers.get('content-type') || '')) return res.json();
+    if (/application\/json/.test(res.headers.get('content-type') || '')) {
+      const d = await res.json();
+      if (!d.ticket) return d;
+      setPending({ ticket: d.ticket, at: Date.now(), revising: !!d.revising });
+      return pollJob(d.ticket, onProgress);
+    }
     const reader = res.body.getReader(), dec = new TextDecoder(); let buf = '', done = null, fail = '';
     for (;;) {
       const { value, done: end } = await reader.read(); if (end) break;
@@ -255,6 +281,7 @@
       <span class="du-kicker">DRAW IT UP · PICTURE TO DRAWING SET</span>
       <h2>Turn a picture into architectural drawings.</h2>
       <p class="du-muted">Upload a photo, rendering, sketch, AI image or drawing. DrawUp reads it, builds one coordinated building model and draws the set from it. Every page shows here. Comment right on the drawings and press Regenerate: DrawUp fixes what you marked, keeps the rest, saves the old set and clouds the changes in red.</p>
+      <p class="du-muted du-dit25-single">Only need one detail, like a roof eave section? <button type="button" class="du-dit25-cat" data-single-detail>Draw a single detail in Details →</button></p>
       <label class="du-dit24-drop" tabindex="0"><input type="file" multiple accept="image/png,image/jpeg,image/webp,application/pdf,.pdf"><b>Add pictures or a PDF</b><span>PNG, JPG, WebP or PDF · up to ${MAX_FILES} pictures or pages</span></label>
       <div class="du-dit24-pics"></div>
       <div class="du-dit24-grid">
@@ -285,6 +312,7 @@
     const showPics = () => { $('.du-dit24-pics').innerHTML = st.pics.map((p, i) => `<figure><img src="${p.dataUrl}" alt=""><figcaption>${esc(p.name)}</figcaption><button type="button" data-rm="${i}" aria-label="Remove ${esc(p.name)}">×</button></figure>`).join(''); host.querySelectorAll('[data-rm]').forEach(b => b.onclick = () => { st.pics.splice(+b.dataset.rm, 1); showPics(); }); go.disabled = !st.pics.length || st.busy; drop.classList.toggle('has', !!st.pics.length); };
     const addFiles = async files => { if (!files.length) return; msg.textContent = 'Reading your files…'; try { const more = await readPictures([...files]); st.pics.push(...more); st.pics = st.pics.slice(0, MAX_FILES); msg.textContent = st.pics.length >= MAX_FILES ? `Using the first ${MAX_FILES} pictures or pages.` : 'Ready. Pick what you need, add notes if you know sizes, then press Draw it up.'; } catch (e) { msg.textContent = e.message || String(e); } showPics(); };
     input.onchange = () => { addFiles(input.files); input.value = ''; };
+    host.querySelector('[data-single-detail]')?.addEventListener('click', () => P()?.openPortalTab?.('details'));
     drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('over'); });
     drop.addEventListener('dragleave', () => drop.classList.remove('over'));
     drop.addEventListener('drop', e => { e.preventDefault(); drop.classList.remove('over'); addFiles(e.dataTransfer.files); });
@@ -300,13 +328,17 @@
     go.onclick = async () => {
       if (st.busy || !st.pics.length) return;
       st.busy = true; go.disabled = true; out.innerHTML = ''; stageText('Reading the picture', st.mode === 'explore' ? 'Designing 3 options' : 'Building one coordinated model'); stage('read', 4); msg.textContent = 'Uploading your pictures…';
-      const genFolder = uuid(), paths = [];
-      try { for (let i = 0; i < st.pics.length; i++) { const path = `${u.id}/drawings/${genFolder}/source-${i + 1}.jpg`; const b = await (await fetch(st.pics[i].dataUrl)).blob(); const up = await sb().storage.from(BUCKET).upload(path, b, { contentType: 'image/jpeg', upsert: true }); if (!up.error) paths.push(path); } }
-      catch (_e) { /* the set still works without saved sources */ }
+      const genFolder = uuid(), paths = [], byIndex = [];
+      for (let i = 0; i < st.pics.length; i++) {
+        try { const path = `${u.id}/drawings/${genFolder}/source-${i + 1}.jpg`; const b = await (await fetch(st.pics[i].dataUrl)).blob(); const up = await sb().storage.from(BUCKET).upload(path, b, { contentType: 'image/jpeg', upsert: true }); if (!up.error) { paths.push(path); byIndex[i] = path; } }
+        catch (_e) { /* that picture is sent with the request instead */ }
+      }
+      // v25.1: uploaded pictures go to the AI as links to these copies; only one that failed to upload is sent inline.
+      const pictures = st.pics.map((p, i) => (byIndex[i] ? { path: byIndex[i] } : { image: p.dataUrl }));
       msg.textContent = st.mode === 'explore' ? 'DrawUp is designing 3 options. This takes a little longer than one set.' : 'DrawUp is reading the picture. A set usually takes about a minute.';
       try {
         stage('model', 12);
-        const done = await runStream({ images: st.pics.map(p => p.dataUrl), source_paths: paths, mode: st.mode, notes: f('notes').value.trim(), location: f('location').value.trim(), project_id: projectId(), coach_thread_id: opts.coachThreadId || '' }, progress);
+        const done = await runStream({ pictures, source_paths: paths, mode: st.mode, notes: f('notes').value.trim(), location: f('location').value.trim(), project_id: projectId(), coach_thread_id: opts.coachThreadId || '' }, progress);
         stage('draw', 94); st.sourceImage = st.pics[0]?.dataUrl || '';
         await loadResult(done.generation || { mode: st.mode, options: done.options, model: done.model }, done.model, done.options);
         stage('draw', 100); setTimeout(() => { $('.du-dit24-progress').hidden = true; }, 900);
@@ -390,7 +422,7 @@
         ${saved ? `<section class="du-dit25-next"><h3>What to do next</h3>${(m.next_steps || []).length ? `<ul class="du-dit25-steps">${m.next_steps.map((x, i) => `<li><label><input type="checkbox" data-step="${i}" checked><span><b>${esc(x.title)}</b><small>${esc(x.why)}</small></span></label></li>`).join('')}</ul>
           <div class="du-dit24-acts"><button class="du-btn ghost" type="button" data-steps-set>Add checked to this set</button><button class="du-btn ghost" type="button" data-steps-project ${g.project_thread_id ? '' : 'disabled title="Pick a project for this set first"'}>Add checked to this project</button></div>` : '<p class="du-muted">No suggestions for this set.</p>'}
           ${st.todos.length ? `<h4>From this project's to-do list</h4><ul class="du-dit25-steps">${st.todos.map(t => `<li><span><b>${esc(t.title)}</b><small>${esc(t.why || '')}</small></span><button class="du-btn ghost" type="button" data-todo-add="${esc(t.id)}">Add to this set</button></li>`).join('')}</ul>` : ''}</section>` : ''}
-        <div class="du-dit24-cols"><section><h3>Details this set still needs</h3><p class="du-muted">${level === 'preliminary' ? 'Listed on G001 and drawn in the full set.' : 'Flagged on A501 and added to the Details library, so the catalog grows with every set.'}</p><ol class="du-dit24-list">${m.details_needed.map(d => `<li><b>${esc(d.title)}</b><span>${esc(d.category)}${d.location ? ' · ' + esc(d.location) : ''}</span><small>${esc(d.why)}</small></li>`).join('') || '<li>No extra details flagged.</li>'}</ol><button class="du-btn ghost" type="button" data-lib>Open the Details library</button></section>
+        <div class="du-dit24-cols"><section><h3>Details this set still needs</h3><p class="du-muted">${level === 'preliminary' ? 'Listed on G001 and drawn in the full set.' : 'Flagged on A501 and added to the Details library, so the catalog grows with every set.'}</p><ol class="du-dit24-list">${m.details_needed.map((d, i) => `<li data-need="${i}"><b>${esc(d.title)}</b><span>${esc(d.category)}${d.location ? ' · ' + esc(d.location) : ''}</span><small>${esc(d.why)}</small></li>`).join('') || '<li>No extra details flagged.</li>'}</ol><button class="du-btn ghost" type="button" data-lib>Open the Details library</button></section>
         <section><h3>Problems in the picture</h3><ul class="du-dit24-list">${m.issues_in_source.map(x => `<li><b><em class="sev-${esc(x.severity)}">${sev[x.severity] || 'NOTE'}</em> ${esc(x.issue)}</b>${x.fix ? `<small>Fix: ${esc(x.fix)}</small>` : ''}</li>`).join('') || '<li>None reported.</li>'}</ul>${m.code_notes.length ? `<h3>Code items to confirm</h3><ul class="du-dit24-list">${m.code_notes.map(t => `<li>${esc(t)}</li>`).join('')}</ul>` : ''}</section></div>`;
       const q = s => out.querySelector(s);
       out.querySelectorAll('[data-view]').forEach(b => b.onclick = () => viewer(+b.dataset.view));
@@ -409,6 +441,7 @@
       q('[data-check]').onclick = () => { history.replaceState(null, '', '#portal/check?quick=1'); P()?.openPortalTab?.('check'); toast('Download the PDF set, then drop it into Quick Check to review it against code.'); };
       q('[data-ask]').onclick = () => { try { sessionStorage.setItem('du-coach-prefill', `I drew up "${m.title}" with DrawUp (${m.footprint.width_ft} x ${m.footprint.depth_ft} ft, ${m.stories} stor${m.stories > 1 ? 'ies' : 'y'}, ${m.roof.type} roof, ${m.foundation.type.replace(/_/g, ' ')}). What should I check before this set goes to permit, and how should I draw these details: ${m.details_needed.map(d => d.title).join('; ')}?`); } catch (_e) { /* ignore */ } opts.onAsk ? opts.onAsk() : P()?.openPortalTab?.('arch-coach'); };
       q('[data-lib]').onclick = () => P()?.openPortalTab?.('details');
+      catalogLinks(m.details_needed);
       if (!saved) return;
       out.querySelectorAll('[data-unmark]').forEach(b => b.onclick = () => { st.marks = st.marks.filter(x => x.id !== b.dataset.unmark); number(); saveMarks(); draw(); });
       q('[data-add-general]').onclick = () => { const t = q('[data-general]').value.trim(); if (!t) return; addMark({ sheet: '', x: null, y: null, text: t.slice(0, 1000) }); draw(); };
@@ -417,6 +450,20 @@
       q('[data-steps-set]') && (q('[data-steps-set]').onclick = () => { const xs = checked(); if (!xs.length) return; xs.forEach(x => addMark({ sheet: '', x: null, y: null, text: (x.instruction || x.title).slice(0, 1000), from: 'next_step' })); toast(`${xs.length} added to your comments. Press Regenerate when you are ready.`); draw(); });
       q('[data-steps-project]') && (q('[data-steps-project]').onclick = async () => { const xs = checked(); if (!xs.length || !g.project_thread_id) return; const { error } = await sb().from('project_todos').insert(xs.map(x => ({ project_thread_id: g.project_thread_id, owner_id: u.id, title: x.title.slice(0, 200), why: x.why || null, instruction: x.instruction || null, kind: x.kind || 'design', source_generation_id: g.id }))); if (error) toast(/project_todos/i.test(error.message) ? 'Run the v25 SQL (drawing revisions) to save project to-dos.' : error.message, true); else toast(`${xs.length} added to the project's to-do list.`); });
       out.querySelectorAll('[data-todo-add]').forEach(b => b.onclick = async () => { const t = st.todos.find(x => x.id === b.dataset.todoAdd); if (!t) return; addMark({ sheet: '', x: null, y: null, text: (t.instruction || t.title).slice(0, 1000), from: 'project_todo' }); await sb().from('project_todos').update({ status: 'added', updated_at: new Date().toISOString() }).eq('id', t.id); st.todos = st.todos.filter(x => x.id !== t.id); draw(); });
+    }
+
+    /** v25.1: each needed detail points to the Detail Catalog: the matching AI-drawn or typical detail, or "Draw it from a picture". */
+    async function catalogLinks(needed) {
+      const D = window.DrawUpDetails; if (!D?.closestCatalog || !needed?.length) return;
+      await D.ensureLoaded?.();
+      needed.forEach((d, i) => {
+        const li = out.querySelector(`[data-need="${i}"]`); if (!li || li.querySelector('.du-dit25-cat')) return;
+        const hit = D.closestCatalog(d.title, d.category), b = document.createElement('button');
+        b.type = 'button'; b.className = 'du-dit25-cat';
+        b.textContent = hit ? `In the Detail Catalog: ${hit.code} ${hit.title} →` : 'Not in the catalog yet: draw it from a picture →';
+        b.onclick = () => { P()?.openPortalTab?.('details'); if (hit) setTimeout(() => D.openCatalog(hit.kind, hit.id), 600); };
+        li.appendChild(b);
+      });
     }
 
     /** Sends the comments (with a picture of each marked spot) and loads the new revision with its redlines. */
@@ -429,7 +476,13 @@
       try {
         const clean = window.DrawUpSheets.render(st.model, renderOpts(levelOf(st.gen)));
         const payload = [];
-        for (const c of comments) { const s = c.sheet && clean.find(x => x.num === c.sheet); payload.push({ id: c.id, text: c.text, sheet: c.sheet || '', crop: s && c.x != null ? await cropAround(s.svg, c.x, c.y) : '' }); }
+        for (const c of comments) {
+          const s = c.sheet && clean.find(x => x.num === c.sheet), crop = s && c.x != null ? await cropAround(s.svg, c.x, c.y) : '';
+          let crop_path = '';
+          // v25.1: the picture of the marked spot is uploaded and sent as a link (inline only if the upload fails).
+          if (crop) try { const path = `${u.id}/drawings/${st.gen.id}/comment-${uuid()}.jpg`; const up = await sb().storage.from(BUCKET).upload(path, await (await fetch(crop)).blob(), { contentType: 'image/jpeg', upsert: true }); if (!up.error) crop_path = path; } catch (_e) { /* sent inline */ }
+          payload.push({ id: c.id, text: c.text, sheet: c.sheet || '', ...(crop_path ? { crop_path } : { crop }) });
+        }
         stage('model', 12); msg.textContent = 'DrawUp is revising the set. Everything you did not comment on stays the same.';
         const done = await runStream({ revise_of: st.gen.id, comments: payload, mode }, progress);
         stage('draw', 94);
@@ -506,6 +559,20 @@
       out.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
     function refreshRecent() { const r = $('.du-dit24-recent'); if (!r) return; recentInline(r); }
+    /** v25.1: a set that was still being made when the page closed is collected here. */
+    (async () => {
+      const job = pendingJob(); if (!job || st.busy || opts.setId) return;
+      st.busy = true; go.disabled = true; stageText('Picking up your last request', job.revising ? 'Revising the model' : 'Building one coordinated model'); stage('model', 12);
+      msg.textContent = 'Finishing the drawing set you started earlier…';
+      try {
+        const done = await pollJob(job.ticket, progress, job.at);
+        stage('draw', 94); await loadResult(done.generation || { options: done.options, model: done.model }, done.model, done.options);
+        if (job.revising && st.parent) { st.view = 'redline'; await draw(); }
+        stage('draw', 100); setTimeout(() => { $('.du-dit24-progress').hidden = true; }, 900);
+        msg.textContent = 'Your drawing set is ready and saved to Your drawing sets.'; refreshRecent();
+      } catch (e) { $('.du-dit24-progress').hidden = true; msg.textContent = e.message || String(e); }
+      finally { st.busy = false; go.disabled = !st.pics.length; }
+    })();
     async function recentInline(r) {
       let sets; try { sets = await listSets({ limit: 12 }); } catch (e) { r.innerHTML = `<p class="du-muted">${esc(e.message)}</p>`; return; }
       if (sets.missing) { r.innerHTML = '<p class="du-muted">Run the v24 SQL in Supabase to save drawing sets.</p>'; return; }

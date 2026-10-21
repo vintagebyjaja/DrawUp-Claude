@@ -5,6 +5,9 @@
    - Details members asked Arch Coach / DrawUp Search for (table detail_finds, filled by the
      server) show as COMMUNITY · AI-FOUND · UNCONFIRMED until an admin reviews them.
    - Firm uploads (details.firm_id) carry the firm name and can appear on the firm profile.
+   - v25.1: details DrawUp AI redrew from a member's upload (details.source = 'drawup_ai', drawn by
+     drawup-detail-draw-v25.js) show as COMMUNITY · AI-DRAWN, with their flaws and fixes. closestCatalog() lets
+     Draw it up point a set's needed details at them.
    Requires: drawup-details-kit-v21.js, drawup-details-catalog-v21.js (load before this file). */
 (function(){
 'use strict';
@@ -47,24 +50,28 @@ async function pdfOf(d){
   return new Blob(parts,{type:'application/pdf'});
 }
 async function download(d,fmt){
-  const base='drawup-typical-'+(d.code||'').toLowerCase()+'-'+slug(d.title);
+  const base=(d.bubble==='AI'?'drawup-ai-detail-':'drawup-typical-')+(d.code||'').toLowerCase()+'-'+slug(d.title);
   try{if(fmt==='svg')saveBlob(new Blob([svgOf(d)],{type:'image/svg+xml'}),base+'.svg');else if(fmt==='png')saveBlob(await raster(d,2,'image/png'),base+'.png');else saveBlob(await pdfOf(d),base+'.pdf');}
   catch(e){toast('Download failed: '+(e.message||e),true);}
 }
 
 /* ---------------------------------------------------------------- data */
-const state={finds:[],uploads:[],mine:[],admin:false,user:null,loaded:false};
+const state={finds:[],uploads:[],mine:[],ai:[],admin:false,user:null,loaded:false};
+const AIDRAW=()=>window.DrawUpDetailDraw;
+const AI_COLS='id,title,category,description,material,assembly,status,visibility,owner_id,created_at,detail_code,drawing,review';
 async function loadData(){
   const c=sb();if(!c)return;
   const u=await c.auth.getSession().then(x=>x.data.session?.user||null,()=>null);state.user=u&&!u.is_anonymous?u:null;
   const sel='id,title,category,description,status,visibility,preview_url,material,assembly,firm_id,show_on_firm,owner_id,created_at,firms(name,slug),detail_assets(id,file_name,file_ext,public_url)';
-  const [f,up,mine,adm]=await Promise.all([
+  const [f,up,mine,adm,ai]=await Promise.all([
     c.from('detail_finds').select('id,title,category,first_query,sources,sources_seen,hits,status,created_at,last_seen_at').order('last_seen_at',{ascending:false}).limit(300).then(x=>x.data||[],()=>[]),
     c.from('details').select(sel).eq('status','published').order('created_at',{ascending:false}).limit(200).then(x=>x.data||[],()=>[]),
     state.user?c.from('details').select(sel).eq('owner_id',state.user.id).order('created_at',{ascending:false}).limit(100).then(x=>x.data||[],()=>[]):[],
-    state.user?c.rpc('is_drawup_admin').then(x=>x.data===true,()=>false):false]);
-  state.finds=f;state.mine=mine;state.admin=adm;
-  const seen=new Set();state.uploads=[...up,...mine].filter(d=>!seen.has(d.id)&&(seen.add(d.id),true));state.loaded=true;
+    state.user?c.rpc('is_drawup_admin').then(x=>x.data===true,()=>false):false,
+    /* v25.1: before SQL v25.1-02 the source column is missing; the query fails and the list stays empty. */
+    c.from('details').select(AI_COLS).eq('source','drawup_ai').order('created_at',{ascending:false}).limit(300).then(x=>x.error?[]:(x.data||[]),()=>[])]);
+  state.finds=f;state.mine=mine;state.admin=adm;state.ai=(ai||[]).filter(r=>r.drawing&&r.status!=='removed');
+  const aiIds=new Set(state.ai.map(r=>r.id)),seen=new Set();state.uploads=[...up,...mine].filter(d=>!aiIds.has(d.id)&&!seen.has(d.id)&&(seen.add(d.id),true));state.loaded=true;
 }
 
 /* ---------------------------------------------------------------- cards */
@@ -80,6 +87,11 @@ function uploadCard(d){const a=d.detail_assets||[],img=d.preview_url||a.find(x=>
   return `<article class="dd21-card" data-kind="upload" data-id="${esc(d.id)}" data-cat="${esc(d.category)}"><div class="dd21-thumb${img?'':' dd21-pending'}">${img?`<img src="${esc(img)}" alt="${esc(d.title)}" loading="lazy">`:`<b>${esc((a[0]?.file_ext||'FILE').toUpperCase())}</b><span>${a.length} file${a.length===1?'':'s'}</span>`}</div>
   <div class="dd21-body"><span class="dd21-kick ${firm?'dd21-firm':''}">${firm?esc(firm)+' · FIRM DETAIL':'MEMBER UPLOAD'} · ${esc(d.category)}${d.status!=='published'?' · '+esc(String(d.status).toUpperCase()):''}</span><h3>${esc(d.title)}</h3>${d.description?`<p class="dd21-meta">${esc(d.description)}</p>`:''}${firm?`<p class="dd21-note">Uploaded by ${esc(firm)}${d.show_on_firm?' · shown on the firm profile':''}.</p>`:''}
   <div class="dd21-acts">${a.filter(x=>x.public_url).map(x=>`<a href="${esc(x.public_url)}" target="_blank" rel="noopener" download>${esc((x.file_ext||'file').toUpperCase())} · ${esc(x.file_name)}</a>`).join('')||'<span class="dd21-note">No files</span>'}</div></div></article>`;}
+
+function aiCard(r){const d=AIDRAW()?.toDetail(r);if(!d)return '';const n=(r.review?.flaws||[]).length;
+  return `<article class="dd21-card dd21-find" data-kind="ai" data-id="${esc(r.id)}" data-cat="${esc(r.category)}"><div class="dd21-thumb"><img src="${AIDRAW().urlOf(r)}" alt="${esc(r.title)}" loading="lazy" decoding="async"></div>
+  <div class="dd21-body"><span class="dd21-kick dd21-ai">COMMUNITY · AI-DRAWN · ${esc(d.code)} · ${esc(r.category)}${r.visibility==='private'?' · PRIVATE':''}</span><h3>${esc(r.title)}</h3><p class="dd21-meta">${esc([r.material,r.assembly,d.scale].filter(Boolean).join(' · '))}${n?` · ${n} flaw${n===1?'':'s'} fixed`:''}</p>
+  <div class="dd21-acts"><button type="button" class="dd21-open" data-open-ai="${esc(r.id)}">Open</button><button type="button" data-dl-ai="pdf" data-id="${esc(r.id)}">PDF</button><button type="button" data-dl-ai="png" data-id="${esc(r.id)}">PNG</button><button type="button" data-dl-ai="svg" data-id="${esc(r.id)}">SVG</button>${state.admin?`<button type="button" data-ai-hide="${esc(r.id)}">Hide</button>`:''}</div></div></article>`;}
 
 /* ---------------------------------------------------------------- viewer */
 function viewer(d,find){
@@ -105,6 +117,9 @@ function bindActs(root){
   root.querySelectorAll('[data-full]').forEach(b=>b.onclick=()=>{const d=CAT().find(x=>x.id===b.dataset.full);if(d)window.open(URL.createObjectURL(new Blob([svgOf(d)],{type:'image/svg+xml'})),'_blank','noopener');});
   root.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>{const d=CAT().find(x=>x.id===b.dataset.open);if(d)viewer(d);});
   root.querySelectorAll('[data-open-find]').forEach(b=>b.onclick=()=>{const f=state.finds.find(x=>x.id===b.dataset.openFind);if(!f)return;const t=closestTypical(f.title,f.category);if(t)viewer(t,f);else openFindNoDrawing(f);});
+  root.querySelectorAll('[data-open-ai]').forEach(b=>b.onclick=()=>{const r=state.ai.find(x=>x.id===b.dataset.openAi);if(r)AIDRAW()?.viewer(r);});
+  root.querySelectorAll('[data-dl-ai]').forEach(b=>b.onclick=e=>{e.stopPropagation();const r=state.ai.find(x=>x.id===b.dataset.id);if(r&&AIDRAW())download(AIDRAW().toDetail(r),b.dataset.dlAi);});
+  root.querySelectorAll('[data-ai-hide]').forEach(b=>b.onclick=async()=>{const {error}=await sb().from('details').update({status:'removed',updated_at:new Date().toISOString()}).eq('id',b.dataset.aiHide);if(error)return toast(error.message,true);toast('Hidden from the catalog.');await loadData();rerender();});
   root.querySelectorAll('[data-ask]').forEach(b=>b.onclick=()=>{document.getElementById('dd21-view')?.remove();askCoach(b.dataset.ask);});
   root.querySelectorAll('[data-review]').forEach(b=>b.onclick=async()=>{const {error}=await sb().from('detail_finds').update({status:b.dataset.to,updated_at:new Date().toISOString()}).eq('id',b.dataset.review);if(error)return toast(error.message,true);toast('Saved.');await loadData();rerender();});
 }
@@ -121,14 +136,16 @@ function filtered(){
   const typ=ui.src&&ui.src!=='typical'?[]:CAT().filter(d=>inCat(d.cat)&&mat(d.mat)&&asm(d.asm)&&(!q||matches(hay(d),q)));
   const fin=ui.src&&ui.src!=='find'||ui.mat||ui.asm?[]:state.finds.filter(f=>f.status!=='hidden'&&inCat(f.category)&&(!q||matches([f.title,f.category,f.first_query].join(' '),q)));
   const upl=ui.src&&ui.src!=='upload'?[]:state.uploads.filter(d=>inCat(d.category)&&mat(d.material)&&asm(d.assembly)&&(!q||matches([d.title,d.category,d.description,d.material,d.assembly,d.firms?.name].join(' '),q)));
-  return {typ,fin,upl};
+  const ai=ui.src&&ui.src!=='ai'?[]:state.ai.filter(r=>inCat(r.category)&&mat(r.material)&&asm(r.assembly)&&(!q||matches([r.title,r.category,r.description,r.material,r.assembly,r.detail_code].join(' '),q)));
+  return {typ,fin,upl,ai};
 }
-function counts(){const n={};CAT().forEach(d=>n[d.cat]=(n[d.cat]||0)+1);state.finds.forEach(f=>n[f.category]=(n[f.category]||0)+1);state.uploads.forEach(d=>n[d.category]=(n[d.category]||0)+1);return n;}
-function rerender(){const g=host&&host.isConnected&&host.querySelector('#dd21-results');if(!g)return;const {typ,fin,upl}=filtered(),total=typ.length+fin.length+upl.length;
+function counts(){const n={};CAT().forEach(d=>n[d.cat]=(n[d.cat]||0)+1);state.finds.forEach(f=>n[f.category]=(n[f.category]||0)+1);state.uploads.forEach(d=>n[d.category]=(n[d.category]||0)+1);state.ai.forEach(d=>n[d.category]=(n[d.category]||0)+1);return n;}
+function rerender(){const g=host&&host.isConnected&&host.querySelector('#dd21-results');if(!g)return;const {typ,fin,upl,ai}=filtered(),total=typ.length+fin.length+upl.length+ai.length;
   try{localStorage.setItem('dd21-filter',JSON.stringify({cat:ui.cat,mat:ui.mat,asm:ui.asm,src:ui.src}));}catch(e){}
   host.querySelector('#dd21-count').textContent=`${total} detail${total===1?'':'s'}${ui.q?` for “${ui.q}”`:''}${ui.cat?' in '+ui.cat:''}`;
   const sec=(k,t,sub,list,fn)=>list.length?`<section class="dd21-sec" data-sec="${k}"><div class="dd21-sechead"><h2>${t} <small>${list.length}</small></h2><p>${sub}</p></div><div class="dd21-grid">${list.map(fn).join('')}</div></section>`:'';
   g.innerHTML=(sec('typical','DrawUp typical details','One detail per drawing, drawn by DrawUp at a stated scale. Learning content: adapt and verify with a licensed professional.',typ,typicalCard)
+    +sec('ai','Drawn by DrawUp AI from member uploads','Members uploaded a detail; DrawUp found the flaws, explained each fix and redrew it to scale. Not reviewed by DrawUp: verify before use.',ai,aiCard)
     +sec('find','Asked in Arch Coach + Search + flagged by Draw it up','Details members searched for, and details Draw it up and Arch Coach flagged as still needed on real projects. Recorded automatically, de-duplicated, with any public sources cited. Unconfirmed until reviewed.',fin,findCard)
     +sec('upload','Firm + member uploads','Uploaded by firms and members with their own files. Firm details show the firm that uploaded them.',upl,uploadCard))
     ||`<div class="dd21-empty"><h3>No details match.</h3><p>Try another word or category${state.user?', or ask Arch Coach: what you ask for gets added here.':'.'}</p></div>`;
@@ -143,7 +160,7 @@ function shell(publicPage){
   <p class="dd21-disc"><b>Typical details are learning content.</b> They are drawn by DrawUp, are not the work of any firm, and must be adapted and verified by a licensed professional for the project, the adopted code and the AHJ.</p>
   <div class="dd21-filters" role="search"><input id="dd21-q" type="search" placeholder="Search details: parapet, storefront sill, grab bar…" value="${esc(ui.q)}" aria-label="Search details">
     <select id="dd21-mat" aria-label="Material"><option value="">Any material</option>${opts(mats,ui.mat)}</select><select id="dd21-asm" aria-label="Assembly"><option value="">Any assembly</option>${opts(asms,ui.asm)}</select>
-    <select id="dd21-src" aria-label="Source"><option value="">All sources</option><option value="typical"${ui.src==='typical'?' selected':''}>DrawUp typical</option><option value="find"${ui.src==='find'?' selected':''}>Asked in Coach + Search</option><option value="upload"${ui.src==='upload'?' selected':''}>Firm + member uploads</option></select></div>
+    <select id="dd21-src" aria-label="Source"><option value="">All sources</option><option value="typical"${ui.src==='typical'?' selected':''}>DrawUp typical</option><option value="find"${ui.src==='find'?' selected':''}>Asked in Coach + Search</option><option value="upload"${ui.src==='upload'?' selected':''}>Firm + member uploads</option><option value="ai"${ui.src==='ai'?' selected':''}>Drawn by DrawUp AI</option></select></div>
   <div class="dd21-chips" role="tablist"><button type="button" data-cat="">All</button>${CATS.map(c=>`<button type="button" data-cat="${esc(c)}">${esc(c)}${n[c]?` <span>${n[c]}</span>`:''}</button>`).join('')}</div>
   <p class="dd21-count" id="dd21-count" aria-live="polite"></p><div id="dd21-results"></div></div>`;
 }
@@ -214,5 +231,16 @@ function hydratePublic(){const pg=document.getElementById('page-details');if(!pg
 function watchPublic(){const pg=document.getElementById('page-details');if(!pg)return;const go=()=>{if(!pg.hidden)hydratePublic();};go();new MutationObserver(go).observe(pg,{attributes:true,attributeFilter:['hidden','class','style']});}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',watchPublic);else watchPublic();
 
-window.DrawUpDetails={render,closestTypical,download,svgOf,urlOf,viewer:id=>{const d=CAT().find(x=>x.id===id);if(d)viewer(d);},reload:async()=>{await loadData();rerender();},state};
+/* v25.1: the catalog detail (AI-drawn first, then DrawUp typical) that best matches a needed detail, for Draw it up. */
+function closestCatalog(title,category){
+  const code=(String(title).match(/\bAI-[A-Z0-9]{3,8}\b/i)||[])[0];
+  if(code){const r=state.ai.find(x=>String(x.detail_code).toUpperCase()===code.toUpperCase());if(r)return {kind:'ai',id:r.id,code:r.detail_code,title:r.title};}
+  const q=words(title).filter(w=>!STOP.has(w));let best=null,bs=0;
+  if(q.length)for(const r of state.ai){const h=' '+words([r.title,r.assembly,r.material].join(' ')).join(' ')+' ';let s=0;for(const w of q)if(h.includes(' '+w+' '))s+=1;if(s&&r.category===category)s+=.5;if(s>bs){bs=s;best=r;}}
+  if(best&&(bs>=2||(bs>=1.5&&q.length<=2)))return {kind:'ai',id:best.id,code:best.detail_code,title:best.title};
+  const t=closestTypical(title,category);return t?{kind:'typical',id:t.id,code:t.code,title:t.title}:null;
+}
+function openCatalog(kind,id){if(kind==='ai'){const r=state.ai.find(x=>x.id===id);if(r)AIDRAW()?.viewer(r);}else{const d=CAT().find(x=>x.id===id);if(d)viewer(d);}}
+async function ensureLoaded(){if(!state.loaded)await loadData().catch(()=>{});return state;}
+window.DrawUpDetails={render,closestTypical,closestCatalog,openCatalog,ensureLoaded,download,svgOf,urlOf,viewer:id=>{const d=CAT().find(x=>x.id===id);if(d)viewer(d);},reload:async()=>{await loadData();rerender();},state};
 })();

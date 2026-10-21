@@ -147,3 +147,7 @@
 .du-dit25-todos small{color:#9fb3c8}.du-dit25-todos em{color:#7fe7ff;font-style:normal;font-size:12px}
 .du-dit25-todos input{width:18px;height:18px}
 @media (max-width:640px){.du-dit25-marks li{grid-template-columns:auto 1fr auto}.du-dit25-marks li span{grid-column:2}.du-dit25-marks li p{grid-column:1/-1}}
+/* v25.1: needed details point to the Detail Catalog */
+.du-dit25-cat{display:block;margin-top:5px;padding:0;border:0;background:none;color:#ffb86b;font:inherit;font-size:12.5px;font-weight:700;text-align:left;cursor:pointer}
+.du-dit25-cat:hover{text-decoration:underline}
+.du-dit25-single .du-dit25-cat{display:inline;margin:0}

@@ -16,7 +16,8 @@
   const summaries = new Map();
   let me = null, arch = null, admin = false, missing = false, meLoaded = null;
   function toast(m, bad) { let t = document.getElementById('du-toast'); if (!t) { t = document.createElement('div'); t.id = 'du-toast'; t.className = 'du-toast'; document.body.appendChild(t); } t.textContent = m; t.dataset.state = bad ? 'bad' : 'good'; t.classList.add('open'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('open'), bad ? 6000 : 2600); }
-  const keyOfCard = c => { const k = c.dataset.kind, id = c.dataset.id; return k && id && /^(typical|find|upload)$/.test(k) ? k + ':' + id : ''; };
+  // v25.1: AI-drawn catalog details are rows in details, so they share the upload:<id> key (comments + architect checks).
+  const keyOfCard = c => { const k = c.dataset.kind === 'ai' ? 'upload' : c.dataset.kind, id = c.dataset.id; return k && id && /^(typical|find|upload)$/.test(k) ? k + ':' + id : ''; };
   const needSql = e => /detail_comments|detail_verifications|detail_review_summary|architect_credentials|schema cache|does not exist|PGRST20/i.test(String(e?.message || e));
 
   async function loadMe(force) {
