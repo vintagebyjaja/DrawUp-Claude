@@ -1,0 +1,19 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "drawup-aec",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2026-10-16",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  // V23.2: keep the Variables set in the Cloudflare dashboard. Without this, every deploy deletes them
+  // (secrets are kept), which is what removed NEXT_PUBLIC_SUPABASE_URL / _ANON_KEY and broke sign-in.
+  "keep_vars": true,
+  "observability": {
+    "enabled": true
+  }
+}

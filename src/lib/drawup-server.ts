@@ -3,13 +3,15 @@
 // the OpenAI key, so it must only be imported from src/app/api/**.
 
 import { createHmac, timingSafeEqual } from 'node:crypto';
+import { runtimeEnv, supabaseAnonKey, supabaseUrl } from '@/lib/drawup-env';
 
-export const SB_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-export const SB_ANON = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || '';
-const SB_SERVICE = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
-const OPENAI_KEY = process.env.OPENAI_API_KEY || '';
+// V23.1: read at run time (see drawup-env.ts), so a Cloudflare build variable can't override the Worker's settings.
+export const SB_URL = supabaseUrl();
+export const SB_ANON = supabaseAnonKey();
+const SB_SERVICE = runtimeEnv('SUPABASE_SERVICE_ROLE_KEY');
+const OPENAI_KEY = runtimeEnv('OPENAI_API_KEY');
 // Overridable so the whole flow can be tested against a local stand-in.
-const OPENAI_BASE = (process.env.OPENAI_BASE_URL || 'https://api.openai.com/v1').replace(/\/$/, '');
+const OPENAI_BASE = (runtimeEnv('OPENAI_BASE_URL') || 'https://api.openai.com/v1').replace(/\/$/, '');
 
 export const PRIVATE_BUCKET = 'drawup-private';
 

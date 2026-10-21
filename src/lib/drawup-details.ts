@@ -104,3 +104,41 @@ export async function recordDetailSources(source: DetailSource, who: { text?: st
     await mergeSources(ev.find_id, cited || []);
   } catch (e) { console.warn('detail sources not recorded', (e as Error)?.message); }
 }
+
+/** V24: when Arch Coach reviews an attached picture or drawing it ends with a "Details to draw" list.
+ *  Each item is added to the shared Details library, so the catalog grows from every review. Never throws. */
+export function detailsFromAnswer(answer: string): { key: string; title: string; category: string; why: string }[] {
+  const lines = String(answer || '').split('\n');
+  const start = lines.findIndex(l => /details?\s+to\s+draw/i.test(l) && l.replace(/[#*_:\s]/g, '').length < 40);
+  if (start < 0) return [];
+  const out: { key: string; title: string; category: string; why: string }[] = [];
+  for (const raw of lines.slice(start + 1)) {
+    const l = raw.trim();
+    if (!l) { if (out.length) break; continue; }
+    const m = /^(?:[-*•]|\d+[.)])\s+(.+)$/.exec(l);
+    if (!m) { if (out.length) break; continue; }
+    const text = m[1].replace(/\*\*/g, '').trim();
+    const [head, ...rest] = text.split(/\s+[—–-]\s+|:\s+/);
+    const title = head.replace(/[.;]+$/, '').slice(0, 120).trim();
+    if (title.length < 4) continue;
+    const intent = detailIntent(/detail/i.test(title) ? title : title + ' detail');
+    const words = title.toLowerCase().replace(/[^a-z0-9 ]+/g, ' ').split(/\s+/).filter(w => w && !FILLER.has(w)).map(w => w.replace(/(?<=[a-z]{3})s$/, ''));
+    const key = intent?.key || [...new Set(words)].sort().join(' ').slice(0, 160);
+    if (!key) continue;
+    out.push({ key, title: /detail$/i.test(title) ? title : title + ' Detail', category: intent?.category || 'Typical Details', why: rest.join(' ').slice(0, 300) });
+    if (out.length >= 10) break;
+  }
+  return out;
+}
+
+export async function recordDetailsFromAnswer(answer: string, userId: string | null | undefined) {
+  try {
+    const items = detailsFromAnswer(answer);
+    for (const d of items) {
+      await adminRpc('drawup_detail_find_note', { p_key: d.key, p_title: d.title, p_category: d.category, p_query: (d.title + (d.why ? ': ' + d.why : '')).slice(0, 400), p_source: 'arch_coach', p_user: userId || null });
+    }
+    // These came from the answer itself, so later answers must not attach their sources to them.
+    if (items.length && userId) await adminRest(`detail_find_events?user_id=eq.${userId}&source=eq.arch_coach&attached=eq.false&created_at=gte.${new Date(Date.now() - 120e3).toISOString()}`, { method: 'PATCH', body: JSON.stringify({ attached: true }) });
+    return items.length;
+  } catch (e) { console.warn('details to draw not recorded', (e as Error)?.message); return 0; }
+}
