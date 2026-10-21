@@ -50,7 +50,7 @@ async function pdfOf(d){
   return new Blob(parts,{type:'application/pdf'});
 }
 async function download(d,fmt){
-  const base=(d.bubble==='AI'?'drawup-ai-detail-':'drawup-typical-')+(d.code||'').toLowerCase()+'-'+slug(d.title);
+  const base=d.fileBase||((d.bubble==='AI'?'drawup-ai-detail-':'drawup-typical-')+(d.code||'').toLowerCase()+'-'+slug(d.title));
   try{if(fmt==='svg')saveBlob(new Blob([svgOf(d)],{type:'image/svg+xml'}),base+'.svg');else if(fmt==='png')saveBlob(await raster(d,2,'image/png'),base+'.png');else saveBlob(await pdfOf(d),base+'.pdf');}
   catch(e){toast('Download failed: '+(e.message||e),true);}
 }
@@ -58,7 +58,8 @@ async function download(d,fmt){
 /* ---------------------------------------------------------------- data */
 const state={finds:[],uploads:[],mine:[],ai:[],admin:false,user:null,loaded:false};
 const AIDRAW=()=>window.DrawUpDetailDraw;
-const AI_COLS='id,title,category,description,material,assembly,status,visibility,owner_id,created_at,detail_code,drawing,review';
+/* v25.1-03: one card per AI detail: its approved revision, else its newest (every revision opens from the viewer). */
+function latestRevisions(rows){const by=new Map();for(const r of rows){const k=r.root_id||r.id,c=by.get(k);if(!c||(r.approved_at&&!c.approved_at)||(!!r.approved_at===!!c.approved_at&&(r.revision||0)>(c.revision||0)))by.set(k,r);}return rows.filter(r=>by.get(r.root_id||r.id)===r);}
 async function loadData(){
   const c=sb();if(!c)return;
   const u=await c.auth.getSession().then(x=>x.data.session?.user||null,()=>null);state.user=u&&!u.is_anonymous?u:null;
@@ -69,8 +70,8 @@ async function loadData(){
     state.user?c.from('details').select(sel).eq('owner_id',state.user.id).order('created_at',{ascending:false}).limit(100).then(x=>x.data||[],()=>[]):[],
     state.user?c.rpc('is_drawup_admin').then(x=>x.data===true,()=>false):false,
     /* v25.1: before SQL v25.1-02 the source column is missing; the query fails and the list stays empty. */
-    c.from('details').select(AI_COLS).eq('source','drawup_ai').order('created_at',{ascending:false}).limit(300).then(x=>x.error?[]:(x.data||[]),()=>[])]);
-  state.finds=f;state.mine=mine;state.admin=adm;state.ai=(ai||[]).filter(r=>r.drawing&&r.status!=='removed');
+    c.from('details').select('*').eq('source','drawup_ai').order('created_at',{ascending:false}).limit(300).then(x=>x.error?[]:(x.data||[]),()=>[])]);
+  state.finds=f;state.mine=mine;state.admin=adm;state.ai=latestRevisions((ai||[]).filter(r=>r.drawing&&r.status!=='removed'));
   const aiIds=new Set(state.ai.map(r=>r.id)),seen=new Set();state.uploads=[...up,...mine].filter(d=>!aiIds.has(d.id)&&!seen.has(d.id)&&(seen.add(d.id),true));state.loaded=true;
 }
 
@@ -90,7 +91,7 @@ function uploadCard(d){const a=d.detail_assets||[],img=d.preview_url||a.find(x=>
 
 function aiCard(r){const d=AIDRAW()?.toDetail(r);if(!d)return '';const n=(r.review?.flaws||[]).length;
   return `<article class="dd21-card dd21-find" data-kind="ai" data-id="${esc(r.id)}" data-cat="${esc(r.category)}"><div class="dd21-thumb"><img src="${AIDRAW().urlOf(r)}" alt="${esc(r.title)}" loading="lazy" decoding="async"></div>
-  <div class="dd21-body"><span class="dd21-kick dd21-ai">COMMUNITY · AI-DRAWN · ${esc(d.code)} · ${esc(r.category)}${r.visibility==='private'?' · PRIVATE':''}</span><h3>${esc(r.title)}</h3><p class="dd21-meta">${esc([r.material,r.assembly,d.scale].filter(Boolean).join(' · '))}${n?` · ${n} flaw${n===1?'':'s'} fixed`:''}</p>
+  <div class="dd21-body"><span class="dd21-kick dd21-ai">COMMUNITY · AI-DRAWN · ${esc(r.sheet_ref?r.sheet_ref+' · ':'')}${esc(d.code)} · ${esc(r.category)}${r.visibility==='private'?' · PRIVATE':''}${r.approved_at?' · APPROVED':''}</span><h3>${esc(r.title)}</h3><p class="dd21-meta">${esc([r.material,r.assembly,d.scale].filter(Boolean).join(' · '))}${n?` · ${n} flaw${n===1?'':'s'} fixed`:''}</p>
   <div class="dd21-acts"><button type="button" class="dd21-open" data-open-ai="${esc(r.id)}">Open</button><button type="button" data-dl-ai="pdf" data-id="${esc(r.id)}">PDF</button><button type="button" data-dl-ai="png" data-id="${esc(r.id)}">PNG</button><button type="button" data-dl-ai="svg" data-id="${esc(r.id)}">SVG</button>${state.admin?`<button type="button" data-ai-hide="${esc(r.id)}">Hide</button>`:''}</div></div></article>`;}
 
 /* ---------------------------------------------------------------- viewer */
@@ -136,7 +137,7 @@ function filtered(){
   const typ=ui.src&&ui.src!=='typical'?[]:CAT().filter(d=>inCat(d.cat)&&mat(d.mat)&&asm(d.asm)&&(!q||matches(hay(d),q)));
   const fin=ui.src&&ui.src!=='find'||ui.mat||ui.asm?[]:state.finds.filter(f=>f.status!=='hidden'&&inCat(f.category)&&(!q||matches([f.title,f.category,f.first_query].join(' '),q)));
   const upl=ui.src&&ui.src!=='upload'?[]:state.uploads.filter(d=>inCat(d.category)&&mat(d.material)&&asm(d.assembly)&&(!q||matches([d.title,d.category,d.description,d.material,d.assembly,d.firms?.name].join(' '),q)));
-  const ai=ui.src&&ui.src!=='ai'?[]:state.ai.filter(r=>inCat(r.category)&&mat(r.material)&&asm(r.assembly)&&(!q||matches([r.title,r.category,r.description,r.material,r.assembly,r.detail_code].join(' '),q)));
+  const ai=ui.src&&ui.src!=='ai'?[]:state.ai.filter(r=>inCat(r.category)&&mat(r.material)&&asm(r.assembly)&&(!q||matches([r.title,r.category,r.description,r.material,r.assembly,r.detail_code,r.sheet_ref,r.detail_no&&r.sheet_no?r.detail_no+'/'+r.sheet_no:'',r.project_name].join(' '),q)));
   return {typ,fin,upl,ai};
 }
 function counts(){const n={};CAT().forEach(d=>n[d.cat]=(n[d.cat]||0)+1);state.finds.forEach(f=>n[f.category]=(n[f.category]||0)+1);state.uploads.forEach(d=>n[d.category]=(n[d.category]||0)+1);state.ai.forEach(d=>n[d.category]=(n[d.category]||0)+1);return n;}

@@ -376,13 +376,49 @@
       const pid = gen?.project_thread_id;
       st.todos = [];
       if (pid) { const { data } = await sb().from('project_todos').select('id,title,why,instruction,status,source_generation_id').eq('project_thread_id', pid).eq('status', 'open').order('created_at', { ascending: false }).limit(20).then(x => x, () => ({})); st.todos = (data || []).filter(t => t.source_generation_id !== gen.id); }
+      await loadOverrides(gen);
       if (gen?.mode === 'explore' && (options || gen.options)?.length) { st.options = options || gen.options; showOptions(); return; }
       st.view = 'clean'; await draw();
+    }
+    /** v25.1: details approved in the Details tab (drawing_generations.detail_overrides) are drawn in their slot. */
+    async function loadOverrides(gen) {
+      st.ovMap = {}; st.ovRows = {};
+      const map = gen?.detail_overrides || {}, ids = [...new Set(Object.values(map).map(v => v?.id).filter(Boolean))];
+      const DD = window.DrawUpDetailDraw; if (!ids.length || !DD) return;
+      const { data } = await sb().from('details').select('*').in('id', ids).then(x => x, () => ({}));
+      for (const [slot, v] of Object.entries(map)) {
+        const row = (data || []).find(r => r.id === v.id); if (!row?.drawing) continue;
+        st.ovRows[slot] = row;
+        st.ovMap[slot] = { svg: DD.svgOf(row), title: row.title, scale: DD.toDetail(row).scale, code: row.detail_code, revision: row.revision || 0, approved: row.approved_at ? new Date(row.approved_at).toLocaleDateString('en-US') : '' };
+      }
+    }
+    /** v25.1: "Work on this detail": that one slot of the sheet goes to Draw a detail (Details tab) with the set's reference. */
+    async function workOnDetail(slot) {
+      const DD = window.DrawUpDetailDraw, m = st.model, g = st.gen || {};
+      if (!DD?.handoff) { toast('Open the Details tab once, then try again.', true); return; }
+      const sheet = (st.sheets || []).find(x => x.num === slot.sheet);
+      let pictures = [];
+      if (sheet && (!slot.needed || st.ovMap?.[slot.ref])) {
+        try { pictures = [{ name: `${slot.ref} ${slot.title}`, dataUrl: await svgToJpeg(window.DrawUpSheets.cropSvg(sheet.svg, slot.rect), 1600) }]; } catch (_e) { /* described in the notes instead */ }
+      }
+      const facts = [`From the Draw it up set "${m.title}": ${m.footprint.width_ft} x ${m.footprint.depth_ft} ft, ${m.stories} stor${m.stories > 1 ? 'ies' : 'y'}, ${m.roof.type} roof${m.roof.roofing ? ' (' + m.roof.roofing + ')' : ''}, ${m.foundation.type.replace(/_/g, ' ')}, walls ${m.wall_assembly.stud || ''} ${m.wall_assembly.cladding || ''}.`];
+      if (slot.needed) facts.unshift(`Draw this needed detail: ${slot.title}.${slot.why ? ' Why: ' + slot.why + '.' : ''}${slot.where ? ' Where: ' + slot.where + '.' : ''}`);
+      DD.handoff({ pictures, notes: facts.join(' ').slice(0, 1800), title: slot.title, sheet: { detail_no: slot.no, sheet_no: slot.sheet, project_name: m.title, revision: String(g.revision || 0), date: new Date(g.created_at || Date.now()).toLocaleDateString('en-US') }, source_set: { kind: 'drawup', set_id: g.id, slot: slot.ref, title: slot.title }, existing: st.ovRows?.[slot.ref] || null });
+      P()?.openPortalTab?.('details');
+    }
+    async function svgToJpeg(svg, pxW) {
+      const url = svgUrl(svg), img = new Image();
+      try {
+        await new Promise((res, rej) => { img.onload = res; img.onerror = () => rej(new Error('The detail could not be drawn.')); img.src = url; });
+        const c = document.createElement('canvas'); c.width = pxW; c.height = Math.round(pxW * (img.naturalHeight || 700) / (img.naturalWidth || 990));
+        const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.drawImage(img, 0, 0, c.width, c.height);
+        return c.toDataURL('image/jpeg', 0.9);
+      } finally { URL.revokeObjectURL(url); }
     }
     function renderOpts(level) {
       const revisions = st.chain.filter(r => r.revision > 0 && r.revision <= (st.gen?.revision || 0)).map(r => ({ no: r.revision, desc: 'Revision ' + r.revision, date: new Date(r.created_at).toLocaleDateString('en-US') }));
       const first = st.chain.find(r => !r.revision);
-      return { level, location: f('location').value.trim() || st.gen?.location || '', status: st.status, reviewer: st.reviewer, license: st.license ? 'LIC. ' + st.license : '', sourceImage: st.sourceImage, revisions,
+      return { overrides: st.ovMap || {}, level, location: f('location').value.trim() || st.gen?.location || '', status: st.status, reviewer: st.reviewer, license: st.license ? 'LIC. ' + st.license : '', sourceImage: st.sourceImage, revisions,
         firstDate: first ? new Date(first.created_at).toLocaleDateString('en-US') : '', date: new Date(st.gen?.created_at || Date.now()).toLocaleDateString('en-US') };
     }
     async function viewSheets(onStep) {
@@ -424,6 +460,10 @@
           ${st.todos.length ? `<h4>From this project's to-do list</h4><ul class="du-dit25-steps">${st.todos.map(t => `<li><span><b>${esc(t.title)}</b><small>${esc(t.why || '')}</small></span><button class="du-btn ghost" type="button" data-todo-add="${esc(t.id)}">Add to this set</button></li>`).join('')}</ul>` : ''}</section>` : ''}
         <div class="du-dit24-cols"><section><h3>Details this set still needs</h3><p class="du-muted">${level === 'preliminary' ? 'Listed on G001 and drawn in the full set.' : 'Flagged on A501 and added to the Details library, so the catalog grows with every set.'}</p><ol class="du-dit24-list">${m.details_needed.map((d, i) => `<li data-need="${i}"><b>${esc(d.title)}</b><span>${esc(d.category)}${d.location ? ' · ' + esc(d.location) : ''}</span><small>${esc(d.why)}</small></li>`).join('') || '<li>No extra details flagged.</li>'}</ol><button class="du-btn ghost" type="button" data-lib>Open the Details library</button></section>
         <section><h3>Problems in the picture</h3><ul class="du-dit24-list">${m.issues_in_source.map(x => `<li><b><em class="sev-${esc(x.severity)}">${sev[x.severity] || 'NOTE'}</em> ${esc(x.issue)}</b>${x.fix ? `<small>Fix: ${esc(x.fix)}</small>` : ''}</li>`).join('') || '<li>None reported.</li>'}</ul>${m.code_notes.length ? `<h3>Code items to confirm</h3><ul class="du-dit24-list">${m.code_notes.map(t => `<li>${esc(t)}</li>`).join('')}</ul>` : ''}</section></div>`;
+      const slotList = saved && window.DrawUpSheets?.slots ? window.DrawUpSheets.slots(m, { level }) : [];
+      if (slotList.length) out.insertAdjacentHTML('beforeend', `<section class="du-dit25-work"><h3>Work on one detail</h3><p class="du-muted">Pick a detail to check and redraw it in the Details tab: comment, regenerate and ask the team there. When you approve it, it replaces only that detail in this set; every other sheet stays exactly the same.</p>
+        <ul class="du-dit25-slots">${slotList.map((x, i) => { const ov = st.ovMap?.[x.ref]; return `<li><b>${esc(x.ref)}</b><span>${esc(x.title)}${ov ? `<em>Replaced by ${esc(ov.code)}${ov.revision ? ' Rev ' + esc(ov.revision) : ''}</em>` : x.needed ? '<em class="need">To be drawn</em>' : ''}</span><button class="du-btn ghost" type="button" data-work="${i}">${ov ? 'Open' : x.needed ? 'Draw it' : 'Work on it'} →</button></li>`; }).join('')}</ul></section>`);
+      out.querySelectorAll('[data-work]').forEach(b => b.onclick = () => { const x = slotList[+b.dataset.work], row = st.ovRows?.[x.ref]; if (row && window.DrawUpDetailDraw) { P()?.openPortalTab?.('details'); setTimeout(() => window.DrawUpDetailDraw.viewer(row), 600); } else workOnDetail(x); });
       const q = s => out.querySelector(s);
       out.querySelectorAll('[data-view]').forEach(b => b.onclick = () => viewer(+b.dataset.view));
       out.querySelectorAll('[data-dl]').forEach(b => b.onclick = () => downloadOne(+b.dataset.dl, b.dataset.as, b));
@@ -461,7 +501,9 @@
         const hit = D.closestCatalog(d.title, d.category), b = document.createElement('button');
         b.type = 'button'; b.className = 'du-dit25-cat';
         b.textContent = hit ? `In the Detail Catalog: ${hit.code} ${hit.title} →` : 'Not in the catalog yet: draw it from a picture →';
-        b.onclick = () => { P()?.openPortalTab?.('details'); if (hit) setTimeout(() => D.openCatalog(hit.kind, hit.id), 600); };
+        const slot = !hit && st.gen?.id && window.DrawUpSheets?.slots ? window.DrawUpSheets.slots(st.model, { level: levelOf(st.gen) }).find(x => x.needed && x.title === d.title) : null;
+        if (slot) b.textContent = 'Not in the catalog yet: draw it for this set →';
+        b.onclick = () => { if (slot) return workOnDetail(slot); P()?.openPortalTab?.('details'); if (hit) setTimeout(() => D.openCatalog(hit.kind, hit.id), 600); };
         li.appendChild(b);
       });
     }

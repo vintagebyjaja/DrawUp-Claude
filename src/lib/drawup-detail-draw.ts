@@ -35,6 +35,11 @@ export const DETAIL_SCHEMA = obj({
   }),
   general_notes: arr(str),
   assumptions: arr(str),
+  // v25.1-03: where the detail sits in its set, what is still missing, and (on a revision) what changed.
+  sheet_ref: obj({ detail_no: str, sheet_no: str, project_name: str, revision: str, date: str }),
+  needs_more_info: { type: 'boolean' },
+  info_requests: arr(str),
+  changes: arr(obj({ comment: str, what: str, done: { type: 'boolean' } })),
 });
 
 export const DETAIL_INSTRUCTIONS = `You are a senior architect and building-envelope consultant at DrawUp. A member uploaded ONE construction
@@ -70,7 +75,64 @@ Do not design a building or a drawing set. Work only on this detail.
      positive = up / right); label like 1'-6" or 24" MIN.
    - view: the view name, e.g. "SECTION AT EAVE".
 4. general_notes: 2-6 notes that apply to the whole detail. assumptions: what you assumed (code edition, climate zone, sizes).
+5. sheet_ref: read the detail's own reference if it is visible: detail_no from the detail bubble or view title (for example "C2",
+   "D4" or "3"), sheet_no from the bubble's lower half or the sheet's title block (for example "A601"), project_name, revision
+   (for example "2" or "Rev 2") and date from the title block. Use the values in MEMBER NOTES / SET REFERENCE when given.
+   "" for anything you cannot read; never invent them.
+6. needs_more_info: true when the upload is not enough to draw this detail accurately (cut off, too blurry, a key layer or size
+   unreadable, or it depends on another view: the wall section, the window product, the structure, the roof slope). Then
+   info_requests lists 1-4 specific things to upload, each one sentence, naming the sheet or view when you can (for example
+   "A screenshot of section 3/A301 showing the wall layers above this window" or "The window manufacturer's head detail").
+   Still draw the best detail you can. false and [] when the detail is complete enough.
+7. changes: [] for a first drawing. On a REVISION (PREVIOUS DETAIL is given) one entry per comment: comment = its number,
+   what = what you changed for it, done = false if you could not do it (say why in what).
 Be specific and practical. This is learning / design-development content: a licensed professional must verify it.`;
+
+/** Added to the instructions when a detail is revised from comments or upgraded with more pictures. */
+export const REVISE_INSTRUCTIONS = `
+THIS IS A REVISION. PREVIOUS DETAIL is the current drawing model (same units and origin) with its flaws list. COMMENTS are what
+the member and their team want changed; a comment with AT x,y points to that spot in the drawing (real inches, same origin).
+NEW PICTURES (if any) are extra screenshots or set pages the member added so the detail can be more accurate.
+- Do every comment. Keep everything a comment does not touch exactly as it was (same coordinates, notes and dims), so the
+  revision only changes what was asked, plus anything the new pictures prove was wrong.
+- flaws: the flaws of the ORIGINAL upload that still matter, plus any new ones the new pictures show.
+- Re-check needs_more_info: set it false once the new pictures answer the earlier requests.`;
+
+/** "C2 / A601" -> "C2-A601" (Details lookup key). */
+export function sheetRefOf(detailNo: string, sheetNo: string) {
+  const d = String(detailNo || '').toUpperCase().replace(/[^A-Z0-9.]/g, ''), sh = String(sheetNo || '').toUpperCase().replace(/[^A-Z0-9.]/g, '');
+  return d && sh ? `${d}-${sh}` : '';
+}
+
+/* ------------------------------------------------------------------ Ask the team about a detail */
+export const ASK_SCHEMA = obj({
+  speaker: { type: 'string', enum: ['Arch Coach', 'Teammate', '6th Man'] },
+  verdict: { type: 'string', enum: ['looks_right', 'needs_changes', 'needs_more_info', 'answer'] },
+  answer: str,
+  suggestions: arr(str),
+  info_requests: arr(str),
+});
+export const ASK_INSTRUCTIONS = `You are DrawUp's AI design team answering a question about ONE construction detail (Arch Coach: codes, building science
+and constructability; Teammate: drafting and coordination; 6th Man: the blunt second opinion). Pick the speaker who fits the question.
+You get the detail's drawing model (real inches, x right, y up), its notes and dimensions, the flaws DrawUp already found, the
+earlier questions and answers, and the member's new question.
+- answer: 2-8 sentences, direct and practical. Say plainly whether the detail is right for the stated conditions, and what is
+  missing or wrong. Cite the code or standard only when you are sure (otherwise "verify with the adopted code").
+- verdict: looks_right, needs_changes, needs_more_info, or answer (a plain question that is not a check).
+- suggestions: 0-5 change instructions, each one sentence, written so they can be pasted as a comment for the next revision
+  (for example "Lap the WRB over the head flashing 2 in min. and tape the top edge").
+- info_requests: 0-3 things to upload (a screenshot of another view, a product detail, the set page) if you need them.
+This is design-development guidance; a licensed professional must verify it.`;
+export function cleanAsk(m: any) {
+  const list = (v: any, k: number, max: number) => (Array.isArray(v) ? v : []).slice(0, k).map((x: any) => s(x, max)).filter(Boolean);
+  return {
+    speaker: pick(m?.speaker, ['Arch Coach', 'Teammate', '6th Man'], 'Arch Coach'),
+    verdict: pick(m?.verdict, ['looks_right', 'needs_changes', 'needs_more_info', 'answer'], 'answer'),
+    answer: s(m?.answer, 3000) || 'The team could not answer that. Try asking it another way.',
+    suggestions: list(m?.suggestions, 5, 300),
+    info_requests: list(m?.info_requests, 3, 300),
+  };
+}
 
 const n = (v: any, lo: number, hi: number, d = 0) => { const x = Number(v); return Number.isFinite(x) ? Math.min(hi, Math.max(lo, x)) : d; };
 const s = (v: any, max = 400) => String(v ?? '').slice(0, max);
@@ -98,5 +160,9 @@ export function cleanDetail(m: any) {
     },
     general_notes: (Array.isArray(m?.general_notes) ? m.general_notes : []).slice(0, 8).map((x: any) => s(x, 300)).filter(Boolean),
     assumptions: (Array.isArray(m?.assumptions) ? m.assumptions : []).slice(0, 8).map((x: any) => s(x, 300)).filter(Boolean),
+    sheet_ref: { detail_no: s(m?.sheet_ref?.detail_no, 12).trim(), sheet_no: s(m?.sheet_ref?.sheet_no, 16).trim(), project_name: s(m?.sheet_ref?.project_name, 120).trim(), revision: s(m?.sheet_ref?.revision, 20).trim(), date: s(m?.sheet_ref?.date, 30).trim() },
+    needs_more_info: m?.needs_more_info === true,
+    info_requests: (Array.isArray(m?.info_requests) ? m.info_requests : []).slice(0, 4).map((x: any) => s(x, 300)).filter(Boolean),
+    changes: (Array.isArray(m?.changes) ? m.changes : []).slice(0, 30).map((c: any) => ({ comment: s(c?.comment, 12), what: s(c?.what, 400), done: c?.done !== false })).filter((c: any) => c.what),
   };
 }

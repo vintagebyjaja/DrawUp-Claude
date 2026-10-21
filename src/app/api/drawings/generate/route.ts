@@ -282,6 +282,26 @@ export async function POST(request: Request) {
 /* ------------------------------------------------------------------ finishing a set (both paths) */
 type Job = { mode: Mode; revising: boolean; parent: any; project: string | null; coachThread: string | null; sourcePaths: string[]; notes: string; location: string; comments: any[]; access: CreditAccess };
 
+/** The detail slots of a set ("4/A501" -> its title), the same numbering as drawup-drawit-sheets-v24.js slots(). */
+function slotTitles(model: any, mode: string) {
+  if (mode === 'preliminary' || mode === 'explore') return new Map<string, string>();
+  const titles = ['Typical wall section', 'Eave at eave wall', 'Wall base at foundation', ...((model?.details_needed || []) as any[]).map(d => String(d?.title || ''))];
+  const out = new Map<string, string>();
+  titles.forEach((t, i) => out.set(`${(i % 9) + 1}/A50${Math.floor(i / 9) + 1}`, t));
+  if (mode === 'full') { const sheet = 'A5' + String(Math.ceil(titles.length / 9) + 1).padStart(2, '0'); ['Window head', 'Window sill', 'Window jamb (plan)', 'Door threshold at slab'].forEach((t, i) => out.set(`${i + 1}/${sheet}`, t)); }
+  return out;
+}
+/** Moves each approved detail to the slot with the same title in the revised set (numbers can shift); drops it if that detail is gone. */
+function carryOverrides(map: Record<string, any>, model: any, mode: string) {
+  const next = slotTitles(model, mode), out: Record<string, any> = {}, key = (t: string) => t.trim().toLowerCase();
+  for (const [slot, v] of Object.entries(map || {})) {
+    const title = key(String(v?.slot_title || ''));
+    const hit = title ? [...next.entries()].find(([, t]) => key(t) === title)?.[0] : next.has(slot) ? slot : undefined;
+    if (hit && !out[hit]) out[hit] = v;
+  }
+  return out;
+}
+
 /** Reads the AI's answer and saves the set. Returns what the page needs, or { error }. Never refunds (the caller does). */
 async function finish(userId: string, job: Job, text: string, aiModel: string, responseId: string | null): Promise<Record<string, any> | { error: string }> {
   const { mode, revising, parent, comments, access } = job;
@@ -308,6 +328,8 @@ async function finish(userId: string, job: Job, text: string, aiModel: string, r
     source_paths: job.sourcePaths, notes: job.notes || parent?.notes || null, location: job.location || null, details_needed: model.details_needed,
     issue_status: parent?.issue_status || 'Preliminary', reviewer: parent?.reviewer || null, license_no: parent?.license_no || null,
     credits_charged: access.credits_charged ?? 0, ai_model: aiModel, ...(responseId ? { ai_response_id: responseId } : {}),
+    // v25.1-03: approved single details (Details tab) stay in the same detail on the revision (only when the column exists).
+    ...(parent && parent.detail_overrides && typeof parent.detail_overrides === 'object' ? { detail_overrides: carryOverrides(parent.detail_overrides, model, mode) } : {}),
   });
   const row = saved?.row || null;
   // A second poll of the same finished answer only reads back the saved set.

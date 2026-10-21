@@ -472,6 +472,16 @@
     detailBox(p, x, y, w, h, String(num), sheet, d.title.toUpperCase().slice(0, 40), 'TO BE DRAWN');
   }
 
+  /** v25.1: an approved AI-drawn detail (drawup-detail-draw-v25.js) in this slot, at its own true scale: the kit draws
+   *  100 px per printed inch, the same as this 36 x 24 in sheet, so it is placed 1:1 (its own title strip cropped off). */
+  function detailOverride(p, ctx, x, y, w, h, ov, num, sheet) {
+    const svg = String(ov.svg || '').replace(/viewBox="0 0 800 600" width="800" height="600"/, 'viewBox="0 0 800 536" width="800" height="536"');
+    p.rect(x, y, w, h, 0, '#fff');
+    if (svg) p.raw(`<image x="${r1(x + (w - 800) / 2)}" y="${r1(y + 34)}" width="800" height="536" href="data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}"/>`);
+    p.text(x + w - 18, y + 24, ('REVISED DETAIL · ' + (ov.code || 'AI') + (ov.revision ? ' REV ' + ov.revision : '') + (ov.approved ? ' · APPROVED ' + ov.approved : '')).toUpperCase(), 10, 'end', 'bold');
+    detailBox(p, x, y, w, h, String(num), sheet, String(ov.title || 'DETAIL').toUpperCase().slice(0, 40), ov.scale || 'AS NOTED');
+  }
+
   /* ------------------------------------------------------------------ sheets */
   function sheetCover(ctx) {
     const { m, g } = ctx, p = Pen(), sheet = { num: 'G001', title: 'Cover + General Notes', scale: 'NONE' };
@@ -569,7 +579,8 @@
       const p = Pen(), num = 'A50' + (page + 1);
       items.slice(page * 9, page * 9 + 9).forEach((it, j) => {
         const [x, y] = slots[j], n = page * 9 + j + 1;
-        if (it.k === 'need') detailNeeded(p, ctx, x, y, cw, ch, it.d, n, num);
+        if (ctx.overrides[n + '/' + num]) detailOverride(p, ctx, x, y, cw, ch, ctx.overrides[n + '/' + num], n, num);
+        else if (it.k === 'need') detailNeeded(p, ctx, x, y, cw, ch, it.d, n, num);
         else { if (it.k === 'wall') detailWallSection(p, ctx, x, y, cw, ch); if (it.k === 'eave') detailEave(p, ctx, x, y, cw, ch); if (it.k === 'base') detailBase(p, ctx, x, y, cw, ch); detailBox(p, x, y, cw, ch, String(n), num, it.t, it.sc); }
       });
       const sheet = { num, title: page ? 'Details (Continued)' : 'Wall Section + Details', scale: 'AS NOTED' };
@@ -694,7 +705,8 @@
   function sheetOpeningDetails(ctx, num) {
     const p = Pen(), cw = 990, ch = 700, xs = [M + 20, M + 1030, M + 2040];
     [[detailWinHead, 'WINDOW HEAD', '1" = 1\'-0"'], [detailWinSill, 'WINDOW SILL', '1" = 1\'-0"'], [detailWinJamb, 'WINDOW JAMB (PLAN)', '1" = 1\'-0"'], [detailThreshold, 'DOOR THRESHOLD AT SLAB', '1" = 1\'-0"']].forEach(([fn, t, sc], i) => {
-      const x = xs[i % 3], y = M + 20 + Math.floor(i / 3) * 730; fn(p, ctx, x, y, cw, ch); detailBox(p, x, y, cw, ch, String(i + 1), num, t, sc);
+      const x = xs[i % 3], y = M + 20 + Math.floor(i / 3) * 730, ov = ctx.overrides[(i + 1) + '/' + num];
+      if (ov) detailOverride(p, ctx, x, y, cw, ch, ov, i + 1, num); else { fn(p, ctx, x, y, cw, ch); detailBox(p, x, y, cw, ch, String(i + 1), num, t, sc); }
     });
     noteList(p, M + 1076, M + 820, ['Typical for every exterior opening on A201 + A800 unless noted', 'Flashing sequence: sill pan, jambs, head, then WRB over the head flashing', 'Products: follow the window + door manufacturer installation instructions where they differ', 'Safety glazing, egress + accessible thresholds per adopted code'], 11, 900);
     const sheet = { num, title: 'Opening Details', scale: 'AS NOTED' };
@@ -723,7 +735,7 @@
   function render(model, opts = {}) {
     const m = model, g = Geo(m), mk = marks(m);
     const level = ['preliminary', 'full'].includes(opts.level) ? opts.level : 'standard';
-    const ctx = { m, g, mk, model: m, level, location: opts.location || '', status: (opts.status || 'PRELIMINARY').toUpperCase(), reviewer: opts.reviewer || '', license: opts.license || '', date: opts.date || new Date().toLocaleDateString('en-US'), firstDate: opts.firstDate || '', revisions: Array.isArray(opts.revisions) ? opts.revisions : [], sourceImage: opts.sourceImage || '', index: [] };
+    const ctx = { overrides: opts.overrides && typeof opts.overrides === 'object' ? opts.overrides : {}, m, g, mk, model: m, level, location: opts.location || '', status: (opts.status || 'PRELIMINARY').toUpperCase(), reviewer: opts.reviewer || '', license: opts.license || '', date: opts.date || new Date().toLocaleDateString('en-US'), firstDate: opts.firstDate || '', revisions: Array.isArray(opts.revisions) ? opts.revisions : [], sourceImage: opts.sourceImage || '', index: [] };
     const nDet = Math.ceil((3 + m.details_needed.length) / 9);
     const full = level === 'full', prelim = level === 'preliminary';
     ctx.index = [{ num: 'G001', title: 'Cover + General Notes' }];
@@ -747,5 +759,22 @@
     return sheets;
   }
 
-  window.DrawUpSheets = { render, ftin, SW, SH };
+  /** v25.1: every detail slot of a set ("4/A501"), where it sits on its sheet, and what is drawn there, so one detail can
+   *  be worked on (Details tab) and the approved one put back in that slot only (render opts.overrides). */
+  function slots(model, opts = {}) {
+    const m = model, level = ['preliminary', 'full'].includes(opts.level) ? opts.level : 'standard';
+    if (level === 'preliminary') return [];
+    const cw = 990, ch = 700, xs = [M + 20, M + 1030, M + 2040], ys = [M + 20, M + 750, M + 1480], cells = ys.flatMap(y => xs.map(x => [x, y]));
+    const items = [{ t: 'Typical wall section', cat: 'Wall Sections' }, { t: 'Eave at eave wall', cat: 'Roofs' }, { t: 'Wall base at foundation', cat: 'Foundations' }, ...(m.details_needed || []).map(d => ({ t: d.title, cat: d.category, why: d.why, where: d.location, need: true }))];
+    const out = items.map((it, i) => { const page = Math.floor(i / 9), [x, y] = cells[i % 9], sheet = 'A50' + (page + 1), no = String(i + 1); return { ref: no + '/' + sheet, no, sheet, title: it.t, category: it.cat, needed: !!it.need, why: it.why || '', where: it.where || '', rect: [x, y, cw, ch] }; });
+    if (level === 'full') {
+      const sheet = 'A5' + String(Math.ceil(items.length / 9) + 1).padStart(2, '0');
+      [['Window head', 'Windows'], ['Window sill', 'Windows'], ['Window jamb (plan)', 'Windows'], ['Door threshold at slab', 'Doors']].forEach(([t, cat], i) => out.push({ ref: (i + 1) + '/' + sheet, no: String(i + 1), sheet, title: t, category: cat, needed: false, why: '', where: '', rect: [xs[i % 3], M + 20 + Math.floor(i / 3) * 730, cw, ch] }));
+    }
+    return out;
+  }
+  /** One region of a sheet's svg as its own svg (same drawing, cropped by its viewBox). */
+  const cropSvg = (svg, [x, y, w, h], px = w) => String(svg).replace(/<svg([^>]*?)viewBox="[^"]*" width="[^"]*" height="[^"]*"/, `<svg$1viewBox="${x} ${y} ${w} ${h}" width="${px}" height="${Math.round(px * h / w)}"`);
+
+  window.DrawUpSheets = { render, ftin, SW, SH, slots, cropSvg };
 })();
