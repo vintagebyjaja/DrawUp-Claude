@@ -18,8 +18,8 @@
   };
   var svg=function(k){return '<svg viewBox="0 0 24 24" aria-hidden="true">'+ICON[k]+'</svg>';};
   var PUBLIC=[['home','Home','home'],['discover','Discover','search'],['coach','Coach','coach'],['check','Check','check'],['connect','Connect','connect'],['firms','Firms','firms']];
-  var PORTAL=[['dashboard','Dashboard','dash'],['search','Search','search'],['arch-coach','Arch Coach','coach'],['connect','Connect','people']];
-  var MORE=[['profile','Profile','◎'],['projects','Projects','▱'],['draw','Draw','⌖'],['check','Check','✓'],['swap','Swap','⇄'],['details','Details','⌗'],['discover','Discover','◈'],['firm','Firm','◇'],['team','Team','◉'],['account','Account','⚙'],['hq','HQ','★']];
+  var PORTAL=[['dashboard','Dashboard','dash'],['search','Search','search'],['ai-team','AI Team','coach'],['connect','Connect','people']];
+  var MORE=[['arch-coach','Arch Coach','✦'],['profile','Profile','◎'],['projects','Projects','▱'],['draw','Draw','⌖'],['check','Check','✓'],['swap','Swap','⇄'],['details','Details','⌗'],['discover','Discover','◈'],['firm','Firm','◇'],['team','Team','◉'],['account','Account','⚙'],['hq','HQ','★']];
   var MAIN=PORTAL.map(function(x){return x[0];});
 
   function build(){
