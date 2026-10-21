@@ -10,7 +10,7 @@
 (function(){
 'use strict';
 const DRAW_KEYS={v:'select',w:'wall',p:'partition',d:'door',n:'window',o:'cased',a:'room',c:'column',s:'stair',f:'fixture',t:'text',l:'dim',m:'measure',e:'camera'};
-const GO_KEYS={d:['dashboard','Dashboard'],s:['search','Search'],p:['profile','Profile'],j:['projects','Projects'],w:['draw','Draw'],c:['arch-coach','Arch Coach'],k:['check','Check'],x:['swap','Swap'],e:['details','Details'],v:['discover','Discover'],m:['connect','Connect'],f:['firm','Firm'],t:['team','Team'],a:['account','Account']};
+const GO_KEYS={d:['dashboard','Dashboard'],i:['ai-team','AI Team'],s:['search','Search'],p:['profile','Profile'],j:['projects','Projects'],w:['draw','Draw'],c:['arch-coach','Arch Coach'],k:['check','Check'],x:['swap','Swap'],e:['details','Details'],v:['discover','Discover'],m:['connect','Connect'],f:['firm','Firm'],t:['team','Team'],a:['account','Account']};
 const TAB_GROUPS='.du-subtabs,.subtabs,.dc-tabs,.du-fp-tabs,[role="tablist"]';
 const typing=t=>!!t&&(t.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName));
 const visible=el=>!!el&&el.getClientRects().length>0&&getComputedStyle(el).visibility!=='hidden';

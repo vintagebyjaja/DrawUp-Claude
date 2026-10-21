@@ -145,8 +145,12 @@
     p.text(x + w / 2, y + 78, 'BY A LICENSED DESIGN PROFESSIONAL + THE AHJ', 9, 'middle');
     y += 120; p.line(x, y, SW - M, y, 1.5);
     y += 24; p.text(x + 20, y, 'ISSUE', 10); y += 20; p.text(x + 20, y, 'NO.', 10, 'start', 'bold'); p.text(x + 70, y, 'DESCRIPTION', 10, 'start', 'bold'); p.text(SW - M - 20, y, 'DATE', 10, 'end', 'bold'); p.line(x + 20, y + 6, SW - M - 20, y + 6, 0.8);
-    y += 22; p.text(x + 20, y, '1', 10); p.text(x + 70, y, st === 'PRELIMINARY' ? 'DRAWUP GENERATED SET' : st, 10); p.text(SW - M - 20, y, ctx.date, 10, 'end');
-    for (let i = 0; i < 3; i++) { y += 22; p.line(x + 20, y + 6, SW - M - 20, y + 6, 0.4); }
+    const rows = [{ no: '1', desc: ctx.level === 'preliminary' ? 'PRELIMINARY / SCHEMATIC SET' : st === 'PRELIMINARY' ? 'DRAWUP GENERATED SET' : st, date: ctx.firstDate || ctx.date }, ...ctx.revisions.slice(-3).map(r => ({ no: String(r.no), desc: String(r.desc || 'REVISION ' + r.no).toUpperCase().slice(0, 30), date: r.date || '', rev: true }))];
+    for (let i = 0; i < 4; i++) {
+      y += 22; const r = rows[i];
+      if (r) { if (r.rev) { p.poly([[x + 26, y + 3], [x + 44, y + 3], [x + 35, y - 13]], 1, '#fff'); p.text(x + 35, y + 1, r.no, 8, 'middle', 'bold'); } else p.text(x + 20, y, r.no, 10); p.text(x + 70, y, r.desc, 10); p.text(SW - M - 20, y, r.date, 10, 'end'); }
+      p.line(x + 20, y + 6, SW - M - 20, y + 6, 0.4);
+    }
     y += 30; p.line(x, y, SW - M, y, 1.5);
     y += 24; p.text(x + 20, y, 'SHEET INDEX', 10); y += 6;
     for (const s of ctx.index) { y += 19; if (s.num === sheet.num) p.rect(x + 14, y - 13, 6, 16, 0, '#000'); p.text(x + 26, y, s.num, 10, 'start', s.num === sheet.num ? 'bold' : 'normal'); p.text(x + 90, y, s.title.toUpperCase().slice(0, 30), 10, 'start', s.num === sheet.num ? 'bold' : 'normal'); }
@@ -491,7 +495,7 @@
     ['A.F.F. above finish floor', 'B.O. bottom of', 'EL. elevation', 'F.O.S. face of sheathing', 'O.C. on center', 'O/O out to out', 'R.O. rough opening', 'T.O. top of', 'TYP. typical', 'VIF verify in field'].forEach(t => { p.text(ix, iy, t.toUpperCase(), 10); iy += 17; });
     // notes columns
     let ny = 1140; p.text(120, ny, 'GENERAL NOTES', 14, 'start', 'bold'); ny += 28;
-    const gen = ['DrawUp generated this set from a picture. A licensed design professional must review, complete and take responsibility for it before it is used for permit or construction.', 'Dimensions are to face of sheathing (F.O.S.) unless noted. Opening dimensions are to the centerline of the rough opening.', 'All views are drawn from one building model, so plans, elevations, sections and schedules agree. Change the model, not a single view.', 'Member sizes, connections, footings and anchorage are typical starting points. Structural design by a licensed engineer for the actual site loads (wind, snow, seismic, soil).', 'Verify all existing conditions and estimated dimensions in the field before ordering materials.', 'Provide the construction details flagged on A501. Each flagged detail is also listed in the DrawUp Details library.'];
+    const gen = ['DrawUp generated this set from a picture. A licensed design professional must review, complete and take responsibility for it before it is used for permit or construction.', 'Dimensions are to face of sheathing (F.O.S.) unless noted. Opening dimensions are to the centerline of the rough opening.', 'All views are drawn from one building model, so plans, elevations, sections and schedules agree. Change the model, not a single view.', 'Member sizes, connections, footings and anchorage are typical starting points. Structural design by a licensed engineer for the actual site loads (wind, snow, seismic, soil).', 'Verify all existing conditions and estimated dimensions in the field before ordering materials.', ctx.level === 'preliminary' ? 'Preliminary / schematic set for design review, school work and competitions. Develop it into the full set before permit: the full set adds details, framing, schedules and the code analysis.' : 'Provide the construction details flagged on A501. Each flagged detail is also listed in the DrawUp Details library.'];
     gen.forEach((t, i) => { p.text(120, ny, String(i + 1) + '.', 11, 'start', 'bold'); ny = p.para(150, ny, t, 11, 920) + 6; });
     ny += 14; if (m.assumptions.length) { p.text(120, ny, 'ASSUMPTIONS (CONFIRM)', 14, 'start', 'bold'); ny += 26; m.assumptions.slice(0, 14).forEach(t => { if (ny > SH - 140) return; p.text(120, ny, '•', 11); ny = p.para(146, ny, t, 10.5, 920) + 3; }); }
     let cy = 1140; const c2 = 1200;
@@ -500,8 +504,8 @@
     let dy = 1140; const c3 = 2120;
     p.text(c3, dy, 'CODE ITEMS TO CONFIRM WITH THE AHJ', 14, 'start', 'bold'); dy += 28;
     m.code_notes.slice(0, 12).forEach(t => { if (dy > 1760) return; p.text(c3, dy, '•', 11); dy = p.para(c3 + 24, dy, t, 10.5, 900) + 3; });
-    dy += 18; p.text(c3, dy, 'DETAILS THIS SET STILL NEEDS (SEE A501)', 14, 'start', 'bold'); dy += 28;
-    m.details_needed.forEach((d, i) => { if (dy > SH - 140) return; p.text(c3, dy, String(i + 4) + '/A50' + (i + 3 < 9 ? '1' : '2'), 10.5, 'start', 'bold'); dy = p.para(c3 + 80, dy, d.title, 10.5, 840) + 3; });
+    dy += 18; p.text(c3, dy, ctx.level === 'preliminary' ? 'DETAILS TO DEVELOP IN THE FULL SET' : 'DETAILS THIS SET STILL NEEDS (SEE A501)', 14, 'start', 'bold'); dy += 28;
+    m.details_needed.forEach((d, i) => { if (dy > SH - 140) return; p.text(c3, dy, ctx.level === 'preliminary' ? String(i + 1) + '.' : String(i + 4) + '/A50' + (Math.floor((i + 3) / 9) + 1), 10.5, 'start', 'bold'); dy = p.para(c3 + 80, dy, d.title, 10.5, 840) + 3; });
     return { ...sheet, svg: wrapSheet(p.svg(), ctx, sheet) };
   }
   function sheetPlan(ctx, level) {
@@ -642,18 +646,104 @@
     return { ...sheet, svg: wrapSheet(p.svg(), ctx, sheet) };
   }
 
+  /* ------------------------------------------------------------------ full set: opening details + code analysis */
+  function wallLayers(p, ctx, x, y0, y1, horiz) { // vertical wall strip (section) from y0 to y1 with exterior on the left; returns layer x's
+    const T = Math.round(ctx.g.wallT * 100), xs = { clad: x - 9, wrb: x - 2, sh: x, stud: x + 6, gyp: x + T };
+    p.rect(x - 9, y0, 7, y1 - y0, 0.8, '#fff'); p.line(x - 2, y0, x - 2, y1, 0.6); p.rect(x, y0, 6, y1 - y0, 0.8, 'url(#h45)');
+    p.rect(x + 6, y0, T - 6, y1 - y0, 0.8, 'url(#batt)'); p.rect(x + T, y0, 6, y1 - y0, 0.8, '#fff');
+    return xs;
+  }
+  function winFrame(p, x, y, w, h) { p.rect(x, y, w, h, 1.6, '#fff'); p.rect(x + 8, y + 8, w - 16, h - 16, 1); p.line(x + w / 2 - 2, y + 8, x + w / 2 - 2, y + h - 8, 0.6); p.line(x + w / 2 + 2, y + 8, x + w / 2 + 2, y + h - 8, 0.6); }
+  function detailWinHead(p, ctx, x, y, w, h) {
+    const bx = x + 260, T = Math.round(ctx.g.wallT * 100), hdrTop = y + 150, hdrBot = y + 150 + 95;
+    wallLayers(p, ctx, bx, y + 40, hdrTop);
+    p.rect(bx + 6, hdrTop, T - 6, hdrBot - hdrTop, 1.4, 'url(#h135)'); p.rect(bx, hdrTop, 6, hdrBot - hdrTop + 6, 0.8, 'url(#h45)'); p.rect(bx - 9, hdrTop, 7, hdrBot - hdrTop - 14, 0.8, '#fff');
+    p.rect(bx + T, hdrTop, 6, hdrBot - hdrTop + 30, 0.8, '#fff');
+    winFrame(p, bx - 4, hdrBot + 14, T + 4, 300);
+    p.pline([[bx - 2, hdrTop + 20], [bx - 2, hdrBot - 2], [bx - 30, hdrBot - 2], [bx - 36, hdrBot + 8]], 2.2); // head flashing with drip
+    p.circle(bx - 14, hdrBot + 12, 4, 1, '#000');
+    noteList(p, x + w - 380, y + 50, [ctx.m.wall_assembly.cladding || 'Cladding', 'WRB lapped OVER head flashing (shingle-fashion)', 'Metal head flashing with drip, end dams', 'Header per A800 schedule, verify by structural', 'Sealant + backer rod at interior perimeter', 'Window per manufacturer installation instructions'], 10, 360);
+  }
+  function detailWinSill(p, ctx, x, y, w, h) {
+    const bx = x + 260, T = Math.round(ctx.g.wallT * 100), sill = y + 330;
+    winFrame(p, bx - 4, y + 40, T + 4, sill - y - 52);
+    p.pline([[bx - 30, sill + 6], [bx - 2, sill - 4], [bx + T - 4, sill - 12], [bx + T - 4, sill - 30]], 2.2); // sloped sill pan with back dam
+    p.rect(bx + 6, sill, T - 6, 24, 1.2, 'url(#h135)'); // rough sill
+    wallLayers(p, ctx, bx, sill + 24, y + 600);
+    p.rect(bx + T, sill - 20, 70, 14, 1.2, '#fff'); // interior stool
+    noteList(p, x + w - 380, y + 50, ['Self-adhered sill pan, sloped to the exterior, turned up 6" at jambs', 'Back dam at interior edge', 'Do NOT seal the bottom flange: leave a weep path', 'WRB lapped UNDER the sill pan', 'Interior stool + apron', 'Insulating foam at the shim space (low expansion)'], 10, 360);
+  }
+  function detailWinJamb(p, ctx, x, y, w, h) { // plan
+    const by = y + 250, T = Math.round(ctx.g.wallT * 100), jx = x + 360;
+    p.rect(x + 60, by, jx - x - 60, 7, 0.8, '#fff'); p.rect(x + 60, by + 9, jx - x - 60, 6, 0.8, 'url(#h45)'); p.rect(x + 60, by + 15, jx - x - 60, T - 15, 0.8, 'url(#batt)'); p.rect(x + 60, by + T, jx - x - 60, 6, 0.8, '#fff');
+    [[jx - 140, 'K'], [jx - 70, 'J']].forEach(([sx]) => { p.rect(sx, by + 15, 70, T - 15, 1.2); p.line(sx, by + 15, sx + 70, by + T, 0.6); p.line(sx + 70, by + 15, sx, by + T, 0.6); });
+    winFrame(p, jx + 14, by - 4, 260, T + 8);
+    p.pline([[jx - 160, by + 8], [jx + 2, by + 8], [jx + 2, by + 30]], 2); p.circle(jx + 8, by + 2, 4, 1, '#000');
+    p.text(jx - 105, by + T + 34, 'KING + JACK STUDS', 9, 'middle');
+    noteList(p, x + w - 380, y + 50, ['Jamb flashing over the sill pan, under the head flashing', 'King + jack studs each side of every opening', 'Sealant + backer rod at cladding joint', 'Casing / returns per finish schedule'], 10, 360);
+  }
+  function detailThreshold(p, ctx, x, y, w, h) {
+    const sl = y + 380, bx = x + 300;
+    p.rect(x + 30, sl, w - 420, 60, 1.6, 'url(#conc)'); p.rect(x + 30, sl + 60, w - 420, 520 - (sl + 60 - y), 0, 'url(#earth)');
+    p.poly([[x + 30, sl + 30], [bx - 20, sl + 22], [bx - 20, sl + 60], [x + 30, sl + 60]], 1.2, 'url(#conc)'); // exterior slab sloped away
+    p.poly([[bx - 30, sl - 2], [bx + 80, sl - 2], [bx + 70, sl - 22], [bx - 10, sl - 16]], 1.6, '#fff'); // threshold
+    p.rect(bx + 6, y + 60, 50, sl - 24 - y - 60, 1.6, '#fff'); // door leaf
+    p.pline([[bx - 40, sl + 2], [bx + 110, sl + 2], [bx + 110, sl - 30]], 2.2); // sill pan
+    noteList(p, x + w - 380, y + 50, ['Door threshold set in sealant on a sill pan with back dam', 'Exterior slab / landing max. 1/2" below threshold where an accessible route is required (verify)', 'Slope exterior landing 1/4" per ft max. away from the door (verify)', 'Weatherstrip + door sweep', 'Thickened slab edge per structural'], 10, 360);
+  }
+  function sheetOpeningDetails(ctx, num) {
+    const p = Pen(), cw = 990, ch = 700, xs = [M + 20, M + 1030, M + 2040];
+    [[detailWinHead, 'WINDOW HEAD', '1" = 1\'-0"'], [detailWinSill, 'WINDOW SILL', '1" = 1\'-0"'], [detailWinJamb, 'WINDOW JAMB (PLAN)', '1" = 1\'-0"'], [detailThreshold, 'DOOR THRESHOLD AT SLAB', '1" = 1\'-0"']].forEach(([fn, t, sc], i) => {
+      const x = xs[i % 3], y = M + 20 + Math.floor(i / 3) * 730; fn(p, ctx, x, y, cw, ch); detailBox(p, x, y, cw, ch, String(i + 1), num, t, sc);
+    });
+    noteList(p, M + 1076, M + 820, ['Typical for every exterior opening on A201 + A800 unless noted', 'Flashing sequence: sill pan, jambs, head, then WRB over the head flashing', 'Products: follow the window + door manufacturer installation instructions where they differ', 'Safety glazing, egress + accessible thresholds per adopted code'], 11, 900);
+    const sheet = { num, title: 'Opening Details', scale: 'AS NOTED' };
+    return { ...sheet, svg: wrapSheet(p.svg(), ctx, sheet) };
+  }
+  function sheetCode(ctx) {
+    const { m, g } = ctx, p = Pen(), sheet = { num: 'G002', title: 'Code Analysis + Criteria', scale: 'NONE' };
+    const area = Math.round(g.W * g.D), doors = m.openings.filter(o => o.kind !== 'window'), wins = m.openings.filter(o => o.kind === 'window');
+    p.text(120, 180, 'CODE ANALYSIS + DESIGN CRITERIA', 44, 'start', 'bold'); p.line(120, 210, 3000, 210, 3);
+    p.para(120, 250, 'Starting values drawn from the building model. The design professional confirms each item with the adopted code and the authority having jurisdiction (AHJ). DrawUp never certifies compliance.', 12, 2700);
+    let y = 330; p.text(120, y, 'PROJECT + CODE BASIS', 16, 'start', 'bold'); y += 34;
+    [['Jurisdiction / code', m.jurisdiction_note || 'Not given: confirm the adopted code edition with the AHJ'], ['Use', m.building_use || 'Confirm'], ['Occupancy group', 'CONFIRM WITH AHJ (by use)'], ['Construction type', m.wall_assembly.stud === 'cmu' ? 'Likely Type V-B or III-B (confirm)' : m.wall_assembly.stud === 'steel_stud' ? 'Likely Type II-B or V-B (confirm)' : 'Likely Type V-B (confirm)'], ['Stories above grade', String(m.stories)], ['Footprint', ftin(g.W) + ' x ' + ftin(g.D) + ' = ' + area + ' SF'], ['Gross floor area', area * m.stories + ' SF (approx.)'], ['Building height', 'Approx. ' + ftin(g.peak) + ' to the highest roof point'], ['Sprinklers', 'CONFIRM: required by use / area?'], ['Accessibility', 'CONFIRM: accessible route, entrance, toilet rooms as applicable']].forEach(([a, b]) => { p.text(120, y, a.toUpperCase(), 12); p.para(560, y, String(b).toUpperCase(), 12, 760, 1.25, 'bold'); y += 30; });
+    y += 20; p.text(120, y, 'DESIGN LOADS (BY STRUCTURAL / AHJ)', 16, 'start', 'bold'); y += 34;
+    ['Roof live / snow load: ______ PSF', 'Ultimate wind speed: ______ MPH, exposure ___', 'Seismic design category: ___', 'Floor live load: ______ PSF', 'Soil bearing: ______ PSF (assumed until tested)', 'Frost depth: ______ IN'].forEach(t => { p.text(120, y, t.toUpperCase(), 12); y += 26; });
+    let ey = 330; const ex = 1500; p.text(ex, ey, 'EGRESS + OPENINGS (FROM THE MODEL)', 16, 'start', 'bold'); ey += 34;
+    for (let l = 1; l <= m.stories; l++) {
+      const dl = doors.filter(o => o.level === l), wl = wins.filter(o => o.level === l), widest = dl.reduce((a, o) => Math.max(a, o.width_ft), 0);
+      ey = p.para(ex, ey, `LEVEL ${l}: ${dl.length} EXTERIOR DOOR${dl.length === 1 ? '' : 'S'}${widest ? ', WIDEST ' + ftin(widest) : ''} · ${wl.length} WINDOW${wl.length === 1 ? '' : 'S'}` + (l > 1 && !dl.length ? ' · EXIT BY INTERIOR STAIR: CONFIRM EXIT COUNT, TRAVEL DISTANCE + EMERGENCY ESCAPE OPENINGS' : ''), 12, 1500) + 8;
+    }
+    ey = p.para(ex, ey + 6, 'CONFIRM: occupant load, number of exits, exit width, travel distance, door swing + hardware, emergency escape openings where sleeping rooms occur, safety glazing near doors.', 11, 1500) + 20;
+    p.text(ex, ey, 'CODE ITEMS TO CONFIRM (FROM DRAWUP)', 16, 'start', 'bold'); ey += 32;
+    (m.code_notes.length ? m.code_notes : ['No code items were listed. Ask Arch Coach for a code checklist for this use and location.']).slice(0, 18).forEach((t, i) => { if (ey > SH - 160) return; p.text(ex, ey, String(i + 1) + '.', 12, 'start', 'bold'); ey = p.para(ex + 34, ey, t, 12, 1460) + 6; });
+    return { ...sheet, svg: wrapSheet(p.svg(), ctx, sheet) };
+  }
+
   function render(model, opts = {}) {
     const m = model, g = Geo(m), mk = marks(m);
-    const ctx = { m, g, mk, model: m, location: opts.location || '', status: (opts.status || 'PRELIMINARY').toUpperCase(), reviewer: opts.reviewer || '', license: opts.license || '', date: opts.date || new Date().toLocaleDateString('en-US'), sourceImage: opts.sourceImage || '', index: [] };
+    const level = ['preliminary', 'full'].includes(opts.level) ? opts.level : 'standard';
+    const ctx = { m, g, mk, model: m, level, location: opts.location || '', status: (opts.status || 'PRELIMINARY').toUpperCase(), reviewer: opts.reviewer || '', license: opts.license || '', date: opts.date || new Date().toLocaleDateString('en-US'), firstDate: opts.firstDate || '', revisions: Array.isArray(opts.revisions) ? opts.revisions : [], sourceImage: opts.sourceImage || '', index: [] };
     const nDet = Math.ceil((3 + m.details_needed.length) / 9);
+    const full = level === 'full', prelim = level === 'preliminary';
     ctx.index = [{ num: 'G001', title: 'Cover + General Notes' }];
+    if (full) ctx.index.push({ num: 'G002', title: 'Code Analysis + Criteria' });
     for (let l = 1; l <= m.stories; l++) ctx.index.push({ num: 'A10' + l, title: m.stories > 1 ? `Level ${l} Plan` + (l === m.stories ? ' + Roof' : '') : 'Floor Plan + Roof Plan' });
     ctx.index.push({ num: 'A201', title: 'Exterior Elevations' }, { num: 'A301', title: 'Building Sections' });
-    for (let i = 0; i < nDet; i++) ctx.index.push({ num: 'A50' + (i + 1), title: i ? 'Details (Continued)' : 'Wall Section + Details' });
-    ctx.index.push({ num: 'A601', title: 'Foundation + Framing' }, { num: 'A800', title: 'Openings + Schedules' });
+    if (!prelim) {
+      for (let i = 0; i < nDet; i++) ctx.index.push({ num: 'A50' + (i + 1), title: i ? 'Details (Continued)' : 'Wall Section + Details' });
+      if (full) ctx.index.push({ num: 'A5' + String(nDet + 1).padStart(2, '0'), title: 'Opening Details' });
+      ctx.index.push({ num: 'A601', title: 'Foundation + Framing' }, { num: 'A800', title: 'Openings + Schedules' });
+    }
     const sheets = [sheetCover(ctx)];
+    if (full) sheets.push(sheetCode(ctx));
     for (let l = 1; l <= m.stories; l++) sheets.push(sheetPlan(ctx, l));
-    sheets.push(sheetElevations(ctx), sheetSections(ctx), ...sheetsDetails(ctx), sheetFraming(ctx), sheetSchedules(ctx));
+    sheets.push(sheetElevations(ctx), sheetSections(ctx));
+    if (!prelim) {
+      sheets.push(...sheetsDetails(ctx));
+      if (full) sheets.push(sheetOpeningDetails(ctx, 'A5' + String(nDet + 1).padStart(2, '0')));
+      sheets.push(sheetFraming(ctx), sheetSchedules(ctx));
+    }
     return sheets;
   }
 

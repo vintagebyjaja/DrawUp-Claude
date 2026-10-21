@@ -46,7 +46,12 @@ export const DRAWINGS_SCHEMA = obj({
   code_notes: arr(str),
   details_needed: arr(obj({ title: str, category: { type: 'string', enum: DETAIL_CATEGORIES }, why: str, location: str })),
   jurisdiction_note: str,
+  next_steps: arr(obj({ title: str, why: str, kind: oneOf('detail', 'sheet', 'design', 'code', 'coordination', 'consultant'), instruction: str })),
+  changes: arr(obj({ comment: num, element: str, what: str, done: { type: 'boolean' } })),
 });
+
+/** Explore mode: two or three different design directions, each a complete model. */
+export const EXPLORE_SCHEMA = obj({ options: arr(obj({ name: str, idea: str, model: DRAWINGS_SCHEMA })) });
 
 export const DRAWINGS_INSTRUCTIONS = `You are DrawUp's architectural documentation engine. The user gives you one or more pictures of a building
 (photo, rendering, hand sketch, AI-generated image, or existing drawings) plus optional notes. Read them and return ONE coordinated
@@ -77,7 +82,40 @@ Be a careful architect:
   Each with the DrawUp category, why it is needed, and where it occurs. 4 to 10 items, most important first.
 - code_notes: model-code items to confirm (IBC / IRC / ADA as applicable), naming what the AHJ must confirm. Never claim compliance.
 - assumptions: every value you assumed.
+- next_steps: 3 to 6 concrete things to do next for THIS set (a sheet or detail to add, a design question to resolve, a code item to
+  confirm, a consultant to bring in). instruction is written as a comment DrawUp can apply on the next revision, for example
+  "Add a 36 in x 80 in man door on the left wall near the back corner".
+- changes: return an empty list for a new set.
 Use plain professional language. Do not invent a site, owner or address.`;
+
+/** Added to the instructions for a quick schematic set. */
+export const PRELIMINARY_NOTE = `MODE: PRELIMINARY (schematic design, school projects, competitions, brainstorming). Get the massing, footprint, rooms,
+openings and roof right. Keep details_needed to the 3 to 5 most important. Keep issues and code notes short.`;
+/** Added to the instructions for a full set. */
+export const FULL_NOTE = `MODE: FULL SET (construction documents starting point). Be thorough: every opening, every room, all assemblies, 6 to 10
+details_needed, and complete code_notes for the code analysis sheet.`;
+/** Explore mode instructions (wraps the model rules above). */
+export const EXPLORE_NOTE = `MODE: EXPLORE. Return 3 different design directions for the same program and site constraints as "options". Option 1
+follows the picture as closely as possible. Options 2 and 3 each change one big idea (for example roof form, entry location,
+room arrangement, porch, footprint proportion) and say what and why in "idea" (2 or 3 sentences). Each option's model follows every
+rule below and stands on its own. Keep each option's details_needed to 3 to 5 items.`;
+
+/** Revision mode: the member's comments on the previous set. */
+export const REVISE_INSTRUCTIONS = `You are revising an existing DrawUp building model. You get the PREVIOUS MODEL (JSON), the member's numbered
+COMMENTS (some pinned on a sheet, with a picture of the marked area: the red circle is where they clicked), and optional general notes.
+Return the COMPLETE updated model in the same schema.
+Rules:
+- Change only what the comments ask for, plus what must change to stay coordinated (for example a moved door also moves its room
+  door swing, a taller wall raises the roof). Everything else stays EXACTLY as it was: same values, same order of rooms and openings,
+  same text. Consistency with the previous set matters more than anything else.
+- In "changes" list every change: comment = the comment number it answers (0 if it was a coordination change), element (for
+  example "Door 101" or "Roof pitch"), what changed with the old and new value, done = true. If a comment cannot be done, add an
+  entry with done = false and say why in "what".
+- Keep issues_in_source, assumptions and code_notes from before unless a comment changes them, and update next_steps for what is
+  left to do. Add a details_needed item if a change creates a new condition that needs a detail.
+Then follow the model rules below.
+
+`;
 
 export type DrawingModel = Record<string, any>;
 
@@ -129,6 +167,8 @@ export function cleanModel(m: any): DrawingModel {
     assumptions: list(m?.assumptions, 20), code_notes: list(m?.code_notes, 14),
     details_needed: details,
     jurisdiction_note: s(m?.jurisdiction_note, 400),
+    next_steps: (Array.isArray(m?.next_steps) ? m.next_steps : []).slice(0, 8).map((x: any) => ({ title: s(x?.title, 160), why: s(x?.why, 400), kind: ['detail', 'sheet', 'design', 'code', 'coordination', 'consultant'].includes(x?.kind) ? x.kind : 'design', instruction: s(x?.instruction, 600) })).filter((x: any) => x.title),
+    changes: (Array.isArray(m?.changes) ? m.changes : []).slice(0, 40).map((x: any) => ({ comment: Math.round(n(x?.comment, 0, 99, 0)), element: s(x?.element, 120), what: s(x?.what, 400), done: x?.done !== false })).filter((x: any) => x.what),
   };
 }
 
