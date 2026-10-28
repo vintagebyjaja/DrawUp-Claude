@@ -9,7 +9,7 @@
 // URL for it in the web search results of that same job (verifySources below). Everything else is labelled unverified.
 
 import { DETAIL_CATEGORIES, DETAIL_SCHEMA, cleanDetail } from '@/lib/drawup-detail-draw';
-import { validate, type Comp, type Drawing } from '@/lib/drawup-vdi-geometry';
+import { formatInches, regionsOf, validate, type Comp, type Drawing } from '@/lib/drawup-vdi-geometry';
 
 const str = { type: 'string' };
 const num = { type: 'number' };
@@ -136,6 +136,10 @@ own websites listed under APPROVED MANUFACTURER DOMAINS. Never cite forums, blog
    the manufacturer's domain; kind visual (illustration / 3D / cutaway), technical (2D CAD / construction detail),
    installation_guide or product_page. why = one sentence on relevance, and say plainly when the region differs from the
    project's. [] when nothing relevant is found. Never invent URLs or titles.
+   bimobject.com is a manufacturer content platform: use its public product pages, set manufacturer to the brand that
+   published the object (not "BIMobject") and title to the product page's title. Prefer manufacturers architects in the
+   project's market actually specify. Never use RevitCity, SketchUp 3D Warehouse, GrabCAD, BibLus/BiblioCAD, CAD-block
+   download sites or any site where anyone can upload models: their content is not from the manufacturer.
 Return JSON only.`;
 
 /* ------------------------------------------------------------------ 3. draw (corrected detail) */
@@ -227,6 +231,9 @@ export function checkDrawing(drawing: any) {
 const OFFICIAL_CODE_HOSTS = [/\.gov$/i, /(^|\.)iccsafe\.org$/i, /(^|\.)ada\.gov$/i, /(^|\.)access-board\.gov$/i, /(^|\.)astm\.org$/i, /(^|\.)nfpa\.org$/i, /(^|\.)concrete\.org$/i, /(^|\.)\w+\.gov\.\w+$/i, /(^|\.)govt\.nz$/i, /(^|\.)gov\.uk$/i, /(^|\.)gc\.ca$/i];
 const host = (u: string) => { try { return new URL(u).hostname.toLowerCase(); } catch { return ''; } };
 export const isOfficialCodeUrl = (u: string) => OFFICIAL_CODE_HOSTS.some(r => r.test(host(u)));
+/** User-upload model sites: never a source, whatever the AI or a settings row says (Jaja, 2026-10-27: "stay away from revit city"). */
+export const BLOCKED_HOSTS = ['revitcity.com', '3dwarehouse.sketchup.com', 'grabcad.com', 'bibliocad.com', 'cadblocksfree.com', 'cad-blocks.net', 'dwgmodels.com', 'cadforum.cz', 'free-cad-blocks.com', 'turbosquid.com', 'cgtrader.com', 'sketchfab.com'];
+export const isBlockedHost = (u: string) => { const h = host(u); return !!h && BLOCKED_HOSTS.some(d => h === d || h.endsWith('.' + d)); };
 export const onDomain = (u: string, domains: string[]) => { const h = host(u); return !!h && domains.some(d => h === d || h.endsWith('.' + d)); };
 
 /** Every URL the research job actually consulted or cited (web_search_call.action.sources + url_citation annotations). */
@@ -244,7 +251,7 @@ const norm = (u: string) => String(u || '').replace(/#.*$/, '').replace(/\/$/, '
 export function verifySources(r: any, data: any, manufacturerDomains: string[]) {
   const seen = new Set([...consultedUrls(data)].map(norm));
   // Exact URL match only: a path the model made up on a real host does not count.
-  const real = (u: string) => !!u && seen.has(norm(u));
+  const real = (u: string) => !!u && !isBlockedHost(u) && seen.has(norm(u));
   const adoption = {
     jurisdiction: s(r?.adoption?.jurisdiction, 120),
     status: pick(r?.adoption?.status, ['confirmed', 'partly_confirmed', 'not_found', 'not_attempted'], 'not_found'),
@@ -265,7 +272,7 @@ export function verifySources(r: any, data: any, manufacturerDomains: string[]) 
   const manufacturer_refs = (Array.isArray(r?.manufacturer_refs) ? r.manufacturer_refs : []).slice(0, 8).map((m: any) => ({
     manufacturer: s(m?.manufacturer, 80), product: s(m?.product, 120), title: s(m?.title, 200), region: s(m?.region, 80), revision: s(m?.revision, 40), published: s(m?.published, 40),
     url: s(m?.url, 600), file_type: s(m?.file_type, 20), kind: pick(m?.kind, ['visual', 'technical', 'installation_guide', 'product_page'], 'technical'), why: s(m?.why, 300),
-  })).filter((m: any) => m.title && m.url && onDomain(m.url, manufacturerDomains) && real(m.url));
+  })).filter((m: any) => m.title && m.url && onDomain(m.url, manufacturerDomains.filter(d => !BLOCKED_HOSTS.includes(d))) && real(m.url));
   return { adoption, code_checks, manufacturer_refs, consulted: seen.size };
 }
 
@@ -274,4 +281,41 @@ export function jurisdictionKey(j: { city?: string; state?: string; country?: st
   const k = (v?: string) => String(v || '').toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
   const c = k(j.country) || 'us';
   return [c === 'united-states' || c === 'usa' ? 'us' : c, k(j.state), k(j.city)].filter(Boolean).join('-');
+}
+
+/* ------------------------------------------------------------------ 4. AI 3D illustration, anchored to the geometry */
+/** Each drawn part with its real size from the corrected geometry, so the illustration is told the true layer sizes. */
+export function partSizes(drawing: any) {
+  const comps: Comp[] = drawing?.components || [];
+  const regs = regionsOf(drawing as Drawing, comps);
+  return comps.map(c => {
+    const mine = regs.filter(r => r.comp === c.id);
+    if (!mine.length) return null;
+    const xs = mine.flatMap(r => r.pts.map(p => p[0])), ys = mine.flatMap(r => r.pts.map(p => p[1]));
+    const w = Math.max(...xs) - Math.min(...xs), h = Math.max(...ys) - Math.min(...ys);
+    return { id: c.id, name: c.name, material: c.material, thick: mine.every(r => r.thin) ? 'membrane / sheet' : formatInches(Math.min(w, h)), long: formatInches(Math.max(w, h)), inferred: !!c.inferred, cx: (Math.max(...xs) + Math.min(...xs)) / 2, cy: (Math.max(...ys) + Math.min(...ys)) / 2 };
+  }).filter(Boolean) as { id: string; name: string; material: string; thick: string; long: string; inferred: boolean; cx: number; cy: number }[];
+}
+export function imagePrompt(title: string, drawing: any, fix: string[] = []) {
+  const parts = partSizes(drawing).sort((a, b) => a.cy - b.cy || a.cx - b.cx);
+  return [
+    `Make a photorealistic architectural cutaway illustration of this construction assembly: ${title}.`,
+    'The attached image is DrawUp\'s exact 3D model of the assembly, built from the dimensioned section. It is the ground truth.',
+    'Keep EXACTLY: the same camera angle and framing, the same parts, the same number of layers, their order, their relative thickness and proportions, the same gaps between exploded parts, and where each part starts and stops. Do not add, remove, merge, split, reorder, resize or move any part. Do not add fasteners, trim, plants, people, sky or buildings that are not in the model.',
+    'Only change the surface appearance: give each part the real material named below (true colour and texture), with soft studio lighting and soft shadows on a plain light grey background.',
+    'PARTS (bottom to top, then left to right), with sizes read from the drawing:',
+    ...parts.map((p, i) => `${i + 1}. ${p.name}: ${p.material || 'as shown'}; ${p.thick === 'membrane / sheet' ? 'thin sheet / membrane' : p.thick + ' thick'}${p.inferred ? ' (assumed part)' : ''}`),
+    'No text, labels, dimensions, arrows, logos or watermarks in the picture.',
+    ...(fix.length ? ['A previous attempt was checked against the model and was wrong. Fix these:', ...fix.map(f => '- ' + f)] : []),
+  ].join('\n');
+}
+export const IMAGE_CHECK_SCHEMA = obj({ matches: bool, score: num, missing: arr(str), extra: arr(str), wrong: arr(str), note: str });
+export const IMAGE_CHECK_INSTRUCTIONS = `You check an AI illustration against DrawUp's exact 3D model of a construction assembly. Image 1 is the model (ground
+truth). Image 2 is the illustration. PARTS lists every part. Compare part by part: is each part present, in the same order and
+position, with about the same thickness (within ~25%), the same material, and nothing extra? missing = parts absent or
+unrecognisable; extra = things in the illustration that are not in the model; wrong = wrong order, size, position, material or
+camera. score = 0-100 for geometric faithfulness. matches = true only if nothing is missing, nothing extra is structural, and
+nothing is in the wrong order. note = one plain sentence for the member. Return JSON only.`;
+export function cleanImageCheck(m: any) {
+  return { matches: m?.matches === true, score: Math.max(0, Math.min(100, Math.round(Number(m?.score) || 0))), missing: list(m?.missing, 12, 160), extra: list(m?.extra, 12, 160), wrong: list(m?.wrong, 12, 200), note: s(m?.note, 300) };
 }

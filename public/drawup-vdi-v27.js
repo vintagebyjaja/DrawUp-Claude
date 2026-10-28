@@ -208,8 +208,8 @@
     const ck = JSON.stringify([row.research, row.jurisdiction, jobState('research'), rv.code_items]);
     if (force || V.codeKey !== ck) { V.codeKey = ck; renderCode(); }
     renderRefs();
-    const dk = JSON.stringify([row.detail_id, row.drawing?.edited_at, jobState('draw'), !!row.drawing, row.ai_image_path, jobState('image')]);
-    if (V.drawKey !== dk) { V.drawKey = dk; renderCompare(); }
+    const dk = JSON.stringify([row.detail_id, row.drawing?.edited_at, jobState('draw'), !!row.drawing]);
+    if (V.drawKey !== dk) { V.drawKey = dk; V.aiKey = ''; renderCompare(); } else renderAiImage();
     renderReady();
   }
   const sec = (name, html) => { const s = V.el.querySelector(`[data-sec="${name}"]`); if (s) s.innerHTML = html; return s; };
@@ -359,7 +359,7 @@
       if (x.kind === 'catalog3d') { img = `<img src="/drawup-holograms/${encodeURIComponent(d.code)}.svg" alt="3D illustration of ${esc(d.title)}">`; title = d.title; meta = `${d.code} · ${d.cat}`; act = `<button type="button" data-cat="${esc(d.id)}">Open with its 2D detail</button>`; }
       else if (x.kind === 'catalog') { img = window.DrawUpDetails?.urlOf ? `<img src="${window.DrawUpDetails.urlOf(d)}" alt="${esc(d.title)}">` : ''; title = d.title; meta = `${d.code} · ${d.cat} · ${d.scale}`; act = `<button type="button" data-cat="${esc(d.id)}">Open in Details</button>`; }
       else if (x.kind === 'own3d') { img = '<div class="vdi27-refown">The 3D assembly of the corrected detail is in section F.</div>'; title = 'Corrected detail in 3D'; act = '<button type="button" data-goto="compare">Go to the 3D view</button>'; }
-      else if (x.kind === 'mfr') { title = d.title; meta = [d.manufacturer, d.product, d.region, d.revision && 'Rev ' + d.revision, d.published].filter(Boolean).join(' · '); act = `<a href="${esc(d.url)}" target="_blank" rel="noopener noreferrer">Open the original ↗</a>`; img = `<div class="vdi27-mfr"><b>${esc(d.manufacturer)}</b><span>${esc(d.file_type || 'Document')}</span></div>`; }
+      else if (x.kind === 'mfr') { title = d.title; meta = [d.manufacturer, d.product, d.region, d.revision && 'Rev ' + d.revision, d.published, /bimobject\.com/i.test(d.url) && 'via BIMobject'].filter(Boolean).join(' · '); act = `<a href="${esc(d.url)}" target="_blank" rel="noopener noreferrer">Open the original ↗</a>`; img = `<div class="vdi27-mfr"><b>${esc(d.manufacturer)}</b><span>${esc(d.file_type || 'Document')}</span></div>`; }
       else { img = d.drawing && window.DrawUpDetailDraw?.urlOf ? `<img src="${window.DrawUpDetailDraw.urlOf(d)}" alt="${esc(d.title)}">` : ''; title = d.title; meta = [d.firms?.name, d.category, d.detail_code].filter(Boolean).join(' · '); act = d.drawing ? `<button type="button" data-ai="${esc(d.id)}">Open</button>` : ''; }
       const regionWarn = x.kind === 'mfr' && d.region && project && !new RegExp(String(d.region).split(/[ ,]/)[0], 'i').test(project) ? `<p class="vdi27-note warn">This is a ${esc(d.region)} document. It is not automatically applicable to a project in ${esc(project)}.</p>` : '';
       return `<article class="vdi27-ref"><span class="vdi27-kick">${opt} · ${label}</span><div class="vdi27-refimg">${img}</div><h4>${esc(title)}</h4><p class="vdi27-meta">${esc(meta)}</p><p><span class="vdi27-prov ${x.kind}">${p[0]}</span> <small>${p[1]}</small></p>${x.kind === 'mfr' ? `<dl class="vdi27-credit"><dt>Source</dt><dd>${esc(d.manufacturer)}</dd><dt>Product</dt><dd>${esc(d.product || '—')}</dd><dt>Detail</dt><dd>${esc(d.title)}</dd><dt>Region</dt><dd>${esc(d.region || 'not stated')}</dd><dt>Revision</dt><dd>${esc(d.revision || d.published || 'not stated')}</dd><dt>Reference</dt><dd><a href="${esc(d.url)}" target="_blank" rel="noopener noreferrer">${esc(new URL(d.url).hostname)}</a></dd></dl><p class="vdi27-fine">Manufacturer-specific. Use only with that manufacturer's products and in the market it was written for.</p>` : ''}${regionWarn}<div class="vdi27-acts">${act}</div></article>`;
@@ -367,7 +367,7 @@
     const more = list.filter(x => x !== technical && !(visual && x.d === visual.d)).slice(0, 8);
     const s = sec('refs', `<div class="vdi27-head"><span class="vdi27-kick">E · TWO REFERENCE OPTIONS</span><h3>Understand the fix</h3></div>
       <div class="vdi27-refs">${card('OPTION 1', 'VISUAL ASSEMBLY', visual)}${card('OPTION 2', 'TECHNICAL CD DETAIL', technical)}</div>
-      ${more.length ? `<details class="vdi27-open"><summary>More references (${more.length})</summary><ul class="vdi27-morerefs">${more.map(x => `<li><span class="vdi27-prov ${x.kind}">${(PROV[x.kind] || PROV.member)[0]}</span> ${x.kind === 'mfr' ? `<a href="${esc(x.d.url)}" target="_blank" rel="noopener noreferrer">${esc(x.d.title)} ↗</a> <small>${esc([x.d.manufacturer, x.d.region].filter(Boolean).join(' · '))}</small>` : x.kind === 'catalog' ? `<button type="button" class="vdi27-link" data-cat="${esc(x.d.id)}">${esc(x.d.code)} ${esc(x.d.title)}</button>` : `<button type="button" class="vdi27-link" data-ai="${esc(x.d.id)}">${esc(x.d.title)}</button> <small>${esc(x.d.firms?.name || x.d.category || '')}</small>`}</li>`).join('')}</ul></details>` : ''}
+      ${more.length ? `<details class="vdi27-open"><summary>More references (${more.length})</summary><ul class="vdi27-morerefs">${more.map(x => `<li><span class="vdi27-prov ${x.kind}">${(PROV[x.kind] || PROV.member)[0]}</span> ${x.kind === 'mfr' ? `<a href="${esc(x.d.url)}" target="_blank" rel="noopener noreferrer">${esc(x.d.title)} ↗</a> <small>${esc([x.d.manufacturer, x.d.region, /bimobject\.com/i.test(x.d.url) && 'via BIMobject'].filter(Boolean).join(' · '))}</small>` : x.kind === 'catalog' ? `<button type="button" class="vdi27-link" data-cat="${esc(x.d.id)}">${esc(x.d.code)} ${esc(x.d.title)}</button>` : `<button type="button" class="vdi27-link" data-ai="${esc(x.d.id)}">${esc(x.d.title)}</button> <small>${esc(x.d.firms?.name || x.d.category || '')}</small>`}</li>`).join('')}</ul></details>` : ''}
       <p class="vdi27-fine">References help you understand the fix. They are not approved for your project: a DrawUp library detail is learning content, and a manufacturer detail applies only to that manufacturer's system and market.</p>`);
     s.querySelectorAll('[data-cat]').forEach(b => b.onclick = () => window.DrawUpDetails?.viewer?.(b.dataset.cat));
     s.querySelectorAll('[data-ai]').forEach(b => b.onclick = () => { const x = list.find(o => o.d.id === b.dataset.ai); if (x && window.DrawUpDetailDraw?.viewer) window.DrawUpDetailDraw.viewer(x.d); });
@@ -412,11 +412,10 @@
       </div>
       <div class="vdi27-editbar" hidden><span>Editing. Your changes update the 3D view and the checks live.</span><button type="button" data-save class="vdi27-primary">Save as new revision</button><button type="button" data-discard>Discard edits</button></div>
       <div class="vdi27-exports"><b>Export</b><button type="button" data-x="svg">SVG</button><button type="button" data-x="lsvg">Layered SVG</button><button type="button" data-x="dxf">DXF (AutoCAD R12)</button><button type="button" data-x="pdf">PDF to scale</button><button type="button" data-x="png">PNG</button><span class="vdi27-muted" title="DWG is a closed format. Converting it needs a licensed engine such as the ODA SDK.">DWG: open the DXF in AutoCAD and Save As DWG</span></div>
-      ${row.ai_image ? `<div class="vdi27-aiimg">${row.ai_image_path ? '<figure><img alt="AI illustration"><figcaption>AI-GENERATED ILLUSTRATION · for understanding only, not technical proof</figcaption></figure>' : jobState('image') === 'running' ? '<div class="vdi27-wait"><i class="vdi27-spin"></i>Making the AI illustration…</div>' : '<button type="button" data-aiimg>Make an AI 3D illustration</button>'}</div>` : ''}`);
+      ${row.ai_image ? '<div class="vdi27-aiimg"></div>' : ''}`);
     // original
     const src = localOriginal.get(V.id) || await signUrl(row.source_paths?.[0]);
     s.querySelectorAll('.vdi27-origwrap img, .vdi27-sl-a img').forEach(i => { i.src = src; });
-    if (row.ai_image_path) { const ai = s.querySelector('.vdi27-aiimg img'); if (ai) ai.src = await signUrl(row.ai_image_path); }
     // 2D + 3D from the same model
     const VW = window.DrawUpVDIView;
     V.sheet = VW.Sheet2D(s.querySelector('.vdi27-2dhost'), { drawing: g, components: comps, changed: changedComps(), title: d.title, id: 'vdi2d',
@@ -455,8 +454,40 @@
     };
     // exports
     s.querySelectorAll('[data-x]').forEach(b => b.onclick = () => exportAs(b.dataset.x));
-    const ai = s.querySelector('[data-aiimg]'); if (ai) ai.onclick = async () => { ai.disabled = true; try { await api({ image: V.id }); toast('Making the illustration. It shows here when it is ready.'); clearTimeout(V.timer); tick(); } catch (err) { toast(err.message, true); ai.disabled = false; } };
+    renderAiImage();
     if (V.comp) selectComp(V.comp);
+  }
+  /* Photoreal AI illustration, anchored to DrawUp's own 3D model of this exact detail and checked against it. */
+  function modelRender() {
+    const c = document.createElement('canvas'); c.style.cssText = 'position:fixed;left:-10000px;top:0;width:1200px;height:800px';
+    document.body.appendChild(c);
+    try {
+      const h = window.DrawUpVDIView.Holo3D(c, { mode: 'real', zoom: 1.8 }), g = (V.sheet && !V.sheet.dirty ? V.sheet.drawing : V.row.drawing.drawing);
+      h.setModel(g, g.components || []); h.setCutaway(true); h.setExplode(0.12); h.select(null); h.render();
+      return c.toDataURL('image/png');
+    } finally { c.remove(); }
+  }
+  async function renderAiImage() {
+    const row = V.row, box = V.el.querySelector('.vdi27-aiimg'); if (!box || !row.drawing) return;
+    const ck = row.ai_image_check || null, js = jobState('image'), jc = jobState('imgcheck');
+    const key = JSON.stringify([row.ai_image_path, ck, js, jc, row.ai_image_ref_path]); if (V.aiKey === key) return; V.aiKey = key;
+    const busy = js === 'running' || js === 'starting' || jc === 'running' || jc === 'starting';
+    const what = ck?.status === 'retrying' ? 'The first try did not match the model, so DrawUp is making it again with the differences fixed (no extra charge)…' : jc === 'running' ? 'Checking the illustration against the 3D model…' : 'Making the illustration from the 3D model of this detail…';
+    const badge = !ck || busy ? '' : ck.status === 'checked' && ck.matches ? `<p class="vdi27-note"><span class="vdi27-tag ok">Checked against the model: matches</span> ${esc(ck.note || '')}</p>`
+      : ck.status === 'checked' ? `<div class="vdi27-note warn"><span class="vdi27-tag warn">Does not fully match the model</span> ${esc(ck.note || '')}<ul>${[...ck.missing.map(x => 'Missing: ' + x), ...ck.extra.map(x => 'Not in the model: ' + x), ...ck.wrong.map(x => 'Different: ' + x)].map(x => `<li>${esc(x)}</li>`).join('')}</ul>Use the DrawUp 3D model for anything technical.</div>`
+      : `<p class="vdi27-note"><span class="vdi27-tag gray">Not checked</span> ${esc(ck.note || 'The illustration could not be checked against the model.')}</p>`;
+    box.innerHTML = `<h4>Photoreal illustration</h4>
+      ${busy ? `<div class="vdi27-wait"><i class="vdi27-spin"></i>${what}</div>` : ''}
+      ${row.ai_image_path && !busy ? `<div class="vdi27-aipair"><figure><img data-ref alt="DrawUp 3D model of this detail"><figcaption>DRAWUP 3D MODEL · exact geometry from the corrected detail</figcaption></figure><figure><img data-ai alt="AI illustration"><figcaption>AI ILLUSTRATION · made from the model on the left</figcaption></figure></div>${badge}` : ''}
+      ${busy ? '' : `<p class="vdi27-muted">The illustration is made from DrawUp's 3D model of this exact detail: same parts, order, sizes and camera. Only the materials are made photoreal, and every picture is compared with the model before it is shown. It is still an illustration, not a construction document.</p><button type="button" data-aiimg>${row.ai_image_path ? 'Make it again' : 'Make a photoreal illustration'}</button>`}`;
+    if (row.ai_image_path && !busy) { box.querySelector('[data-ai]').src = await signUrl(row.ai_image_path); box.querySelector('[data-ref]').src = await signUrl(row.ai_image_ref_path); }
+    const b = box.querySelector('[data-aiimg]');
+    if (b) b.onclick = async () => {
+      if (V.sheet?.dirty) return toast('Save your edits first, so the illustration matches the saved detail.', true);
+      b.disabled = true;
+      try { const reference = modelRender(); await api({ image: V.id, reference }); V.row.jobs = { ...V.row.jobs, image: { status: 'running' } }; V.aiKey = ''; renderAiImage(); clearTimeout(V.timer); tick(); }
+      catch (err) { toast(err.message, true); b.disabled = false; }
+    };
   }
   async function detailRow() {
     if (V.detailRow?.id === V.row.detail_id) return V.detailRow;

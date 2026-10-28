@@ -1,8 +1,9 @@
 import { awardXp } from '@/lib/drawup-coach-persona';
 import { DETAIL_INSTRUCTIONS } from '@/lib/drawup-detail-draw';
 import {
-  DRAW_EXTRA, DRAW_SCHEMA, RESEARCH_INSTRUCTIONS, RESEARCH_SCHEMA, REVIEW_SCHEMA, checkDrawing, cleanDraw, cleanReview,
-  jurisdictionKey, reviewInstructions, verifySources,
+  DRAW_EXTRA, DRAW_SCHEMA, IMAGE_CHECK_INSTRUCTIONS, IMAGE_CHECK_SCHEMA, RESEARCH_INSTRUCTIONS, RESEARCH_SCHEMA, REVIEW_SCHEMA,
+  checkDrawing, cleanDraw, cleanImageCheck, cleanReview, imagePrompt, isBlockedHost, jurisdictionKey, partSizes, reviewInstructions,
+  verifySources,
 } from '@/lib/drawup-vdi';
 import {
   PRIVATE_BUCKET, adminRest, creditMessage, missingConfig, models, openaiBackground, openaiGet, outputText, pathIsOwn,
@@ -31,7 +32,8 @@ const MAX_PICTURES = 3;
 const IMG_RE = /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/;
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const JOB_MAX_MS = 40 * 60 * 1000;
-const FALLBACK_DOMAINS = ['jameshardie.co.nz'];
+const FALLBACK_DOMAINS = ['jameshardie.co.nz', 'bimobject.com'];
+const MAX_SEARCH_DOMAINS = 30;
 
 const json = (data: unknown, status = 200) => new Response(JSON.stringify(data), { status, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' } });
 const price = (name: string, d: number) => Math.max(0, Math.round(Number(process.env[name]) || d));
@@ -40,7 +42,7 @@ const effort = () => (['minimal', 'low', 'medium'].includes(String(process.env.D
 const webSearchOn = () => process.env.DRAWUP_VDI_WEB_SEARCH !== 'off';
 const now = () => new Date().toISOString();
 
-type Job = { r?: string; model?: string; status: 'starting' | 'running' | 'done' | 'failed'; at: string; error?: string; access?: CreditAccess; retried?: boolean; text?: string };
+type Job = { r?: string; model?: string; status: 'starting' | 'running' | 'done' | 'failed'; at: string; error?: string; access?: CreditAccess; retried?: boolean; text?: string; attempt?: number };
 type Row = Record<string, any> & { id: string; owner_id: string; jobs: Record<string, Job> };
 
 async function rows<T = any>(query: string): Promise<T[]> {
@@ -63,9 +65,14 @@ function view(row: Row) {
   const { jobs: _j, ...rest } = row;
   return { ...rest, jobs, web_search: webSearchOn(), ai_image: process.env.DRAWUP_VDI_AI_IMAGE === 'on' };
 }
-async function manufacturerDomains() {
-  const r = await rows<{ domain: string }>('vdi_manufacturer_sources?approved=eq.true&select=domain');
-  return r.length ? r.map(x => x.domain) : FALLBACK_DOMAINS;
+/** Approved manufacturer sites for this assembly: sources tagged with one of its classes (or with none), plus content
+ *  platforms (BIMobject). Blocked sites never appear, whatever their row says. */
+async function manufacturerDomains(classes: string[] = []) {
+  const r = await rows<{ domain: string; classes?: string[]; kind?: string }>('vdi_manufacturer_sources?approved=eq.true&license_status=neq.blocked&select=domain,classes,kind');
+  if (!r.length) return FALLBACK_DOMAINS;
+  const fits = (x: { classes?: string[] }) => !x.classes?.length || !classes.length || x.classes.some(c => classes.includes(c));
+  const list = [...r.filter(x => x.kind === 'platform'), ...r.filter(x => x.kind !== 'platform' && fits(x))].map(x => x.domain).filter(d => !isBlockedHost('https://' + d));
+  return [...new Set(list)].slice(0, MAX_SEARCH_DOMAINS);
 }
 async function pictureUrls(row: Row) {
   const paths = (row.source_paths || []).filter((p: string) => pathIsOwn(p, row.owner_id));
@@ -89,7 +96,7 @@ export async function POST(request: Request) {
     if (typeof body?.place === 'string') return await place(user, body.place, body);
     if (typeof body?.redraw === 'string') return await redraw(user, body.redraw);
     if (typeof body?.save_edit === 'string') return await saveEdit(user, body.save_edit, body.drawing);
-    if (typeof body?.image === 'string') return await image(user, body.image);
+    if (typeof body?.image === 'string') return await image(user, body.image, body.reference);
   } catch (e: any) {
     console.error('[drawup] vdi', e);
     return json({ error: /relation|schema cache|does not exist/i.test(String(e?.message)) ? 'Run the v27 SQL in Supabase first.' : e?.message || 'DrawUp could not do that.' }, 500);
@@ -158,7 +165,7 @@ async function startReview(row: Row, kind: 'review' | 'refine', extra?: { questi
 async function startResearch(row: Row) {
   if (!webSearchOn()) return { ok: false, skipped: true, error: 'Web search is off (DRAWUP_VDI_WEB_SEARCH=off).' };
   const r = row.review || {}, j = row.jurisdiction || {}, place = placeLine(j);
-  const domains = await manufacturerDomains();
+  const domains = await manufacturerDomains(r.assembly?.classes || []);
   const key = place ? jurisdictionKey(j) : '';
   const cached = key ? await rows(`vdi_code_adoptions?jurisdiction_key=eq.${encodeURIComponent(key)}&checked_at=gte.${new Date(Date.now() - 90 * 864e5).toISOString()}&select=code,edition,amendments,effective,source_url`) : [];
   const text = [
@@ -216,7 +223,7 @@ async function poll(user: { id: string }, id: string) {
   let changed = false, fields: Record<string, unknown> = {};
   const after: ('research' | 'draw')[] = [];
 
-  for (const kind of ['review', 'refine', 'research', 'draw', 'image'] as const) {
+  for (const kind of ['review', 'refine', 'research', 'draw', 'image', 'imgcheck'] as const) {
     const j = jobs[kind];
     if (!j || !j.r) {
       // a claim that never got its AI id (the request died between the two writes) is released after 2 minutes
@@ -235,6 +242,7 @@ async function poll(user: { id: string }, id: string) {
       if (kind === 'review') { await refundOnce(user.id, j.access, 'vdi_review_refund', row.id); fields.stage = 'failed'; }
       else if (j.access) await refundOnce(user.id, j.access, `vdi_${kind}_refund`, j.r);
       if (kind === 'draw') fields.stage = 'reviewed';
+      if (kind === 'imgcheck') fields.ai_image_check = { status: 'unchecked', note: 'The illustration could not be checked against the model.' };
       continue;
     }
     try {
@@ -249,7 +257,7 @@ async function poll(user: { id: string }, id: string) {
         if (kind === 'review') { fields.stage = 'reviewed'; after.push('research', 'draw'); await awardXp(user.id, 'upload', 'vdi:' + row.id).catch(() => {}); }
         else after.push('research');
       } else if (kind === 'research') {
-        const parsed = JSON.parse(outputText(data)), domains = await manufacturerDomains();
+        const parsed = JSON.parse(outputText(data)), domains = await manufacturerDomains(row.review?.assembly?.classes || []);
         const research = { ...verifySources(parsed, data, domains), at: now(), place: placeLine(row.jurisdiction) };
         fields.research = research;
         jobs[kind] = { ...j, status: 'done', at: now() };
@@ -268,9 +276,23 @@ async function poll(user: { id: string }, id: string) {
         const path = `${row.owner_id}/vdi/${row.id}/ai-3d-${Date.now().toString(36)}.png`;
         await storageUpload(PRIVATE_BUCKET, path, Uint8Array.from(Buffer.from(img.result, 'base64')), 'image/png');
         fields.ai_image_path = path; jobs[kind] = { ...j, status: 'done', at: now() };
+        // every illustration is checked against DrawUp's own 3D model before it is shown as matching
+        const chk = await startImageCheck(row, path);
+        jobs.imgcheck = chk.ok ? { ...chk.job!, attempt: j.attempt || 1 } : { status: 'failed', at: now(), error: chk.error };
+        fields.ai_image_check = chk.ok ? { status: 'checking', attempt: j.attempt || 1 } : { status: 'unchecked', note: 'The illustration could not be checked against the model.' };
+      } else if (kind === 'imgcheck') {
+        const c = cleanImageCheck(JSON.parse(outputText(data))), attempt = j.attempt || 1;
+        jobs[kind] = { ...j, status: 'done', at: now() };
+        if (!c.matches && attempt < 2) {
+          // one automatic retry, told exactly what was wrong; no extra charge
+          const again = await startImage(row, row.ai_image_ref_path, 2, [...c.missing.map(x => 'Missing: ' + x), ...c.extra.map(x => 'Remove: ' + x), ...c.wrong.map(x => 'Wrong: ' + x)]);
+          if (again.ok) { jobs.image = { ...again.job!, access: undefined }; fields.ai_image_check = { ...c, status: 'retrying', attempt }; }
+          else fields.ai_image_check = { ...c, status: 'checked', attempt };
+        } else fields.ai_image_check = { ...c, status: 'checked', attempt };
       }
     } catch (e: any) {
       jobs[kind] = { ...j, status: 'failed', error: 'the answer came back unreadable: ' + (e?.message || e) };
+      if (kind === 'imgcheck') fields.ai_image_check = { status: 'unchecked', note: 'The illustration could not be checked against the model.' };
       if (kind === 'review') { await refundOnce(user.id, j.access, 'vdi_review_refund', row.id); fields.stage = 'failed'; }
       else if (j.access) await refundOnce(user.id, j.access, `vdi_${kind}_refund`, j.r!);
     }
@@ -387,21 +409,49 @@ async function saveEdit(user: { id: string }, id: string, drawing: any) {
   return json({ ...(saved ? view(saved) : {}), detail, validation });
 }
 
-async function image(user: { id: string; is_anonymous?: boolean }, id: string) {
+/** AI 3D illustration. The page sends a render of DrawUp's own 3D model (built from the corrected geometry); the image model
+ *  must keep that model's parts, order, proportions and camera and only make the materials photoreal. A second AI job then
+ *  compares the result with the model; one free automatic retry if it does not match. */
+async function image(user: { id: string; is_anonymous?: boolean }, id: string, reference: unknown) {
   if (process.env.DRAWUP_VDI_AI_IMAGE !== 'on') return json({ error: 'AI 3D illustrations are not turned on for this site yet.' }, 403);
+  const ref = String(reference || '');
+  if (!/^data:image\/png;base64,[A-Za-z0-9+/=]+$/.test(ref) || ref.length > 8 * 1024 * 1024) return json({ error: 'The 3D model picture did not come through. Open the 3D view and try again.' }, 400);
   const row = await loadOwn(id, user.id);
   if (!row?.drawing) return json({ error: 'Make the corrected detail first.' }, 404);
-  if (['running', 'starting'].includes(row.jobs?.image?.status || '')) return json({ error: 'The illustration is already being made.' }, 409);
+  if (!partSizes(row.drawing.drawing).length) return json({ error: 'The corrected detail has no named parts to illustrate.' }, 400);
+  if (['running', 'starting'].includes(row.jobs?.image?.status || '') || ['running', 'starting'].includes(row.jobs?.imgcheck?.status || '')) return json({ error: 'The illustration is already being made.' }, 409);
+  const refPath = `${row.owner_id}/vdi/${row.id}/model-3d-${Date.now().toString(36)}.png`;
+  try { await storageUpload(PRIVATE_BUCKET, refPath, Uint8Array.from(Buffer.from(ref.split(',')[1], 'base64')), 'image/png'); }
+  catch { return json({ error: 'The 3D model picture could not be saved. Try again.' }, 502); }
   const cost = price('DRAWUP_VDI_IMAGE_COST', 8);
   const access = await reserveCredits(user, cost, 'vdi_image');
   if (!access.ok) return json({ error: creditMessage(access, cost), ...access }, 402);
-  const comps = (row.drawing?.drawing?.components || []).map((c: any) => `${c.name} (${c.material})`).join('; ');
-  const prompt = `Clean architectural axonometric cutaway illustration of a construction assembly: ${row.drawing?.title || row.review?.title}. ` +
-    `Layers from the building's interior to exterior and bottom to top as in the section: ${comps}. Realistic building materials, layers slightly separated to show ` +
-    `installation order, thin cyan holographic edge highlights, dark navy background, soft controlled studio lighting, no text, no labels, no people, no logos.`;
+  const made = await startImage({ ...row, ai_image_ref_path: refPath }, refPath, 1, []);
+  if (!made.ok) { await refundOnce(user.id, access, 'vdi_image_refund', id + ':' + Date.now()); return json({ error: made.error + ' You were not charged.' }, 502); }
+  await patch(id, { ai_image_ref_path: refPath, ai_image_check: null, jobs: { ...row.jobs, image: { ...made.job!, access }, imgcheck: undefined } });
+  return json({ status: 'running', credits_charged: access.credits_charged || 0 });
+}
+async function startImage(row: Row, refPath: string, attempt: number, fix: string[]) {
   try {
-    const made = await openaiBackground({ input: prompt, tools: [{ type: 'image_generation', size: '1536x1024', quality: 'medium' }], tool_choice: { type: 'image_generation' } }, models(process.env.DRAWUP_VDI_IMAGE_MODEL, 'gpt-5-mini', 'gpt-5'));
-    await patch(id, { jobs: { ...row.jobs, image: { r: made.id, model: made.model, status: 'running', at: now(), access } } });
-    return json({ status: 'running' });
-  } catch (e: any) { await refundOnce(user.id, access, 'vdi_image_refund', id + ':' + Date.now()); return json({ error: (e?.message || 'The illustration could not start.') + ' You were not charged.' }, 502); }
+    const [refUrl] = await storageSignedUrls(PRIVATE_BUCKET, [refPath], 3600);
+    if (!refUrl) return { ok: false, error: 'The 3D model picture could not be read.' };
+    const made = await openaiBackground({
+      input: [{ role: 'user', content: [{ type: 'input_text', text: imagePrompt(row.drawing?.title || row.review?.title || 'construction detail', row.drawing.drawing, fix) }, { type: 'input_image', image_url: refUrl }] }],
+      tools: [{ type: 'image_generation', size: '1536x1024', quality: 'high', input_fidelity: 'high' }], tool_choice: { type: 'image_generation' },
+    }, models(process.env.DRAWUP_VDI_IMAGE_MODEL, 'gpt-5-mini', 'gpt-5'));
+    return { ok: true, job: { r: made.id, model: made.model, status: 'running', at: now(), attempt } as Job };
+  } catch (e: any) { return { ok: false, error: e?.message || 'The illustration could not start.' }; }
+}
+async function startImageCheck(row: Row, imagePath: string) {
+  try {
+    const [refUrl, imgUrl] = await storageSignedUrls(PRIVATE_BUCKET, [row.ai_image_ref_path, imagePath], 3600);
+    if (!refUrl || !imgUrl) return { ok: false, error: 'pictures not readable' };
+    const parts = partSizes(row.drawing.drawing).map((p, i) => `${i + 1}. ${p.name} (${p.material}; ${p.thick})`).join('\n');
+    const made = await openaiBackground({
+      instructions: IMAGE_CHECK_INSTRUCTIONS,
+      input: [{ role: 'user', content: [{ type: 'input_text', text: 'PARTS:\n' + parts }, { type: 'input_image', image_url: refUrl }, { type: 'input_image', image_url: imgUrl }] }],
+      reasoning: { effort: 'low' }, max_output_tokens: 3000, text: { format: { type: 'json_schema', name: 'drawup_vdi_image_check', strict: true, schema: IMAGE_CHECK_SCHEMA } },
+    }, models(process.env.DRAWUP_VDI_RESEARCH_MODEL, 'gpt-5-mini', 'gpt-5'));
+    return { ok: true, job: { r: made.id, model: made.model, status: 'running', at: now() } as Job };
+  } catch (e: any) { return { ok: false, error: e?.message || 'check could not start' }; }
 }

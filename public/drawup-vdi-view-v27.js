@@ -325,7 +325,7 @@ ${P('stone', 2.4, 2.4, L(`M0 ${sc(.6)}H${sc(2.4)}M0 ${sc(1.8)}H${sc(1.4)}`), 30)
   }
 
   function Holo3D(canvas, o = {}) {
-    const S = { regions: [], mode: o.mode || 'real', explode: 0, cutaway: true, hidden: new Set(), sel: null, cam: { yaw: -0.65, pitch: 0.38, zoom: 1, px: 0, py: 0 }, scene: null, faces: [] };
+    const S = { regions: [], mode: o.mode || 'real', explode: 0, cutaway: true, hidden: new Set(), sel: null, cam: { yaw: -0.65, pitch: 0.38, zoom: o.zoom || 1, px: 0, py: 0 }, scene: null, faces: [] };
     const g = canvas.getContext('2d');
     const build = () => { S.scene = prismsOf(S.regions.filter(r => !S.hidden.has(r.comp)), { explode: S.explode, cutaway: S.cutaway }); };
     function size() { const dpr = Math.min(2, window.devicePixelRatio || 1), w = canvas.clientWidth || 600, h = canvas.clientHeight || 400; if (canvas.width !== Math.round(w * dpr) || canvas.height !== Math.round(h * dpr)) { canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr); } return { W: canvas.width, H: canvas.height, k: dpr }; }
