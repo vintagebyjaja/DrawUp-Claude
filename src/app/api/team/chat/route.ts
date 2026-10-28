@@ -1,11 +1,12 @@
 import { accountGate, adminRest, adminSelectOne, adminUpdate, creditMessage, missingConfig, openaiCreate, outputText, refundCredits, refundOnce, reserveCredits, signedInUser, type CreditAccess } from '@/lib/drawup-server';
 import { recordDetailQuery } from '@/lib/drawup-details';
-import { awardXp } from '@/lib/drawup-coach-persona';
+import { awardXp, legendFor } from '@/lib/drawup-coach-persona';
 import {
   JOB_TITLE, MEMORY_EVERY, NEXT_MARK, SPEAKER_NAME, UUID_RE, buildTeamPrompt, coachCost, jobModels, jobPrompt, loadContext, memoryPrompt, metric,
-  needsVerification, parseNext, prefsFor, projectFor, routeAssistant, scopeKey, sixthCommand, teamCosts, teamModels, threadFor, wantsLayoutOption,
-  type Speaker, type Thread,
+  generalOnly, needsVerification, parseNext, prefsFor, projectFor, routeAssistant, scopeKey, sixthCommand, teamCosts, teamModels, threadFor, wantsLayoutOption,
+  type LegendGuest, type Speaker, type Thread,
 } from '@/lib/drawup-team';
+import { isHqAccount } from '@/lib/drawup-server';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -111,11 +112,22 @@ export async function POST(request: Request) {
 
   // ---- who is answering
   const selected = String(body?.assistant || 'teammate');
-  const routed = continueOf ? { speaker: (SPEAKER_NAME[selected as Speaker] ? selected : 'teammate') as Speaker, named: false } : routeAssistant(message, selected);
+  // v28: the member's Hall of Fame legend can chime in (assistant 'legend' + the legend key). XP locks are checked here.
+  let legend: LegendGuest | null = null;
+  if (selected === 'legend') {
+    const { legend: l, unlocked, xp } = await legendFor(user.id, String(body?.legend || ''), await isHqAccount(user.id).catch(() => false));
+    if (!l) return json({ error: 'That legend is not in the Hall of Fame.' }, 404);
+    if (!unlocked) return json({ error: `${l.name} unlocks at ${l.xp_required} XP. You have ${xp} XP.`, code: 'LEGEND_LOCKED' }, 403);
+    legend = { key: l.key, name: l.name, kind: l.kind, principles: l.principles || [], note: l.note };
+  }
+  const routed = legend ? { speaker: 'teammate' as Speaker, named: true } : continueOf ? { speaker: (SPEAKER_NAME[selected as Speaker] ? selected : 'teammate') as Speaker, named: false } : routeAssistant(message, selected);
   const speaker = routed.speaker;
-  const command = speaker === 'sixth_man' ? sixthCommand(message) : null;
-  const verify = speaker === 'coach' && !images.length && !continueOf && needsVerification(message);
-  const layout = speaker === 'teammate' && !continueOf && wantsLayoutOption(message);
+  const dbSpeaker = legend ? 'legend' : speaker;
+  const who = legend ? legend.name : SPEAKER_NAME[speaker];
+  const general = !project;
+  const command = speaker === 'sixth_man' && !legend ? sixthCommand(message) : null;
+  const verify = !legend && speaker === 'coach' && !images.length && !continueOf && needsVerification(message);
+  const layout = !legend && speaker === 'teammate' && !continueOf && wantsLayoutOption(message);
   const shot = speaker === 'sixth_man' && command === 'shot';
   const costs = teamCosts();
   const priced = images.length ? { action: 'plan_analysis', cost: costs.image }
@@ -135,7 +147,7 @@ export async function POST(request: Request) {
   const th = thread!;
   let userMsg: any;
   try {
-    userMsg = await insert('coach_messages', { thread_id: th.id, role: 'user', content: message, client_request_id: requestId, meta: { to: speaker, named: routed.named, continue_of: continueOf || undefined }, ...(attachments.length ? { attachments } : {}) });
+    userMsg = await insert('coach_messages', { thread_id: th.id, role: 'user', content: message, client_request_id: requestId, meta: { to: legend ? 'legend' : speaker, legend: legend ? { key: legend.key, name: legend.name } : undefined, named: routed.named, continue_of: continueOf || undefined }, ...(attachments.length ? { attachments } : {}) });
   } catch (e: any) {
     if (e.code !== '23505') {
       if (/column|schema cache/i.test(e.message)) return json({ error: 'The AI Design Team database update is not installed yet. Run the v25 SQL files (v25-01 to v25-05) in Supabase.' }, 503);
@@ -151,24 +163,30 @@ export async function POST(request: Request) {
   // ---- credits: taken before any AI runs, given back if nothing useful came out
   const access: CreditAccess = await reserveCredits(user, priced.cost, priced.action);
   if (!access.ok) {
-    const sys = await insert('coach_messages', { thread_id: th.id, role: 'assistant', speaker, status: 'failed', reply_to: userMsg.id, content: creditMessage(access, priced.cost) + ' Your conversation, saved ideas and drawings are all kept.', meta: { credit_block: true } }).catch(() => null);
+    const sys = await insert('coach_messages', { thread_id: th.id, role: 'assistant', speaker: legend ? 'teammate' : speaker, status: 'failed', reply_to: userMsg.id, content: creditMessage(access, priced.cost) + ' Your conversation, saved ideas and drawings are all kept.', meta: { credit_block: true } }).catch(() => null);
     return json({ error: creditMessage(access, priced.cost), ...access, thread_id: th.id, user_message_id: userMsg.id, message: sys }, 402);
   }
 
   const prefs = await prefsFor(user.id);
-  const aware = speaker === 'teammate' || (speaker === 'sixth_man' ? prefs.sixth_man_aware : prefs.coach_aware);
+  const aware = !general && !legend && (speaker === 'teammate' || (speaker === 'sixth_man' ? prefs.sixth_man_aware : prefs.coach_aware));
   const ctx = await loadContext(user.id, th, project, aware);
   let continueText = '';
   if (continueOf) {
     const prev = await adminSelectOne<any>('coach_messages', `id=eq.${continueOf}&thread_id=eq.${th.id}&select=content`).catch(() => null);
     continueText = prev?.content || '';
   }
-  const prompt = await buildTeamPrompt({ userId: user.id, speaker, message, ctx, prefs, command, verifying: verify, continueText, layoutJob: layout });
+  const prompt = await buildTeamPrompt({ userId: user.id, speaker, message, ctx, prefs, command, verifying: verify, continueText, layoutJob: layout, general, legend });
   const content: any[] = [{ type: 'input_text', text: prompt.input }];
   images.forEach((img: string, i: number) => content.push({ type: 'input_text', text: `<user_files>PICTURE ${i + 1}</user_files>` }, { type: 'input_image', image_url: img }));
   const payload = { instructions: prompt.instructions, input: content.length > 1 ? [{ role: 'user', content }] : prompt.input, max_output_tokens: prefs.concise ? 900 : 1800 };
 
-  const assistant = await insert('coach_messages', { thread_id: th.id, role: 'assistant', speaker, status: 'streaming', content: '', reply_to: userMsg.id, meta: { continued_from: continueOf || undefined, command: command || undefined } });
+  let assistant: any;
+  try { assistant = await insert('coach_messages', { thread_id: th.id, role: 'assistant', speaker: dbSpeaker, status: 'streaming', content: '', reply_to: userMsg.id, meta: { continued_from: continueOf || undefined, command: command || undefined, legend: legend ? { key: legend.key, name: legend.name, kind: legend.kind } : undefined } }); }
+  catch (e: any) {
+    await refundCredits(user.id, access, priced.action + '_refund');
+    if (legend && /speaker_check|check constraint/i.test(e?.message || '')) return json({ error: 'Legends in the AI Team need the v28 database update. Run the v28 SQL in Supabase. You were not charged.' }, 503);
+    throw e;
+  }
   await adminRest(`coach_threads?id=eq.${th.id}`, { method: 'PATCH', body: JSON.stringify({ updated_at: new Date().toISOString() }) }).catch(() => {});
 
   const upstreamAbort = new AbortController();
@@ -176,9 +194,9 @@ export async function POST(request: Request) {
   try { started = await openStream(payload, teamModels(speaker), upstreamAbort.signal); }
   catch (e: any) {
     await refundCredits(user.id, access, priced.action + '_refund');
-    await adminUpdate('coach_messages', assistant.id, { status: 'failed', content: `${SPEAKER_NAME[speaker]} could not answer just now. You were not charged. Try again.`, updated_at: new Date().toISOString() }).catch(() => {});
-    await metric({ user_id: user.id, speaker, kind: 'chat', ok: false, error: String(e?.message || e).slice(0, 300), total_ms: Date.now() - t0 });
-    return json({ error: `${SPEAKER_NAME[speaker]} could not answer just now (${e?.message || 'AI unavailable'}). You were not charged.`, thread_id: th.id, user_message_id: userMsg.id }, 502);
+    await adminUpdate('coach_messages', assistant.id, { status: 'failed', content: `${who} could not answer just now. You were not charged. Try again.`, updated_at: new Date().toISOString() }).catch(() => {});
+    await metric({ user_id: user.id, speaker: dbSpeaker, kind: 'chat', ok: false, error: String(e?.message || e).slice(0, 300), total_ms: Date.now() - t0 });
+    return json({ error: `${who} could not answer just now (${e?.message || 'AI unavailable'}). You were not charged.`, thread_id: th.id, user_message_id: userMsg.id }, 502);
   }
 
   const enc = new TextEncoder();
@@ -197,8 +215,8 @@ export async function POST(request: Request) {
     async start(ctrl) {
       const send = (o: unknown) => { if (closed) return; try { ctrl.enqueue(enc.encode(JSON.stringify(o) + '\n')); } catch { closed = true; } };
       const ping = setInterval(() => send({ t: 'ping' }), 8000);
-      send({ t: 'meta', thread_id: th.id, thread_title: th.title, project_id: project?.id || null, user_message_id: userMsg.id, message_id: assistant.id, speaker, named: routed.named, credits_charged: access.credits_charged ?? 0, credits_remaining: access.credits_remaining ?? null, unlimited: !!access.hq || access.access_type === 'unlimited' });
-      send({ t: 'status', status: speaker === 'sixth_man' || speaker === 'coach' ? 'reviewing' : 'writing' });
+      send({ t: 'meta', thread_id: th.id, thread_title: th.title, project_id: project?.id || null, user_message_id: userMsg.id, message_id: assistant.id, speaker: dbSpeaker, legend: legend ? { key: legend.key, name: legend.name, kind: legend.kind } : undefined, named: routed.named, credits_charged: access.credits_charged ?? 0, credits_remaining: access.credits_remaining ?? null, unlimited: !!access.hq || access.access_type === 'unlimited' });
+      send({ t: 'status', status: !legend && (speaker === 'sixth_man' || speaker === 'coach') ? 'reviewing' : 'writing' });
 
       // Background work starts right away, in parallel with the chat reply.
       const jobP = (async () => {
@@ -267,21 +285,23 @@ export async function POST(request: Request) {
       const job = await jobP;
       if (status === 'stopped') { await finishStopped(); clearInterval(ping); try { ctrl.close(); } catch {} return; }
       const answer = vis.trim();
-      const next = parseNext(full.includes(NEXT_MARK) ? full.slice(full.indexOf(NEXT_MARK) + NEXT_MARK.length) : '');
+      const parsed = parseNext(full.includes(NEXT_MARK) ? full.slice(full.indexOf(NEXT_MARK) + NEXT_MARK.length) : '');
+      // v28: a general chat (no project in the filter) never gets "apply to a drawing set" or "add to project".
+      const next = general ? generalOnly(parsed) : parsed;
       let saved: any = null;
       if (!answer) {
         if (!jobHoldsCredits) await refundCredits(user.id, access, priced.action + '_refund');
-        const errText = `${SPEAKER_NAME[speaker]} could not answer just now (${errMsg || 'no answer'}). ${jobHoldsCredits ? 'The requirements check is still running and will post here.' : 'You were not charged for the reply.'}`;
+        const errText = `${who} could not answer just now (${errMsg || 'no answer'}). ${jobHoldsCredits ? 'The requirements check is still running and will post here.' : 'You were not charged for the reply.'}`;
         saved = await adminUpdate('coach_messages', assistant.id, { status: 'failed', content: errText, updated_at: new Date().toISOString() }).catch(() => null);
         send({ t: 'error', error: errText, message: saved });
       } else {
-        const meta: any = { model: started.model, first_token_ms: firstMs, ...(next.suggestions.length ? { suggestions: next.suggestions } : {}), ...(next.plays.length ? { plays: next.plays } : {}), ...(next.proposal ? { proposal: next.proposal } : {}), ...(next.decision ? { decision: next.decision } : {}), ...(job ? { job_id: job.id } : {}), ...(verify ? { preliminary: true } : {}), ...(continueOf ? { continued_from: continueOf } : {}), ...(command ? { command } : {}), ...(status === 'incomplete' ? { cut_short: true } : {}) };
+        const meta: any = { model: started.model, first_token_ms: firstMs, ...(next.suggestions.length ? { suggestions: next.suggestions } : {}), ...(next.plays.length ? { plays: next.plays } : {}), ...(next.proposal ? { proposal: next.proposal } : {}), ...(next.decision ? { decision: next.decision } : {}), ...(next.visual && !legend ? { visual: next.visual } : {}), ...(legend ? { legend: { key: legend.key, name: legend.name, kind: legend.kind } } : {}), ...(general ? { general: true } : {}), ...(job ? { job_id: job.id } : {}), ...(verify ? { preliminary: true } : {}), ...(continueOf ? { continued_from: continueOf } : {}), ...(command ? { command } : {}), ...(status === 'incomplete' ? { cut_short: true } : {}) };
         saved = await adminUpdate('coach_messages', assistant.id, { status: status === 'incomplete' ? 'stopped' : 'done', content: answer, meta, updated_at: new Date().toISOString() }, 'status=eq.streaming').catch(() => null);
         if (!saved) saved = await adminSelectOne<any>('coach_messages', `id=eq.${assistant.id}&select=id,role,content,speaker,status,meta,reply_to,created_at`).catch(() => null);
         send({ t: 'done', message: saved, credits_remaining: access.credits_remaining ?? null });
         await awardXp(user.id, 'ask', 'team:' + assistant.id).catch(() => {});
       }
-      await metric({ user_id: user.id, speaker, kind: continueOf ? 'continue' : 'chat', model: started.model, first_token_ms: firstMs || null, total_ms: Date.now() - t0, chars: answer.length, credits: access.credits_charged ?? 0, ok: !!answer, error: answer ? null : errMsg.slice(0, 300) });
+      await metric({ user_id: user.id, speaker: dbSpeaker, kind: continueOf ? 'continue' : 'chat', model: started.model, first_token_ms: firstMs || null, total_ms: Date.now() - t0, chars: answer.length, credits: access.credits_charged ?? 0, ok: !!answer, error: answer ? null : errMsg.slice(0, 300) });
 
       // Event-driven project memory: refreshed after every dozen new messages, never while idle.
       // It runs on DrawUp's AI key after the reply is finished and never costs the member credits.

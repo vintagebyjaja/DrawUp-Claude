@@ -80,7 +80,7 @@
   function prefControlsHTML() {
     const on = prefs.transitions !== 'off';
     return `<div class="dus-pref-row"><div><b>Holographic transitions</b><span>A short holographic entrance when you open a major area. Off goes straight to the page.${reducedMotion() ? ' Your device asks for reduced motion, so they stay off.' : ''}</span></div><div class="dus-toggle" role="group" aria-label="Holographic transitions"><button type="button" data-dus-pref="transitions" data-v="on" aria-pressed="${on}">On</button><button type="button" data-dus-pref="transitions" data-v="off" aria-pressed="${!on}">Off</button></div></div>
-      <div class="dus-pref-row" ${on ? '' : 'hidden'}><div><b>Length</b><span>Quick is about 1.2 seconds. Cinematic is about 1.8 seconds. You can skip any transition with a click, a tap or Esc.</span></div><div class="dus-toggle" role="group" aria-label="Transition length"><button type="button" data-dus-pref="speed" data-v="quick" aria-pressed="${prefs.speed !== 'cinematic'}">Quick</button><button type="button" data-dus-pref="speed" data-v="cinematic" aria-pressed="${prefs.speed === 'cinematic'}">Cinematic</button></div></div>`;
+      <div class="dus-pref-row" ${on ? '' : 'hidden'}><div><b>Length</b><span>Quick is about 3 seconds. Cinematic is about 4 seconds. You can skip any transition with a click, a tap or Esc.</span></div><div class="dus-toggle" role="group" aria-label="Transition length"><button type="button" data-dus-pref="speed" data-v="quick" aria-pressed="${prefs.speed !== 'cinematic'}">Quick</button><button type="button" data-dus-pref="speed" data-v="cinematic" aria-pressed="${prefs.speed === 'cinematic'}">Cinematic</button></div></div>`;
   }
   function renderPrefControls() { $$('[data-dus-prefs]').forEach(b => { b.innerHTML = prefControlsHTML(); }); }
   document.addEventListener('click', e => { const b = e.target.closest('[data-dus-pref]'); if (!b) return; e.preventDefault(); setPrefs({ [b.dataset.dusPref]: b.dataset.v }); });
@@ -544,7 +544,7 @@
       <div class="dus-legends__art">
         <div class="dus-legends__pic"><img src="${ART}arch-coach-legends.webp" width="${LEG_W}" height="${LEG_H}" alt="" decoding="async" loading="lazy">
         ${LEGENDS.filter(l => l[3]).map(l => `<button type="button" class="dus-legends__hit dus-legends__hit--band" tabindex="-1" aria-hidden="true" data-dus-legend="${l[0]}" style="${pct(l[3])}"></button>`).join('')}
-        ${LEGENDS.map(l => `<button type="button" class="dus-legends__hit" data-dus-legend="${l[0]}" style="${pct(l[2])}" aria-label="${l[0] ? esc(l[1]) + ': make this your go-to legend' : 'DrawUp General: choose a legend each time you ask'}"></button>`).join('')}</div>
+        ${LEGENDS.map(l => `<button type="button" class="dus-legends__hit" data-dus-legend="${l[0]}" style="${pct(l[2])}" aria-label="${l[0] ? esc(l[1]) + ': read the bio and choose as your legend' : 'DrawUp General: choose a legend each time you ask'}"></button>`).join('')}</div>
         <form class="dus-legends__bar" data-dus-legends-form style="${pct([286, 580, 1353, 659])}">
           <label class="dus-legends__clip" title="Attach pictures or files">${ico('clip')}<span class="dus-sr">Attach pictures or files</span><input type="file" multiple accept="${AC_ACCEPT}" hidden data-dus-legends-file></label>
           <label class="dus-sr" for="dus-legends-input">Ask Arch Coach</label>
@@ -604,6 +604,8 @@
     });
   }
   async function openLegend(key) {
+    // v28: a mini bio page first (vision, style, "Choose as my legend"); the legend picker stays one click away there.
+    if (window.DrawUpLegendBio?.open) { window.DrawUpLegendBio.open(key); return; }
     const C = window.DrawUpCoach; if (!C?.open) { go(T('arch-coach')); return; }
     await C.open('legend');
     // put focus on that legend in the picker; locked legends stay disabled and say how much XP unlocks them

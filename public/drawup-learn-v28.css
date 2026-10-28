@@ -1,0 +1,57 @@
+/* DrawUp v28: Arch Coach Learning (Playbook) readability on the v26 light Studio page.
+   The Playbook keeps its dark-glass cards and hero (the approved look). v26 turned page text navy, which put navy
+   labels and headings on those dark cards and very light breadcrumbs on the white page. These rules give every piece of
+   text a colour that reads on the surface it actually sits on. Selectors carry #du-portal / #du-workspace-content so
+   they beat the v26 and legacy portal rules, which use ids and !important. */
+
+/* breadcrumbs and tabs sit on the light page */
+#du-portal #du-workspace-content .pb-root .pb-crumbs{color:#4A5770!important;font-size:14px}
+#du-portal #du-workspace-content .pb-root .pb-crumbs button{color:#2854A1!important;font-weight:600;text-decoration:none}
+#du-portal #du-workspace-content .pb-root .pb-crumbs button:hover{text-decoration:underline}
+#du-portal #du-workspace-content .pb-root .pb-crumbs span{color:#7B879C!important}
+#du-portal #du-workspace-content .pb-root .pb-crumbs b{color:#142238!important}
+#du-portal #du-workspace-content .pb-root .pb-tabs button{background:#fff!important;color:#142238!important;border:1px solid #D3DAE5!important;font-weight:600}
+#du-portal #du-workspace-content .pb-root .pb-tabs button:hover{border-color:#2854A1!important}
+#du-portal #du-workspace-content .pb-root .pb-tabs button.on{background:#081729!important;color:#fff!important;border-color:#081729!important;box-shadow:inset 0 -3px 0 #55D8FF}
+#du-portal #du-workspace-content .pb-root > .pb-muted,#du-portal #du-workspace-content .pb-root > p.pb-muted{color:#4A5770!important}
+
+/* everything on a dark card or the dark hero */
+#du-portal #du-workspace-content .pb-root :is(.pb-hero,.pb-head,.pb-card,.pb-path,.pb-ch,.pb-lesson,.pb-stats article) .du-kicker{color:#7fe7ff!important;letter-spacing:.2em!important}
+#du-portal #du-workspace-content .pb-root :is(.pb-hero,.pb-card,.pb-path,.pb-ch,.pb-lesson,.pb-stats article) :is(h1,h2,h3,h4,b,strong:not(.pb-stats strong)){color:#F4F9FF!important}
+#du-portal #du-workspace-content .pb-root :is(.pb-hero,.pb-card) p:not(.pb-flow){color:#C9D6E3!important}
+#du-portal #du-workspace-content .pb-root :is(.pb-hero,.pb-card,.pb-path,.pb-ch,.pb-lesson) :is(small,.pb-muted){color:#B4C4D4!important}
+#du-portal #du-workspace-content .pb-root .pb-hero .pb-flow{color:#7fe7ff!important}
+#du-portal #du-workspace-content .pb-root .pb-hero .pb-pos{color:#C9D6E3!important}
+#du-portal #du-workspace-content .pb-root .pb-ch span,#du-portal #du-workspace-content .pb-root .pb-lesson .pb-meta{color:#9EE9FF!important}
+#du-portal #du-workspace-content .pb-root .pb-path em{color:#FFC59E!important}
+#du-portal #du-workspace-content .pb-root .pb-res a b{color:#F4F9FF!important}
+#du-portal #du-workspace-content .pb-root .pb-res a small{color:#B4C4D4!important}
+#du-portal #du-workspace-content .pb-root .pb-card a:not(.du-btn){color:#9EE9FF}
+/* a pb-head (play / lesson title) sits on the light page, not a card */
+#du-portal #du-workspace-content .pb-root .pb-head h1{color:#142238!important}
+#du-portal #du-workspace-content .pb-root .pb-head p{color:#4A5770!important}
+#du-portal #du-workspace-content .pb-root .pb-head .du-kicker{color:#2854A1!important}
+
+/* curated videos: a grid of real thumbnails with readable titles, instead of one tall dark tile */
+#du-portal #du-workspace-content .pb-root .pb-embeds{display:grid!important;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
+#du-portal #du-workspace-content .pb-root .pb-embed{margin:0;display:flex;flex-direction:column;border-radius:14px;overflow:hidden;background:#fff;border:1px solid #E1E6EE;position:relative}
+#du-portal #du-workspace-content .pb-root .pb-embed .pb-poster{position:relative;aspect-ratio:16/9;width:100%;min-height:0!important;height:auto!important;display:grid;place-items:center;align-content:center;gap:6px;padding:12px;border:0;cursor:pointer;background:linear-gradient(135deg,#0b2440,#2a1a4f);background-size:cover!important;background-position:center!important}
+#du-portal #du-workspace-content .pb-root .pb-embed .pb-poster.has-thumb b,#du-portal #du-workspace-content .pb-root .pb-embed .pb-poster.has-thumb small{display:none}
+#du-portal #du-workspace-content .pb-root .pb-embed .pb-poster > span{width:56px;height:40px;border-radius:12px;display:grid;place-items:center;background:rgba(200,30,30,.92);color:#fff;font-size:18px}
+#du-portal #du-workspace-content .pb-root .pb-embed .pb-poster b{color:#fff!important;font-size:15px;line-height:1.3;text-align:center}
+#du-portal #du-workspace-content .pb-root .pb-embed .pb-poster small{color:#DCE6F0!important}
+#du-portal #du-workspace-content .pb-root .pb-embed .pb-frame{width:100%;aspect-ratio:16/9;height:auto;border:0;display:block}
+#du-portal #du-workspace-content .pb-root .pb-embed .pb-vtitle,#du-portal #du-workspace-content .pb-root .pb-card .pb-embed p.pb-vtitle{margin:0;padding:12px 14px 2px;font:650 15px/1.35 var(--dus-font,inherit);color:#142238!important}
+#du-portal #du-workspace-content .pb-root .pb-embed figcaption{padding:4px 14px 14px;color:#4A5770!important;font-size:13px;line-height:1.45}
+#du-portal #du-workspace-content .pb-root .pb-embed figcaption a{color:#2854A1!important;font-weight:600}
+#du-portal #du-workspace-content .pb-root .pb-embed .pb-style{position:absolute;z-index:2;left:10px;top:10px}
+
+/* the AI Team video shelves (drawup-visual-v28) sit on a light card */
+#du-portal #du-workspace-content .pb-root .pb-card.pb-light{background:#fff!important;border:1px solid #E1E6EE!important;box-shadow:0 2px 6px rgba(16,28,51,.06),0 12px 32px rgba(16,28,51,.08)!important}
+#du-portal #du-workspace-content .pb-root .pb-card.pb-light .du-kicker{color:#2854A1!important}
+#du-portal #du-workspace-content .pb-root .pb-card.pb-light :is(h2,h3){color:#142238!important}
+#du-portal #du-workspace-content .pb-root .pb-card.pb-light :is(p,.pb-muted){color:#4A5770!important}
+#du-portal #du-workspace-content .pb-root .pb-card.pb-light .du-vid28-meta h4 a{color:#142238!important}
+#du-portal #du-workspace-content .pb-root .pb-card.pb-light .du-vid28-ch,#du-portal #du-workspace-content .pb-root .pb-card.pb-light .du-vid28-ch a{color:#4A5770!important}
+#du-portal #du-workspace-content .pb-root .pb-card.pb-light .du-vid28-topic{color:#2854A1!important}
+#du-portal #du-workspace-content .pb-root .pb-card.pb-light .du-vid28-shelf h3{color:#142238!important}

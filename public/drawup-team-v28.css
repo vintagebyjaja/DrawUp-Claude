@@ -1,0 +1,21 @@
+/* DrawUp v28 AI Team additions: delete a conversation, regular-chat / project-thinking line, legend chime-in. */
+.du-tm28-thread{position:relative;display:flex;align-items:stretch;gap:2px;min-width:0}
+.du-tm25-threads .du-tm28-thread > button[data-thread]{flex:1 1 auto;min-width:0;padding-right:34px}
+.du-tm25-threads .du-tm28-del,.du-tm28-del{position:absolute;right:4px;top:50%;transform:translateY(-50%);display:grid;place-items:center;width:30px;min-height:0;height:30px;padding:0;border-radius:9px;border:1px solid transparent;background:transparent;font-size:14px;line-height:1;cursor:pointer;opacity:0;transition:opacity .15s,background .15s}
+.du-tm28-thread:hover .du-tm28-del,.du-tm28-thread.on .du-tm28-del,.du-tm28-del:focus-visible{opacity:1}
+.du-tm25-threads .du-tm28-del:hover,.du-tm28-del:hover{background:rgba(200,65,47,.12);border-color:rgba(200,65,47,.35)}
+@media (hover:none){.du-tm28-del{opacity:.75}}
+html.dus #du-workspace-content .du-tm28-del{color:var(--dus-ink-2)}
+.du-tm28-mode{margin:6px 0 0;font-size:12.5px;line-height:1.4;color:var(--dus-ink-2,#9fb6c8)}
+.du-tm28-mode b{color:var(--dus-ink,#fff);font-weight:600}
+
+/* the member's Hall of Fame legend speaking in the team chat */
+.du-tm25-av.legend,.du-tm28-mono{background:linear-gradient(145deg,#2b1a4f,#5b2a86);color:#ffe7b0;border:1px solid rgba(255,214,140,.55);font-family:var(--dus-display,inherit);font-weight:800;letter-spacing:.02em;font-size:13px}
+html.dus #du-workspace-content .du-tm25-av.legend{background:linear-gradient(145deg,#2b1a4f,#5b2a86)!important;color:#ffe7b0!important}
+.du-tm25-msg.legend .du-tm25-bubble{border-left:3px solid #b98cff}
+html.dus #du-workspace-content .du-tm25-msg.legend .du-tm25-bubble{border-left:3px solid #8a5cd6!important}
+.du-tm25-msg.legend header b{color:#6b3fb3}
+html.dus #du-workspace-content .du-tm25-msg.legend header b{color:#5b2a86!important}
+.du-tm28-chime{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:12px;padding:10px 12px;border-radius:14px;border:1px dashed rgba(138,92,214,.5);background:rgba(138,92,214,.06)}
+.du-tm28-chime > span:nth-child(2){flex:1 1 180px;font-size:13.5px;color:var(--dus-ink,#eaf6ff)}
+.du-tm28-mono{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;flex:none}

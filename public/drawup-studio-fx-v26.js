@@ -5,7 +5,8 @@
  * (the Arch Coach legends artwork and the Swap gym pair). Nothing here is a crop of the 3x3 reference board.
  *
  * Rules it keeps:
- *  - 1.2 s (Quick) or 1.8 s (Cinematic), never more than 2 s, and it never plays twice in a row for the same area.
+ *  - v28 (Jaja: "like 3 seconds, so quick I can't see what is happening"): 3 s (Quick) or 4 s (Cinematic). It never
+ *    plays twice in a row for the same area, and a click, tap or Esc still skips it at once.
  *  - It never waits on or blocks the page and never makes a navigation request: DrawUpStudio opens the tab first.
  *  - A click, a tap, Esc, Enter, Space or the Skip button ends it at once.
  *  - DrawUpStudio only calls it for clicks in the Studio navigation, not for direct links, reloads or back/forward,
@@ -143,7 +144,7 @@
   function play(section, opts = {}) {
     const sc = SCENES[section]; if (!sc || reduced()) return Promise.resolve(false);
     stop();
-    const ms = opts.speed === 'cinematic' ? 1800 : 1200;
+    const ms = opts.speed === 'cinematic' ? 4000 : 3000;
     const el = document.createElement('div');
     el.className = `dus-fx dus-fx--${section}${small() ? ' is-small' : ''}`;
     el.setAttribute('role', 'status'); el.setAttribute('aria-live', 'polite');
