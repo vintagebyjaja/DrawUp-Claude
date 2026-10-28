@@ -33,8 +33,10 @@ function mediaOf(u){u=safeUrl(u);if(!u)return null;let m;
   }catch(_e){}return null;}
 function embedHTML(u,label,note,style){const md=mediaOf(u);if(!md)return '';
   const site=md.type==='youtube'?'YouTube':md.type==='instagram'?'Instagram':'the source';
-  return `<figure class="pb-embed pb-embed-${md.type}" data-embed="${esc(JSON.stringify(md))}">${style?'<span class="pb-style">★ The style DrawUp wants</span>':''}<button type="button" class="pb-poster" aria-label="Play ${esc(label||'video')}"><span>▶</span><b>${esc(label||'Video')}</b><small>Tap to load from ${site}</small></button>
-  <figcaption>${note?esc(note)+' ':''}<a href="${esc(md.open)}" target="_blank" rel="noopener">Open on ${site} ↗</a></figcaption></figure>`;}
+  // v28: YouTube posters show the video's own thumbnail (from i.ytimg.com), and the title sits under it where it reads.
+  const th=md.type==='youtube'?` has-thumb" style="background-image:url('https://i.ytimg.com/vi/${encodeURIComponent(md.id)}/hqdefault.jpg')`:'';
+  return `<figure class="pb-embed pb-embed-${md.type}" data-embed="${esc(JSON.stringify(md))}">${style?'<span class="pb-style">★ The style DrawUp wants</span>':''}<button type="button" class="pb-poster${th}" aria-label="Play ${esc(label||'video')}"><span>▶</span><b>${esc(label||'Video')}</b><small>Tap to load from ${site}</small></button>
+  <p class="pb-vtitle">${esc(label||'Video')}</p><figcaption>${note?esc(note)+' ':''}<a href="${esc(md.open)}" target="_blank" rel="noopener">Open on ${site} ↗</a></figcaption></figure>`;}
 function bindEmbeds(root){root.querySelectorAll('.pb-embed .pb-poster').forEach(b=>b.onclick=()=>{const f=b.closest('.pb-embed');let md;try{md=JSON.parse(f.dataset.embed);}catch(_e){return;}
   let el;if(md.type==='file'){el=document.createElement('video');el.controls=true;el.preload='metadata';el.src=md.url;}
   else{el=document.createElement('iframe');el.loading='lazy';el.allowFullscreen=true;el.referrerPolicy='strict-origin-when-cross-origin';el.title='Video';
@@ -243,9 +245,11 @@ function viewChallenges(root,head){
 async function viewWatch(root,head){
   const items=pub().flatMap(l=>(l.watch||[]).map(v=>({...v,lesson:l})));
   const feat=items.filter(v=>mediaOf(v.url));const seen=new Set();
-  root.innerHTML=`${head}${hubTabs('pb=watch')}${feat.length?`<article class="pb-card"><span class="du-kicker">CURATED VIDEOS</span><div class="pb-embeds">${feat.filter(v=>!seen.has(v.url)&&seen.add(v.url)).map(v=>embedHTML(v.url,v.label,(v.note?v.note+' ':'')+'In: '+v.lesson.title+'.',v.style)).join('')}</div></article>`:''}<div class="pb-grid2"><article class="pb-card"><span class="du-kicker">FROM PLAYBOOK LESSONS</span><div class="pb-res">${items.filter(v=>!mediaOf(v.url)).map(v=>safeUrl(v.url)?`<a href="${esc(v.url)}" target="_blank" rel="noopener"><b>${esc(v.label)} ↗</b><small>${esc(v.lesson.title)} · ${v.kind==='search'?'search results':v.kind==='official'?'official site':'video'}</small></a>`:'').join('')}</div></article>
+  const lessonLinks=items.filter(v=>!mediaOf(v.url)&&safeUrl(v.url));
+  root.innerHTML=`${head}${hubTabs('pb=watch')}${feat.length?`<article class="pb-card pb-light"><span class="du-kicker">CURATED VIDEOS</span><div class="pb-embeds">${feat.filter(v=>!seen.has(v.url)&&seen.add(v.url)).map(v=>embedHTML(v.url,v.label,(v.note?v.note+' ':'')+'In: '+v.lesson.title+'.',v.style)).join('')}</div></article>`:''}${window.DrawUpVisual?'<article class="pb-card pb-light"><span class="du-kicker">FROM AI TEAM QUESTIONS</span><div id="pb-ai-videos"></div></article>':''}<div class="pb-grid2"><article class="pb-card"><span class="du-kicker">FROM PLAYBOOK LESSONS</span>${lessonLinks.length?`<div class="pb-res">${lessonLinks.map(v=>`<a href="${esc(v.url)}" target="_blank" rel="noopener"><b>${esc(v.label)} ↗</b><small>${esc(v.lesson.title)} · ${v.kind==='search'?'search results':v.kind==='official'?'official site':'video'}</small></a>`).join('')}</div>`:'<p class="pb-muted">Lesson links show here when HQ adds them to a lesson.</p>'}</article>
   <article class="pb-card"><span class="du-kicker">POSTED BY MEMBERS</span><div id="pb-member-videos" class="pb-res"><p class="pb-muted">Loading…</p></div><button class="du-btn ghost" data-go="pb=board">Post a video</button></article></div>`;
   nav(root);bindPosition(root);bindEmbeds(root);
+  window.DrawUpVisual?.watchShelf(root.querySelector('#pb-ai-videos'));
   const {data}=await cx().client.from('connect_posts').select('id,title,link_url,topic,created_at').eq('kind','board').like('topic','Playbook%').not('link_url','is',null).order('created_at',{ascending:false}).limit(40);
   const box=root.querySelector('#pb-member-videos');if(box){box.innerHTML=(data||[]).length?data.map(p=>mediaOf(p.link_url)?embedHTML(p.link_url,p.title,p.topic.replace(/^Playbook: /,'')+' · member post.'):safeUrl(p.link_url)?`<a href="${esc(p.link_url)}" target="_blank" rel="noopener"><b>${esc(p.title)} ↗</b><small>${esc(p.topic)} · member post</small></a>`:'').join(''):'<p class="pb-muted">No member videos yet. Be the first to post one.</p>';bindEmbeds(box);}
 }

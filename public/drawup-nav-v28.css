@@ -1,0 +1,41 @@
+/* DrawUp v28: the top header and the Season 1 tip-off bar stay on screen while scrolling, on phones and desktop.
+   The old rule `html, body { overflow-x: hidden }` (drawup-mobile-v20.css, the v13 portal sheets and the phone block in
+   drawup-preview.html) turned <body> into its own scroll box, so the sticky header scrolled away with the page and the
+   iPhone "tap the status bar to go to the top" gesture had nothing to scroll. `overflow-x: clip` still stops
+   sideways scrolling but keeps the page itself as the scroller, which fixes both. Older browsers without `clip` keep
+   the old rule and get a fixed header instead (see the @supports block). */
+@supports (overflow: clip) {
+  html, body { overflow-x: clip !important; overflow-y: visible !important; }
+}
+html.dus .tipoff-strip { position: sticky; top: var(--dus-nav-h, 62px); z-index: 11900; }
+
+@supports not (overflow: clip) {
+  html.dus .dus-nav--public { position: fixed !important; left: 0; right: 0; top: 0; }
+  html.dus .tipoff-strip { position: fixed; left: 0; right: 0; top: var(--dus-nav-h, 62px); }
+  html.dus body { padding-top: calc(var(--dus-nav-h, 62px) + var(--du-tip28-h, 30px)); }
+}
+
+/* Back to top: shows after scrolling down a few screens; sits above the phone tab bar */
+.du-top28 {
+  position: fixed; right: 16px; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); z-index: 12600;
+  width: 46px; height: 46px; border-radius: 50%; border: 1px solid rgba(255, 255, 255, .22);
+  display: grid; place-items: center; cursor: pointer;
+  background: rgba(8, 23, 41, .92); color: #fff; font-size: 20px; line-height: 1;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .28);
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  opacity: 0; transform: translateY(12px); pointer-events: none; transition: opacity .2s, transform .2s;
+}
+.du-top28.on { opacity: 1; transform: none; pointer-events: auto; }
+.du-top28:focus-visible { outline: 3px solid #55D8FF; outline-offset: 2px; }
+@media (max-width: 900px) { .du-top28 { bottom: calc(92px + env(safe-area-inset-bottom, 0px)); right: 14px; } }
+@media (prefers-reduced-motion: reduce) { .du-top28 { transition: none; } }
+
+/* Discover: the "Search DrawUp" button beside each search box */
+.du-srch28 {
+  flex: none; min-height: 40px; padding: 0 16px; border-radius: 999px; border: 0; cursor: pointer;
+  background: #FFB38E; color: #2A1406; font: 650 14px/1 var(--dus-font, Inter, system-ui, sans-serif); white-space: nowrap;
+}
+.du-srch28:hover { background: #FFC4A6; }
+.du-srch28:focus-visible { outline: 3px solid #55D8FF; outline-offset: 2px; }
+.du-srch28-hint { margin: 6px 0 0; font-size: 12.5px; color: var(--dus-ink-2, #9fb6c8); }
+@media (max-width: 720px) { .du-srch28 { width: 100%; grid-column: 1 / -1; } }

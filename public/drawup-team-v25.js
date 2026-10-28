@@ -11,6 +11,9 @@
  * - "Add to this set" hands comments to Draw it up (window.DrawUpDrawIt.open, from the Draw it up thread);
  *   "Add to project" saves them to the project's memory.
  * window.DrawUpTeam = { open(opts), projectCard(host, projectId), ask(text, assistant) }
+ * v28: no project in the Project filter = a regular chat (nothing is offered to apply to a set or project); delete a
+ *      conversation from the history; the member's go-to Hall of Fame legend can chime in (speaker 'legend'); visual
+ *      questions get a "See it" card (drawup-visual-v28.js).
  */
 (function () {
   'use strict';
@@ -37,6 +40,7 @@
   const sleep = ms => new Promise(r => setTimeout(r, ms));
   const store = { get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (_) { return d; } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (_) {} } };
   const firstLine = (t, n = 90) => { const s = String(t || '').replace(/[#*_>`]/g, '').split('\n').map(x => x.trim()).find(Boolean) || 'Saved from the AI Design Team'; return s.length > n ? s.slice(0, n - 1) + '…' : s; };
+  const mono = n => { const i = String(n || '').split(/[\s.]+/).filter(w => /^[A-Z]/.test(w)).map(w => w[0]); return i.length > 1 ? i[0] + i[i.length - 1] : i[0] || 'HOF'; };
   const when = d => { const x = new Date(d); return isNaN(x) ? '' : x.toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }); };
 
   /* ------------------------------------------------------------------ Markdown (safe, progressive) */
@@ -84,7 +88,7 @@
   const S = {
     host: null, threads: [], projects: [], thread: null, projectId: '', messages: [], jobs: [], allJobs: [], prefs: null, costs: null, voice: false,
     selected: store.get('du-tm25-assistant', 'teammate'), credits: null, unlimited: false, view: 'chat', streams: new Map(), picked: new Set(),
-    schemaMissing: false, pollTimer: 0, globalTimer: 0, pending: [], railOpen: false, memory: [], locker: [], lockerFilter: 'all', seen: store.get('du-tm25-seen', {}),
+    schemaMissing: false, legend: null, pollTimer: 0, globalTimer: 0, pending: [], railOpen: false, memory: [], locker: [], lockerFilter: 'all', seen: store.get('du-tm25-seen', {}),
   };
 
   async function loadConfig() {
@@ -106,6 +110,16 @@
       if (data) { S.unlimited = !!data.unlimited_access; S.credits = (data.monthly_credits_remaining || 0) + (data.purchased_credits_remaining || 0); }
     } catch (_) {}
   }
+  // v28: the member's go-to legend (Arch Coach > Legends). Locks are checked again on the server.
+  async function loadLegend() {
+    try {
+      const { data: row } = await sb().from('arch_coach_profiles').select('legend,xp').eq('user_id', uid()).maybeSingle();
+      if (!row?.legend) { S.legend = null; return; }
+      const { data: l } = await sb().from('arch_coach_legends').select('key,name,kind,xp_required').eq('key', row.legend).maybeSingle();
+      S.legend = l ? { ...l, unlocked: (row.xp || 0) >= (l.xp_required || 0) || !!C().isAdmin } : null;
+    } catch (_) { S.legend = null; }
+  }
+  window.addEventListener('drawup:legend', () => { loadLegend().then(() => { if (S.host?.isConnected && S.view === 'chat') draw(); }); });
   async function loadThreads() {
     let r = await sb().from('coach_threads').select('id,title,project_thread_id,updated_at,team').eq('owner_id', uid()).order('updated_at', { ascending: false }).limit(60);
     if (r.error && /team/i.test(r.error.message)) { S.schemaMissing = true; r = await sb().from('coach_threads').select('id,title,project_thread_id,updated_at').eq('owner_id', uid()).order('updated_at', { ascending: false }).limit(60); }
@@ -140,7 +154,7 @@
   async function render(w, opts = {}) {
     S.host = w;
     w.innerHTML = '<div class="du-loading">THE TEAM IS WARMING UP…</div>';
-    await Promise.all([loadConfig(), loadPrefs(), loadCredits(), loadThreads()]);
+    await Promise.all([loadConfig(), loadPrefs(), loadCredits(), loadThreads(), loadLegend()]);
     const q = new URLSearchParams((location.hash.split('?')[1] || ''));
     const want = opts.threadId || q.get('thread') || '';
     if (opts.projectId) S.projectId = opts.projectId;
@@ -168,7 +182,7 @@
           ${[['chat', '◆', 'Conversation'], ['locker', '▣', 'The Locker Room'], ['memory', '◎', 'Project Memory'], ['jobs', '⟳', 'Active Generations' + (running ? ` (${running})` : '')]].map(x => `<button type="button" data-view="${x[0]}" class="${S.view === x[0] ? 'on' : ''}"><span>${x[1]}</span>${esc(x[2])}</button>`).join('')}
         </nav>
         <div class="du-tm25-kicker">CONVERSATION HISTORY</div>
-        <div class="du-tm25-threads">${S.threads.map(t => `<button type="button" data-thread="${t.id}" class="${S.thread && S.thread.id === t.id ? 'on' : ''}"><b>${esc(t.title || 'New conversation')}</b><small>${esc(projectName(t.project_thread_id) || 'General')}${t.team === false ? ' · Arch Coach' : ''} · ${esc(when(t.updated_at))}</small></button>`).join('') || '<p class="du-muted">Your conversations appear here.</p>'}</div>
+        <div class="du-tm25-threads">${S.threads.map(t => `<div class="du-tm28-thread ${S.thread && S.thread.id === t.id ? 'on' : ''}"><button type="button" data-thread="${t.id}" class="${S.thread && S.thread.id === t.id ? 'on' : ''}"><b>${esc(t.title || 'New conversation')}</b><small>${esc(projectName(t.project_thread_id) || 'General')}${t.team === false ? ' · Arch Coach' : ''} · ${esc(when(t.updated_at))}</small></button><button type="button" class="du-tm28-del" data-delthread="${t.id}" aria-label="Delete conversation: ${esc(t.title || 'New conversation')}" title="Delete conversation">🗑</button></div>`).join('') || '<p class="du-muted">Your conversations appear here.</p>'}</div>
       </aside>
       <section class="du-tm25-main">
         <header class="du-tm25-head">
@@ -176,13 +190,14 @@
           <div class="du-tm25-title"><span class="du-kicker">AI DESIGN TEAM</span>
             <h1>${esc(S.thread?.title || 'New conversation')}</h1>
             <label class="du-tm25-proj">Project <select id="du-tm25-project"><option value="">General (no project)</option>${S.projects.map(p => `<option value="${p.id}" ${p.id === pid ? 'selected' : ''}>${esc(p.project_name)}</option>`).join('')}</select></label>
+            <p class="du-tm28-mode">${pid ? `Project thinking is on for <b>${esc(projectName(pid))}</b>: the team uses its memory and can propose drawing changes.` : 'Regular chat. Pick a project to turn on project thinking.'}</p>
           </div>
           <div class="du-tm25-headstats">
             <span class="du-tm25-pill" title="Who you are talking to">${ICON[S.selected]} ${esc(NAMES[S.selected])}</span>
             <span class="du-tm25-pill" id="du-tm25-credits">${S.unlimited ? 'Unlimited credits' : S.credits == null ? '—' : S.credits + ' credits'}</span>
             <button type="button" class="du-tm25-pill" data-view="jobs" title="Background tasks">⟳ ${running} running</button>
             <button type="button" class="du-tm25-pill du-tm25-bell" data-act="bell" aria-label="Notifications">🔔${unseen ? `<i>${unseen}</i>` : ''}</button>
-            <button type="button" class="du-tm25-pill" data-act="settings" aria-label="Team settings">⚙</button>
+            ${S.thread ? `<button type="button" class="du-tm25-pill du-tm28-delhead" data-delthread="${S.thread.id}" aria-label="Delete this conversation" title="Delete this conversation">🗑</button>` : ''}<button type="button" class="du-tm25-pill" data-act="settings" aria-label="Team settings">⚙</button>
           </div>
         </header>
         <div class="du-tm25-bench">${benchHtml()}</div>
@@ -192,6 +207,7 @@
       </section>
     </div>`;
     bind(w);
+    window.DrawUpVisual?.mount(w);
     const inp = w.querySelector('#du-tm25-input');
     if (inp && typed) inp.value = typed;
     if (inp && focused) inp.focus();
@@ -243,7 +259,9 @@
     const meta = m.meta || {};
     const live = m.status === 'streaming';
     const q = completion && m.reply_to && byId.get(m.reply_to);
-    const label = m.role === 'user' ? 'YOU' + (meta.to && meta.to !== 'teammate' ? ' → ' + NAMES[meta.to].toUpperCase() : '') : NAMES[sp]?.toUpperCase() || 'ARCH COACH';
+    const legendName = meta.legend?.name || 'Legend';
+    const label = m.role === 'user' ? 'YOU' + (meta.to === 'legend' ? ' → ' + legendName.toUpperCase() : meta.to && meta.to !== 'teammate' && NAMES[meta.to] ? ' → ' + NAMES[meta.to].toUpperCase() : '') : sp === 'legend' ? legendName.toUpperCase() + ' · HALL OF FAME LEGEND' : NAMES[sp]?.toUpperCase() || 'ARCH COACH';
+    const general = !activeProjectId();
     const badges = [];
     if (meta.preliminary) badges.push(S.messages.some(x => x.meta?.completion_of === m.id || (x.reply_to && x.reply_to === m.reply_to && x.meta?.verified))
       ? '<span class="du-tm25-badge prelim">Quick answer · verified result below</span>'
@@ -260,17 +278,24 @@
     let extra = '';
     if (!live && m.role === 'assistant' && m.status !== 'failed') {
       if (meta.plays?.length) extra += `<div class="du-tm25-plays">${meta.plays.map((p, i) => `<article><span class="du-kicker">PLAY ${i + 1}</span><h4>${esc(p.title)}</h4><p>${esc(p.summary)}</p><div><button type="button" class="du-btn primary" data-shot="${i}" data-msg="${m.id}">Take the shot (${S.costs?.shot ?? 8} cr)</button><button type="button" class="du-btn ghost" data-saveplay="${i}" data-msg="${m.id}">Save play</button></div></article>`).join('')}</div>`;
-      if (meta.proposal) extra += proposalHtml(m);
+      if (meta.proposal && !general) extra += proposalHtml(m);
       if (meta.decision) extra += `<div class="du-tm25-decision">Decision: <b>${esc(meta.decision)}</b> <button type="button" class="du-btn ghost" data-decide="${m.id}">✓ Approve &amp; save decision</button></div>`;
       if (meta.queued_changes?.length) extra += `<div class="du-tm25-queued"><b>Queued for the next revision</b><ul>${meta.queued_changes.map(c => `<li>${esc(c)}</li>`).join('')}</ul>${meta.job_id ? `<button type="button" class="du-btn ghost" data-revise="${meta.job_id}">Run the revision</button>` : ''}</div>`;
-      if (meta.suggestions?.length) extra += `<div class="du-tm25-next"><span>Next:</span>${meta.suggestions.map((s, i) => `<button type="button" data-sugg="${i}" data-msg="${m.id}">${s.kind === 'handoff' ? '↪ ' : s.kind === 'save' ? '▣ ' : s.kind === 'add_to_set' ? '✎ ' : s.kind === 'add_to_project' ? '＋ ' : ''}${esc(s.label)}</button>`).join('')}</div>`;
+      const sugg = (meta.suggestions || []).map((s, i) => [s, i]).filter(([s]) => !general || (s.kind !== 'add_to_set' && s.kind !== 'add_to_project'));
+      if (sugg.length) extra += `<div class="du-tm25-next"><span>Next:</span>${sugg.map(([s, i]) => `<button type="button" data-sugg="${i}" data-msg="${m.id}">${s.kind === 'handoff' ? '↪ ' : s.kind === 'save' ? '▣ ' : s.kind === 'add_to_set' ? '✎ ' : s.kind === 'add_to_project' ? '＋ ' : ''}${esc(s.label)}</button>`).join('')}</div>`;
+      // v28: a picture and four ways to see it, under any answer to a visual question
+      const asked = m.reply_to && byId.get(m.reply_to);
+      if (sp !== 'legend' && !meta.job_kind && window.DrawUpVisual && (meta.visual || (asked && window.DrawUpVisual.isVisual(asked.content)))) extra += `<div class="du-vis28-slot" data-vis-id="${esc(m.id)}" data-q="${esc(asked?.content || '')}" data-topic="${esc(meta.visual?.topic || '')}" data-kind="${esc(meta.visual?.kind || '')}"></div>`;
+      // v28: the member's go-to legend can chime in on the latest answer
+      const lastA = [...S.messages].reverse().find(x => x.role === 'assistant');
+      if (S.legend?.unlocked && sp !== 'legend' && lastA && lastA.id === m.id && !String(m.id).startsWith('tmp-')) extra += `<div class="du-tm28-chime"><span class="du-tm28-mono" aria-hidden="true">${esc(mono(S.legend.name))}</span><span><b>${esc(S.legend.name)}</b> can chime in on this.</span><button type="button" class="du-btn ghost" data-chime="${esc(m.id)}">Hear from ${esc(S.legend.name.split(' ').pop())}</button></div>`;
     }
     const acts = live ? `<button type="button" data-stop="${m.id}">■ Stop</button>`
-      : m.role === 'assistant' ? `${m.status === 'stopped' ? `<button type="button" data-continue="${m.id}">↻ Continue</button>` : ''}<button type="button" data-save="${m.id}" data-kind="idea">Save idea</button><button type="button" data-save="${m.id}" data-kind="bookmark">Bookmark</button><button type="button" data-toset="${m.id}">Add to set</button><button type="button" data-toproj="${m.id}">Add to project</button>${['teammate', 'sixth_man', 'coach'].filter(s => s !== sp).map(s => `<button type="button" data-handoff="${s}" data-msg="${m.id}">Ask ${NAMES[s]}</button>`).join('')}${m.role === 'assistant' && m.content && 'speechSynthesis' in window ? `<button type="button" data-speak="${m.id}" aria-label="Read aloud">🔊</button>` : ''}`
+      : m.role === 'assistant' ? `${m.status === 'stopped' ? `<button type="button" data-continue="${m.id}">↻ Continue</button>` : ''}<button type="button" data-save="${m.id}" data-kind="idea">Save idea</button><button type="button" data-save="${m.id}" data-kind="bookmark">Bookmark</button>${general ? '' : `<button type="button" data-toset="${m.id}">Add to set</button>`}<button type="button" data-toproj="${m.id}">Add to project</button>${['teammate', 'sixth_man', 'coach'].filter(s => s !== sp).map(s => `<button type="button" data-handoff="${s}" data-msg="${m.id}">Ask ${NAMES[s]}</button>`).join('')}${m.role === 'assistant' && m.content && 'speechSynthesis' in window ? `<button type="button" data-speak="${m.id}" aria-label="Read aloud">🔊</button>` : ''}`
       : `<button type="button" data-save="${m.id}" data-kind="note">Save note</button>`;
     return `<article class="du-tm25-msg ${sp} ${completion ? 'completion' : ''} ${picked ? 'picked' : ''}" data-id="${m.id}">
       <label class="du-tm25-pick" title="Select to add to a set or project"><input type="checkbox" data-pick="${m.id}" ${picked ? 'checked' : ''}><span class="du-sr">Select</span></label>
-      <div class="du-tm25-av ${sp}" aria-hidden="true">${m.role === 'user' ? 'YOU'.slice(0, 1) : ICON[sp]}</div>
+      <div class="du-tm25-av ${sp}" aria-hidden="true">${m.role === 'user' ? 'YOU'.slice(0, 1) : sp === 'legend' ? esc(mono(legendName)) : ICON[sp]}</div>
       <div class="du-tm25-bubble">
         ${q ? `<div class="du-tm25-attached">↳ Completed result for your question: “${esc(firstLine(q.content, 80))}”</div>` : ''}
         <header><b>${esc(label)}</b>${badges.join('')}<time>${esc(when(m.created_at))}</time></header>
@@ -353,9 +378,10 @@
     if (!text) return;
     const assistant = opts.assistant || S.selected;
     const reqId = rid();
-    const guess = opts.continueOf ? assistant : guessSpeaker(text, assistant);
-    const tempUser = { id: 'tmp-u-' + reqId, role: 'user', content: text, created_at: new Date().toISOString(), meta: { to: guess } };
-    const tempBot = { id: 'tmp-a-' + reqId, role: 'assistant', speaker: guess, status: 'streaming', content: '', created_at: new Date().toISOString(), meta: {} };
+    const lg = assistant === 'legend' && S.legend ? { key: S.legend.key, name: S.legend.name } : null;
+    const guess = lg ? 'legend' : opts.continueOf ? assistant : guessSpeaker(text, assistant);
+    const tempUser = { id: 'tmp-u-' + reqId, role: 'user', content: text, created_at: new Date().toISOString(), meta: { to: guess, legend: lg || undefined } };
+    const tempBot = { id: 'tmp-a-' + reqId, role: 'assistant', speaker: guess, status: 'streaming', content: '', created_at: new Date().toISOString(), meta: lg ? { legend: lg } : {} };
     const st = { reqId, msgId: tempBot.id, text: '', speaker: guess, threadId: S.thread?.id || 'new', ctrl: new AbortController(), local: [tempUser, tempBot] };
     S.streams.set(reqId, st);
     if (S.view !== 'chat') S.view = 'chat';
@@ -372,7 +398,7 @@
       }
     } catch (e) { toast(e.message, true); }
 
-    const body = { message: text, request_id: reqId, assistant, thread_id: S.thread?.id || undefined, project_id: !S.thread ? (S.projectId || undefined) : undefined, images, attachments, continue_of: opts.continueOf || undefined };
+    const body = { message: text, request_id: reqId, assistant, legend: lg ? lg.key : undefined, thread_id: S.thread?.id || undefined, project_id: !S.thread ? (S.projectId || undefined) : undefined, images, attachments, continue_of: opts.continueOf || undefined };
     let tries = 0, gotMeta = false;
     for (;;) {
       try {
@@ -427,7 +453,7 @@
       if (u) u.id = e.user_message_id; if (a) { a.id = e.message_id; a.speaker = e.speaker; }
       st.local[0].id = e.user_message_id; st.local[1].id = e.message_id; st.local[1].speaker = e.speaker;
       st.msgId = e.message_id; st.speaker = e.speaker;
-      if (e.named && e.speaker !== S.selected) { S.selected = e.speaker; store.set('du-tm25-assistant', e.speaker); }
+      if (e.named && e.speaker !== S.selected && NAMES[e.speaker]) { S.selected = e.speaker; store.set('du-tm25-assistant', e.speaker); }
       if (e.credits_remaining != null) S.credits = e.credits_remaining;
       if (e.unlimited) S.unlimited = true;
       draw(); scrollEnd(true);
@@ -479,7 +505,7 @@
         await loadMessages();
         const done = S.jobs.filter(j => j.status === 'completed' && !S.seen[j.id]);
         done.forEach(j => toast(`${NAMES[j.speaker] || 'Team'}: ${j.title} is ready.`));
-        if (!S.streams.size) draw(); else { const b = S.host.querySelector('.du-tm25-body'); if (b && S.view === 'chat') { b.innerHTML = chatHtml(); bindMsgs(S.host); } }
+        if (!S.streams.size) draw(); else { const b = S.host.querySelector('.du-tm25-body'); if (b && S.view === 'chat') { b.innerHTML = chatHtml(); bindMsgs(S.host); window.DrawUpVisual?.mount(S.host); } }
       } else S.host.querySelectorAll('.du-tm25-job.running small').forEach(el => { const j = S.jobs.find(x => x.id === el.closest('[data-job]').dataset.job); if (j) { const s = Math.round((Date.now() - new Date(j.created_at)) / 1000); el.textContent = s < 90 ? s + 's' : Math.round(s / 60) + ' min'; } });
       if (S.jobs.some(j => j.status === 'running' || j.status === 'finishing')) { delay = Math.min(12000, delay + 1500); S.pollTimer = setTimeout(tick, delay); }
     };
@@ -698,18 +724,31 @@
     on('[data-apply]', b => { const m = msgById(b.dataset.apply), p = m.meta.proposal; addToSet([...p.changes, ...(p.keep?.length ? ['Keep: ' + p.keep.join('; ')] : [])], { messageId: m.id, title: 'Apply: ' + p.title }); });
     on('[data-saveprop]', b => { const m = msgById(b.dataset.saveprop), p = m.meta.proposal; saveLocker({ kind: 'proposal', title: p.title, body: p.changes.map(c => '- ' + c).join('\n'), message_id: m.id, speaker: m.speaker }); });
     on('[data-reject]', b => { const m = msgById(b.dataset.reject), p = m.meta.proposal; saveLocker({ kind: 'rejected', title: p.title, body: p.changes.map(c => '- ' + c).join('\n'), message_id: m.id, speaker: m.speaker }); });
-    w.querySelectorAll('[data-pick]').forEach(c => c.onchange = () => { c.checked ? S.picked.add(c.dataset.pick) : S.picked.delete(c.dataset.pick); const body = w.querySelector('.du-tm25-body'); const keep = w.querySelector('#du-tm25-msgs')?.scrollTop; body.innerHTML = chatHtml(); bindMsgs(w); const box = w.querySelector('#du-tm25-msgs'); if (box) box.scrollTop = keep; });
+    w.querySelectorAll('[data-pick]').forEach(c => c.onchange = () => { c.checked ? S.picked.add(c.dataset.pick) : S.picked.delete(c.dataset.pick); const body = w.querySelector('.du-tm25-body'); const keep = w.querySelector('#du-tm25-msgs')?.scrollTop; body.innerHTML = chatHtml(); bindMsgs(w); window.DrawUpVisual?.mount(w); const box = w.querySelector('#du-tm25-msgs'); if (box) box.scrollTop = keep; });
     on('[data-act="pick-set"]', () => addToSet(pickedTexts()));
     on('[data-act="pick-proj"]', () => addToProject(pickedTexts()));
     on('[data-act="pick-locker"]', async () => { const ms = S.messages.filter(m => S.picked.has(m.id)); const r = await sb().from('locker_items').insert(ms.map(m => ({ owner_id: uid(), kind: 'idea', title: firstLine(m.content), body: m.content, message_id: m.id, coach_thread_id: S.thread?.id || null, project_thread_id: activeProjectId() || null, speaker: m.speaker || null }))); toast(r.error ? r.error.message : `${ms.length} saved to the Locker Room.`, !!r.error); S.picked.clear(); draw(); });
     on('[data-act="pick-clear"]', () => { S.picked.clear(); draw(); });
     on('[data-starter]', b => send(b.dataset.starter, { assistant: b.dataset.as }));
+    on('[data-chime]', () => { if (S.legend) send(`${S.legend.name}, what is your take on this?`, { assistant: 'legend' }); });
     bindJobButtons(w);
+  }
+  // v28: delete a conversation (its messages, background tasks and thread memory go with it; Locker Room items stay).
+  async function deleteThread(id) {
+    const t = S.threads.find(x => x.id === id); if (!t) return;
+    if ([...S.streams.values()].some(s => s.threadId === id)) { toast('Wait for the reply to finish, or stop it, before deleting.', true); return; }
+    if (!confirm(`Delete “${t.title || 'New conversation'}”? Its messages are removed for good. Saved Locker Room items and drawing sets are kept.`)) return;
+    const r = await sb().from('coach_threads').delete().eq('id', id).eq('owner_id', uid());
+    if (r.error) { toast('Could not delete: ' + r.error.message, true); return; }
+    S.threads = S.threads.filter(x => x.id !== id);
+    if (S.thread?.id === id) { S.thread = null; S.messages = []; S.jobs = []; history.replaceState(null, '', '#portal/ai-team'); }
+    toast('Conversation deleted.'); draw();
   }
   function bind(w) {
     const on = (sel, fn) => w.querySelectorAll(sel).forEach(b => b.onclick = e => fn(b, e));
     on('[data-view]', b => { S.view = b.dataset.view; S.railOpen = false; draw(); });
     on('[data-thread]', b => openThread(b.dataset.thread));
+    on('[data-delthread]', b => deleteThread(b.dataset.delthread));
     on('[data-act="new"]', () => { S.thread = null; S.messages = []; S.jobs = []; S.view = 'chat'; S.railOpen = false; history.replaceState(null, '', '#portal/ai-team'); draw(); w.querySelector('#du-tm25-input')?.focus(); });
     on('[data-act="rail"]', () => { S.railOpen = !S.railOpen; w.querySelector('.du-tm25').classList.toggle('rail-open', S.railOpen); });
     on('[data-act="settings"]', settings);
