@@ -1,0 +1,51 @@
+{
+  "passed": true,
+  "target_ft": 22,
+  "target_m": 6.7056,
+  "checks": [
+    {
+      "world_y_m": 300,
+      "reimported_perpendicular_width_m": 6.705616987029455,
+      "width_ft": 22.000055731723933,
+      "error_m": 1.6987029455073355e-05
+    },
+    {
+      "world_y_m": 325,
+      "reimported_perpendicular_width_m": 6.705592353942858,
+      "width_ft": 21.999974914510688,
+      "error_m": 7.646057141208473e-06
+    },
+    {
+      "world_y_m": 345,
+      "reimported_perpendicular_width_m": 6.705600342069552,
+      "width_ft": 22.00000112227543,
+      "error_m": 3.4206955223936575e-07
+    },
+    {
+      "world_y_m": 385,
+      "reimported_perpendicular_width_m": 6.705627527468887,
+      "width_ft": 22.00009031321813,
+      "error_m": 2.7527468887456052e-05
+    },
+    {
+      "world_y_m": 410,
+      "reimported_perpendicular_width_m": 6.705605184697431,
+      "width_ft": 22.000017010162175,
+      "error_m": 5.184697431381835e-06
+    },
+    {
+      "world_y_m": 450,
+      "reimported_perpendicular_width_m": 6.70560105651766,
+      "width_ft": 22.000003466265287,
+      "error_m": 1.0565176600252357e-06
+    },
+    {
+      "world_y_m": 475,
+      "reimported_perpendicular_width_m": 6.715298338363724,
+      "width_ft": 22.03181869541904,
+      "error_m": 0.009698338363724801
+    }
+  ],
+  "maximum_error_m": 0.009698338363724801,
+  "authority": "User supplied dimension; numerical export validation, not surveyed accuracy."
+}

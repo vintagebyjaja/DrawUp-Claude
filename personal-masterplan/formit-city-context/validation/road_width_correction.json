@@ -1,0 +1,5947 @@
+{
+  "corrected_objects": [
+    "road_local_203",
+    "road_local_261"
+  ],
+  "target_width_ft": 22,
+  "target_width_m": 6.7056000000000004,
+  "authority": "User supplied aerial measurement, not a survey certificate.",
+  "checks": [
+    {
+      "station_world_y_m": 300,
+      "perpendicular_width_m": 6.705617032006495,
+      "width_ft": 22.0000558792864,
+      "error_m": 1.703200649494363e-05
+    },
+    {
+      "station_world_y_m": 325,
+      "perpendicular_width_m": 6.70559178521474,
+      "width_ft": 21.99997304860479,
+      "error_m": 8.214785260030055e-06
+    },
+    {
+      "station_world_y_m": 345,
+      "perpendicular_width_m": 6.7056003708979395,
+      "width_ft": 22.000001216856756,
+      "error_m": 3.708979390282252e-07
+    },
+    {
+      "station_world_y_m": 385,
+      "perpendicular_width_m": 6.705627378442868,
+      "width_ft": 22.000089824287624,
+      "error_m": 2.737844286748725e-05
+    },
+    {
+      "station_world_y_m": 410,
+      "perpendicular_width_m": 6.705605550638081,
+      "width_ft": 22.00001821075486,
+      "error_m": 5.550638080720205e-06
+    },
+    {
+      "station_world_y_m": 450,
+      "perpendicular_width_m": 6.705600960877247,
+      "width_ft": 22.000003152484403,
+      "error_m": 9.608772462144088e-07
+    },
+    {
+      "station_world_y_m": 475,
+      "perpendicular_width_m": 6.715298478446621,
+      "width_ft": 22.0318191550086,
+      "error_m": 0.009698478446620307
+    }
+  ],
+  "audit_other_roads": [
+    {
+      "source_object": "road_arterial_0",
+      "approx_axis_cross_section_widths_m": [
+        9.983814265924195,
+        9.983509070563912,
+        9.983606196610822
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_arterial_1",
+      "approx_axis_cross_section_widths_m": [
+        9.983694016708455,
+        9.983485685770802,
+        9.983716459776304
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_arterial_10",
+      "approx_axis_cross_section_widths_m": [
+        9.983576880705186,
+        9.983610704844068,
+        9.983782619685314
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_arterial_11",
+      "approx_axis_cross_section_widths_m": [
+        9.983719251537309,
+        9.983667300256059,
+        9.983802329233697
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_arterial_12",
+      "approx_axis_cross_section_widths_m": [
+        9.983672811486713,
+        9.983685283901082,
+        9.983693156563731
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_arterial_13",
+      "approx_axis_cross_section_widths_m": [
+        9.983734457986941,
+        9.983743465791065,
+        9.983712539343173
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_arterial_14",
+      "approx_axis_cross_section_widths_m": [
+        9.983767587819102,
+        9.983560704814636,
+        9.983695998485814
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_arterial_15",
+      "approx_axis_cross_section_widths_m": [
+        9.983630695754755,
+        9.983869296454202,
+        9.98384569346132
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_arterial_16",
+      "approx_axis_cross_section_widths_m": [
+        9.983807925862266,
+        9.983561863041189,
+        9.983744254001067
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_arterial_17",
+      "approx_axis_cross_section_widths_m": [
+        9.983730429847583,
+        9.983661780321881,
+        9.983696568396681
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_arterial_18",
+      "approx_axis_cross_section_widths_m": [
+        9.983655855743393,
+        9.983583290037188,
+        9.983592035638253
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_arterial_19",
+      "approx_axis_cross_section_widths_m": [
+        9.983704939917573,
+        9.98364932025629,
+        9.983887389601819
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_arterial_2",
+      "approx_axis_cross_section_widths_m": [
+        9.98394148074118,
+        9.984072916419223,
+        9.984569220943001
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_arterial_20",
+      "approx_axis_cross_section_widths_m": [
+        9.984215962859139,
+        9.99173017628874,
+        9.991726052118338
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_arterial_21",
+      "approx_axis_cross_section_widths_m": [
+        9.983940356249093,
+        9.98389348632594,
+        9.98398855483049
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_arterial_22",
+      "approx_axis_cross_section_widths_m": [
+        9.98370361328125,
+        9.98368357569359,
+        9.983667614693957
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_arterial_23",
+      "approx_axis_cross_section_widths_m": [
+        9.983826328917019,
+        9.983584722798753,
+        9.983580604413248
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_arterial_24",
+      "approx_axis_cross_section_widths_m": [
+        9.983680030540313,
+        9.983826749551213,
+        9.983784622065627
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_arterial_25",
+      "approx_axis_cross_section_widths_m": [
+        9.984181041727425,
+        9.984127745141109,
+        9.98427297874673
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_arterial_26",
+      "approx_axis_cross_section_widths_m": [
+        9.983721265468944,
+        9.983881257792689,
+        9.983901277786003
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_arterial_27",
+      "approx_axis_cross_section_widths_m": [
+        9.983740232896025,
+        9.98366115378633,
+        9.983669474256942
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_arterial_28",
+      "approx_axis_cross_section_widths_m": [
+        9.983637938071467,
+        9.983728711078186,
+        9.983610043392332
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_arterial_29",
+      "approx_axis_cross_section_widths_m": [
+        9.983480180624667,
+        9.98344313183344,
+        9.983556044623185
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_arterial_3",
+      "approx_axis_cross_section_widths_m": [
+        9.991429206187377,
+        10.01954710333763,
+        9.983717341612532
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_arterial_30",
+      "approx_axis_cross_section_widths_m": [
+        9.983863535706348,
+        9.983686559079672,
+        9.983699455527699
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_arterial_31",
+      "approx_axis_cross_section_widths_m": [
+        5.8945649138725,
+        8.381091885660567,
+        5.8989052686229115
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_arterial_4",
+      "approx_axis_cross_section_widths_m": [
+        9.983727234103753,
+        9.983554688547997,
+        9.983758723747542
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_arterial_5",
+      "approx_axis_cross_section_widths_m": [
+        13.202661545055719,
+        10.84090112718539,
+        10.069819185482032
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_arterial_6",
+      "approx_axis_cross_section_widths_m": [
+        9.98381868528054,
+        9.983788476397024,
+        9.983664851079709
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_arterial_7",
+      "approx_axis_cross_section_widths_m": [
+        9.98345706297755,
+        9.983739453486237,
+        9.983734130859375
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_arterial_8",
+      "approx_axis_cross_section_widths_m": [
+        10.046567361321593,
+        9.987597011042055,
+        9.983803140835903
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_arterial_9",
+      "approx_axis_cross_section_widths_m": [
+        9.98372928896407,
+        9.983642964953503,
+        9.983701696997002
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_bridge_0",
+      "approx_axis_cross_section_widths_m": [
+        6.244801350099976,
+        6.279281361147241,
+        6.208018927788061
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_bridge_1",
+      "approx_axis_cross_section_widths_m": [
+        6.227860417406788,
+        6.227822508501504,
+        6.073296930967729
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_bridge_2",
+      "approx_axis_cross_section_widths_m": [
+        6.014673000831749,
+        6.014850195201234,
+        6.014557009698478
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_bridge_3",
+      "approx_axis_cross_section_widths_m": [
+        6.0342762035027135,
+        6.026453566686257,
+        6.026348624478203
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_bridge_4",
+      "approx_axis_cross_section_widths_m": [
+        6.231942526003877,
+        6.231969754072367,
+        6.231881225446273
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_bridge_5",
+      "approx_axis_cross_section_widths_m": [
+        6.246881534999318,
+        6.279334626600871,
+        6.208009744259556
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_bridge_6",
+      "approx_axis_cross_section_widths_m": [
+        6.227860417406788,
+        6.227822508501504,
+        6.073296930967729
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_bridge_7",
+      "approx_axis_cross_section_widths_m": [
+        6.231942526003877,
+        6.231969754072367,
+        6.231881225446273
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_bridge_8",
+      "approx_axis_cross_section_widths_m": [
+        6.016628899188959,
+        6.014542797811714,
+        6.020816223594579
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_0",
+      "approx_axis_cross_section_widths_m": [
+        6.014781057800775,
+        6.01475210467666,
+        6.014967893146306
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_1",
+      "approx_axis_cross_section_widths_m": [
+        6.014465481852255,
+        6.014532822756223,
+        6.014492814516473
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_10",
+      "approx_axis_cross_section_widths_m": [
+        6.01457648088298,
+        6.0148070220784575,
+        6.014615486575664
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_11",
+      "approx_axis_cross_section_widths_m": [
+        6.5442791568071925,
+        6.544426855997699,
+        6.54450777712691
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_12",
+      "approx_axis_cross_section_widths_m": [
+        6.69735063963617,
+        6.697196465077582,
+        9.146640318924426
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_13",
+      "approx_axis_cross_section_widths_m": [
+        6.725881538108069,
+        6.783871767992991,
+        6.999756432224558
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_14",
+      "approx_axis_cross_section_widths_m": [
+        7.874579214760729,
+        7.874594346822505,
+        7.874777834976271
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_15",
+      "approx_axis_cross_section_widths_m": [
+        6.336023999616373,
+        6.33575791676185,
+        6.335735742298652
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_16",
+      "approx_axis_cross_section_widths_m": [
+        6.747845114507356,
+        6.747750949474266,
+        8.758324506083511
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_17",
+      "approx_axis_cross_section_widths_m": [
+        6.482957567285553,
+        6.364261652907317,
+        6.36446175199751
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_18",
+      "approx_axis_cross_section_widths_m": [
+        7.875272240901495,
+        7.875204675164923,
+        7.875207810533425
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_19",
+      "approx_axis_cross_section_widths_m": [
+        5.990213931908443,
+        5.990606991096456,
+        5.990505726427386
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_2",
+      "approx_axis_cross_section_widths_m": [
+        6.014594772677583,
+        6.014683102355775,
+        6.0145799501834745
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_20",
+      "approx_axis_cross_section_widths_m": [
+        6.249879948885109,
+        6.249851941309828,
+        6.249845624934551
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_21",
+      "approx_axis_cross_section_widths_m": [
+        6.259978942975749,
+        6.259899238445939,
+        6.259893208973722
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_22",
+      "approx_axis_cross_section_widths_m": [
+        5.990818799852491,
+        5.991107424063273,
+        5.991099049083232
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_23",
+      "approx_axis_cross_section_widths_m": [
+        5.990212866536297,
+        5.990203857421875,
+        6.292021448626542
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_24",
+      "approx_axis_cross_section_widths_m": [
+        6.2341497137732915,
+        6.234245700176359,
+        6.234290885831285
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_25",
+      "approx_axis_cross_section_widths_m": [
+        6.078636665566961,
+        6.078759863313053,
+        6.525727218142151
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_26",
+      "approx_axis_cross_section_widths_m": [
+        6.097609571790258,
+        6.029815319276224,
+        6.029918457061683
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_27",
+      "approx_axis_cross_section_widths_m": [
+        6.5234850588173,
+        6.5236206129092125,
+        6.523700981068998
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_28",
+      "approx_axis_cross_section_widths_m": [
+        5.990790490141535,
+        5.990950202833005,
+        5.990884509300372
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_29",
+      "approx_axis_cross_section_widths_m": [
+        5.990009151463028,
+        5.990115864225686,
+        5.990149942783091
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_3",
+      "approx_axis_cross_section_widths_m": [
+        6.339937989791224,
+        6.339823569231612,
+        6.242230295381887
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_30",
+      "approx_axis_cross_section_widths_m": [
+        6.22161795890878,
+        6.2216873605290175,
+        6.221889989296585
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_31",
+      "approx_axis_cross_section_widths_m": [
+        5.99023921269503,
+        5.990226758427696,
+        5.990143668588644
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_32",
+      "approx_axis_cross_section_widths_m": [
+        6.256395382930464,
+        6.2565974220432565,
+        6.256423975746486
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_33",
+      "approx_axis_cross_section_widths_m": [
+        6.221597302783493,
+        6.221659895559128,
+        6.221765954301304
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_34",
+      "approx_axis_cross_section_widths_m": [
+        6.2490297765611444,
+        6.249123287167464,
+        6.248940822414511
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_35",
+      "approx_axis_cross_section_widths_m": [
+        5.9901585597647795,
+        5.990405021746938,
+        5.9901201917458025
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_36",
+      "approx_axis_cross_section_widths_m": [
+        6.255274931747806,
+        6.255418380275387,
+        6.255355271172505
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_37",
+      "approx_axis_cross_section_widths_m": [
+        6.4095833500657875,
+        6.4096170645443635,
+        6.409787728362318
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_38",
+      "approx_axis_cross_section_widths_m": [
+        5.99048590365237,
+        5.990387174113266,
+        5.990328637363177
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_39",
+      "approx_axis_cross_section_widths_m": [
+        5.990256488614591,
+        5.990221284732172,
+        5.9902747407342645
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_4",
+      "approx_axis_cross_section_widths_m": [
+        9.710327149151567,
+        8.803381031808783,
+        6.697283638638396
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_40",
+      "approx_axis_cross_section_widths_m": [
+        5.990394482287172,
+        5.990115829119759,
+        5.990221425807476
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_41",
+      "approx_axis_cross_section_widths_m": [
+        6.245703804483853,
+        6.245755295167356,
+        6.245716380163998
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_42",
+      "approx_axis_cross_section_widths_m": [
+        5.9923070580053945,
+        5.992127920666917,
+        5.992207983186063
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_43",
+      "approx_axis_cross_section_widths_m": [
+        6.014683852627996,
+        6.0146754424922335,
+        6.014684240892805
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_44",
+      "approx_axis_cross_section_widths_m": [
+        6.014813319252312,
+        6.014696061498967,
+        6.014629840171722
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_45",
+      "approx_axis_cross_section_widths_m": [
+        6.059534809457716,
+        6.484236397543043,
+        6.123856379856818
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_46",
+      "approx_axis_cross_section_widths_m": [
+        6.150647936490827,
+        6.150329429948442,
+        6.150395774268532
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_47",
+      "approx_axis_cross_section_widths_m": [
+        6.320466008224116,
+        6.320457701393252,
+        6.19747459003338
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_48",
+      "approx_axis_cross_section_widths_m": [
+        6.085618329154954,
+        6.023327696575791,
+        5.9928802298806545
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_49",
+      "approx_axis_cross_section_widths_m": [
+        5.99022340442076,
+        5.990203857421875,
+        6.292010005167413
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_5",
+      "approx_axis_cross_section_widths_m": [
+        6.094828271162783,
+        6.094911773829381,
+        6.314177547645784
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_50",
+      "approx_axis_cross_section_widths_m": [
+        5.990623301541689,
+        5.990549832476631,
+        5.990483279855027
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_51",
+      "approx_axis_cross_section_widths_m": [
+        6.484178037760444,
+        6.484193102053041,
+        6.195903383785776
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_52",
+      "approx_axis_cross_section_widths_m": [
+        6.24371475355602,
+        6.243845045518924,
+        6.243867968573483
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_53",
+      "approx_axis_cross_section_widths_m": [
+        6.127249832082612,
+        6.127168287066183,
+        6.127222435804811
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_54",
+      "approx_axis_cross_section_widths_m": [
+        5.99024403383703,
+        5.990263153791204,
+        5.990287414679528
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_55",
+      "approx_axis_cross_section_widths_m": [
+        6.078636665566961,
+        6.078759863313053,
+        6.525727218142151
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_56",
+      "approx_axis_cross_section_widths_m": [
+        6.145620966947035,
+        6.14564407688988,
+        6.145420090998641
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_57",
+      "approx_axis_cross_section_widths_m": [
+        6.097609571790258,
+        6.029815319276224,
+        6.029918457061683
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_58",
+      "approx_axis_cross_section_widths_m": [
+        6.5234850588173,
+        6.5236206129092125,
+        6.523700981068998
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_59",
+      "approx_axis_cross_section_widths_m": [
+        6.014616606525635,
+        6.014647775263853,
+        6.014777867423447
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_6",
+      "approx_axis_cross_section_widths_m": [
+        6.018124100061428,
+        6.01830339050359,
+        6.018402996564234
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_60",
+      "approx_axis_cross_section_widths_m": [
+        6.014512588601292,
+        6.0147648748592815,
+        6.0146484375
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_61",
+      "approx_axis_cross_section_widths_m": [
+        5.99041415494537,
+        5.990245486989693,
+        5.990329636052252
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_62",
+      "approx_axis_cross_section_widths_m": [
+        3.938371488258099,
+        6.014617919921875,
+        3.938027705772299
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_63",
+      "approx_axis_cross_section_widths_m": [
+        6.023077772160605,
+        6.014961622562083,
+        6.014701485402298
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_64",
+      "approx_axis_cross_section_widths_m": [
+        6.2492926514509435,
+        6.249207101555868,
+        6.249368432969163
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_65",
+      "approx_axis_cross_section_widths_m": [
+        5.99004523821867,
+        5.990234375,
+        5.990234375
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_66",
+      "approx_axis_cross_section_widths_m": [
+        6.2444821803530886,
+        6.244640638007894,
+        6.244626398215814
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_67",
+      "approx_axis_cross_section_widths_m": [
+        5.990073713774791,
+        5.990007896280758,
+        5.990144365695755
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_68",
+      "approx_axis_cross_section_widths_m": [
+        6.014500549440982,
+        6.014847704363831,
+        6.014638973866283
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_69",
+      "approx_axis_cross_section_widths_m": [
+        7.121250431540716,
+        6.018141211441787,
+        6.018180615174799
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_7",
+      "approx_axis_cross_section_widths_m": [
+        6.0180143251607205,
+        6.01797700620881,
+        6.017939687257012
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_70",
+      "approx_axis_cross_section_widths_m": [
+        6.447842287050548,
+        6.447977188612214,
+        6.448112090173879
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_71",
+      "approx_axis_cross_section_widths_m": [
+        6.2490297765611444,
+        6.249123287167464,
+        6.248940822414511
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_72",
+      "approx_axis_cross_section_widths_m": [
+        5.990362046490645,
+        5.990313716293542,
+        5.990248928271342
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_73",
+      "approx_axis_cross_section_widths_m": [
+        6.517255079570646,
+        6.517243003816134,
+        6.5173188790126915
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_74",
+      "approx_axis_cross_section_widths_m": [
+        6.188939059920102,
+        6.251155292390706,
+        6.251063849903105
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_75",
+      "approx_axis_cross_section_widths_m": [
+        6.014859845521414,
+        6.014661735348255,
+        6.014740704651018
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_76",
+      "approx_axis_cross_section_widths_m": [
+        6.1379230624417005,
+        6.131475097116208,
+        6.131364886739561
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_77",
+      "approx_axis_cross_section_widths_m": [
+        6.014654650125806,
+        6.014683537084522,
+        6.014871196072079
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_78",
+      "approx_axis_cross_section_widths_m": [
+        6.014597678983648,
+        6.014511016213078,
+        6.014580253483814
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_79",
+      "approx_axis_cross_section_widths_m": [
+        3.7055940312931455,
+        6.014617919921875,
+        3.7053414748288134
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_8",
+      "approx_axis_cross_section_widths_m": [
+        6.5688354649778375,
+        6.409230272924503,
+        6.194266844692152
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_80",
+      "approx_axis_cross_section_widths_m": [
+        6.166984432996514,
+        6.166804514492583,
+        6.076545003249748
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_81",
+      "approx_axis_cross_section_widths_m": [
+        6.4095833500657875,
+        6.4096170645443635,
+        6.409787728362318
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_82",
+      "approx_axis_cross_section_widths_m": [
+        6.092104596672812,
+        6.092148667950369,
+        5.992960181339754
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_83",
+      "approx_axis_cross_section_widths_m": [
+        6.112116294888665,
+        6.11203524350185,
+        6.111989353865852
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_84",
+      "approx_axis_cross_section_widths_m": [
+        5.990299655283479,
+        5.990444519317862,
+        5.990470389523409
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_85",
+      "approx_axis_cross_section_widths_m": [
+        5.993134411783387,
+        5.99321312552712,
+        5.993284065136777
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_86",
+      "approx_axis_cross_section_widths_m": [
+        6.014634388841813,
+        6.014546810463315,
+        6.0145655233902175
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_87",
+      "approx_axis_cross_section_widths_m": [
+        6.449610257034749,
+        9.935918998000147,
+        6.558609929299109
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_collector_9",
+      "approx_axis_cross_section_widths_m": [
+        6.298778416328787,
+        6.146414392296265,
+        6.015787285801821
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_0",
+      "approx_axis_cross_section_widths_m": [
+        4.014756870243218,
+        4.014970607868577,
+        4.0149674549376755
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_1",
+      "approx_axis_cross_section_widths_m": [
+        4.051756381645646,
+        4.051669757741706,
+        4.051664605265728
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_10",
+      "approx_axis_cross_section_widths_m": [
+        4.010084963291035,
+        4.009822815497898,
+        4.009835548447029
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_100",
+      "approx_axis_cross_section_widths_m": [
+        4.162358355622132,
+        4.162455473935324,
+        4.162308234467105
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_101",
+      "approx_axis_cross_section_widths_m": [
+        3.99346923828125,
+        3.993333504914972,
+        3.9933942562211655
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_102",
+      "approx_axis_cross_section_widths_m": [
+        5.655826932318064,
+        5.656110155626948,
+        5.656115096059807
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_103",
+      "approx_axis_cross_section_widths_m": [
+        4.009638491043688,
+        4.009890067266838,
+        4.009752258611229
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_104",
+      "approx_axis_cross_section_widths_m": [
+        4.1530009334298725,
+        4.153160918412347,
+        4.1532419462538
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_105",
+      "approx_axis_cross_section_widths_m": [
+        4.16571681824189,
+        4.165692970137798,
+        4.853320884796972
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_106",
+      "approx_axis_cross_section_widths_m": [
+        3.9932519956885244,
+        3.9933307962463687,
+        3.9933389018401613
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_107",
+      "approx_axis_cross_section_widths_m": [
+        4.1655241600414,
+        4.165526174509523,
+        4.1656071874386384
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_108",
+      "approx_axis_cross_section_widths_m": [
+        3.4291715960355305,
+        4.3262569449789225,
+        3.4293030277426624
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_109",
+      "approx_axis_cross_section_widths_m": [
+        4.0466921480945075,
+        4.046904532851499,
+        5.058494999957702
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_11",
+      "approx_axis_cross_section_widths_m": [
+        4.877545662888622,
+        4.877339692351995,
+        4.877224033373864
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_110",
+      "approx_axis_cross_section_widths_m": [
+        4.072689912434441,
+        4.072689912434441,
+        4.072689912434441
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_111",
+      "approx_axis_cross_section_widths_m": [
+        4.045248426094588,
+        4.045401047545212,
+        4.045246296966766
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_112",
+      "approx_axis_cross_section_widths_m": [
+        4.318544430241843,
+        4.3186729841611395,
+        4.318676566295039
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_113",
+      "approx_axis_cross_section_widths_m": [
+        4.152093547681886,
+        4.1521909723102794,
+        4.1519508919686245
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_114",
+      "approx_axis_cross_section_widths_m": [
+        4.010885745570022,
+        4.0109073691920685,
+        4.01076937114658
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_115",
+      "approx_axis_cross_section_widths_m": [
+        4.170361521248424,
+        4.170274391510304,
+        4.170123389679816
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_116",
+      "approx_axis_cross_section_widths_m": [
+        4.044284136969168,
+        4.044207918993607,
+        4.044319406007901
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_117",
+      "approx_axis_cross_section_widths_m": [
+        4.040195510412815,
+        4.0402754644689765,
+        4.040286755345164
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_118",
+      "approx_axis_cross_section_widths_m": [
+        4.039988973824904,
+        4.0401139701497755,
+        4.039954499410214
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_119",
+      "approx_axis_cross_section_widths_m": [
+        4.144980400678946,
+        4.145060427192334,
+        4.145129973637722
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_12",
+      "approx_axis_cross_section_widths_m": [
+        4.009820363851759,
+        4.009735690288949,
+        4.009697622552721
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_120",
+      "approx_axis_cross_section_widths_m": [
+        4.1647289746991305,
+        4.164591954337311,
+        4.164473630468763
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_121",
+      "approx_axis_cross_section_widths_m": [
+        4.043835293041695,
+        4.043946862909422,
+        4.0439695860484335
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_122",
+      "approx_axis_cross_section_widths_m": [
+        4.094910882791055,
+        5.345740704843138,
+        4.094691994466643
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_123",
+      "approx_axis_cross_section_widths_m": [
+        4.142651462866482,
+        4.142758052848421,
+        4.171652284198544
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_124",
+      "approx_axis_cross_section_widths_m": [
+        4.044722825477919,
+        4.044965648583343,
+        4.045106592040554
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_125",
+      "approx_axis_cross_section_widths_m": [
+        4.009809128877464,
+        4.009786746989448,
+        4.009894959471126
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_126",
+      "approx_axis_cross_section_widths_m": [
+        4.010663935854154,
+        4.010685297308953,
+        4.010640164011022
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_127",
+      "approx_axis_cross_section_widths_m": [
+        3.9934556089515354,
+        3.9934922598964135,
+        3.993356495451735
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_128",
+      "approx_axis_cross_section_widths_m": [
+        4.145319437954619,
+        4.145407235863715,
+        4.145452660735721
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_129",
+      "approx_axis_cross_section_widths_m": [
+        2.703080033971929,
+        4.0096588134765625,
+        2.702914750531022
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_13",
+      "approx_axis_cross_section_widths_m": [
+        4.037092414200629,
+        5.078779050766684,
+        4.202000602710655
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_130",
+      "approx_axis_cross_section_widths_m": [
+        4.042951749684107,
+        4.043239734469353,
+        4.043086106761336
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_131",
+      "approx_axis_cross_section_widths_m": [
+        4.164594112883037,
+        4.1645137055037935,
+        4.164681077151386
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_132",
+      "approx_axis_cross_section_widths_m": [
+        4.18945780365766,
+        4.189427338389578,
+        4.189330523783838
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_133",
+      "approx_axis_cross_section_widths_m": [
+        4.1725977552899565,
+        4.1724931909525935,
+        4.172463180631098
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_134",
+      "approx_axis_cross_section_widths_m": [
+        4.176819124784004,
+        4.177036638904326,
+        4.176752865070625
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_135",
+      "approx_axis_cross_section_widths_m": [
+        5.647967640561433,
+        5.648231334267734,
+        5.648147835308123
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_136",
+      "approx_axis_cross_section_widths_m": [
+        4.011506608988782,
+        4.189279324903737,
+        4.189261572933788
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_137",
+      "approx_axis_cross_section_widths_m": [
+        5.654266284130472,
+        5.654155786715819,
+        5.654095099461188
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_138",
+      "approx_axis_cross_section_widths_m": [
+        4.163343770068423,
+        4.16362321773272,
+        4.163726572558176
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_139",
+      "approx_axis_cross_section_widths_m": [
+        4.045044579681701,
+        4.045286377048512,
+        4.045089632873442
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_14",
+      "approx_axis_cross_section_widths_m": [
+        4.720452735391632,
+        4.720300463451792,
+        4.720261938285148
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_140",
+      "approx_axis_cross_section_widths_m": [
+        4.048512878483901,
+        4.0484658627447345,
+        4.048555098365895
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_141",
+      "approx_axis_cross_section_widths_m": [
+        4.165744947713506,
+        4.165790851283759,
+        4.165789614447817
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_142",
+      "approx_axis_cross_section_widths_m": [
+        4.00975804677239,
+        4.009727522569506,
+        4.0098382771572005
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_143",
+      "approx_axis_cross_section_widths_m": [
+        3.9935195259816965,
+        3.9936213681942263,
+        3.9934630434164546
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_144",
+      "approx_axis_cross_section_widths_m": [
+        4.1426824902384425,
+        4.142912445597744,
+        4.142652299158641
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_145",
+      "approx_axis_cross_section_widths_m": [
+        3.9934729322304747,
+        3.9935275616404624,
+        3.993500208613682
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_146",
+      "approx_axis_cross_section_widths_m": [
+        3.9935213878296167,
+        3.9935166649312066,
+        3.993640367572141
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_147",
+      "approx_axis_cross_section_widths_m": [
+        3.993495609346894,
+        3.9935002156955193,
+        3.993466109240501
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_148",
+      "approx_axis_cross_section_widths_m": [
+        3.993720124634592,
+        3.993744520925162,
+        3.9934537014930243
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_149",
+      "approx_axis_cross_section_widths_m": [
+        3.993565390083802,
+        3.9934844970703125,
+        3.9934844970703125
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_15",
+      "approx_axis_cross_section_widths_m": [
+        3.9934562975813037,
+        3.9932485476991246,
+        3.993263834774325
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_150",
+      "approx_axis_cross_section_widths_m": [
+        4.0096435546875,
+        4.0096435546875,
+        4.0096435546875
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_151",
+      "approx_axis_cross_section_widths_m": [
+        4.048057473977593,
+        4.047785918372512,
+        4.0481849785148825
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_152",
+      "approx_axis_cross_section_widths_m": [
+        4.010361369315206,
+        4.010360096760962,
+        4.167368932996595
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_153",
+      "approx_axis_cross_section_widths_m": [
+        4.009656601468691,
+        4.009685256835837,
+        4.009516032989836
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_154",
+      "approx_axis_cross_section_widths_m": [
+        4.053198846765369,
+        4.053067650078475,
+        4.053039767922527
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_155",
+      "approx_axis_cross_section_widths_m": [
+        3.9932857943777833,
+        3.9934259599066024,
+        3.993299194392222
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_156",
+      "approx_axis_cross_section_widths_m": [
+        4.039897764240607,
+        4.039864297867638,
+        4.039892912511675
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_157",
+      "approx_axis_cross_section_widths_m": [
+        3.9947967959155903,
+        3.9946711816554057,
+        4.278587935285657
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_158",
+      "approx_axis_cross_section_widths_m": [
+        4.021267779874499,
+        4.02136730639544,
+        4.021374266122036
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_159",
+      "approx_axis_cross_section_widths_m": [
+        4.010871313698544,
+        4.010941292222938,
+        4.010996456788078
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_16",
+      "approx_axis_cross_section_widths_m": [
+        4.01207914390227,
+        4.012121933479136,
+        4.01214893710511
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_160",
+      "approx_axis_cross_section_widths_m": [
+        4.00962859982269,
+        4.0096769611741365,
+        4.009701310754394
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_161",
+      "approx_axis_cross_section_widths_m": [
+        3.9937489954476746,
+        3.9937291133662143,
+        3.993731200881655
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_162",
+      "approx_axis_cross_section_widths_m": [
+        4.077784323583245,
+        4.077526643033536,
+        4.0773490953135365
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_163",
+      "approx_axis_cross_section_widths_m": [
+        3.5612194504314516,
+        3.993467725033497,
+        3.561265570432198
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_164",
+      "approx_axis_cross_section_widths_m": [
+        4.0099438068508135,
+        4.010164002802341,
+        4.010196220410904
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_165",
+      "approx_axis_cross_section_widths_m": [
+        4.065067773594933,
+        4.065119130867913,
+        4.065170488140836
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_166",
+      "approx_axis_cross_section_widths_m": [
+        4.009785962320805,
+        4.009956359863281,
+        4.009895690831556
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_167",
+      "approx_axis_cross_section_widths_m": [
+        4.0531508267528125,
+        4.053130318122584,
+        4.052892588305269
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_168",
+      "approx_axis_cross_section_widths_m": [
+        3.993418033467549,
+        3.9934461735842888,
+        3.993436951525041
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_169",
+      "approx_axis_cross_section_widths_m": [
+        4.048304960765321,
+        4.048488322347659,
+        4.048407585730054
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_17",
+      "approx_axis_cross_section_widths_m": [
+        4.078716832646933,
+        4.078541055138089,
+        4.078730263698958
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_170",
+      "approx_axis_cross_section_widths_m": [
+        4.0454284519580455,
+        4.045756183576913,
+        4.045518357217205
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_171",
+      "approx_axis_cross_section_widths_m": [
+        3.9935634816195034,
+        4.009833331323591,
+        4.009949903122333
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_172",
+      "approx_axis_cross_section_widths_m": [
+        3.9934149603611786,
+        3.9935302734375,
+        3.9935302734375
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_173",
+      "approx_axis_cross_section_widths_m": [
+        4.009727314744964,
+        4.009753008888083,
+        4.009818559208384
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_174",
+      "approx_axis_cross_section_widths_m": [
+        2.9358181116610638,
+        4.0096588134765625,
+        2.9355759980708456
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_175",
+      "approx_axis_cross_section_widths_m": [
+        3.993408203125,
+        3.9933182888592,
+        3.993408203125
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_176",
+      "approx_axis_cross_section_widths_m": [
+        3.9934810761626807,
+        4.004622486729829,
+        4.050893321015593
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_177",
+      "approx_axis_cross_section_widths_m": [
+        4.009710136039075,
+        4.009804091603428,
+        4.009682556639177
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_178",
+      "approx_axis_cross_section_widths_m": [
+        3.9934844970703125,
+        3.993511138607346,
+        4.2238954120169865
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_179",
+      "approx_axis_cross_section_widths_m": [
+        4.009856300720912,
+        4.009992730928161,
+        4.009915138482256
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_18",
+      "approx_axis_cross_section_widths_m": [
+        3.9935430153923903,
+        3.9935229596796944,
+        3.993315219379838
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_180",
+      "approx_axis_cross_section_widths_m": [
+        3.993485025963878,
+        3.9934780163563346,
+        3.993465508248846
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_181",
+      "approx_axis_cross_section_widths_m": [
+        4.012219708359922,
+        4.012325175604843,
+        4.012037204864001
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_182",
+      "approx_axis_cross_section_widths_m": [
+        4.009867212132008,
+        4.009834857153507,
+        4.009962983044872
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_183",
+      "approx_axis_cross_section_widths_m": [
+        3.9934562975813037,
+        3.9932485476991246,
+        3.993263834774325
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_184",
+      "approx_axis_cross_section_widths_m": [
+        4.0451165985847695,
+        4.044912921445615,
+        4.045058564395177
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_185",
+      "approx_axis_cross_section_widths_m": [
+        4.047575087790781,
+        4.047375694098156,
+        4.047496316557833
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_186",
+      "approx_axis_cross_section_widths_m": [
+        4.302112795231679,
+        4.255244083008542,
+        4.255163548891019
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_187",
+      "approx_axis_cross_section_widths_m": [
+        3.9935430153923903,
+        3.9935229596796944,
+        3.993315219379838
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_188",
+      "approx_axis_cross_section_widths_m": [
+        4.009833144387926,
+        4.009872393383489,
+        4.009692071772065
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_189",
+      "approx_axis_cross_section_widths_m": [
+        3.9934219999336165,
+        3.9933958984013316,
+        3.9935234190759274
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_19",
+      "approx_axis_cross_section_widths_m": [
+        4.067646571325611,
+        4.067600137829743,
+        4.067659883608712
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_190",
+      "approx_axis_cross_section_widths_m": [
+        4.105100693769799,
+        4.031535983691725,
+        4.031544880488937
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_191",
+      "approx_axis_cross_section_widths_m": [
+        3.9934312350243886,
+        3.993520247170153,
+        3.9934731965360584
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_192",
+      "approx_axis_cross_section_widths_m": [
+        3.993499755859375,
+        4.479258157290872,
+        5.089058511065502
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_193",
+      "approx_axis_cross_section_widths_m": [
+        4.009697609582531,
+        4.009727985394704,
+        4.009724111923106
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_194",
+      "approx_axis_cross_section_widths_m": [
+        18.541920535411464,
+        20.529337989429848,
+        15.83960228610988
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_195",
+      "approx_axis_cross_section_widths_m": [
+        4.072689912434441,
+        4.072689912434441,
+        4.072689912434441
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_196",
+      "approx_axis_cross_section_widths_m": [
+        3.993485102830846,
+        3.9934818727321613,
+        3.993521739803896
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_197",
+      "approx_axis_cross_section_widths_m": [
+        3.993538543419845,
+        3.9934713428320947,
+        3.9934308533024137
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_198",
+      "approx_axis_cross_section_widths_m": [
+        4.029058339915537,
+        4.21686940883103,
+        5.0118380561616505
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_199",
+      "approx_axis_cross_section_widths_m": [
+        3.9934627323205234,
+        3.9935966189710257,
+        3.9936878151316364
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_2",
+      "approx_axis_cross_section_widths_m": [
+        4.01026964647636,
+        4.010455258493181,
+        4.010424325326369
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_20",
+      "approx_axis_cross_section_widths_m": [
+        4.067986741310392,
+        4.068105658179718,
+        4.0680594681531375
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_200",
+      "approx_axis_cross_section_widths_m": [
+        4.058310813376991,
+        4.432936410432077,
+        4.43287141767653
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_201",
+      "approx_axis_cross_section_widths_m": [
+        4.010094946763729,
+        4.010028558497197,
+        4.009903356470659
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_202",
+      "approx_axis_cross_section_widths_m": [
+        4.046459056334129,
+        4.046428410387264,
+        4.04630519424596
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_203",
+      "approx_axis_cross_section_widths_m": [
+        4.015167650845186,
+        4.015009944937717,
+        4.033451399402793
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_204",
+      "approx_axis_cross_section_widths_m": [
+        4.055322950863172,
+        4.055360265601223,
+        4.407136959630122
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_205",
+      "approx_axis_cross_section_widths_m": [
+        4.009681181256553,
+        4.009796149079477,
+        4.009911116902387
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_206",
+      "approx_axis_cross_section_widths_m": [
+        3.9934844970703125,
+        3.9934844970703125,
+        3.9934844970703125
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_207",
+      "approx_axis_cross_section_widths_m": [
+        4.102964594688672,
+        4.102728079496202,
+        4.2393296775187395
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_208",
+      "approx_axis_cross_section_widths_m": [
+        4.2735243522627115,
+        4.090916687571621,
+        4.324835743291544
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_209",
+      "approx_axis_cross_section_widths_m": [
+        4.0982182776971,
+        4.098298560904027,
+        4.098563584509378
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_21",
+      "approx_axis_cross_section_widths_m": [
+        4.050431954974783,
+        4.050266869694269,
+        4.050225410506641
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_210",
+      "approx_axis_cross_section_widths_m": [
+        4.010614684522977,
+        4.01042860270266,
+        4.037598288857282
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_211",
+      "approx_axis_cross_section_widths_m": [
+        4.009793516465475,
+        4.00985279413554,
+        4.0099212657248735
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_212",
+      "approx_axis_cross_section_widths_m": [
+        3.9934844970703125,
+        3.9934844970703125,
+        3.9934844970703125
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_213",
+      "approx_axis_cross_section_widths_m": [
+        3.993435115110259,
+        3.993578371122055,
+        3.9934094415904156
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_214",
+      "approx_axis_cross_section_widths_m": [
+        4.009958067646721,
+        4.00987116742283,
+        4.009821654570516
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_215",
+      "approx_axis_cross_section_widths_m": [
+        3.9937241672419077,
+        3.993423515450104,
+        3.993805928009806
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_216",
+      "approx_axis_cross_section_widths_m": [
+        3.9934277212398968,
+        3.9935180322126484,
+        3.9934019239064185
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_217",
+      "approx_axis_cross_section_widths_m": [
+        4.0463236982440485,
+        4.046566390393526,
+        4.046438992380168
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_218",
+      "approx_axis_cross_section_widths_m": [
+        4.009719102668313,
+        4.009956359863281,
+        4.009666707184749
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_219",
+      "approx_axis_cross_section_widths_m": [
+        4.009751353805939,
+        4.009859426018181,
+        4.009715583943773
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_22",
+      "approx_axis_cross_section_widths_m": [
+        4.056878149181216,
+        4.056880100359194,
+        4.056882051537173
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_220",
+      "approx_axis_cross_section_widths_m": [
+        4.042249431162446,
+        4.042171170362536,
+        4.0425272460198585
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_221",
+      "approx_axis_cross_section_widths_m": [
+        4.044489664909207,
+        4.044814301083818,
+        4.0447791747987765
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_222",
+      "approx_axis_cross_section_widths_m": [
+        6.642859974340567,
+        4.256451629378802,
+        4.2564239735755365
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_223",
+      "approx_axis_cross_section_widths_m": [
+        2.935697506083656,
+        4.00994873046875,
+        2.9356566155523893
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_224",
+      "approx_axis_cross_section_widths_m": [
+        4.00970311201722,
+        4.009773461972117,
+        4.009999803943245
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_225",
+      "approx_axis_cross_section_widths_m": [
+        4.009683126831078,
+        4.009702388570929,
+        4.0097080659026005
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_226",
+      "approx_axis_cross_section_widths_m": [
+        4.015651871989689,
+        4.081836403506259,
+        4.081863289123021
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_227",
+      "approx_axis_cross_section_widths_m": [
+        4.056168360989432,
+        4.05619614969163,
+        4.056225881618985
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_228",
+      "approx_axis_cross_section_widths_m": [
+        3.993445955122411,
+        3.9935181594544247,
+        3.9936069493447235
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_229",
+      "approx_axis_cross_section_widths_m": [
+        4.079736513153307,
+        4.079726864711802,
+        4.079717216270296
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_23",
+      "approx_axis_cross_section_widths_m": [
+        4.012535964732933,
+        4.012439862703388,
+        4.012360122341079
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_230",
+      "approx_axis_cross_section_widths_m": [
+        3.9934112934976156,
+        3.9936961921410443,
+        3.993471543566045
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_231",
+      "approx_axis_cross_section_widths_m": [
+        4.009855237037868,
+        4.010059518253456,
+        4.009760857806896
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_232",
+      "approx_axis_cross_section_widths_m": [
+        3.993777647008187,
+        3.9937473972709086,
+        3.9935341300388245
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_233",
+      "approx_axis_cross_section_widths_m": [
+        4.0756541614919115,
+        4.075457632995352,
+        4.075476577008658
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_234",
+      "approx_axis_cross_section_widths_m": [
+        4.244860749780742,
+        4.244787175873171,
+        4.244863525289816
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_235",
+      "approx_axis_cross_section_widths_m": [
+        5.385715489171417,
+        4.340933641444138,
+        4.039699280421985
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_236",
+      "approx_axis_cross_section_widths_m": [
+        3.390209097419131,
+        4.089105910278818,
+        3.3901753097969163
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_237",
+      "approx_axis_cross_section_widths_m": [
+        4.009786282517666,
+        4.0097587744487555,
+        4.009962134485249
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_238",
+      "approx_axis_cross_section_widths_m": [
+        4.00974185953919,
+        4.009737649194051,
+        4.00974568917195
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_239",
+      "approx_axis_cross_section_widths_m": [
+        4.010174405708312,
+        4.010216324606404,
+        4.0102049447326635
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_24",
+      "approx_axis_cross_section_widths_m": [
+        6.161229047303891,
+        4.8300060218293766,
+        4.830270227009123
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_240",
+      "approx_axis_cross_section_widths_m": [
+        4.134511734001677,
+        4.134429510494769,
+        4.13469124158469
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_241",
+      "approx_axis_cross_section_widths_m": [
+        4.157938334703431,
+        4.157804776963985,
+        4.0600168365557465
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_242",
+      "approx_axis_cross_section_widths_m": [
+        3.9934639424700435,
+        3.9934840107547416,
+        3.993262872636194
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_243",
+      "approx_axis_cross_section_widths_m": [
+        4.121204100188436,
+        4.28842261576483,
+        4.488049066320627
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_244",
+      "approx_axis_cross_section_widths_m": [
+        3.99346923828125,
+        3.9935250719199757,
+        3.9934632032956188
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_245",
+      "approx_axis_cross_section_widths_m": [
+        4.049780789433129,
+        4.049692192122819,
+        4.049811680943108
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_246",
+      "approx_axis_cross_section_widths_m": [
+        3.9935302734375,
+        3.9934812173014507,
+        3.9934207276729694
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_247",
+      "approx_axis_cross_section_widths_m": [
+        4.04670861685581,
+        4.046772775800662,
+        4.046619500305205
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_248",
+      "approx_axis_cross_section_widths_m": [
+        2.703080033971929,
+        4.0096588134765625,
+        2.702914750531022
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_249",
+      "approx_axis_cross_section_widths_m": [
+        4.076781624056302,
+        4.076718361807664,
+        4.0763943507708404
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_25",
+      "approx_axis_cross_section_widths_m": [
+        4.009926691986493,
+        4.009916873679003,
+        4.009697020711769
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_250",
+      "approx_axis_cross_section_widths_m": [
+        3.9935575918956943,
+        3.99353345780807,
+        3.9936618560803083
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_251",
+      "approx_axis_cross_section_widths_m": [
+        3.5813420312997977,
+        4.048160838839706,
+        3.581323853710643
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_252",
+      "approx_axis_cross_section_widths_m": [
+        4.016384980948999,
+        3.9933199724904966,
+        3.9935103731386903
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_253",
+      "approx_axis_cross_section_widths_m": [
+        3.993350805846262,
+        3.9933405903757375,
+        3.993474450063104
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_254",
+      "approx_axis_cross_section_widths_m": [
+        4.04957492474054,
+        4.049296806720832,
+        4.049274892236582
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_255",
+      "approx_axis_cross_section_widths_m": [
+        4.009983711331358,
+        4.009870522104933,
+        4.009607197451487
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_256",
+      "approx_axis_cross_section_widths_m": [
+        4.009699596236715,
+        4.00971531001187,
+        4.009660641147434
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_257",
+      "approx_axis_cross_section_widths_m": [
+        4.027908962040726,
+        4.009855187680387,
+        4.009651003070246
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_258",
+      "approx_axis_cross_section_widths_m": [
+        4.075666841881514,
+        4.181069851298389,
+        4.894799111751013
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_259",
+      "approx_axis_cross_section_widths_m": [
+        4.088409509083604,
+        4.088659024718378,
+        4.07426495679055
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_26",
+      "approx_axis_cross_section_widths_m": [
+        4.053699907195096,
+        4.053750666158862,
+        4.053480492724702
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_260",
+      "approx_axis_cross_section_widths_m": [
+        3.9934976641012554,
+        3.9936117812459315,
+        3.9934992206901256
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_261",
+      "approx_axis_cross_section_widths_m": [
+        4.021292815930309,
+        4.01034493464627,
+        4.010270834317424
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_262",
+      "approx_axis_cross_section_widths_m": [
+        4.009830550959123,
+        4.009546423992674,
+        4.009776256946225
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_263",
+      "approx_axis_cross_section_widths_m": [
+        4.009966864573812,
+        4.009735685094256,
+        4.009785660775265
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_264",
+      "approx_axis_cross_section_widths_m": [
+        4.044346093006652,
+        4.0445182721088315,
+        4.044269807144801
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_265",
+      "approx_axis_cross_section_widths_m": [
+        4.048104495990685,
+        4.048065653110797,
+        4.048111405622379
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_266",
+      "approx_axis_cross_section_widths_m": [
+        4.0098960117518345,
+        4.009574357993301,
+        4.009630748337145
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_267",
+      "approx_axis_cross_section_widths_m": [
+        4.046584361734494,
+        4.046555803137618,
+        4.046473382389813
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_268",
+      "approx_axis_cross_section_widths_m": [
+        4.1264504947045,
+        4.05655249352526,
+        4.021515768925724
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_269",
+      "approx_axis_cross_section_widths_m": [
+        3.9935381338483467,
+        3.9935550199151066,
+        3.993489606418848
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_27",
+      "approx_axis_cross_section_widths_m": [
+        3.3891870955084755,
+        4.014348721481724,
+        3.389226138298966
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_270",
+      "approx_axis_cross_section_widths_m": [
+        3.99350349226836,
+        3.9936016484719516,
+        3.9935324123346163
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_271",
+      "approx_axis_cross_section_widths_m": [
+        3.993514685928176,
+        3.993772535245853,
+        3.9935595946633384
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_272",
+      "approx_axis_cross_section_widths_m": [
+        4.00972457269404,
+        4.009770037595274,
+        4.009762586522015
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_273",
+      "approx_axis_cross_section_widths_m": [
+        4.704558822797715,
+        4.175035919682053,
+        4.17484906981921
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_28",
+      "approx_axis_cross_section_widths_m": [
+        4.009733560845646,
+        4.009737723386976,
+        4.00994873046875
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_29",
+      "approx_axis_cross_section_widths_m": [
+        4.009804886394932,
+        4.009815186490584,
+        4.00995764249808
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_3",
+      "approx_axis_cross_section_widths_m": [
+        4.065267943028374,
+        4.065101422968752,
+        4.064969093155298
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_30",
+      "approx_axis_cross_section_widths_m": [
+        4.0836907556885365,
+        4.083717957246364,
+        4.083724596169759
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_31",
+      "approx_axis_cross_section_widths_m": [
+        4.009719609699928,
+        4.009812035417667,
+        4.009752992206188
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_32",
+      "approx_axis_cross_section_widths_m": [
+        4.194097300218573,
+        4.441071534637217,
+        4.643843957158197
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_33",
+      "approx_axis_cross_section_widths_m": [
+        3.993445955122411,
+        3.9935181594544247,
+        3.9936069493447235
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_34",
+      "approx_axis_cross_section_widths_m": [
+        4.0525361170888345,
+        4.0525854481218175,
+        3.99346923828125
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_35",
+      "approx_axis_cross_section_widths_m": [
+        4.011195206859554,
+        4.011080207644227,
+        4.011214473748623
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_36",
+      "approx_axis_cross_section_widths_m": [
+        3.993300964352329,
+        3.9934160006132515,
+        3.9935023604743947
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_37",
+      "approx_axis_cross_section_widths_m": [
+        4.051517966517167,
+        4.051790544568803,
+        4.051631727436643
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_38",
+      "approx_axis_cross_section_widths_m": [
+        4.073368954432908,
+        4.073362545971861,
+        4.07351871020856
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_39",
+      "approx_axis_cross_section_widths_m": [
+        4.057157054577829,
+        4.056960939938278,
+        4.057076750943111
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_4",
+      "approx_axis_cross_section_widths_m": [
+        4.009805400407799,
+        4.0096341526959804,
+        4.0098438809318395
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_40",
+      "approx_axis_cross_section_widths_m": [
+        4.070725390891454,
+        4.070730276947074,
+        4.0706786661076535
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_41",
+      "approx_axis_cross_section_widths_m": [
+        4.244328546339261,
+        4.332309460611327,
+        4.532819979267856
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_42",
+      "approx_axis_cross_section_widths_m": [
+        4.069412338727872,
+        4.226798011384503,
+        4.0697013668659
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_43",
+      "approx_axis_cross_section_widths_m": [
+        3.9934639424700435,
+        3.9934840107547416,
+        3.993262872636194
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_44",
+      "approx_axis_cross_section_widths_m": [
+        4.6486404141722915,
+        4.648768875732685,
+        4.648398273587361
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_45",
+      "approx_axis_cross_section_widths_m": [
+        4.066292700802251,
+        4.066262057626318,
+        4.066208192905947
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_46",
+      "approx_axis_cross_section_widths_m": [
+        4.462129763123357,
+        4.199156717221058,
+        4.069174927827817
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_47",
+      "approx_axis_cross_section_widths_m": [
+        4.0502411005224985,
+        4.05027198387279,
+        4.0501944208447185
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_48",
+      "approx_axis_cross_section_widths_m": [
+        4.009794311136972,
+        4.009858446875171,
+        4.009739815565922
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_49",
+      "approx_axis_cross_section_widths_m": [
+        4.06992383309435,
+        4.069846999803801,
+        4.0698609752511885
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_5",
+      "approx_axis_cross_section_widths_m": [
+        3.9937489954476746,
+        3.9937291133662143,
+        3.993731200881655
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_50",
+      "approx_axis_cross_section_widths_m": [
+        4.009722031602422,
+        4.009613979692148,
+        4.009813581856463
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_51",
+      "approx_axis_cross_section_widths_m": [
+        4.018423852281387,
+        4.0185904288942425,
+        4.194899468106712
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_52",
+      "approx_axis_cross_section_widths_m": [
+        4.009623037711918,
+        4.009896591301612,
+        4.009941278384048
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_53",
+      "approx_axis_cross_section_widths_m": [
+        4.048248508334154,
+        4.048350271273648,
+        4.0483345731900044
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_54",
+      "approx_axis_cross_section_widths_m": [
+        4.041109290648876,
+        4.047122811898248,
+        5.07091881563241
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_55",
+      "approx_axis_cross_section_widths_m": [
+        4.009821315492104,
+        4.009897070574084,
+        4.009652664631858
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_56",
+      "approx_axis_cross_section_widths_m": [
+        5.737803607688647,
+        5.028274244844681,
+        5.02806838454967
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_57",
+      "approx_axis_cross_section_widths_m": [
+        4.084286727250799,
+        4.0843716683158675,
+        4.048150002127215
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_58",
+      "approx_axis_cross_section_widths_m": [
+        4.008619895659649,
+        4.008437013141247,
+        4.0083827417826114
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_59",
+      "approx_axis_cross_section_widths_m": [
+        4.01059194014158,
+        4.010484069190738,
+        4.010524283277391
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_6",
+      "approx_axis_cross_section_widths_m": [
+        4.064335835542892,
+        4.064278753413163,
+        4.064103399730541
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_60",
+      "approx_axis_cross_section_widths_m": [
+        3.99350349226836,
+        3.9936016484719516,
+        3.9935324123346163
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_61",
+      "approx_axis_cross_section_widths_m": [
+        4.060048339973264,
+        4.060041620682995,
+        4.060034901392726
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_62",
+      "approx_axis_cross_section_widths_m": [
+        4.011947388751224,
+        4.011911158973106,
+        4.011924277538554
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_63",
+      "approx_axis_cross_section_widths_m": [
+        4.0691619219155655,
+        4.069332489778446,
+        4.069251594379864
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_64",
+      "approx_axis_cross_section_widths_m": [
+        4.01026964647636,
+        4.010455258493181,
+        4.010424325326369
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_65",
+      "approx_axis_cross_section_widths_m": [
+        4.011440237664601,
+        4.011473013772331,
+        4.009960594291897
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_66",
+      "approx_axis_cross_section_widths_m": [
+        4.109658719983713,
+        4.109690619195362,
+        4.109833580857298
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_67",
+      "approx_axis_cross_section_widths_m": [
+        4.089357813025742,
+        4.089353300173968,
+        4.089285371726476
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_68",
+      "approx_axis_cross_section_widths_m": [
+        4.074627204145941,
+        4.074915351621485,
+        4.074628381737398
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_69",
+      "approx_axis_cross_section_widths_m": [
+        3.99346923828125,
+        3.993333504914972,
+        3.9933942562211655
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_7",
+      "approx_axis_cross_section_widths_m": [
+        4.064410021917183,
+        4.064585192743223,
+        4.064234856392105
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_70",
+      "approx_axis_cross_section_widths_m": [
+        4.086148186380115,
+        4.0860335532034355,
+        4.085986504871471
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_71",
+      "approx_axis_cross_section_widths_m": [
+        4.012535964732933,
+        4.012439862703388,
+        4.012360122341079
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_72",
+      "approx_axis_cross_section_widths_m": [
+        4.052202309047743,
+        4.052370044330019,
+        4.05241628769204
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_73",
+      "approx_axis_cross_section_widths_m": [
+        4.011830584572635,
+        4.090759590499033,
+        4.011883297709687
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_74",
+      "approx_axis_cross_section_widths_m": [
+        4.043835293041695,
+        4.043946862909422,
+        4.0439695860484335
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_75",
+      "approx_axis_cross_section_widths_m": [
+        4.100833978740752,
+        4.100883755944096,
+        4.100816025473932
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_76",
+      "approx_axis_cross_section_widths_m": [
+        4.009722031602422,
+        4.009613979692148,
+        4.009813581856463
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_77",
+      "approx_axis_cross_section_widths_m": [
+        4.089220572337581,
+        4.089335176647296,
+        4.08914865681038
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_78",
+      "approx_axis_cross_section_widths_m": [
+        4.042492499738728,
+        4.042458660665659,
+        4.042721280699709
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_79",
+      "approx_axis_cross_section_widths_m": [
+        4.0115014938680815,
+        4.195227501258614,
+        4.195281057198201
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_8",
+      "approx_axis_cross_section_widths_m": [
+        4.071725912970464,
+        4.071788703645268,
+        4.071749363498213
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_80",
+      "approx_axis_cross_section_widths_m": [
+        4.083431157200664,
+        4.083606181048538,
+        4.083493930541977
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_81",
+      "approx_axis_cross_section_widths_m": [
+        4.179417597410406,
+        4.179357397437457,
+        4.1794692766225126
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_82",
+      "approx_axis_cross_section_widths_m": [
+        4.045044579681701,
+        4.045286377048512,
+        4.045089632873442
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_83",
+      "approx_axis_cross_section_widths_m": [
+        4.0871811395965665,
+        4.087098256982699,
+        4.087164824592577
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_84",
+      "approx_axis_cross_section_widths_m": [
+        4.1626749403448,
+        4.162637532837039,
+        4.1628842129111945
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_85",
+      "approx_axis_cross_section_widths_m": [
+        3.9935195259816965,
+        3.9936213681942263,
+        3.9934630434164546
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_86",
+      "approx_axis_cross_section_widths_m": [
+        4.092043852502911,
+        4.091888442197046,
+        4.091934969504564
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_87",
+      "approx_axis_cross_section_widths_m": [
+        3.993563782852391,
+        3.9937653040225314,
+        3.9961376374484416
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_88",
+      "approx_axis_cross_section_widths_m": [
+        3.993323022854554,
+        3.9933591186389776,
+        3.993416628350417
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_89",
+      "approx_axis_cross_section_widths_m": [
+        4.168045463717192,
+        4.16816484649172,
+        4.168092295521376
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_9",
+      "approx_axis_cross_section_widths_m": [
+        4.073299503691942,
+        4.073341013913364,
+        4.073187206981402
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_90",
+      "approx_axis_cross_section_widths_m": [
+        4.01032563945617,
+        4.010158919384054,
+        4.163330905800393
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_91",
+      "approx_axis_cross_section_widths_m": [
+        4.056074865321591,
+        4.056224025980256,
+        4.056226954947988
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_92",
+      "approx_axis_cross_section_widths_m": [
+        4.166971581922212,
+        4.167172423274792,
+        4.010554152458212
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_93",
+      "approx_axis_cross_section_widths_m": [
+        2.4700997326601737,
+        4.009613037109375,
+        2.470058138803381
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_94",
+      "approx_axis_cross_section_widths_m": [
+        4.009958936837847,
+        4.01006534558951,
+        4.010275641052317
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_95",
+      "approx_axis_cross_section_widths_m": [
+        3.9940452914370326,
+        3.994046314051559,
+        3.993977290209898
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_96",
+      "approx_axis_cross_section_widths_m": [
+        7.8201435871400236,
+        4.368574047024367,
+        4.008520986323674
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_97",
+      "approx_axis_cross_section_widths_m": [
+        4.1580665835316495,
+        4.158033287467106,
+        4.15797443865813
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_98",
+      "approx_axis_cross_section_widths_m": [
+        4.160743708235373,
+        4.144909021429726,
+        4.144727884595113
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_local_99",
+      "approx_axis_cross_section_widths_m": [
+        4.048626351193661,
+        4.048332525876447,
+        4.048391530009326
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_0",
+      "approx_axis_cross_section_widths_m": [
+        2.07313953962462,
+        2.0731330374975414,
+        5.199528017977215
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_1",
+      "approx_axis_cross_section_widths_m": [
+        2.0065414258278906,
+        2.0063878829591317,
+        2.0063259945606546
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_10",
+      "approx_axis_cross_section_widths_m": [
+        2.005020544291426,
+        2.004997359430547,
+        2.0049475776535246
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_100",
+      "approx_axis_cross_section_widths_m": [
+        2.166859497072892,
+        2.1669148055160576,
+        2.167009448374131
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_101",
+      "approx_axis_cross_section_widths_m": [
+        2.171887535514429,
+        2.1718511277280186,
+        2.171864574584106
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_102",
+      "approx_axis_cross_section_widths_m": [
+        2.092337728486143,
+        2.0836824475520643,
+        2.083814292179113
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_103",
+      "approx_axis_cross_section_widths_m": [
+        2.0977808146003625,
+        2.097763871134539,
+        2.0978234214053018
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_104",
+      "approx_axis_cross_section_widths_m": [
+        23.028487367719947,
+        23.337884264420325,
+        16.17372297948134
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_105",
+      "approx_axis_cross_section_widths_m": [
+        2.0076115070694414,
+        2.0075261450272137,
+        2.0076740812813796
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_106",
+      "approx_axis_cross_section_widths_m": [
+        2.0076421857964135,
+        2.2837242627405487,
+        4.128541159790643
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_107",
+      "approx_axis_cross_section_widths_m": [
+        2.026207455573399,
+        2.0262730168267353,
+        2.0264430443942274
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_108",
+      "approx_axis_cross_section_widths_m": [
+        2.0049632184405937,
+        2.005079455545001,
+        2.0049805617327365
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_109",
+      "approx_axis_cross_section_widths_m": [
+        2.023710380115091,
+        2.0235432715407597,
+        2.0237656945311215
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_11",
+      "approx_axis_cross_section_widths_m": [
+        2.0352684693871197,
+        2.0351868191734184,
+        11.708317705537866
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_110",
+      "approx_axis_cross_section_widths_m": [
+        2.104798058403162,
+        2.104795180810356,
+        2.1047923032175504
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_111",
+      "approx_axis_cross_section_widths_m": [
+        1.9966998491257755,
+        1.9967776491587301,
+        1.9967739804326357
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_112",
+      "approx_axis_cross_section_widths_m": [
+        2.2637981199682145,
+        2.26402779602779,
+        2.2641221376142084
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_113",
+      "approx_axis_cross_section_widths_m": [
+        2.0009671267271756,
+        2.0010140493985205,
+        2.001027462004515
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_114",
+      "approx_axis_cross_section_widths_m": [
+        1.99676513671875,
+        1.99676513671875,
+        1.99676513671875
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_115",
+      "approx_axis_cross_section_widths_m": [
+        2.0257227493401047,
+        2.0256977869107686,
+        2.025629972896297
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_116",
+      "approx_axis_cross_section_widths_m": [
+        2.7932660943865812,
+        2.793099088059421,
+        2.7929461495505166
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_117",
+      "approx_axis_cross_section_widths_m": [
+        2.066519133912152,
+        2.0664561479148915,
+        2.0663931619175173
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_118",
+      "approx_axis_cross_section_widths_m": [
+        2.0018463822864874,
+        1.9984361672052842,
+        2.021456963791479
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_119",
+      "approx_axis_cross_section_widths_m": [
+        2.0917001438310763,
+        2.0917115751819892,
+        2.091955093200113
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_12",
+      "approx_axis_cross_section_widths_m": [
+        2.00494255951196,
+        2.0050155688867335,
+        2.0049995653009205
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_120",
+      "approx_axis_cross_section_widths_m": [
+        2.0049462346496796,
+        2.0048536054302986,
+        2.0049692961611925
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_121",
+      "approx_axis_cross_section_widths_m": [
+        2.0561586372990632,
+        2.0883646640639597,
+        2.06863476411192
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_122",
+      "approx_axis_cross_section_widths_m": [
+        1.9967704182485022,
+        1.9968175261425358,
+        1.9967837489667772
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_123",
+      "approx_axis_cross_section_widths_m": [
+        1.9967453059150557,
+        1.9967974034531153,
+        1.9967140680569173
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_124",
+      "approx_axis_cross_section_widths_m": [
+        2.0620860355911006,
+        2.06202670386363,
+        2.062067286722325
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_125",
+      "approx_axis_cross_section_widths_m": [
+        2.0832358300303326,
+        2.0831399407445588,
+        2.0833848210144197
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_126",
+      "approx_axis_cross_section_widths_m": [
+        2.084842583945715,
+        2.084848532794581,
+        2.0049073144924705
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_127",
+      "approx_axis_cross_section_widths_m": [
+        2.0811982496773,
+        2.0813083985763114,
+        2.0812383555179395
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_128",
+      "approx_axis_cross_section_widths_m": [
+        2.005034908938825,
+        2.0050418504403638,
+        2.004809536823416
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_129",
+      "approx_axis_cross_section_widths_m": [
+        2.055725479626517,
+        2.0558631568414967,
+        2.0557891552284673
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_13",
+      "approx_axis_cross_section_widths_m": [
+        2.0439770649280717,
+        2.04407209322585,
+        2.0440196829543993
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_130",
+      "approx_axis_cross_section_widths_m": [
+        1.9984792940972511,
+        1.9967041015625,
+        1.9967572758293386
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_131",
+      "approx_axis_cross_section_widths_m": [
+        2.1210156142303447,
+        2.121027447220456,
+        2.1213086557048086
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_132",
+      "approx_axis_cross_section_widths_m": [
+        2.0203011523651355,
+        2.0206141957925325,
+        2.020721301139872
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_133",
+      "approx_axis_cross_section_widths_m": [
+        2.0635764803789947,
+        2.0636054052266033,
+        2.0636117804543233
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_134",
+      "approx_axis_cross_section_widths_m": [
+        2.2348770333650236,
+        2.234806493238125,
+        2.0100288831960142
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_135",
+      "approx_axis_cross_section_widths_m": [
+        2.0222902758151236,
+        2.0224224766310783,
+        2.0222124113063273
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_136",
+      "approx_axis_cross_section_widths_m": [
+        2.0713643890952653,
+        2.071619456102951,
+        2.071536858365562
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_137",
+      "approx_axis_cross_section_widths_m": [
+        2.0488342033102924,
+        2.049132206645936,
+        2.0489525364586427
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_138",
+      "approx_axis_cross_section_widths_m": [
+        2.0264621710849724,
+        2.0264872125495685,
+        2.026370132763873
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_139",
+      "approx_axis_cross_section_widths_m": [
+        2.0302637386697597,
+        2.0302083322516182,
+        2.0304267265291287
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_14",
+      "approx_axis_cross_section_widths_m": [
+        1.997370828268913,
+        1.9972573945876206,
+        1.997390459584551
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_140",
+      "approx_axis_cross_section_widths_m": [
+        2.1108205832895166,
+        2.1107474969102995,
+        2.11089529334496
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_141",
+      "approx_axis_cross_section_widths_m": [
+        2.031828825232367,
+        2.031819047334352,
+        2.031756636225623
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_142",
+      "approx_axis_cross_section_widths_m": [
+        2.000946613655401,
+        2.001012280653981,
+        2.08241495114828
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_143",
+      "approx_axis_cross_section_widths_m": [
+        2.0049608626448787,
+        2.004974365234375,
+        2.005041311107334
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_144",
+      "approx_axis_cross_section_widths_m": [
+        3.4802483097654715,
+        2.044734114495128,
+        4.144944302613979
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_145",
+      "approx_axis_cross_section_widths_m": [
+        1.9971303991646892,
+        1.9969788338980266,
+        1.9969854738471327
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_146",
+      "approx_axis_cross_section_widths_m": [
+        2.174081174923799,
+        2.1107968196973843,
+        2.100473219835635
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_147",
+      "approx_axis_cross_section_widths_m": [
+        2.0048433598085467,
+        2.0048614085254712,
+        2.0051663043946064
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_148",
+      "approx_axis_cross_section_widths_m": [
+        2.3165223380374655,
+        2.01089383728835,
+        2.0106710515812694
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_149",
+      "approx_axis_cross_section_widths_m": [
+        2.026286512896206,
+        2.0262677171290875,
+        2.026219116216623
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_15",
+      "approx_axis_cross_section_widths_m": [
+        2.0495989114257327,
+        2.049649630194949,
+        2.049541027180794
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_150",
+      "approx_axis_cross_section_widths_m": [
+        2.0048542489862626,
+        2.004780016263794,
+        2.004667905258401
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_151",
+      "approx_axis_cross_section_widths_m": [
+        2.081410673202157,
+        2.081229552613422,
+        2.11347896158901
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_152",
+      "approx_axis_cross_section_widths_m": [
+        2.0049655120275247,
+        2.0048229200241394,
+        2.0048914238658426
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_153",
+      "approx_axis_cross_section_widths_m": [
+        2.4774424144279124,
+        2.4776036106389654,
+        2.4777104846382088
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_154",
+      "approx_axis_cross_section_widths_m": [
+        1.999057702596815,
+        1.9991837671953476,
+        1.9992486239531218
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_155",
+      "approx_axis_cross_section_widths_m": [
+        2.0049101528705933,
+        2.0048196910041156,
+        2.0047701313078505
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_156",
+      "approx_axis_cross_section_widths_m": [
+        2.0223005260205156,
+        2.0223152177255486,
+        2.0222744311653997
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_157",
+      "approx_axis_cross_section_widths_m": [
+        2.030338428454087,
+        2.0304144597070035,
+        2.0304745887455056
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_158",
+      "approx_axis_cross_section_widths_m": [
+        2.018733347958886,
+        2.0081943650806693,
+        2.0085831389065163
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_159",
+      "approx_axis_cross_section_widths_m": [
+        2.0321854150948866,
+        2.0320518149679856,
+        2.000493536186127
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_16",
+      "approx_axis_cross_section_widths_m": [
+        2.0392846573339796,
+        2.0390551350054977,
+        2.039355998556516
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_160",
+      "approx_axis_cross_section_widths_m": [
+        2.005027460930137,
+        2.004802379130126,
+        2.00499341795404
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_161",
+      "approx_axis_cross_section_widths_m": [
+        2.0010116015582753,
+        2.00101067560297,
+        2.001279664908793
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_162",
+      "approx_axis_cross_section_widths_m": [
+        2.004995292267111,
+        2.0050115115543434,
+        2.004735600555165
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_163",
+      "approx_axis_cross_section_widths_m": [
+        2.0022914624541954,
+        2.002210104613937,
+        2.01705309750821
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_164",
+      "approx_axis_cross_section_widths_m": [
+        2.005524996561803,
+        2.0051496865180525,
+        2.005452173835579
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_165",
+      "approx_axis_cross_section_widths_m": [
+        2.004896771089591,
+        2.0050140939400194,
+        2.0049459081045597
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_166",
+      "approx_axis_cross_section_widths_m": [
+        17.013582775027007,
+        17.13865052511111,
+        17.26370876917109
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_167",
+      "approx_axis_cross_section_widths_m": [
+        2.004950146285182,
+        2.0049242013509456,
+        2.004842942393452
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_168",
+      "approx_axis_cross_section_widths_m": [
+        2.0871615591467503,
+        2.0872515221008996,
+        2.087341485055042
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_169",
+      "approx_axis_cross_section_widths_m": [
+        2.099409441652668,
+        2.099444428766091,
+        2.0995695843213724
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_17",
+      "approx_axis_cross_section_widths_m": [
+        1.9973091932609464,
+        1.9974397909432469,
+        1.9972646415273516
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_170",
+      "approx_axis_cross_section_widths_m": [
+        2.285572823378857,
+        2.156985667674121,
+        2.1571009486057164
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_171",
+      "approx_axis_cross_section_widths_m": [
+        1.9967312047033374,
+        1.996734619140625,
+        1.996708206704227
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_172",
+      "approx_axis_cross_section_widths_m": [
+        1.9967647099161923,
+        1.9967264538771587,
+        1.9969728260538204
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_173",
+      "approx_axis_cross_section_widths_m": [
+        2.3028993145958907,
+        2.227901394660705,
+        2.004935357896642
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_174",
+      "approx_axis_cross_section_widths_m": [
+        2.024231378403602,
+        2.024361082949162,
+        2.0242689270597616
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_175",
+      "approx_axis_cross_section_widths_m": [
+        2.0235201401621907,
+        2.0232066434039098,
+        2.0234169903497445
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_176",
+      "approx_axis_cross_section_widths_m": [
+        2.0046721629196327,
+        2.004766698917024,
+        2.004861234914415
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_177",
+      "approx_axis_cross_section_widths_m": [
+        3.7625397520487667,
+        2.0097063494538787,
+        2.009822214303071
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_178",
+      "approx_axis_cross_section_widths_m": [
+        2.260550531229242,
+        37.572872572458174,
+        31.809233569006395
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_179",
+      "approx_axis_cross_section_widths_m": [
+        1.9964967351056941,
+        1.9967828311384608,
+        1.996728324932036
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_18",
+      "approx_axis_cross_section_widths_m": [
+        1.9970875299797513,
+        1.997249323102551,
+        1.9971315772208413
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_180",
+      "approx_axis_cross_section_widths_m": [
+        2.0796499343643973,
+        2.079510213229213,
+        2.0796118711264455
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_181",
+      "approx_axis_cross_section_widths_m": [
+        1.996704560770695,
+        1.9967312690963581,
+        1.996757977422135
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_182",
+      "approx_axis_cross_section_widths_m": [
+        2.0048378204317316,
+        2.004947787479125,
+        2.005084449901375
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_183",
+      "approx_axis_cross_section_widths_m": [
+        2.005066229425836,
+        2.005021483701114,
+        2.0051233821317282
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_184",
+      "approx_axis_cross_section_widths_m": [
+        2.13468871287526,
+        2.1348935979878263,
+        2.1348158731118474
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_185",
+      "approx_axis_cross_section_widths_m": [
+        1.9521887547056167,
+        2.0446248371903266,
+        1.952507518125799
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_186",
+      "approx_axis_cross_section_widths_m": [
+        2.0264125431437776,
+        2.0263753911478943,
+        2.026382121055434
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_187",
+      "approx_axis_cross_section_widths_m": [
+        2.0056997157310548,
+        2.0058315728455796,
+        2.0058110395362405
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_188",
+      "approx_axis_cross_section_widths_m": [
+        2.005381433524917,
+        2.0051514065809215,
+        2.005375872325544
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_189",
+      "approx_axis_cross_section_widths_m": [
+        1.9965566697908343,
+        1.997931028579444,
+        1.9966577991416443
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_19",
+      "approx_axis_cross_section_widths_m": [
+        2.04041946266139,
+        2.0403759022793793,
+        2.040354045781015
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_190",
+      "approx_axis_cross_section_widths_m": [
+        2.0988488207691915,
+        2.098946162634178,
+        2.098983030405705
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_191",
+      "approx_axis_cross_section_widths_m": [
+        1.9970459228339337,
+        1.997154416855551,
+        1.996962322993511
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_192",
+      "approx_axis_cross_section_widths_m": [
+        2.000948789890799,
+        2.0009906446217656,
+        2.000923716194876
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_193",
+      "approx_axis_cross_section_widths_m": [
+        2.004717861707263,
+        2.007774434436783,
+        2.007726492601705
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_194",
+      "approx_axis_cross_section_widths_m": [
+        2.051769792593518,
+        2.7200926664087604,
+        2.0052457689992025
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_195",
+      "approx_axis_cross_section_widths_m": [
+        2.0048784125490933,
+        2.0048099306784906,
+        2.00493648745163
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_196",
+      "approx_axis_cross_section_widths_m": [
+        2.003777499925036,
+        2.003882028918383,
+        2.051310705881747
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_197",
+      "approx_axis_cross_section_widths_m": [
+        2.0230898168575067,
+        2.023079352021938,
+        2.023218029863372
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_198",
+      "approx_axis_cross_section_widths_m": [
+        2.020162365908689,
+        2.0203802152949066,
+        2.02027387136971
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_199",
+      "approx_axis_cross_section_widths_m": [
+        1.9967903415657133,
+        1.9967026570926123,
+        1.9967883577195096
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_2",
+      "approx_axis_cross_section_widths_m": [
+        1.9973865376664435,
+        1.9973179170582966,
+        1.9972492964501498
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_20",
+      "approx_axis_cross_section_widths_m": [
+        1.9972852782075847,
+        1.997197873998573,
+        1.9972368709152306
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_200",
+      "approx_axis_cross_section_widths_m": [
+        2.0341039831416765,
+        2.033949334316148,
+        2.0338664764619807
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_201",
+      "approx_axis_cross_section_widths_m": [
+        1.9968860404889597,
+        1.9967131655834578,
+        1.9969386486230576
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_202",
+      "approx_axis_cross_section_widths_m": [
+        1.99700771318345,
+        1.996831253880714,
+        1.9970027470521927
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_203",
+      "approx_axis_cross_section_widths_m": [
+        2.145776652883683,
+        2.145536019584142,
+        2.2841840297085128
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_204",
+      "approx_axis_cross_section_widths_m": [
+        2.007192500231014,
+        2.0072020273971702,
+        2.0072548506005887
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_205",
+      "approx_axis_cross_section_widths_m": [
+        2.006583432665934,
+        2.0153027640338905,
+        3.599166154104296
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_206",
+      "approx_axis_cross_section_widths_m": [
+        2.021454741942023,
+        2.0215988733633026,
+        2.0215579098779983
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_207",
+      "approx_axis_cross_section_widths_m": [
+        2.025120112489873,
+        2.025098554532434,
+        2.0249693896237773
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_208",
+      "approx_axis_cross_section_widths_m": [
+        2.004974365234375,
+        2.0047404585003505,
+        2.004974365234375
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_209",
+      "approx_axis_cross_section_widths_m": [
+        16.154804067979626,
+        24.344265791200428,
+        1.996732115954046
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_21",
+      "approx_axis_cross_section_widths_m": [
+        3.0809545660283106,
+        2.051671291386441,
+        2.0515905193893786
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_210",
+      "approx_axis_cross_section_widths_m": [
+        2.00483976113253,
+        2.0050492346634883,
+        2.004730910699891
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_211",
+      "approx_axis_cross_section_widths_m": [
+        1.9966465533207156,
+        1.9968137392459653,
+        1.996777685714619
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_212",
+      "approx_axis_cross_section_widths_m": [
+        1.996889720047875,
+        4.2512092683723495,
+        1.99676513671875
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_213",
+      "approx_axis_cross_section_widths_m": [
+        2.004845294714414,
+        2.0048797454149963,
+        2.0049364385633908
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_214",
+      "approx_axis_cross_section_widths_m": [
+        2.006888129817611,
+        2.0069619475829086,
+        2.006945740486742
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_215",
+      "approx_axis_cross_section_widths_m": [
+        2.0400002510974673,
+        2.0397591345910087,
+        2.0400619349475164
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_216",
+      "approx_axis_cross_section_widths_m": [
+        2.057815004723352,
+        2.0054088685445777,
+        2.0053857243007087
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_217",
+      "approx_axis_cross_section_widths_m": [
+        2.006028289438092,
+        2.0061762993526386,
+        2.0062131043489373
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_218",
+      "approx_axis_cross_section_widths_m": [
+        2.033093567139886,
+        2.033046691148826,
+        2.1702715043706178
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_219",
+      "approx_axis_cross_section_widths_m": [
+        2.060950114317471,
+        2.079552413974085,
+        2.1041445696841095
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_22",
+      "approx_axis_cross_section_widths_m": [
+        2.092125900190922,
+        2.09190949920162,
+        2.091838971085167
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_220",
+      "approx_axis_cross_section_widths_m": [
+        2.0048741293622925,
+        2.0050962329197546,
+        2.004919978205976
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_221",
+      "approx_axis_cross_section_widths_m": [
+        2.028696194502686,
+        2.0286915562972467,
+        2.022886987488505
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_222",
+      "approx_axis_cross_section_widths_m": [
+        2.0063304750129873,
+        2.0664129732038923,
+        3.209677552640123
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_223",
+      "approx_axis_cross_section_widths_m": [
+        1.9968537483167097,
+        1.9968979029141565,
+        1.996767945661361
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_224",
+      "approx_axis_cross_section_widths_m": [
+        2.0581116401838813,
+        1.9967634816700297,
+        1.9966295147517599
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_225",
+      "approx_axis_cross_section_widths_m": [
+        2.026681814994504,
+        2.0266871220414657,
+        2.0269260197399888
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_226",
+      "approx_axis_cross_section_widths_m": [
+        2.0275546699457934,
+        2.027677249299625,
+        2.0276692839374704
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_227",
+      "approx_axis_cross_section_widths_m": [
+        2.01222995473816,
+        2.0120011718310025,
+        2.0119840551710695
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_228",
+      "approx_axis_cross_section_widths_m": [
+        2.0048798074047625,
+        2.0049142053183857,
+        2.0049393453232085
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_229",
+      "approx_axis_cross_section_widths_m": [
+        2.0018780208291105,
+        2.001683887870456,
+        1.9986730624819415
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_23",
+      "approx_axis_cross_section_widths_m": [
+        2.0050535606245603,
+        2.0049307131346836,
+        2.00517088678896
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_230",
+      "approx_axis_cross_section_widths_m": [
+        2.0352517041654323,
+        2.012668616786698,
+        2.007347829640622
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_231",
+      "approx_axis_cross_section_widths_m": [
+        2.0273407124923324,
+        2.0274013634453922,
+        2.0271576700841933
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_232",
+      "approx_axis_cross_section_widths_m": [
+        2.0049462346496796,
+        2.0048536054302986,
+        2.0049692961611925
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_233",
+      "approx_axis_cross_section_widths_m": [
+        2.0397610776648776,
+        2.0123370520788626,
+        2.0050838355118117
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_234",
+      "approx_axis_cross_section_widths_m": [
+        2.009753741799493,
+        2.009820110736129,
+        2.0096758018025795
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_235",
+      "approx_axis_cross_section_widths_m": [
+        2.005342701003258,
+        2.005389863802691,
+        2.0052153144799263
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_236",
+      "approx_axis_cross_section_widths_m": [
+        2.035718975695737,
+        64.48677841224915,
+        68.5787739249463
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_237",
+      "approx_axis_cross_section_widths_m": [
+        2.0371247634643055,
+        2.037092278083719,
+        2.037007719720066
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_238",
+      "approx_axis_cross_section_widths_m": [
+        2.033242510104458,
+        2.033222609340328,
+        2.033184500605671
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_239",
+      "approx_axis_cross_section_widths_m": [
+        2.0336965922382433,
+        2.0337209801081144,
+        2.0336331882696186
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_24",
+      "approx_axis_cross_section_widths_m": [
+        2.0049875654815423,
+        2.0047111791152474,
+        2.004961441095361
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_240",
+      "approx_axis_cross_section_widths_m": [
+        2.005034908938825,
+        2.0050418504403638,
+        2.004809536823416
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_241",
+      "approx_axis_cross_section_widths_m": [
+        2.004929623176622,
+        2.0047153824869497,
+        2.00498963964759
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_242",
+      "approx_axis_cross_section_widths_m": [
+        2.025220115002753,
+        2.0253865924398866,
+        2.025061867906249
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_243",
+      "approx_axis_cross_section_widths_m": [
+        2.053824906051096,
+        2.004891042752167,
+        2.0048100582197073
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_244",
+      "approx_axis_cross_section_widths_m": [
+        1.9969481437299237,
+        2.0169335390713172,
+        2.049718247893054
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_245",
+      "approx_axis_cross_section_widths_m": [
+        2.1210156142303447,
+        2.121027447220456,
+        2.1213086557048086
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_246",
+      "approx_axis_cross_section_widths_m": [
+        2.0238080975399626,
+        2.023945347744281,
+        2.023849124285796
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_247",
+      "approx_axis_cross_section_widths_m": [
+        5.743806312589598,
+        2.02029745925104,
+        2.020378473199031
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_248",
+      "approx_axis_cross_section_widths_m": [
+        2.0020812698882082,
+        2.0022234093834186,
+        1.999062196030934
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_249",
+      "approx_axis_cross_section_widths_m": [
+        2.0251736827234765,
+        2.0251413368727356,
+        2.0251519765324986
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_25",
+      "approx_axis_cross_section_widths_m": [
+        2.027041585103291,
+        2.027145333406054,
+        2.0269958456404424
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_250",
+      "approx_axis_cross_section_widths_m": [
+        2.0281322445283365,
+        2.0156587407130075,
+        2.027223847159604
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_26",
+      "approx_axis_cross_section_widths_m": [
+        2.033580172101665,
+        2.033664776736998,
+        2.033750706207627
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_27",
+      "approx_axis_cross_section_widths_m": [
+        2.022167738977714,
+        2.0319065482912038,
+        2.0317217224612705
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_28",
+      "approx_axis_cross_section_widths_m": [
+        2.0050759372086695,
+        2.0048789795012354,
+        2.0049655314510026
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_29",
+      "approx_axis_cross_section_widths_m": [
+        2.0260018244695743,
+        2.0258953063095078,
+        2.026024082245243
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_3",
+      "approx_axis_cross_section_widths_m": [
+        2.0446635969570224,
+        2.0446724142460617,
+        2.0446555656302703
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_30",
+      "approx_axis_cross_section_widths_m": [
+        2.0273003774238987,
+        2.0099751528090337,
+        2.0391070791934
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_31",
+      "approx_axis_cross_section_widths_m": [
+        1.9966757902035965,
+        1.99687198257908,
+        1.996756472610116
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_32",
+      "approx_axis_cross_section_widths_m": [
+        2.0049393768623105,
+        2.004833428244808,
+        2.004974365234375
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_33",
+      "approx_axis_cross_section_widths_m": [
+        2.0226581414250404,
+        2.590294002246651,
+        2.1510109275031937
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_34",
+      "approx_axis_cross_section_widths_m": [
+        1.9965521369990142,
+        1.9967982551164596,
+        1.9968532356036235
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_35",
+      "approx_axis_cross_section_widths_m": [
+        1.9973016612432275,
+        1.9972401288810033,
+        1.9972446814767864
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_36",
+      "approx_axis_cross_section_widths_m": [
+        2.029135285994329,
+        2.029259602784805,
+        2.029263749070651
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_37",
+      "approx_axis_cross_section_widths_m": [
+        1.9967792838032778,
+        1.9969059710870738,
+        1.99668520495851
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_38",
+      "approx_axis_cross_section_widths_m": [
+        2.045894490451957,
+        2.045650817608305,
+        2.0259841952730824
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_39",
+      "approx_axis_cross_section_widths_m": [
+        1.9968003832354384,
+        1.9966543667784435,
+        1.9966601741676868
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_4",
+      "approx_axis_cross_section_widths_m": [
+        2.0049843470466158,
+        2.004983358306049,
+        2.0048495483364377
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_40",
+      "approx_axis_cross_section_widths_m": [
+        2.042257917005685,
+        2.0423487325764427,
+        2.042249729523121
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_41",
+      "approx_axis_cross_section_widths_m": [
+        2.0520802534527434,
+        2.023324070448382,
+        2.0232923556981746
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_42",
+      "approx_axis_cross_section_widths_m": [
+        2.0268358450491633,
+        2.0269378463043495,
+        2.0268889044078833
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_43",
+      "approx_axis_cross_section_widths_m": [
+        2.052599481924048,
+        2.0528969975665348,
+        2.0527507164855905
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_44",
+      "approx_axis_cross_section_widths_m": [
+        2.3902151095956015,
+        2.9998795204223825,
+        2.6863482320597996
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_45",
+      "approx_axis_cross_section_widths_m": [
+        2.4904345180293603,
+        2.4902803804980636,
+        2.49017267680091
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_46",
+      "approx_axis_cross_section_widths_m": [
+        2.004859051819352,
+        2.004974365234375,
+        2.0048499205371684
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_47",
+      "approx_axis_cross_section_widths_m": [
+        2.036090339163934,
+        2.036246466772127,
+        2.0363519761423277
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_48",
+      "approx_axis_cross_section_widths_m": [
+        2.4606650265185976,
+        2.46052361016649,
+        2.460639548545714
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_49",
+      "approx_axis_cross_section_widths_m": [
+        1.9966821741534204,
+        1.9968972822908313,
+        1.9966180990474527
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_5",
+      "approx_axis_cross_section_widths_m": [
+        2.0048805596834427,
+        2.0047837515303684,
+        2.0046839723166983
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_50",
+      "approx_axis_cross_section_widths_m": [
+        2.0127559856359767,
+        2.0126802679794764,
+        2.012692471605021
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_51",
+      "approx_axis_cross_section_widths_m": [
+        2.0478972311935877,
+        2.047870696196185,
+        2.047827666303931
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_52",
+      "approx_axis_cross_section_widths_m": [
+        2.0051246416119852,
+        2.00507586818037,
+        2.0050647200721414
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_53",
+      "approx_axis_cross_section_widths_m": [
+        2.179278512452697,
+        2.0137970295522223,
+        2.013755910916302
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_54",
+      "approx_axis_cross_section_widths_m": [
+        2.00516045898587,
+        2.0051408841510465,
+        2.0052423691732315
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_55",
+      "approx_axis_cross_section_widths_m": [
+        3.069346169569684,
+        2.051875710751176,
+        2.0516454624777225
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_56",
+      "approx_axis_cross_section_widths_m": [
+        2.005038275240622,
+        2.005029137718907,
+        2.0050006386073846
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_57",
+      "approx_axis_cross_section_widths_m": [
+        2.0051180520895286,
+        2.005078239141426,
+        17.61924422557729
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_58",
+      "approx_axis_cross_section_widths_m": [
+        1.9969001140366345,
+        1.9968933684046988,
+        1.9968718459500678
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_59",
+      "approx_axis_cross_section_widths_m": [
+        2.005007235964115,
+        2.0048539154178684,
+        2.005178938580798
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_6",
+      "approx_axis_cross_section_widths_m": [
+        2.004931731182637,
+        2.005018270092023,
+        2.005035670561597
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_60",
+      "approx_axis_cross_section_widths_m": [
+        1.9969229386145457,
+        1.9966548816678937,
+        2.027644366983793
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_61",
+      "approx_axis_cross_section_widths_m": [
+        2.0057403680304446,
+        2.005602933133474,
+        2.005781058164331
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_62",
+      "approx_axis_cross_section_widths_m": [
+        1.9967120853062283,
+        1.9968776178132543,
+        2.041173116847858
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_63",
+      "approx_axis_cross_section_widths_m": [
+        1.9968029498869555,
+        1.9965703945348423,
+        2.028085313222846
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_64",
+      "approx_axis_cross_section_widths_m": [
+        2.0432607033233126,
+        2.0430911496543445,
+        2.0489856132413706
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_65",
+      "approx_axis_cross_section_widths_m": [
+        1.9967366098414914,
+        1.9966093173252375,
+        1.99689654682345
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_66",
+      "approx_axis_cross_section_widths_m": [
+        2.040411922568069,
+        2.0404397027112964,
+        2.040549857823976
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_67",
+      "approx_axis_cross_section_widths_m": [
+        2.0468772897280587,
+        2.0467848001165976,
+        2.04699556634705
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_68",
+      "approx_axis_cross_section_widths_m": [
+        1.997452701332179,
+        1.9972481345662345,
+        1.996941361415736
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_69",
+      "approx_axis_cross_section_widths_m": [
+        1.9975397444189866,
+        1.9974787738020723,
+        1.9974285275385455
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_7",
+      "approx_axis_cross_section_widths_m": [
+        2.024398147060765,
+        2.0244632450974507,
+        2.0242985763855756
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_70",
+      "approx_axis_cross_section_widths_m": [
+        2.004859051819352,
+        2.004974365234375,
+        2.0048499205371684
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_71",
+      "approx_axis_cross_section_widths_m": [
+        2.045617825552654,
+        2.0456946575065444,
+        2.0458453146311513
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_72",
+      "approx_axis_cross_section_widths_m": [
+        2.24802387372074,
+        2.2477324364425613,
+        2.010085697266163
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_73",
+      "approx_axis_cross_section_widths_m": [
+        2.0049608626448787,
+        2.004974365234375,
+        2.005041311107334
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_74",
+      "approx_axis_cross_section_widths_m": [
+        1.9967159186332992,
+        1.9967478145653104,
+        1.996939189299269
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_75",
+      "approx_axis_cross_section_widths_m": [
+        2.0814549474226283,
+        2.081142279784757,
+        2.0112280697929066
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_76",
+      "approx_axis_cross_section_widths_m": [
+        2.0723369871368718,
+        2.072432837229467,
+        2.150510583743884
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_77",
+      "approx_axis_cross_section_widths_m": [
+        2.0186701818918777,
+        2.106634794597113,
+        2.0083949625535524
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_78",
+      "approx_axis_cross_section_widths_m": [
+        2.004992787792503,
+        2.005051290416816,
+        2.0052080385526665
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_79",
+      "approx_axis_cross_section_widths_m": [
+        2.0405338296065665,
+        2.0403975069004545,
+        2.1792765316661225
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_8",
+      "approx_axis_cross_section_widths_m": [
+        20.065949336674578,
+        19.74362270661763,
+        19.421289033449312
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_80",
+      "approx_axis_cross_section_widths_m": [
+        2.007126317550366,
+        2.007146666085319,
+        2.0072201204476814
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_81",
+      "approx_axis_cross_section_widths_m": [
+        2.0003370196044443,
+        2.000098867022757,
+        2.000239566242726
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_82",
+      "approx_axis_cross_section_widths_m": [
+        1.9968047582105442,
+        1.996967777827706,
+        1.9969072663233192
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_83",
+      "approx_axis_cross_section_widths_m": [
+        2.0701384305261286,
+        2.070211351444243,
+        2.0702909152665825
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_84",
+      "approx_axis_cross_section_widths_m": [
+        38.44375717613548,
+        36.02751637552586,
+        35.68542934991444
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_85",
+      "approx_axis_cross_section_widths_m": [
+        2.053864019373748,
+        2.148298626432563,
+        2.148405689975391
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_86",
+      "approx_axis_cross_section_widths_m": [
+        2.0796499343643973,
+        2.079510213229213,
+        2.0796118711264455
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_87",
+      "approx_axis_cross_section_widths_m": [
+        2.0714802448157457,
+        2.0713807256220775,
+        2.0714205923560485
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_88",
+      "approx_axis_cross_section_widths_m": [
+        2.029714286661431,
+        2.029763894562848,
+        2.0295942733550305
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_89",
+      "approx_axis_cross_section_widths_m": [
+        2.0795701602581858,
+        2.079485781449989,
+        2.079496055420009
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_9",
+      "approx_axis_cross_section_widths_m": [
+        2.030859302454644,
+        2.0306982229926263,
+        2.0305097242251975
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_90",
+      "approx_axis_cross_section_widths_m": [
+        2.13468871287526,
+        2.1348935979878263,
+        2.1348158731118474
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_91",
+      "approx_axis_cross_section_widths_m": [
+        2.0022964052755583,
+        2.0021987683954308,
+        2.0021315500169976
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_92",
+      "approx_axis_cross_section_widths_m": [
+        2.681434382814814,
+        1.9965838670062794,
+        2.3733009599270076
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_93",
+      "approx_axis_cross_section_widths_m": [
+        1.9969693979879821,
+        1.9969060321684537,
+        1.9968064853303247
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_94",
+      "approx_axis_cross_section_widths_m": [
+        2.1560654285646024,
+        2.030895543765837,
+        1.9967295225361568
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_95",
+      "approx_axis_cross_section_widths_m": [
+        2.005007235964115,
+        2.0048539154178684,
+        2.005178938580798
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_96",
+      "approx_axis_cross_section_widths_m": [
+        2.002590105227114,
+        2.014320759985935,
+        2.6532930414066414
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_97",
+      "approx_axis_cross_section_widths_m": [
+        2.0042909884164146,
+        2.0042226045595726,
+        2.00426399761551
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_98",
+      "approx_axis_cross_section_widths_m": [
+        2.004910021612204,
+        2.0049817817347275,
+        2.005185312225308
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    },
+    {
+      "source_object": "road_service_99",
+      "approx_axis_cross_section_widths_m": [
+        1.9967999982622473,
+        1.9965735526399158,
+        2.0280855611678135
+      ],
+      "status": "Cross-section estimate, may include bends/intersections; not externally verified."
+    }
+  ],
+  "limitations": [
+    "Only the identified apartment-side 50th St corridor was corrected to the supplied 22 ft dimension.",
+    "Other road widths are source geometry estimates; no verified widths were supplied for them.",
+    "Context road surfaces are coarse; intersection corners and sidewalks need independent survey verification."
+  ],
+  "native_FormIt_tested": false
+}
