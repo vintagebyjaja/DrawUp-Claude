@@ -1,0 +1,49 @@
+{
+  "detailed_buildings": [
+    {
+      "building": "building_2356",
+      "materials": 1,
+      "mesh_objects": 1,
+      "maximum_wall_grade_cutoff_m": 25.8094970703125,
+      "vertex_count": 69
+    },
+    {
+      "building": "building_2099",
+      "materials": 1,
+      "mesh_objects": 1,
+      "maximum_wall_grade_cutoff_m": 22.08360595703125,
+      "vertex_count": 53
+    },
+    {
+      "building": "building_2772",
+      "materials": 1,
+      "mesh_objects": 1,
+      "maximum_wall_grade_cutoff_m": 28.05479736328125,
+      "vertex_count": 34
+    },
+    {
+      "building": "building_2603",
+      "materials": 1,
+      "mesh_objects": 1,
+      "maximum_wall_grade_cutoff_m": 32.717682409286496,
+      "vertex_count": 135
+    },
+    {
+      "building": "building_2664",
+      "materials": 1,
+      "mesh_objects": 1,
+      "maximum_wall_grade_cutoff_m": 14.20726318359375,
+      "vertex_count": 13
+    }
+  ],
+  "removed_loose_edges": 0,
+  "contours_exported": false,
+  "terrain_moved": false,
+  "buildings_moved": false,
+  "FormIt_runtime_tested": false,
+  "limitations": [
+    "FormIt may display mesh triangle edges: turn off Edges in Visual Styles; FBX cannot set this application display preference.",
+    "One mesh and one material per detailed building; native FormIt solid/group selection behavior requires checking in FormIt.",
+    "Grade-aware masonry is an estimated facade treatment, not surveyed floor elevations."
+  ]
+}

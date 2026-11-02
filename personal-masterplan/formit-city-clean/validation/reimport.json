@@ -1,0 +1,17 @@
+{
+  "passed": true,
+  "meshes": 4038,
+  "buildings": 3159,
+  "buildings_with_multiple_materials": [],
+  "missing_meshes": [],
+  "extra_meshes": [],
+  "failures": [],
+  "max_roundtrip_vertex_error_m": 0,
+  "max_source_to_cleaned_vertex_error_m": 0,
+  "loose_edges": 0,
+  "contours_present": false,
+  "terrain_min_z_m": 0.0,
+  "terrain_triangle_count": 40235,
+  "native_FormIt_tested": false,
+  "building_atlas_uv_check": "Passed: one active UV layer and exact vertex/UV pair agreement for each of five detailed buildings."
+}

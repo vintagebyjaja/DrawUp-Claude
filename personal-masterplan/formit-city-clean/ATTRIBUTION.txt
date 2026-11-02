@@ -1,0 +1,3 @@
+Imagery: USDA NAIP via Microsoft Planetary Computer.
+Topographic data: © OpenStreetMap contributors; Maryland iMAP.
+Attribution supplied with the user-provided Maps3D export.
