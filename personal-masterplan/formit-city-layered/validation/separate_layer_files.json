@@ -1,0 +1,42 @@
+[
+  {
+    "file": "02_Grass_Landscape_Inferred.fbx",
+    "expected_meshes": 1,
+    "observed_meshes": 1,
+    "max_vertex_error_m": 0,
+    "failed_objects": [],
+    "passed": true
+  },
+  {
+    "file": "03_Roads_Source.fbx",
+    "expected_meshes": 654,
+    "observed_meshes": 654,
+    "max_vertex_error_m": 0,
+    "failed_objects": [],
+    "passed": true
+  },
+  {
+    "file": "04_Parking_Paved_Inferred.fbx",
+    "expected_meshes": 1,
+    "observed_meshes": 1,
+    "max_vertex_error_m": 0,
+    "failed_objects": [],
+    "passed": true
+  },
+  {
+    "file": "05_Sidewalks_Paths_Source.fbx",
+    "expected_meshes": 215,
+    "observed_meshes": 215,
+    "max_vertex_error_m": 0,
+    "failed_objects": [],
+    "passed": true
+  },
+  {
+    "file": "06_Curbs_Estimated.fbx",
+    "expected_meshes": 1,
+    "observed_meshes": 1,
+    "max_vertex_error_m": 0,
+    "failed_objects": [],
+    "passed": true
+  }
+]

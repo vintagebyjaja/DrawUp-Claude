@@ -1,0 +1,86 @@
+{
+  "input_up_axis": "+Y",
+  "output_up_axis": "+Z",
+  "rotation_x_degrees": 90,
+  "source_unit": "ft",
+  "output_unit": "m",
+  "feet_to_metres": 0.3048,
+  "minimum_source_tin_y_ft": 0.013000000268220901,
+  "vertical_translation_after_rotation_m": -0.003962400081753731,
+  "matrix_source_feet_to_corrected_metres": [
+    [
+      0.30480000376701355,
+      0.0,
+      0.0,
+      0.0
+    ],
+    [
+      0.0,
+      0.0,
+      -0.30480000376701355,
+      0.0
+    ],
+    [
+      0.0,
+      0.30480000376701355,
+      0.0,
+      -0.0039623999036848545
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "inverse_matrix_corrected_metres_to_source_feet": [
+    [
+      3.2808399200439453,
+      -0.0,
+      0.0,
+      -0.0
+    ],
+    [
+      -0.0,
+      0.0,
+      3.2808399200439453,
+      0.012999999336898327
+    ],
+    [
+      0.0,
+      -3.2808399200439453,
+      0.0,
+      -0.0
+    ],
+    [
+      -0.0,
+      0.0,
+      -0.0,
+      1.0
+    ]
+  ],
+  "formula": "Xnew=0.3048*Xold; Ynew=-0.3048*Zold; Znew=0.3048*(Yold - minimum_source_tin_y_ft)",
+  "zero_reference": "Lowest actual tinMesh terrain surface. Original base remains below zero, per user preference.",
+  "output_bounds_min_m": [
+    -701.6426391601562,
+    -698.3885498046875,
+    -20.0040225982666
+  ],
+  "output_bounds_max_m": [
+    701.6426391601562,
+    698.3885498046875,
+    61.82106018066406
+  ],
+  "output_dimensions_m": [
+    1403.2852783203125,
+    1396.777099609375,
+    81.82508277893066
+  ],
+  "terrain_z_min_m": 0.0,
+  "terrain_z_max_m": 47.903587341308594,
+  "base_bottom_z_m": -20.0040225982666,
+  "building_vertical_edge_checks": 38426,
+  "building_vertical_edge_checks_passed": 38426,
+  "uv_coordinates_unchanged_by_correction": true,
+  "object_transforms_baked": true
+}

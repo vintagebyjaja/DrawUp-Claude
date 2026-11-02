@@ -1,0 +1,50 @@
+{
+  "format": "maps3d-georeference",
+  "version": 1,
+  "crs": "EPSG:32618",
+  "crsName": "UTM Zone 18N",
+  "crsUnit": "m",
+  "absolute": false,
+  "modelUnit": "ft",
+  "modelUnitsPerMeter": 3.280839895013123,
+  "frame": {
+    "proj4": "+proj=tmerc +lat_0=38.893760 +lon_0=-76.928760 +k=1 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs",
+    "originLngLat": [
+      -76.92876,
+      38.89376
+    ]
+  },
+  "sceneOriginProjected": {
+    "easting": 332729.0605617979,
+    "northing": 4306755.264595623,
+    "height": 7.625
+  },
+  "axisRotationDeg": -1.2113070829459003,
+  "unitsPerMetre": 0.9999445318256907,
+  "northRotationDeg": 0,
+  "printScaleMmPerMeter": null,
+  "verticalExaggeration": 1,
+  "footprintCornersLngLat": [
+    [
+      -76.93682,
+      38.90003
+    ],
+    [
+      -76.9207,
+      38.90003
+    ],
+    [
+      -76.9207,
+      38.88749
+    ],
+    [
+      -76.93682,
+      38.88749
+    ],
+    [
+      -76.93682,
+      38.90003
+    ]
+  ],
+  "notes": "Model coordinates are ground metres in `frame` (a local transverse Mercator; reproject with frame.proj4 for exact results), scaled into modelUnit (divide by modelUnitsPerMeter first when modelUnit is not meters). To place the model in `crs` affinely: divide by printScaleMmPerMeter/1000 first if the export was print-resized, rotate plan coordinates by axisRotationDeg (counterclockwise, about the origin), multiply by unitsPerMetre and add sceneOriginProjected (its height is the elevation of model Y = 0). When northRotationDeg is non-zero the exported model was straightened by that many degrees and axisRotationDeg already accounts for it. footprintCornersLngLat pins the model footprint's corners to the ground directly."
+}

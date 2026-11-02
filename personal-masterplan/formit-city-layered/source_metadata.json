@@ -1,0 +1,73 @@
+{
+  "bounds": {
+    "sw": [
+      -76.93682,
+      38.88749
+    ],
+    "ne": [
+      -76.9207,
+      38.90003
+    ]
+  },
+  "projection": {
+    "code": "MAPS3D:LOCAL:38.893760:-76.928760",
+    "name": "Local coordinates",
+    "zone": null,
+    "hemisphere": null
+  },
+  "sceneOrigin": [
+    0,
+    0.015816010780156375
+  ],
+  "sceneOriginGeo": [
+    -76.92876,
+    38.89376014246932
+  ],
+  "modelDimensionsInMeters": {
+    "width": 1398.6264377757338,
+    "length": 1392.1396040966174,
+    "height": 67.5390625
+  },
+  "resolution": {
+    "elevation": {
+      "tileSize": 512,
+      "zoom": 16
+    },
+    "texture": {
+      "tileSize": 256,
+      "zoom": 17
+    }
+  },
+  "altitudeBoundsinMeters": {
+    "max": 55.5390625,
+    "min": 7.625,
+    "dataMin": 7.625,
+    "base": -12,
+    "elevationOffset": 7.625
+  },
+  "modelYZero": "Y=0 in model space corresponds to minimum elevation",
+  "modelCoordinatesAltitudeBounds": {
+    "max": 47.90755081176758,
+    "min": 0.00390625,
+    "base": -20
+  },
+  "elevationCanvas": {
+    "width": 1507,
+    "height": 1507
+  },
+  "groundParams": {
+    "width": 1403.285419913561,
+    "height": 1396.7769778610964,
+    "subdivisionsX": 1506,
+    "subdivisionsY": 1506
+  },
+  "coordinateSystem": "relative",
+  "fileUnit": "ft",
+  "coordinateDescription": "Model centered at origin (0,0,0). Use georeferencing offset in metadata to position in real-world coordinates.",
+  "modelOrigin": {
+    "x": 0,
+    "y": 0,
+    "z": 0,
+    "description": "Model centered at origin with georeferencing offset in metadata"
+  }
+}

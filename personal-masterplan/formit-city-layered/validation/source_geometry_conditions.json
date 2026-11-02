@@ -1,0 +1,13 @@
+{
+  "preexisting_source_degenerate_face_counts": {
+    "clippedBottom": 5,
+    "road_paths_11": 2,
+    "road_service_33": 1
+  },
+  "layer_working_degenerate_face_counts": {
+    "road_service_33": 1,
+    "road_paths_11": 2,
+    "clippedBottom": 5
+  },
+  "new_derived_surface_or_curb_degeneracies": {}
+}

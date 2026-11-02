@@ -1,0 +1,896 @@
+{
+  "source_mesh_count": 4036,
+  "original_terrain_faces": 40235,
+  "terrain_face_partition": {
+    "grass": 5128,
+    "paved": 8668,
+    "other": 26439
+  },
+  "terrain_union_exactly_matches_original": true,
+  "masked_terrain_faces": 8360,
+  "curb_segments_estimated": 7516,
+  "curb_width_m_assumed": 0.12,
+  "curb_height_m_assumed": 0.12,
+  "curb_source_paths": [
+    {
+      "path": "road_paths_0",
+      "inferred_segments": 50
+    },
+    {
+      "path": "road_paths_1",
+      "inferred_segments": 16
+    },
+    {
+      "path": "road_paths_10",
+      "inferred_segments": 8
+    },
+    {
+      "path": "road_paths_100",
+      "inferred_segments": 131
+    },
+    {
+      "path": "road_paths_101",
+      "inferred_segments": 8
+    },
+    {
+      "path": "road_paths_102",
+      "inferred_segments": 14
+    },
+    {
+      "path": "road_paths_103",
+      "inferred_segments": 10
+    },
+    {
+      "path": "road_paths_104",
+      "inferred_segments": 19
+    },
+    {
+      "path": "road_paths_105",
+      "inferred_segments": 18
+    },
+    {
+      "path": "road_paths_106",
+      "inferred_segments": 32
+    },
+    {
+      "path": "road_paths_107",
+      "inferred_segments": 29
+    },
+    {
+      "path": "road_paths_108",
+      "inferred_segments": 12
+    },
+    {
+      "path": "road_paths_109",
+      "inferred_segments": 53
+    },
+    {
+      "path": "road_paths_11",
+      "inferred_segments": 165
+    },
+    {
+      "path": "road_paths_110",
+      "inferred_segments": 8
+    },
+    {
+      "path": "road_paths_111",
+      "inferred_segments": 14
+    },
+    {
+      "path": "road_paths_112",
+      "inferred_segments": 14
+    },
+    {
+      "path": "road_paths_113",
+      "inferred_segments": 10
+    },
+    {
+      "path": "road_paths_114",
+      "inferred_segments": 11
+    },
+    {
+      "path": "road_paths_115",
+      "inferred_segments": 26
+    },
+    {
+      "path": "road_paths_116",
+      "inferred_segments": 122
+    },
+    {
+      "path": "road_paths_117",
+      "inferred_segments": 10
+    },
+    {
+      "path": "road_paths_118",
+      "inferred_segments": 10
+    },
+    {
+      "path": "road_paths_119",
+      "inferred_segments": 143
+    },
+    {
+      "path": "road_paths_12",
+      "inferred_segments": 46
+    },
+    {
+      "path": "road_paths_120",
+      "inferred_segments": 10
+    },
+    {
+      "path": "road_paths_121",
+      "inferred_segments": 44
+    },
+    {
+      "path": "road_paths_122",
+      "inferred_segments": 7
+    },
+    {
+      "path": "road_paths_123",
+      "inferred_segments": 105
+    },
+    {
+      "path": "road_paths_124",
+      "inferred_segments": 9
+    },
+    {
+      "path": "road_paths_125",
+      "inferred_segments": 13
+    },
+    {
+      "path": "road_paths_126",
+      "inferred_segments": 152
+    },
+    {
+      "path": "road_paths_127",
+      "inferred_segments": 22
+    },
+    {
+      "path": "road_paths_128",
+      "inferred_segments": 31
+    },
+    {
+      "path": "road_paths_129",
+      "inferred_segments": 9
+    },
+    {
+      "path": "road_paths_13",
+      "inferred_segments": 6
+    },
+    {
+      "path": "road_paths_130",
+      "inferred_segments": 6
+    },
+    {
+      "path": "road_paths_131",
+      "inferred_segments": 44
+    },
+    {
+      "path": "road_paths_132",
+      "inferred_segments": 22
+    },
+    {
+      "path": "road_paths_133",
+      "inferred_segments": 100
+    },
+    {
+      "path": "road_paths_134",
+      "inferred_segments": 25
+    },
+    {
+      "path": "road_paths_135",
+      "inferred_segments": 4
+    },
+    {
+      "path": "road_paths_136",
+      "inferred_segments": 4
+    },
+    {
+      "path": "road_paths_137",
+      "inferred_segments": 53
+    },
+    {
+      "path": "road_paths_138",
+      "inferred_segments": 7
+    },
+    {
+      "path": "road_paths_139",
+      "inferred_segments": 23
+    },
+    {
+      "path": "road_paths_14",
+      "inferred_segments": 48
+    },
+    {
+      "path": "road_paths_140",
+      "inferred_segments": 194
+    },
+    {
+      "path": "road_paths_141",
+      "inferred_segments": 32
+    },
+    {
+      "path": "road_paths_142",
+      "inferred_segments": 157
+    },
+    {
+      "path": "road_paths_143",
+      "inferred_segments": 79
+    },
+    {
+      "path": "road_paths_144",
+      "inferred_segments": 16
+    },
+    {
+      "path": "road_paths_145",
+      "inferred_segments": 13
+    },
+    {
+      "path": "road_paths_146",
+      "inferred_segments": 8
+    },
+    {
+      "path": "road_paths_147",
+      "inferred_segments": 10
+    },
+    {
+      "path": "road_paths_148",
+      "inferred_segments": 13
+    },
+    {
+      "path": "road_paths_149",
+      "inferred_segments": 18
+    },
+    {
+      "path": "road_paths_15",
+      "inferred_segments": 31
+    },
+    {
+      "path": "road_paths_150",
+      "inferred_segments": 61
+    },
+    {
+      "path": "road_paths_151",
+      "inferred_segments": 19
+    },
+    {
+      "path": "road_paths_152",
+      "inferred_segments": 48
+    },
+    {
+      "path": "road_paths_153",
+      "inferred_segments": 12
+    },
+    {
+      "path": "road_paths_154",
+      "inferred_segments": 11
+    },
+    {
+      "path": "road_paths_155",
+      "inferred_segments": 315
+    },
+    {
+      "path": "road_paths_156",
+      "inferred_segments": 12
+    },
+    {
+      "path": "road_paths_157",
+      "inferred_segments": 10
+    },
+    {
+      "path": "road_paths_158",
+      "inferred_segments": 139
+    },
+    {
+      "path": "road_paths_159",
+      "inferred_segments": 65
+    },
+    {
+      "path": "road_paths_16",
+      "inferred_segments": 12
+    },
+    {
+      "path": "road_paths_160",
+      "inferred_segments": 26
+    },
+    {
+      "path": "road_paths_161",
+      "inferred_segments": 45
+    },
+    {
+      "path": "road_paths_162",
+      "inferred_segments": 10
+    },
+    {
+      "path": "road_paths_163",
+      "inferred_segments": 10
+    },
+    {
+      "path": "road_paths_164",
+      "inferred_segments": 10
+    },
+    {
+      "path": "road_paths_165",
+      "inferred_segments": 12
+    },
+    {
+      "path": "road_paths_166",
+      "inferred_segments": 8
+    },
+    {
+      "path": "road_paths_167",
+      "inferred_segments": 25
+    },
+    {
+      "path": "road_paths_168",
+      "inferred_segments": 14
+    },
+    {
+      "path": "road_paths_169",
+      "inferred_segments": 6
+    },
+    {
+      "path": "road_paths_17",
+      "inferred_segments": 18
+    },
+    {
+      "path": "road_paths_170",
+      "inferred_segments": 8
+    },
+    {
+      "path": "road_paths_171",
+      "inferred_segments": 10
+    },
+    {
+      "path": "road_paths_172",
+      "inferred_segments": 12
+    },
+    {
+      "path": "road_paths_173",
+      "inferred_segments": 193
+    },
+    {
+      "path": "road_paths_174",
+      "inferred_segments": 8
+    },
+    {
+      "path": "road_paths_175",
+      "inferred_segments": 19
+    },
+    {
+      "path": "road_paths_176",
+      "inferred_segments": 10
+    },
+    {
+      "path": "road_paths_177",
+      "inferred_segments": 18
+    },
+    {
+      "path": "road_paths_178",
+      "inferred_segments": 6
+    },
+    {
+      "path": "road_paths_179",
+      "inferred_segments": 68
+    },
+    {
+      "path": "road_paths_18",
+      "inferred_segments": 25
+    },
+    {
+      "path": "road_paths_180",
+      "inferred_segments": 35
+    },
+    {
+      "path": "road_paths_181",
+      "inferred_segments": 21
+    },
+    {
+      "path": "road_paths_182",
+      "inferred_segments": 33
+    },
+    {
+      "path": "road_paths_183",
+      "inferred_segments": 122
+    },
+    {
+      "path": "road_paths_184",
+      "inferred_segments": 70
+    },
+    {
+      "path": "road_paths_185",
+      "inferred_segments": 10
+    },
+    {
+      "path": "road_paths_186",
+      "inferred_segments": 12
+    },
+    {
+      "path": "road_paths_187",
+      "inferred_segments": 10
+    },
+    {
+      "path": "road_paths_188",
+      "inferred_segments": 15
+    },
+    {
+      "path": "road_paths_189",
+      "inferred_segments": 29
+    },
+    {
+      "path": "road_paths_19",
+      "inferred_segments": 66
+    },
+    {
+      "path": "road_paths_190",
+      "inferred_segments": 32
+    },
+    {
+      "path": "road_paths_191",
+      "inferred_segments": 10
+    },
+    {
+      "path": "road_paths_192",
+      "inferred_segments": 7
+    },
+    {
+      "path": "road_paths_193",
+      "inferred_segments": 16
+    },
+    {
+      "path": "road_paths_194",
+      "inferred_segments": 34
+    },
+    {
+      "path": "road_paths_195",
+      "inferred_segments": 61
+    },
+    {
+      "path": "road_paths_196",
+      "inferred_segments": 42
+    },
+    {
+      "path": "road_paths_197",
+      "inferred_segments": 68
+    },
+    {
+      "path": "road_paths_198",
+      "inferred_segments": 8
+    },
+    {
+      "path": "road_paths_199",
+      "inferred_segments": 66
+    },
+    {
+      "path": "road_paths_2",
+      "inferred_segments": 8
+    },
+    {
+      "path": "road_paths_20",
+      "inferred_segments": 61
+    },
+    {
+      "path": "road_paths_200",
+      "inferred_segments": 18
+    },
+    {
+      "path": "road_paths_201",
+      "inferred_segments": 8
+    },
+    {
+      "path": "road_paths_202",
+      "inferred_segments": 10
+    },
+    {
+      "path": "road_paths_203",
+      "inferred_segments": 8
+    },
+    {
+      "path": "road_paths_204",
+      "inferred_segments": 4
+    },
+    {
+      "path": "road_paths_205",
+      "inferred_segments": 24
+    },
+    {
+      "path": "road_paths_206",
+      "inferred_segments": 13
+    },
+    {
+      "path": "road_paths_207",
+      "inferred_segments": 9
+    },
+    {
+      "path": "road_paths_208",
+      "inferred_segments": 7
+    },
+    {
+      "path": "road_paths_209",
+      "inferred_segments": 6
+    },
+    {
+      "path": "road_paths_21",
+      "inferred_segments": 44
+    },
+    {
+      "path": "road_paths_210",
+      "inferred_segments": 6
+    },
+    {
+      "path": "road_paths_211",
+      "inferred_segments": 9
+    },
+    {
+      "path": "road_paths_212",
+      "inferred_segments": 14
+    },
+    {
+      "path": "road_paths_213",
+      "inferred_segments": 109
+    },
+    {
+      "path": "road_paths_214",
+      "inferred_segments": 18
+    },
+    {
+      "path": "road_paths_22",
+      "inferred_segments": 10
+    },
+    {
+      "path": "road_paths_23",
+      "inferred_segments": 80
+    },
+    {
+      "path": "road_paths_24",
+      "inferred_segments": 8
+    },
+    {
+      "path": "road_paths_25",
+      "inferred_segments": 160
+    },
+    {
+      "path": "road_paths_26",
+      "inferred_segments": 45
+    },
+    {
+      "path": "road_paths_27",
+      "inferred_segments": 84
+    },
+    {
+      "path": "road_paths_28",
+      "inferred_segments": 20
+    },
+    {
+      "path": "road_paths_29",
+      "inferred_segments": 68
+    },
+    {
+      "path": "road_paths_3",
+      "inferred_segments": 12
+    },
+    {
+      "path": "road_paths_30",
+      "inferred_segments": 10
+    },
+    {
+      "path": "road_paths_31",
+      "inferred_segments": 36
+    },
+    {
+      "path": "road_paths_32",
+      "inferred_segments": 14
+    },
+    {
+      "path": "road_paths_33",
+      "inferred_segments": 24
+    },
+    {
+      "path": "road_paths_34",
+      "inferred_segments": 11
+    },
+    {
+      "path": "road_paths_35",
+      "inferred_segments": 49
+    },
+    {
+      "path": "road_paths_36",
+      "inferred_segments": 10
+    },
+    {
+      "path": "road_paths_37",
+      "inferred_segments": 12
+    },
+    {
+      "path": "road_paths_38",
+      "inferred_segments": 11
+    },
+    {
+      "path": "road_paths_39",
+      "inferred_segments": 11
+    },
+    {
+      "path": "road_paths_4",
+      "inferred_segments": 13
+    },
+    {
+      "path": "road_paths_40",
+      "inferred_segments": 56
+    },
+    {
+      "path": "road_paths_41",
+      "inferred_segments": 30
+    },
+    {
+      "path": "road_paths_42",
+      "inferred_segments": 83
+    },
+    {
+      "path": "road_paths_43",
+      "inferred_segments": 179
+    },
+    {
+      "path": "road_paths_44",
+      "inferred_segments": 8
+    },
+    {
+      "path": "road_paths_45",
+      "inferred_segments": 31
+    },
+    {
+      "path": "road_paths_46",
+      "inferred_segments": 106
+    },
+    {
+      "path": "road_paths_47",
+      "inferred_segments": 9
+    },
+    {
+      "path": "road_paths_48",
+      "inferred_segments": 19
+    },
+    {
+      "path": "road_paths_49",
+      "inferred_segments": 10
+    },
+    {
+      "path": "road_paths_5",
+      "inferred_segments": 17
+    },
+    {
+      "path": "road_paths_50",
+      "inferred_segments": 13
+    },
+    {
+      "path": "road_paths_51",
+      "inferred_segments": 8
+    },
+    {
+      "path": "road_paths_52",
+      "inferred_segments": 6
+    },
+    {
+      "path": "road_paths_53",
+      "inferred_segments": 10
+    },
+    {
+      "path": "road_paths_54",
+      "inferred_segments": 6
+    },
+    {
+      "path": "road_paths_55",
+      "inferred_segments": 89
+    },
+    {
+      "path": "road_paths_56",
+      "inferred_segments": 0
+    },
+    {
+      "path": "road_paths_57",
+      "inferred_segments": 28
+    },
+    {
+      "path": "road_paths_58",
+      "inferred_segments": 8
+    },
+    {
+      "path": "road_paths_59",
+      "inferred_segments": 8
+    },
+    {
+      "path": "road_paths_6",
+      "inferred_segments": 14
+    },
+    {
+      "path": "road_paths_60",
+      "inferred_segments": 6
+    },
+    {
+      "path": "road_paths_61",
+      "inferred_segments": 10
+    },
+    {
+      "path": "road_paths_62",
+      "inferred_segments": 10
+    },
+    {
+      "path": "road_paths_63",
+      "inferred_segments": 8
+    },
+    {
+      "path": "road_paths_64",
+      "inferred_segments": 10
+    },
+    {
+      "path": "road_paths_65",
+      "inferred_segments": 13
+    },
+    {
+      "path": "road_paths_66",
+      "inferred_segments": 34
+    },
+    {
+      "path": "road_paths_67",
+      "inferred_segments": 10
+    },
+    {
+      "path": "road_paths_68",
+      "inferred_segments": 6
+    },
+    {
+      "path": "road_paths_69",
+      "inferred_segments": 14
+    },
+    {
+      "path": "road_paths_7",
+      "inferred_segments": 10
+    },
+    {
+      "path": "road_paths_70",
+      "inferred_segments": 6
+    },
+    {
+      "path": "road_paths_71",
+      "inferred_segments": 59
+    },
+    {
+      "path": "road_paths_72",
+      "inferred_segments": 17
+    },
+    {
+      "path": "road_paths_73",
+      "inferred_segments": 10
+    },
+    {
+      "path": "road_paths_74",
+      "inferred_segments": 8
+    },
+    {
+      "path": "road_paths_75",
+      "inferred_segments": 10
+    },
+    {
+      "path": "road_paths_76",
+      "inferred_segments": 9
+    },
+    {
+      "path": "road_paths_77",
+      "inferred_segments": 16
+    },
+    {
+      "path": "road_paths_78",
+      "inferred_segments": 30
+    },
+    {
+      "path": "road_paths_79",
+      "inferred_segments": 6
+    },
+    {
+      "path": "road_paths_8",
+      "inferred_segments": 10
+    },
+    {
+      "path": "road_paths_80",
+      "inferred_segments": 9
+    },
+    {
+      "path": "road_paths_81",
+      "inferred_segments": 7
+    },
+    {
+      "path": "road_paths_82",
+      "inferred_segments": 65
+    },
+    {
+      "path": "road_paths_83",
+      "inferred_segments": 25
+    },
+    {
+      "path": "road_paths_84",
+      "inferred_segments": 10
+    },
+    {
+      "path": "road_paths_85",
+      "inferred_segments": 8
+    },
+    {
+      "path": "road_paths_86",
+      "inferred_segments": 117
+    },
+    {
+      "path": "road_paths_87",
+      "inferred_segments": 27
+    },
+    {
+      "path": "road_paths_88",
+      "inferred_segments": 10
+    },
+    {
+      "path": "road_paths_89",
+      "inferred_segments": 73
+    },
+    {
+      "path": "road_paths_9",
+      "inferred_segments": 180
+    },
+    {
+      "path": "road_paths_90",
+      "inferred_segments": 126
+    },
+    {
+      "path": "road_paths_91",
+      "inferred_segments": 6
+    },
+    {
+      "path": "road_paths_92",
+      "inferred_segments": 9
+    },
+    {
+      "path": "road_paths_93",
+      "inferred_segments": 6
+    },
+    {
+      "path": "road_paths_94",
+      "inferred_segments": 36
+    },
+    {
+      "path": "road_paths_95",
+      "inferred_segments": 74
+    },
+    {
+      "path": "road_paths_96",
+      "inferred_segments": 19
+    },
+    {
+      "path": "road_paths_97",
+      "inferred_segments": 234
+    },
+    {
+      "path": "road_paths_98",
+      "inferred_segments": 26
+    },
+    {
+      "path": "road_paths_99",
+      "inferred_segments": 9
+    }
+  ],
+  "limitations": [
+    "Grass layer may include non-grass vegetation and miss shaded grass; color classification is approximate.",
+    "Paved layer includes candidate parking/driveways; parking use is not independently verified.",
+    "Paths layer includes exported footways, not a verified sidewalk inventory.",
+    "Curbs are generated along path edges; actual curb location, width and height were not supplied."
+  ],
+  "layer_mesh_counts": {
+    "00_Original_Terrain_Backup": 1,
+    "01_Terrain_Unclassified": 1,
+    "02_Grass_Landscape_Inferred": 1,
+    "03_Roads_Source": 654,
+    "04_Parking_Paved_Inferred": 1,
+    "05_Sidewalks_Paths_Source": 215,
+    "06_Curbs_Estimated": 1,
+    "07_Buildings": 3159,
+    "08_Trees": 2,
+    "09_Water": 2,
+    "10_Model_Base": 2,
+    "11_Contours": 1
+  }
+}

@@ -1,0 +1,72 @@
+{
+  "mesh_objects": 4039,
+  "expected_mesh_objects": 4039,
+  "missing_objects": [],
+  "extra_objects": [],
+  "failed_objects": [],
+  "triangles": 344082,
+  "max_vertex_error_m": 0,
+  "source_terrain_faces": 40235,
+  "reimported_partition_terrain_faces": 40235,
+  "terrain_triangle_hash_matches_original": true,
+  "terrain_min_z_m": 0.0,
+  "required_layer_groups": [
+    "LAYER_01_Terrain_Unclassified",
+    "LAYER_02_Grass_Landscape_Inferred",
+    "LAYER_03_Roads_Source",
+    "LAYER_04_Parking_Paved_Inferred",
+    "LAYER_05_Sidewalks_Paths_Source",
+    "LAYER_06_Curbs_Estimated",
+    "LAYER_07_Buildings",
+    "LAYER_08_Trees",
+    "LAYER_09_Water",
+    "LAYER_10_Model_Base",
+    "LAYER_11_Contours"
+  ],
+  "missing_layer_groups": [],
+  "fbx_up_axis": [
+    2
+  ],
+  "fbx_unit_scale_cm": [
+    100.0
+  ],
+  "textures": [
+    {
+      "name": "apartment_brick.png",
+      "packed": true,
+      "exists": true
+    },
+    {
+      "name": "apartment_facade_pattern.png",
+      "packed": true,
+      "exists": true
+    },
+    {
+      "name": "corner_facade.png",
+      "packed": true,
+      "exists": true
+    },
+    {
+      "name": "maptexture.jpg",
+      "packed": true,
+      "exists": true
+    },
+    {
+      "name": "monroe_facade_reference.jpg",
+      "packed": true,
+      "exists": true
+    },
+    {
+      "name": "school_brick.png",
+      "packed": true,
+      "exists": true
+    },
+    {
+      "name": "solar_cells.png",
+      "packed": true,
+      "exists": true
+    }
+  ],
+  "FormIt_runtime_tested": false,
+  "passed": true
+}
