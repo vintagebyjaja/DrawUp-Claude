@@ -1,0 +1,36 @@
+{
+  "format": "fbx",
+  "file_bytes": 3861324,
+  "mesh_objects": 4511,
+  "vertices": 40440,
+  "polygons": 32177,
+  "triangles": 59656,
+  "bounds_min": [
+    -134.61538696289062,
+    -115.38461303710938,
+    -0.5000200271606445
+  ],
+  "bounds_max": [
+    140.38461303710938,
+    133.6538543701172,
+    18.700000762939453
+  ],
+  "dimensions": [
+    275.0,
+    249.03846740722656,
+    19.200020790100098
+  ],
+  "nonfinite_coordinates": 0,
+  "degenerate_faces": 0,
+  "faces_without_material": 0,
+  "materials": 21,
+  "images": [
+    {
+      "name": "brick.png",
+      "packed": true,
+      "exists": true,
+      "path": "/workspace/masterplan-run01/delivery/textures/brick.png"
+    }
+  ],
+  "passed": true
+}

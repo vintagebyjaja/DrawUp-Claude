@@ -1,0 +1,176 @@
+{
+  "accuracy": "Approximate, uncalibrated reference model; NOT georeferenced",
+  "formats": {
+    "blend": {
+      "format": "blend",
+      "file_bytes": 9525144,
+      "mesh_objects": 4511,
+      "vertices": 40440,
+      "polygons": 32177,
+      "triangles": 59656,
+      "bounds_min": [
+        -134.61538696289062,
+        -115.38461303710938,
+        -0.5
+      ],
+      "bounds_max": [
+        140.38461303710938,
+        133.6538543701172,
+        18.700000762939453
+      ],
+      "dimensions": [
+        275.0,
+        249.03846740722656,
+        19.200000762939453
+      ],
+      "nonfinite_coordinates": 0,
+      "degenerate_faces": 0,
+      "faces_without_material": 0,
+      "materials": 21,
+      "images": [
+        {
+          "name": "brick.png",
+          "packed": true,
+          "exists": true,
+          "path": "//textures/brick.png"
+        }
+      ],
+      "passed": true
+    },
+    "glb": {
+      "format": "glb",
+      "file_bytes": 1249532,
+      "mesh_objects": 4511,
+      "vertices": 119472,
+      "polygons": 59656,
+      "triangles": 59656,
+      "bounds_min": [
+        -134.61538696289062,
+        -115.38461303710938,
+        -0.5
+      ],
+      "bounds_max": [
+        140.38461303710938,
+        133.6538543701172,
+        18.700000762939453
+      ],
+      "dimensions": [
+        275.0,
+        249.03846740722656,
+        19.200000762939453
+      ],
+      "nonfinite_coordinates": 0,
+      "degenerate_faces": 0,
+      "faces_without_material": 0,
+      "materials": 21,
+      "images": [
+        {
+          "name": "brick",
+          "packed": true,
+          "exists": false,
+          "path": ""
+        }
+      ],
+      "passed": true
+    },
+    "obj": {
+      "format": "obj",
+      "file_bytes": 5682750,
+      "mesh_objects": 4511,
+      "vertices": 40440,
+      "polygons": 32177,
+      "triangles": 59656,
+      "bounds_min": [
+        -134.61538696289062,
+        -115.38461303710938,
+        -0.5000098943710327
+      ],
+      "bounds_max": [
+        140.38461303710938,
+        133.6538543701172,
+        18.700002670288086
+      ],
+      "dimensions": [
+        275.0,
+        249.03846740722656,
+        19.20001256465912
+      ],
+      "nonfinite_coordinates": 0,
+      "degenerate_faces": 0,
+      "faces_without_material": 0,
+      "materials": 21,
+      "images": [
+        {
+          "name": "brick.png",
+          "packed": false,
+          "exists": true,
+          "path": "/workspace/masterplan-run01/delivery/textures/brick.png"
+        }
+      ],
+      "passed": true
+    },
+    "fbx": {
+      "format": "fbx",
+      "file_bytes": 3861324,
+      "mesh_objects": 4511,
+      "vertices": 40440,
+      "polygons": 32177,
+      "triangles": 59656,
+      "bounds_min": [
+        -134.61538696289062,
+        -115.38461303710938,
+        -0.5000200271606445
+      ],
+      "bounds_max": [
+        140.38461303710938,
+        133.6538543701172,
+        18.700000762939453
+      ],
+      "dimensions": [
+        275.0,
+        249.03846740722656,
+        19.200020790100098
+      ],
+      "nonfinite_coordinates": 0,
+      "degenerate_faces": 0,
+      "faces_without_material": 0,
+      "materials": 21,
+      "images": [
+        {
+          "name": "brick.png",
+          "packed": true,
+          "exists": true,
+          "path": "/workspace/masterplan-run01/delivery/textures/brick.png"
+        }
+      ],
+      "passed": true
+    }
+  },
+  "comparisons": {
+    "blend": {
+      "max_world_bounds_error_nominal_m": 0.0,
+      "same_triangle_count": true,
+      "bounds_match_within_1mm": true,
+      "passed": true
+    },
+    "glb": {
+      "max_world_bounds_error_nominal_m": 0.0,
+      "same_triangle_count": true,
+      "bounds_match_within_1mm": true,
+      "passed": true
+    },
+    "obj": {
+      "max_world_bounds_error_nominal_m": 9.894371032714844e-06,
+      "same_triangle_count": true,
+      "bounds_match_within_1mm": true,
+      "passed": true
+    },
+    "fbx": {
+      "max_world_bounds_error_nominal_m": 2.002716064453125e-05,
+      "same_triangle_count": true,
+      "bounds_match_within_1mm": true,
+      "passed": true
+    }
+  },
+  "passed": true
+}

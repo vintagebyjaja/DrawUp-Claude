@@ -1,0 +1,142 @@
+[
+  {
+    "path": "IMPORT_VALIDATION.md",
+    "bytes": 6500,
+    "sha256": "75885ea05877a94e2b085192d26f426e8a750d831c7722a9c144c41bdbb630f8"
+  },
+  {
+    "path": "Monroe_MasterPlan.blend",
+    "bytes": 9525144,
+    "sha256": "a983704786e9c4feaf7c76b785ba1ba6fa98819f0a3eb2a95afead18d1ae36a1"
+  },
+  {
+    "path": "Monroe_MasterPlan.fbx",
+    "bytes": 3861324,
+    "sha256": "2524e2233d35eab541f3f764ed25805f59a04f537662eebe681c6d1853f08094"
+  },
+  {
+    "path": "Monroe_MasterPlan.glb",
+    "bytes": 1249532,
+    "sha256": "431f9b90fbfdc81b0a829e80d9b1a4a2465032cf142b15318e96b407dbcbcb11"
+  },
+  {
+    "path": "Monroe_MasterPlan.mtl",
+    "bytes": 4008,
+    "sha256": "4c00d66d9e9909e0ae066839fa4e35b8561eee1eb8ed4a75ad8d6fdab72abf51"
+  },
+  {
+    "path": "Monroe_MasterPlan.obj",
+    "bytes": 5682750,
+    "sha256": "d7e5c2dfa268cce31cf7ca2af742e861946e09ebb2c022611993fd8fe432c2da"
+  },
+  {
+    "path": "PROTOTYPE_RESULTS.md",
+    "bytes": 3996,
+    "sha256": "473062a14a97391d900a3108ac42945279051c69d00f1440add6290dc764b1dd"
+  },
+  {
+    "path": "README.md",
+    "bytes": 4738,
+    "sha256": "461b734fc21d0bfedce017ba37558b277af2b0d515f2343c4f9d4ab0e746991d"
+  },
+  {
+    "path": "REFERENCE_INVENTORY.json",
+    "bytes": 1893,
+    "sha256": "b52963c6838fe8e3391fc0dd73ace51d095c865647e7a851ecc3797ffdbb3b87"
+  },
+  {
+    "path": "previews/01_aerial.png",
+    "bytes": 1863186,
+    "sha256": "b1a6ac348c0b95ff95cd3568479022dd1335e9682392825018d94e5d82eecb88"
+  },
+  {
+    "path": "previews/02_birds_eye.png",
+    "bytes": 1926152,
+    "sha256": "2ef95808304bb7094c2687847f32cac3660bbf0179402a07d502dc737d557ce1"
+  },
+  {
+    "path": "previews/03_street.png",
+    "bytes": 1899667,
+    "sha256": "73fe146de3ad998246ae2a9b830c3e2ee5df42ff85edf470cc189be07ec7bcef"
+  },
+  {
+    "path": "previews/04_building.png",
+    "bytes": 2126085,
+    "sha256": "74851415bf3d2006e122417a73912a97de5d0b96bfb1639aba25d21a4d562a24"
+  },
+  {
+    "path": "scripts/build_monroe.py",
+    "bytes": 15517,
+    "sha256": "4945af10b5f9de10b641c62708e59fa281b7824ac8531f8c8667bbebec6cae3e"
+  },
+  {
+    "path": "scripts/compare_exports.py",
+    "bytes": 1072,
+    "sha256": "a3701e6c0e07d0bfc273c45fa61b3aa76f69d5eecf4db614d34dd926c924d7d7"
+  },
+  {
+    "path": "scripts/prepare_textures.py",
+    "bytes": 536,
+    "sha256": "103d2eb821022acdbf46459e36eda45932a41e3d6191049b61f427e08ec79897"
+  },
+  {
+    "path": "scripts/regenerate.sh",
+    "bytes": 769,
+    "sha256": "2c9717f3772fb3cd9c059bc9787d048c0ddd062ede23b40d058aed69267e4d02"
+  },
+  {
+    "path": "scripts/render_monroe.py",
+    "bytes": 560,
+    "sha256": "7bf88cca92dbb5233300da16ed674acee234033e0f60954a9d784827ff5d88bb"
+  },
+  {
+    "path": "scripts/requirements.txt",
+    "bytes": 15,
+    "sha256": "41b54a6fb2918667ca47a61d73b522629d84490f3d78f0f20b21135faba10d35"
+  },
+  {
+    "path": "scripts/validate_monroe.py",
+    "bytes": 2319,
+    "sha256": "27624279c3e6c21d63ec479b77d9bf63651b4ab91724b05c5b792caea5b833df"
+  },
+  {
+    "path": "source/LICENSE.txt",
+    "bytes": 382,
+    "sha256": "1fd445e49a2e72bde2682348d09ba2ec4da50b027b4aabb37170e9a57e5b4608"
+  },
+  {
+    "path": "source/cadmapper-fairmount-heights-maryland-us.skp",
+    "bytes": 3553999,
+    "sha256": "a05d8747c1246bb6f23cdc0837c25725c0dac44fb40745018f95aac3dbeccf60"
+  },
+  {
+    "path": "textures/brick.png",
+    "bytes": 1555,
+    "sha256": "a3fc9323562330531024d0294d3cb2f77946df2055a404b8f7dbb729f674c9df"
+  },
+  {
+    "path": "validation/SUMMARY.json",
+    "bytes": 4129,
+    "sha256": "ad6ec939764ce1f224df26372fb164d331f0dd6b38c8c33f5c92df368e00bf99"
+  },
+  {
+    "path": "validation/blend.json",
+    "bytes": 655,
+    "sha256": "470d52b01a27dc26fc1b7668e2eca202f701f5e25c5bfaa93997c2fb47883d6a"
+  },
+  {
+    "path": "validation/fbx.json",
+    "bytes": 703,
+    "sha256": "5af7b79d7141b2807f63edaf87c7af2d183cc1b8c6bad4be3d12dcb3892008a9"
+  },
+  {
+    "path": "validation/glb.json",
+    "bytes": 631,
+    "sha256": "77f0053886ec101d0a4f19e6a1cebfd792376100527e00d38ad161cd60604b78"
+  },
+  {
+    "path": "validation/obj.json",
+    "bytes": 703,
+    "sha256": "7d658f349e865e538f8b912ffa905559eb548dba51d4320329581770a62d3754"
+  }
+]

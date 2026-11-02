@@ -1,0 +1,62 @@
+[
+  {
+    "file": "Screenshot 2026-11-01 231212.jpg",
+    "bytes": 710558,
+    "sha256": "e3da63281cdef995e6fa644fa239146b0fe7c07a9ced7659abba5f4dc2f93602"
+  },
+  {
+    "file": "Screenshot 2026-11-01 231223.jpg",
+    "bytes": 890277,
+    "sha256": "c3b2f4f518b7c6a17e35f2920b5a1b1cae3fe11830c0616a2e9ae9180b878330"
+  },
+  {
+    "file": "Screenshot 2026-11-01 231238.jpg",
+    "bytes": 160987,
+    "sha256": "ea42d72d923a5c7061e547c242ef39c0570f18cc831b1d6fa322e34be4bbaef8"
+  },
+  {
+    "file": "Screenshot 2026-11-01 231345.jpg",
+    "bytes": 580375,
+    "sha256": "8192c48b2dbfa4733751629c2b58a7866a096eb67fa8141f94e19dbd01710c48"
+  },
+  {
+    "file": "Screenshot 2026-11-01 231411.jpg",
+    "bytes": 964400,
+    "sha256": "f8165b161ea8618b25e161d55bd728d625dca27b308a59d37cf1d72cd768697a"
+  },
+  {
+    "file": "Screenshot 2026-11-01 231442.jpg",
+    "bytes": 652131,
+    "sha256": "716abe829c3f70cda2c381f09c794234ae40e3cbf3d22a6cb6709711370a1d5e"
+  },
+  {
+    "file": "Screenshot 2026-11-01 231503.jpg",
+    "bytes": 918497,
+    "sha256": "87caad88832a78464991772a0c315b3df32a7454c80c3ab687d003b176e5a8d7"
+  },
+  {
+    "file": "Screenshot 2026-11-01 231525.jpg",
+    "bytes": 1109395,
+    "sha256": "f57ac9a5f298491297d7c21559e3f3e02b452db373af330b4cbaab7ba1fc8e78"
+  },
+  {
+    "file": "Screenshot 2026-11-01 231538.jpg",
+    "bytes": 975230,
+    "sha256": "169927fffe26b184856e95c22ce5357a2507a19f568e2b64b8bcbfc1b2f7ccce"
+  },
+  {
+    "file": "Screenshot 2026-11-01 231555.jpg",
+    "bytes": 855416,
+    "sha256": "0fc8a2c3efcd2c1e8447ef0a05a35a01134886defc2226c1d0ebc3af9c8af4f8"
+  },
+  {
+    "file": "Screenshot 2026-11-01 231609.jpg",
+    "bytes": 937341,
+    "sha256": "3e091dcfa7d8b7bf5156b354f05120fc3f52e7f2ea54f6b6ec19232ca443b942"
+  },
+  {
+    "file": "site_address.txt",
+    "bytes": 388,
+    "sha256": "5a94de5585244f8574a90a736e9bdc72022e021611ab1899dac16f7ddbc280c1"
+  }
+]
