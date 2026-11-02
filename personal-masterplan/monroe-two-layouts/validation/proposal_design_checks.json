@@ -1,0 +1,138 @@
+{
+  "status": "proposed_concept_not_as_built_or_permit_design",
+  "road_width_m": 6.7056,
+  "road_width_ft": 22,
+  "minimum_loop_centerline_radius_m": 12,
+  "primary_curve_min_radius_m_approx": 14.8,
+  "vehicle_max_grades": {
+    "loop": 0.08000000000000258,
+    "primary": 0.08500000000000402,
+    "secondary": 0.08000000000000294,
+    "cross_aisle": 0.079999999999999,
+    "corner_access": 0.050000000000001675
+  },
+  "vehicle_max_local_cut_fill_m": {
+    "loop": 0.7666142859228344,
+    "primary": 1.8799949432149319,
+    "secondary": 0.380202948221978,
+    "cross_aisle": 1.52767326138731,
+    "corner_access": 1.5535737794823063
+  },
+  "parking_plane": {
+    "origin": [
+      8,
+      344.6576,
+      23.641972206756325
+    ],
+    "x_slope": -0.015,
+    "y_slope": -0.012,
+    "gradient": 0.019209372712298545
+  },
+  "parking_spaces_total": 22,
+  "visitor_spaces": 9,
+  "staff_spaces": 9,
+  "resident_parallel_spaces": 4,
+  "marked_accessible_spaces": 2,
+  "building_paving_collision_area_m2": 0.0,
+  "vehicle_destination_component_labels": {
+    "main_gate": 1,
+    "secondary_gate": 1,
+    "school_dropoff": 1,
+    "north_hall_dropoff": 1,
+    "south_annex_service": 1,
+    "visitor_staff_aisle": 1,
+    "corner_access": 1,
+    "resident_bays_access": 1
+  },
+  "all_vehicle_destinations_connected_via_proposed_and_retained_public_roads": true,
+  "concept_emergency_vehicle": {
+    "length_m": 9,
+    "width_m": 2.5,
+    "wheelbase_m": 5,
+    "swept_area_outside_pavement_with_0_15m_tolerance_m2": 0.0,
+    "swept_building_collision_area_m2": 0.0,
+    "limitations": "Concept bicycle-model envelope; not a certified apparatus or fire-authority approval."
+  },
+  "pedestrian_routes": [
+    {
+      "name": "Accessible_school_court",
+      "building": "building_2356",
+      "profile_max_grade": 0.05000000000000347,
+      "max_local_grading_m": 0.3088982307224377,
+      "length_m": 38.91710604924248,
+      "grade_class": "walk_5_percent_or_less",
+      "door_tie_in_verified": false
+    },
+    {
+      "name": "School_west_arrival",
+      "building": "building_2356",
+      "profile_max_grade": 0.04999999999999924,
+      "max_local_grading_m": 0.24608359037793548,
+      "length_m": 7.963574427488573,
+      "grade_class": "walk_5_percent_or_less",
+      "door_tie_in_verified": false
+    },
+    {
+      "name": "North_hall_arrival",
+      "building": "building_2099",
+      "profile_max_grade": 0.050000000000008524,
+      "max_local_grading_m": 0.535193288708868,
+      "length_m": 49.1295343282834,
+      "grade_class": "walk_5_percent_or_less",
+      "door_tie_in_verified": false
+    },
+    {
+      "name": "South_annex_arrival",
+      "building": "building_2772",
+      "profile_max_grade": 0.04253288420285392,
+      "max_local_grading_m": 0.045842279788935514,
+      "length_m": 20.25678977211198,
+      "grade_class": "walk_5_percent_or_less",
+      "door_tie_in_verified": false
+    },
+    {
+      "name": "Apartment_north_arrival",
+      "building": "building_2603",
+      "profile_max_grade": 0.050000000000000586,
+      "max_local_grading_m": 0.7071896612159456,
+      "length_m": 22.945405230910648,
+      "grade_class": "walk_5_percent_or_less",
+      "door_tie_in_verified": false
+    },
+    {
+      "name": "Corner_building_arrival",
+      "building": "building_2664",
+      "profile_max_grade": 0.05000000000000187,
+      "max_local_grading_m": 1.8074201232654055,
+      "length_m": 39.53231602331874,
+      "grade_class": "walk_5_percent_or_less",
+      "door_tie_in_verified": false
+    }
+  ],
+  "source_tree_proxy_count": 2289,
+  "proposed_tree_removal_candidates": [
+    711,
+    712,
+    713,
+    720,
+    721,
+    722
+  ],
+  "preserved_tree_root_review_candidates": [
+    861,
+    862,
+    863
+  ],
+  "new_proposed_tree_count": 22,
+  "limitations": [
+    "Land ownership, ROW permits, utilities, fire access, drainage and actual door/floor levels are not independently verified.",
+    "Source terrain supports numeric concept grading only; retaining walls and cut/fill require civil design and survey.",
+    "Accessible parking geometry and route profiles are proposed; no ADA or code compliance certification.",
+    "All buildings remain fixed; secondary/corner access uses the existing public-road network."
+  ],
+  "travel_lane_width_ft": 9,
+  "campus_road_paved_width_ft": 22,
+  "paved_gutter_shoulder_ft_each_side": 2,
+  "parking_aisle_width_ft": 24,
+  "pavement_volumes_closed": true
+}

@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "baseline_building_geometry_unchanged": true,
+  "building_meshes": 3159,
+  "each_building_one_material": true,
+  "neutral_facade_buildings": 3151,
+  "editable_road_sidewalk_volumes": 866,
+  "separate_sports_meshes": 4,
+  "source_layout_preserved": false,
+  "source_dimensions_not_survey_verified": true
+}

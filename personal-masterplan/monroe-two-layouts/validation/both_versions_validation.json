@@ -1,0 +1,68 @@
+{
+  "existing": {
+    "passed": true,
+    "mesh_objects": 4087,
+    "building_meshes": 3159,
+    "building_native_hash_failures": [],
+    "max_building_vertex_error_m": 0,
+    "max_any_mesh_roundtrip_error_m": 0,
+    "missing_meshes": [],
+    "extra_meshes": [],
+    "failures": [],
+    "editable_closed_pavement_and_sports_bodies": 873,
+    "open_pavement_or_sports_bodies": [],
+    "separate_sports_objects": [
+      "E_Baseball_Field",
+      "E_Football_Field",
+      "E_Running_Track",
+      "E_Woodson_Baseball_Practice_Field"
+    ],
+    "unpacked_used_images": [],
+    "native_FormIt_checked": false,
+    "width_schedule_is_client_assumptions_not_survey": true
+  },
+  "proposed": {
+    "passed": true,
+    "mesh_objects": 4746,
+    "building_meshes": 3159,
+    "building_native_hash_failures": [],
+    "max_building_vertex_error_m": 0,
+    "max_any_mesh_roundtrip_error_m": 3.0517578125e-05,
+    "missing_meshes": [],
+    "extra_meshes": [],
+    "failures": [],
+    "editable_closed_pavement_and_sports_bodies": 874,
+    "open_pavement_or_sports_bodies": [],
+    "separate_sports_objects": [
+      "E_Baseball_Field",
+      "E_Football_Field",
+      "E_Running_Track",
+      "E_Woodson_Baseball_Practice_Field"
+    ],
+    "unpacked_used_images": [],
+    "native_FormIt_checked": false,
+    "width_schedule_is_client_assumptions_not_survey": true,
+    "proposed_road_mesh_grade_checks": {
+      "loop": {
+        "max_actual_mesh_grade": 0.10606553819444411,
+        "samples_on_retained_public_street_not_new_mesh": 0
+      },
+      "primary": {
+        "max_actual_mesh_grade": 0.1414690409613865,
+        "samples_on_retained_public_street_not_new_mesh": 1
+      },
+      "secondary": {
+        "max_actual_mesh_grade": 0.10871138951228271,
+        "samples_on_retained_public_street_not_new_mesh": 5
+      },
+      "cross_aisle": {
+        "max_actual_mesh_grade": 0.08877963362069029,
+        "samples_on_retained_public_street_not_new_mesh": 0
+      },
+      "corner_access": {
+        "max_actual_mesh_grade": 0.09461036095252529,
+        "samples_on_retained_public_street_not_new_mesh": 6
+      }
+    }
+  }
+}

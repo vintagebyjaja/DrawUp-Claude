@@ -1,0 +1,17 @@
+{
+  "passed": true,
+  "buildings": 3159,
+  "geometry_hash_failures": [],
+  "baseline_file_unchanged": true,
+  "source_tree_proxy_count": 2289,
+  "tree_removal_candidates": [
+    711,
+    712,
+    713,
+    720,
+    721,
+    722
+  ],
+  "retained_source_tree_count": 2283,
+  "new_proposed_trees": 22
+}

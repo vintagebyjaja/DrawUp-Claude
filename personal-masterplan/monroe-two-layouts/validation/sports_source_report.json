@@ -1,0 +1,30 @@
+{
+  "features": [
+    {
+      "name": "E_Baseball_Field",
+      "thickness_m": 0.12,
+      "area_m2": 12090.458290182445,
+      "source": "Image-traced boundary on original aerial image, transformed with the existing model UV calibration; not a surveyed sports-field dimension."
+    },
+    {
+      "name": "E_Football_Field",
+      "thickness_m": 0.12,
+      "area_m2": 8817.615831233647,
+      "source": "Image-traced boundary on original aerial image, transformed with the existing model UV calibration; not a surveyed sports-field dimension."
+    },
+    {
+      "name": "E_Running_Track",
+      "thickness_m": 0.12,
+      "area_m2": 5307.078488827601,
+      "source": "Image-traced boundary on original aerial image, transformed with the existing model UV calibration; not a surveyed sports-field dimension."
+    },
+    {
+      "name": "E_Woodson_Baseball_Practice_Field",
+      "thickness_m": 0.12,
+      "area_m2": 11171.659522491302,
+      "source": "Image-traced boundary on original aerial image, transformed with the existing model UV calibration; not a surveyed sports-field dimension."
+    }
+  ],
+  "original_terrain_cut_from_working_base_under_fields": true,
+  "building_geometry_changed": false
+}

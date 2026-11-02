@@ -1,0 +1,22 @@
+{
+  "passed": true,
+  "mesh_objects": 4087,
+  "building_meshes": 3159,
+  "building_native_hash_failures": [],
+  "max_building_vertex_error_m": 0,
+  "max_any_mesh_roundtrip_error_m": 0,
+  "missing_meshes": [],
+  "extra_meshes": [],
+  "failures": [],
+  "editable_closed_pavement_and_sports_bodies": 873,
+  "open_pavement_or_sports_bodies": [],
+  "separate_sports_objects": [
+    "E_Baseball_Field",
+    "E_Football_Field",
+    "E_Running_Track",
+    "E_Woodson_Baseball_Practice_Field"
+  ],
+  "unpacked_used_images": [],
+  "native_FormIt_checked": false,
+  "width_schedule_is_client_assumptions_not_survey": true
+}
