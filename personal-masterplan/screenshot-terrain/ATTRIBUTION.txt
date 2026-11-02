@@ -1,0 +1,5 @@
+Imagery: USDA NAIP via Microsoft Planetary Computer.
+Topographic data: © OpenStreetMap contributors; Maryland iMAP.
+Attribution supplied with the user-provided Maps3D export.
+
+Ground overlay: derived from user-supplied Google Earth screenshots at the user's explicit request for a personal approximate prototype. Source image hashes and processing limits are recorded in textures/screenshot_manifest.json. No new orthophoto license or surveyed accuracy is claimed.

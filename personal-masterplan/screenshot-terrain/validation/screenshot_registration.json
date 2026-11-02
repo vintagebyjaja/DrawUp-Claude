@@ -1,0 +1,144 @@
+{
+  "status": "user_authorized_screenshot_approximation",
+  "usage": "personal_prototype",
+  "license_verified": false,
+  "survey_accurate": false,
+  "output_grid_m_per_pixel": 0.2,
+  "effective_source_resolution": "Variable screenshot detail, not verified 10\u201330 cm imagery. Fallback retains original blurry data outside screenshot coverage.",
+  "source_order": [
+    "original_low_resolution_ground",
+    "Neighborhood_Aerial_Overview.png",
+    "Monroe_School_Site_and_Streets.png",
+    "Monroe_School_Closeup.png"
+  ],
+  "source_pixel_counts": [
+    26971106,
+    19984801,
+    1304758,
+    459479
+  ],
+  "screenshot_coverage_fraction": 0.446407506513117,
+  "building_infill_fraction": 0.18032779213460454,
+  "buildings_masked": 3159,
+  "infill_method": "Local non-AI Telea image infill beneath original building footprint faces, with approx 0.5m margin. Exposed inferred ground is not surveyed.",
+  "source_registrations": [
+    {
+      "file": "Neighborhood_Aerial_Overview.png",
+      "sha256": "9ba98ffb19c23856c2bd37acbd50be60e0a1df3834479c82a003d343715d25fe",
+      "image_pixels": [
+        2048,
+        1325
+      ],
+      "candidate_matches": 479,
+      "ground_candidate_matches": 240,
+      "registration_mode": "ground_features",
+      "inliers": 227,
+      "median_reference_pixel_residual": 2.1875123977661133,
+      "homography_source_image_to_screenshot": [
+        [
+          1.2539656743909806,
+          0.1439578873689868,
+          -57.582184768284066
+        ],
+        [
+          -0.15443273399399532,
+          1.2501650374107474,
+          206.19455609916884
+        ],
+        [
+          3.41867547155511e-07,
+          -7.452406035524345e-06,
+          1.0
+        ]
+      ],
+      "approx_image_scale_relative_to_old": 1.260910724184383,
+      "is_verified_orthophoto": false
+    },
+    {
+      "file": "Monroe_School_Site_and_Streets.png",
+      "sha256": "04c020e3906a97be2a0db5517e19d91f4214dda9f914c1126004ddeb55fa044f",
+      "image_pixels": [
+        2025,
+        1459
+      ],
+      "candidate_matches": 100,
+      "ground_candidate_matches": 51,
+      "registration_mode": "ground_features",
+      "inliers": 25,
+      "median_reference_pixel_residual": 2.372713565826416,
+      "homography_source_image_to_screenshot": [
+        [
+          -3.972554162189953,
+          -0.6241195036780212,
+          3711.283647959297
+        ],
+        [
+          0.46548615262391985,
+          -4.019370464370518,
+          1715.7841121082197
+        ],
+        [
+          -1.3121498604492845e-05,
+          -0.0001325563114996273,
+          1.0
+        ]
+      ],
+      "approx_image_scale_relative_to_old": 4.032082074333694,
+      "is_verified_orthophoto": false
+    },
+    {
+      "file": "Monroe_School_Closeup.png",
+      "sha256": "55d257e5b6fb14aeb8860adc78adcbaf53ce8ac3a11be8b8f1c4c7dc9e87d9a7",
+      "image_pixels": [
+        2048,
+        1230
+      ],
+      "candidate_matches": 75,
+      "ground_candidate_matches": 22,
+      "registration_mode": "mixed_features_ground_control_insufficient",
+      "inliers": 36,
+      "median_reference_pixel_residual": 2.5500051975250244,
+      "homography_source_image_to_screenshot": [
+        [
+          6.538276371269476,
+          0.6128341675946347,
+          -4052.4209172935766
+        ],
+        [
+          -0.8383292473951196,
+          6.656869266286126,
+          -1383.497998005528
+        ],
+        [
+          -4.808724712828913e-05,
+          -0.00012997211216830888,
+          1.0
+        ]
+      ],
+      "approx_image_scale_relative_to_old": 6.636128979825978,
+      "is_verified_orthophoto": false
+    }
+  ],
+  "original_world_to_uv_affine": [
+    [
+      0.0007149330418587328,
+      1.2598535987583697e-08
+    ],
+    [
+      3.6000602460055375e-09,
+      0.0007182673194250995
+    ],
+    [
+      0.5000125581384184,
+      0.5000083853455644
+    ]
+  ],
+  "original_world_to_uv_max_residual": 0.0005311957673558854,
+  "local_proj4": "+proj=tmerc +lat_0=38.893760 +lon_0=-76.928760 +k=1 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs",
+  "limitations": [
+    "Projective screenshot registration is approximate; perspective, terrain relief, building lean and capture dates can leave local offsets.",
+    "Labels and image borders are excluded where identified; unmapped areas retain the earlier image.",
+    "No artificial sharpening or generated aerial details. Building-footprint ground restoration is inferred.",
+    "This is not newly licensed orthophotography and no native GSD is claimed."
+  ]
+}

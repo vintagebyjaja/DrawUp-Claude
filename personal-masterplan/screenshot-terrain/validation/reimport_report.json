@@ -1,0 +1,168 @@
+{
+  "passed": true,
+  "mesh_count": 4083,
+  "building_meshes": 3159,
+  "buildings_with_multiple_materials": [],
+  "missing_meshes": [],
+  "extra_meshes": [],
+  "failures": [],
+  "max_FBX_roundtrip_vertex_error_m": 0,
+  "max_tiled_terrain_deviation_from_original_surface_m": 3.057712456211448e-05,
+  "terrain_min_z_m": 0.0,
+  "triangles": 423701,
+  "loose_edges": 0,
+  "actual_high_tile_images_packed_in_FBX": [
+    {
+      "material": "Screenshot ground | screenshot_x00_y00",
+      "image": "screenshot_x00_y00_ground.jpg",
+      "packed": true,
+      "pixels": [
+        1749,
+        1741
+      ]
+    },
+    {
+      "material": "Screenshot ground | screenshot_x00_y01",
+      "image": "screenshot_x00_y01_ground.jpg",
+      "packed": true,
+      "pixels": [
+        1749,
+        1741
+      ]
+    },
+    {
+      "material": "Screenshot ground | screenshot_x00_y02",
+      "image": "screenshot_x00_y02_ground.jpg",
+      "packed": true,
+      "pixels": [
+        1749,
+        1741
+      ]
+    },
+    {
+      "material": "Screenshot ground | screenshot_x00_y03",
+      "image": "screenshot_x00_y03_ground.jpg",
+      "packed": true,
+      "pixels": [
+        1749,
+        1741
+      ]
+    },
+    {
+      "material": "Screenshot ground | screenshot_x01_y00",
+      "image": "screenshot_x01_y00_ground.jpg",
+      "packed": true,
+      "pixels": [
+        1749,
+        1741
+      ]
+    },
+    {
+      "material": "Screenshot ground | screenshot_x01_y01",
+      "image": "screenshot_x01_y01_ground.jpg",
+      "packed": true,
+      "pixels": [
+        1749,
+        1741
+      ]
+    },
+    {
+      "material": "Screenshot ground | screenshot_x01_y02",
+      "image": "screenshot_x01_y02_ground.jpg",
+      "packed": true,
+      "pixels": [
+        1749,
+        1741
+      ]
+    },
+    {
+      "material": "Screenshot ground | screenshot_x01_y03",
+      "image": "screenshot_x01_y03_ground.jpg",
+      "packed": true,
+      "pixels": [
+        1749,
+        1741
+      ]
+    },
+    {
+      "material": "Screenshot ground | screenshot_x02_y00",
+      "image": "screenshot_x02_y00_ground.jpg",
+      "packed": true,
+      "pixels": [
+        1749,
+        1741
+      ]
+    },
+    {
+      "material": "Screenshot ground | screenshot_x02_y01",
+      "image": "screenshot_x02_y01_ground.jpg",
+      "packed": true,
+      "pixels": [
+        1749,
+        1741
+      ]
+    },
+    {
+      "material": "Screenshot ground | screenshot_x02_y02",
+      "image": "screenshot_x02_y02_ground.jpg",
+      "packed": true,
+      "pixels": [
+        1749,
+        1741
+      ]
+    },
+    {
+      "material": "Screenshot ground | screenshot_x02_y03",
+      "image": "screenshot_x02_y03_ground.jpg",
+      "packed": true,
+      "pixels": [
+        1749,
+        1741
+      ]
+    },
+    {
+      "material": "Screenshot ground | screenshot_x03_y00",
+      "image": "screenshot_x03_y00_ground.jpg",
+      "packed": true,
+      "pixels": [
+        1749,
+        1741
+      ]
+    },
+    {
+      "material": "Screenshot ground | screenshot_x03_y01",
+      "image": "screenshot_x03_y01_ground.jpg",
+      "packed": true,
+      "pixels": [
+        1749,
+        1741
+      ]
+    },
+    {
+      "material": "Screenshot ground | screenshot_x03_y02",
+      "image": "screenshot_x03_y02_ground.jpg",
+      "packed": true,
+      "pixels": [
+        1749,
+        1741
+      ]
+    },
+    {
+      "material": "Screenshot ground | screenshot_x03_y03",
+      "image": "screenshot_x03_y03_ground.jpg",
+      "packed": true,
+      "pixels": [
+        1749,
+        1741
+      ]
+    }
+  ],
+  "native_LOD_test": {
+    "near_camera_high_tiles": 10,
+    "far_camera_high_tiles": 0,
+    "passed": true
+  },
+  "screenshot_coverage_fraction": 0.446407506513117,
+  "Google_screenshot_alignment_is_approximate": true,
+  "native_FormIt_tested": false
+}

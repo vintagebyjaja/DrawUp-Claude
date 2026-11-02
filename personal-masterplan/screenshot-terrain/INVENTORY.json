@@ -1,0 +1,552 @@
+[
+  {
+    "path": "ATTRIBUTION.txt",
+    "bytes": 466,
+    "sha256": "7df7f4f76f0e390a97763901fdd2aed6849809a519295988367708d42509119e"
+  },
+  {
+    "path": "FormIt_City_Corrected_transform.json",
+    "bytes": 1766,
+    "sha256": "cacf11e2195d94df69534874f865a13e33d98eda7bea2e7f9ec2414c3d4ca999"
+  },
+  {
+    "path": "Monroe_Screenshot_Terrain.blend",
+    "bytes": 75907272,
+    "sha256": "fa6db6f5f8b5adb4e2f2049a8fe07e4bdde96ec8cdbeed74c28d4fc74e713113"
+  },
+  {
+    "path": "Monroe_Screenshot_Terrain.fbx",
+    "bytes": 36579548,
+    "sha256": "9e83cbde3a52fb29338b07be039f4a50484c918fd3c69b73340bb5c33e287251"
+  },
+  {
+    "path": "README.md",
+    "bytes": 6834,
+    "sha256": "0637b325b0eaafa48e9690400e6d6461c89ef7c5f02a5770fb699f17e3fce4eb"
+  },
+  {
+    "path": "layers/03_Roads_Source.fbx",
+    "bytes": 2137468,
+    "sha256": "00b09818c65961845cc6b51f43612adb7b5dc6e25bd17680466b347da81debab"
+  },
+  {
+    "path": "layers/05_Sidewalks_Paths_Source.fbx",
+    "bytes": 693804,
+    "sha256": "42210b6ea1a5ae38d532377b94813fbc5d289afcb6a172ee04f8e9677da39266"
+  },
+  {
+    "path": "layers/06_Curbs_Estimated.fbx",
+    "bytes": 1244892,
+    "sha256": "71a4300e9ac5d96548358ebd15ef603ad7f376d98f0cbe67ae4a8593e173e196"
+  },
+  {
+    "path": "original_geographic_plan.json",
+    "bytes": 455343,
+    "sha256": "091faaa2bee5efb21b83b7436aaa722c90e45765b36a3593f9a3f3e9fa9c1bdd"
+  },
+  {
+    "path": "previews/after_apartments.png",
+    "bytes": 2894600,
+    "sha256": "831b526306434e3bbf23cc42bf7d5fed6766f3372ee8b2d02c39d54f077d1556"
+  },
+  {
+    "path": "previews/after_full_coverage.png",
+    "bytes": 2855447,
+    "sha256": "b557ec1b2ebb5eb106f10be6cbd09d5a854e8e7860ef59a7bd6cec2118a74ecb"
+  },
+  {
+    "path": "previews/after_neighborhood.png",
+    "bytes": 3028925,
+    "sha256": "c157ed8da81dce26b1edf860a5c158b14cf1dd48e4a7c300f6fe538166b5dd63"
+  },
+  {
+    "path": "previews/after_school.png",
+    "bytes": 2860345,
+    "sha256": "42ef844056b829b1f38fa2ad4f77dabc1f899f781e6320e6c69c99acb8180efa"
+  },
+  {
+    "path": "previews/before_apartments.png",
+    "bytes": 2829052,
+    "sha256": "8c14da5e646ccf510674a4e00c27138fa008847a3081e41636d0dc785071141c"
+  },
+  {
+    "path": "previews/before_full_coverage.png",
+    "bytes": 2857949,
+    "sha256": "72615358524ec3086b88a2413fd057a83403da02ec8746f48fecf4c92c5c3a8f"
+  },
+  {
+    "path": "previews/before_neighborhood.png",
+    "bytes": 3011326,
+    "sha256": "6f96295c2bfc3d0cc913e718e9725a15a3c2bf07206528f7a0649b14a6730b3f"
+  },
+  {
+    "path": "previews/before_school.png",
+    "bytes": 2816294,
+    "sha256": "e3e99a472f19dcf4f2f1fec2022117a0592a7beddea98bf30a49ac0b6955fddd"
+  },
+  {
+    "path": "previews/comparison_apartments.jpg",
+    "bytes": 842782,
+    "sha256": "9b7b71c4caf45c9b098abf7b908cf09490711d9fa8cf3330ded8077b1a44108a"
+  },
+  {
+    "path": "previews/comparison_neighborhood.jpg",
+    "bytes": 1080464,
+    "sha256": "c4dd4091c681ac956a974f38cd1515ae4b565131181fd11c60b137aefa876830"
+  },
+  {
+    "path": "previews/comparison_school.jpg",
+    "bytes": 783919,
+    "sha256": "08f36bc67e5421a721d2c73efbb45e16a565817568c9aa3ac44a3971e19f3645"
+  },
+  {
+    "path": "scripts/apply_to_scene.py",
+    "bytes": 3585,
+    "sha256": "dd35c684d2555d61ba9966ada043c0d1f977fb9e09c6d95f842b6980907b6846"
+  },
+  {
+    "path": "scripts/build_screenshot_tiles.py",
+    "bytes": 8948,
+    "sha256": "a49accf8bf23ad9e2cb286c33fcfabf0517c75d4d23fb9ea4062da212a446adc"
+  },
+  {
+    "path": "scripts/check_final_native.py",
+    "bytes": 1407,
+    "sha256": "951af59a393de78bf44dcdb9bf68eea0411e3f96af433148623eeb19c1f4f07d"
+  },
+  {
+    "path": "scripts/extract_registration_geometry.py",
+    "bytes": 1095,
+    "sha256": "31b99d3f05e3fd6358f1da5436c5aeb933ebf0abc16b185a9d51ec31df5112ca"
+  },
+  {
+    "path": "scripts/lod_screenshots.py",
+    "bytes": 2278,
+    "sha256": "9af2327d10735b7860e50fe8b38593e962e841c6c2fb05ad2024f146adfa743e"
+  },
+  {
+    "path": "scripts/render_school_unclipped.py",
+    "bytes": 1966,
+    "sha256": "802cf5fb7f25294b487aa847daf050ecd7c096186c746faed6f9c2c410e87c77"
+  },
+  {
+    "path": "scripts/save_native_full_detail.py",
+    "bytes": 2649,
+    "sha256": "8cc339decadea05555858fb3ef94f3a9148071ce6e507cf533a3b1a74896e471"
+  },
+  {
+    "path": "scripts/screenshot_terrain.py",
+    "bytes": 5020,
+    "sha256": "5e2634f75ad1dc4d749735557a37889eddb3efe0bac1dee0dd9e47039c7eed87"
+  },
+  {
+    "path": "scripts/validate_and_render.py",
+    "bytes": 5693,
+    "sha256": "485671f0e1c7623e1c79dcd6dd758113a44bf6ed60a0401e934d889f35e4f23a"
+  },
+  {
+    "path": "scripts/verify_uv_and_embedded_tiles.py",
+    "bytes": 1706,
+    "sha256": "7d8a500100e5516bd50d46d3bffc78518d5f6ad91ae8bee159d6334189424928"
+  },
+  {
+    "path": "source_georeference.json",
+    "bytes": 1685,
+    "sha256": "e367155b4d1dd0191e1015a0038355de9387e92d0f83ee3f2ad3dc638bce85f1"
+  },
+  {
+    "path": "source_metadata.json",
+    "bytes": 1544,
+    "sha256": "e3458db3192e1aadb4f60151bc383897c92edbd984979580230bd60205e163d9"
+  },
+  {
+    "path": "textures/apartment_brick.png",
+    "bytes": 1504,
+    "sha256": "f8f45878dc25f057fa615268f6f1f11175d40edbe09010cef09b90d3509de412"
+  },
+  {
+    "path": "textures/apartment_facade_pattern.png",
+    "bytes": 8461,
+    "sha256": "5ebe1931afd3a374c66d795c3727f356e9b81a8448433f60b3a22a724c7c83a0"
+  },
+  {
+    "path": "textures/apartment_facade_reference.jpg",
+    "bytes": 652131,
+    "sha256": "716abe829c3f70cda2c381f09c794234ae40e3cbf3d22a6cb6709711370a1d5e"
+  },
+  {
+    "path": "textures/building_2099_Unified_Color.png",
+    "bytes": 627973,
+    "sha256": "bb974bc077cd91610b0cec212cea7d16ece56fd47894bd14ed979bb62d4ceee2"
+  },
+  {
+    "path": "textures/building_2356_Unified_Color.png",
+    "bytes": 802816,
+    "sha256": "8639c5cb137b430fa0c55f631c1ff118022d7002cc069e632105b00d001b6151"
+  },
+  {
+    "path": "textures/building_2603_Unified_Color.png",
+    "bytes": 461555,
+    "sha256": "1b07032e4e8dc69f96f119531df591a4cb2953b8506003275ac7abc000191adb"
+  },
+  {
+    "path": "textures/building_2664_Unified_Color.png",
+    "bytes": 261892,
+    "sha256": "2c9eba2c5e1ec1d5a38cf6d5aef5f35fbe425efe667e7153d784c60763d269d6"
+  },
+  {
+    "path": "textures/building_2772_Unified_Color.png",
+    "bytes": 399015,
+    "sha256": "5cab733092f50c2784b8b64443815f88d8a8550a45b1de983ef6da2bb611cdd8"
+  },
+  {
+    "path": "textures/context_cream_render_01floors_charcoal.png",
+    "bytes": 3880,
+    "sha256": "80877f77c7f589e7838fb6019f356739f1b50a75ba8c75990a597ae967c60c86"
+  },
+  {
+    "path": "textures/context_cream_render_02floors_charcoal.png",
+    "bytes": 4027,
+    "sha256": "f3ea4491b9d1d12d99e63664f39228d5cca1f0af356c2ccdc55100e96dc1ecad"
+  },
+  {
+    "path": "textures/context_cream_render_02floors_midgray.png",
+    "bytes": 4030,
+    "sha256": "2d9d700f9c2d1e87c0ff5bcf904ac64d27986bf10e050bc8a665749671ab4a55"
+  },
+  {
+    "path": "textures/context_cream_render_02floors_palegray.png",
+    "bytes": 4028,
+    "sha256": "73e3079a69b58961281bdc5dbc7dfbc86f1e13b314b9677d4aa9cde372123b6f"
+  },
+  {
+    "path": "textures/context_cream_render_03floors_midgray.png",
+    "bytes": 4174,
+    "sha256": "b4c9ccf70fd4ce567032df276510b5f61e91a8f61dad259ccb8787617d1c3625"
+  },
+  {
+    "path": "textures/context_tan_brick_02floors_midgray.png",
+    "bytes": 11537,
+    "sha256": "fdd6a7d8770e501c52b06c41571b487357a01006aff350234643258ffa57eab1"
+  },
+  {
+    "path": "textures/context_tan_brick_02floors_palegray.png",
+    "bytes": 11540,
+    "sha256": "3a13bfe7e603c382632ecab29d46493be932380080726e132eb9eb78a48591d0"
+  },
+  {
+    "path": "textures/context_tan_brick_03floors_charcoal.png",
+    "bytes": 11954,
+    "sha256": "c60112bb5dcb04c7caaf585d0a039b5d6bed0a8db4b0d74178cc7be108464cb3"
+  },
+  {
+    "path": "textures/context_tan_brick_03floors_midgray.png",
+    "bytes": 11956,
+    "sha256": "3b7e5595fdbcd03b7d6028b04ddf0b259d89d14bbcefe9ac6b9e1beb0c38f327"
+  },
+  {
+    "path": "textures/context_tan_brick_03floors_palegray.png",
+    "bytes": 11955,
+    "sha256": "63d7f9a16fef9dd82a512413785cae96d2bd6e30865b525e9fd372e129184b40"
+  },
+  {
+    "path": "textures/context_tan_brick_04floors_midgray.png",
+    "bytes": 11983,
+    "sha256": "9bc5e9b668f27e2a75092f9ad54a80b68336909fe001eb555f7944c9ff9f4144"
+  },
+  {
+    "path": "textures/context_tan_brick_04floors_palegray.png",
+    "bytes": 11981,
+    "sha256": "633a0f312a431743c94380b284b6c5805187248ead5a620cf6aaba63c32afd88"
+  },
+  {
+    "path": "textures/context_tan_brick_05floors_midgray.png",
+    "bytes": 11995,
+    "sha256": "1d82417ca50ba5aa5d2120f7056390b0ab1e874be5ea3e976cffa46c496b3bca"
+  },
+  {
+    "path": "textures/context_tan_brick_06floors_midgray.png",
+    "bytes": 12404,
+    "sha256": "78c966eecdf98803d8feb8c2b1102d67e72b1b2e69f33f15fedc31fc9e8c0f64"
+  },
+  {
+    "path": "textures/context_tan_brick_07floors_midgray.png",
+    "bytes": 12644,
+    "sha256": "cc3ed4da16fe9657bf2670557717702da0774835fe34713b80ce165eb8bf632c"
+  },
+  {
+    "path": "textures/context_tan_brick_08floors_midgray.png",
+    "bytes": 12629,
+    "sha256": "ace6963558b66ee0062a86200a583cac9849c36ad6a0c43514ea4edb9298e55b"
+  },
+  {
+    "path": "textures/context_warm_brick_01floors_charcoal.png",
+    "bytes": 11276,
+    "sha256": "f59ffbc9e79479823e20823e40e99327c8a4fe1737a8f3fe334a41bdfd6c9116"
+  },
+  {
+    "path": "textures/context_warm_brick_01floors_midgray.png",
+    "bytes": 11279,
+    "sha256": "9aa3c4a78d07fe3518d3cc93bda57fa2cb153892b844e2819d17a7693d60ba8b"
+  },
+  {
+    "path": "textures/context_warm_brick_01floors_palegray.png",
+    "bytes": 11279,
+    "sha256": "55135bc4d3c6aa240412428f9955b9f7c266f62695f5b0bcce916c21afee2717"
+  },
+  {
+    "path": "textures/context_warm_brick_02floors_charcoal.png",
+    "bytes": 11379,
+    "sha256": "a7df272b86e74bfb70afd9d48a1040ce008cae190ef31925ab9d0eadf350407a"
+  },
+  {
+    "path": "textures/context_warm_brick_02floors_midgray.png",
+    "bytes": 11384,
+    "sha256": "2b101e7ad7c87c3aa48484ee576e64aec07140bf5d3146c83d3cc039fd7b0927"
+  },
+  {
+    "path": "textures/context_warm_brick_02floors_palegray.png",
+    "bytes": 11382,
+    "sha256": "f852ba722009b06ba21cb86cd9de9a71772fa2529d705929acd9d2ae18c6c5b7"
+  },
+  {
+    "path": "textures/context_warm_brick_02floors_redbrown.png",
+    "bytes": 11377,
+    "sha256": "8c5a3aa6233ad664291d9b8fa22ff9efcd5ce87749eb55a42d308a8bbe084fcb"
+  },
+  {
+    "path": "textures/context_warm_brick_03floors_charcoal.png",
+    "bytes": 11818,
+    "sha256": "4b486894baba9d07865792ff944a88aebf3a1322ad6953e0bb9ef415561479e2"
+  },
+  {
+    "path": "textures/context_warm_brick_03floors_midgray.png",
+    "bytes": 11821,
+    "sha256": "5737a4f1ef85779c45158870a58e048192d1f00706577fa44e9eb81f40e8a2a7"
+  },
+  {
+    "path": "textures/context_warm_brick_03floors_palegray.png",
+    "bytes": 11821,
+    "sha256": "0c788e1580e82dea2ae2916a4b9530e4c4881821ea819019516c8044980a6892"
+  },
+  {
+    "path": "textures/corner_facade.png",
+    "bytes": 7315,
+    "sha256": "649d40ec9b637b39c0abd4cd09e9726193bd15f85665fe422af550fd2ba8452f"
+  },
+  {
+    "path": "textures/maptexture.jpg",
+    "bytes": 1394185,
+    "sha256": "9b5575bc7bd820ff7b7c88ac1abf6422312c7e712bf3a99040ad73093fa91f44"
+  },
+  {
+    "path": "textures/monroe_facade_reference.jpg",
+    "bytes": 160987,
+    "sha256": "ea42d72d923a5c7061e547c242ef39c0570f18cc831b1d6fa322e34be4bbaef8"
+  },
+  {
+    "path": "textures/school_brick.png",
+    "bytes": 1512,
+    "sha256": "9cf7591474e5ad048ebcdb00df9e6964343db441cf87b74c3257416bc4c161b1"
+  },
+  {
+    "path": "textures/screenshot_manifest.json",
+    "bytes": 13445,
+    "sha256": "32b54ffa6b2ff4e381173526b5d9dad5b3fd92bd9e8e6c84722076e9a7a48701"
+  },
+  {
+    "path": "textures/screenshot_x00_y00_ground.jpg",
+    "bytes": 745399,
+    "sha256": "e7bd093a1d8fb44fe609e552a2942cdce987d34202fcd31a6b05164f39ac546f"
+  },
+  {
+    "path": "textures/screenshot_x00_y00_overview.jpg",
+    "bytes": 85622,
+    "sha256": "4fc8475f878899bca19c13fbc5302600ef46517c44de0f373bb3323a1b47b142"
+  },
+  {
+    "path": "textures/screenshot_x00_y01_ground.jpg",
+    "bytes": 743875,
+    "sha256": "59d9f3cbf1a214157f233b341210142985eeff1fb9ed410ee60075984fb883b3"
+  },
+  {
+    "path": "textures/screenshot_x00_y01_overview.jpg",
+    "bytes": 84790,
+    "sha256": "9bd1cba349c155eba62f794a161e8d57e0433d2ca2075ab4331ac0f530a126f6"
+  },
+  {
+    "path": "textures/screenshot_x00_y02_ground.jpg",
+    "bytes": 671322,
+    "sha256": "5bdc73b438bdd617e0a2e0a92ba7edd202350a4247745ecd65021388103a2baa"
+  },
+  {
+    "path": "textures/screenshot_x00_y02_overview.jpg",
+    "bytes": 75422,
+    "sha256": "d0301690e71bf9d026f045c17095cd221af9c7b359bb7cdedd54f951e6614228"
+  },
+  {
+    "path": "textures/screenshot_x00_y03_ground.jpg",
+    "bytes": 635807,
+    "sha256": "10d11a014cddd479b37d7ce04397969083c3ede058143b6449dcd0a9ccb5b3f9"
+  },
+  {
+    "path": "textures/screenshot_x00_y03_overview.jpg",
+    "bytes": 71695,
+    "sha256": "6d6b678dd7105013a232b768ebe2f98a27169f77ee11102f743c4f18fbc2699e"
+  },
+  {
+    "path": "textures/screenshot_x01_y00_ground.jpg",
+    "bytes": 732764,
+    "sha256": "9a6ae13f24676b96c88b23584e5b6e721c7163355115d3b478f1760734e12c3b"
+  },
+  {
+    "path": "textures/screenshot_x01_y00_overview.jpg",
+    "bytes": 84435,
+    "sha256": "67c1f21c03d7e37f370503a5181719e2ca5d3abe1c73944e69547203cb55f3e0"
+  },
+  {
+    "path": "textures/screenshot_x01_y01_ground.jpg",
+    "bytes": 687674,
+    "sha256": "ce89b99ed7da90ce24a7a568117dae7c9383e30eaa2f5c574b89b2080509aa21"
+  },
+  {
+    "path": "textures/screenshot_x01_y01_overview.jpg",
+    "bytes": 78308,
+    "sha256": "d0368b6d941ebe02a68dc440cd04417b95433667ccacee364a89117afbdfcbcd"
+  },
+  {
+    "path": "textures/screenshot_x01_y02_ground.jpg",
+    "bytes": 642797,
+    "sha256": "7b67df9c923acb0a4e673a25ca682c551a67a0c05641e50554d8930a0eac07c5"
+  },
+  {
+    "path": "textures/screenshot_x01_y02_overview.jpg",
+    "bytes": 71382,
+    "sha256": "faf6321f98d2d33832d57a5600cecea3c9f2fa7c29c391abd87ca18a817a306e"
+  },
+  {
+    "path": "textures/screenshot_x01_y03_ground.jpg",
+    "bytes": 735763,
+    "sha256": "10115d11cb4a9bfd93f5f1ed47d1209e6c399af99e3024a54accd40b1ddefd04"
+  },
+  {
+    "path": "textures/screenshot_x01_y03_overview.jpg",
+    "bytes": 79047,
+    "sha256": "901c7a267913f719342c7125e3886507b466dd257ae51dc99f1ff5463ca859b8"
+  },
+  {
+    "path": "textures/screenshot_x02_y00_ground.jpg",
+    "bytes": 769615,
+    "sha256": "6031ef6c673826c7b518515c2df1158c0af88324663286586cf66a90ee99dc60"
+  },
+  {
+    "path": "textures/screenshot_x02_y00_overview.jpg",
+    "bytes": 87929,
+    "sha256": "8584f52485a7222bccea09ed8cd9d38882c1bb30d0be891ea95631c9ac357e62"
+  },
+  {
+    "path": "textures/screenshot_x02_y01_ground.jpg",
+    "bytes": 739041,
+    "sha256": "1b616e77a6393feb79bd55d7c4081df15901b3e38019cccbb733e4574d66e078"
+  },
+  {
+    "path": "textures/screenshot_x02_y01_overview.jpg",
+    "bytes": 84980,
+    "sha256": "fb15c50b72e3499220d527cfb7627fceb39939fa57187dbc4a475543294b9f22"
+  },
+  {
+    "path": "textures/screenshot_x02_y02_ground.jpg",
+    "bytes": 616400,
+    "sha256": "757c91f98fc973ce60af50504f8faf7f37e5fae64b5ee3df7d535f7ad374f6fd"
+  },
+  {
+    "path": "textures/screenshot_x02_y02_overview.jpg",
+    "bytes": 68606,
+    "sha256": "eab864c92615275a8d0c3704e0a577d78e75e0d20dde70dc5d6e5d965aea5f19"
+  },
+  {
+    "path": "textures/screenshot_x02_y03_ground.jpg",
+    "bytes": 659739,
+    "sha256": "cb0f4e9346cdbf4aba5bd91e0c09efc5d55ffd567231b2feda2aa5c112ec5564"
+  },
+  {
+    "path": "textures/screenshot_x02_y03_overview.jpg",
+    "bytes": 73053,
+    "sha256": "f1b2598e3e17ec929e61f5126bbd8e50a574af38561195833ad4403c4165299f"
+  },
+  {
+    "path": "textures/screenshot_x03_y00_ground.jpg",
+    "bytes": 724668,
+    "sha256": "e0fa1fe0f9e1aa0983162cc9ef89eb60e14bf987a57cee31a619031918e3acb8"
+  },
+  {
+    "path": "textures/screenshot_x03_y00_overview.jpg",
+    "bytes": 82610,
+    "sha256": "2a0dcc07b157594730fe9e1319aa642a7203b38ab611cc46a4d2b42c9263f333"
+  },
+  {
+    "path": "textures/screenshot_x03_y01_ground.jpg",
+    "bytes": 698168,
+    "sha256": "925d2bc9840704a448b24e2a7a2f8f4f2355a3a969acbf113e7eaeab6694915f"
+  },
+  {
+    "path": "textures/screenshot_x03_y01_overview.jpg",
+    "bytes": 78158,
+    "sha256": "53db226c0323c7004ade28eb48ec739721a4ef3ece5a019415753b7f8559eb6a"
+  },
+  {
+    "path": "textures/screenshot_x03_y02_ground.jpg",
+    "bytes": 635272,
+    "sha256": "693553f6feaf4020bb8bf4e136d48b0ff7fdf75fdb75396b19f7ac5e52cea21f"
+  },
+  {
+    "path": "textures/screenshot_x03_y02_overview.jpg",
+    "bytes": 71049,
+    "sha256": "08e925d140c7b27873f887d738570a82698c657f4b8b48442f45e939d847e5c9"
+  },
+  {
+    "path": "textures/screenshot_x03_y03_ground.jpg",
+    "bytes": 647881,
+    "sha256": "cd30f5fb1b6192b3a0b538b422cb6111e92e9d2d27d443200c8546a10637dd19"
+  },
+  {
+    "path": "textures/screenshot_x03_y03_overview.jpg",
+    "bytes": 72984,
+    "sha256": "b8cea1139e1cc8e69ce2e7099ff71de0f520ffb25ebfbcc1e9b8f30ea717262e"
+  },
+  {
+    "path": "textures/solar_cells.png",
+    "bytes": 1678,
+    "sha256": "bbd0713edd3c260a9032c4ac15cef9ef2937255868255fb6f4093f4aedb4e1c3"
+  },
+  {
+    "path": "validation/UV_and_texture_integrity.json",
+    "bytes": 1654,
+    "sha256": "0afc647c1d15ee85884fbcc04cb840f15e3a52e9e696455baccc2fe6381be551"
+  },
+  {
+    "path": "validation/final_native_check.json",
+    "bytes": 232,
+    "sha256": "da3c3fb9b46a8d9de4a14ef127945d9f9ef11c5b9819f1168327f3a2c1ca8bb0"
+  },
+  {
+    "path": "validation/reimport_report.json",
+    "bytes": 3804,
+    "sha256": "14a3fb22f4638e055486058c2f5c3a40fa8435315cf4c305a6ce4f2a7c4ef965"
+  },
+  {
+    "path": "validation/retained_baseline_road_width.json",
+    "bytes": 1441,
+    "sha256": "ad07c5bf28c7e6c950314a0646c2634f6fb3ba0fab0b3cf1f2fb88eaa4ace931"
+  },
+  {
+    "path": "validation/scene_update.json",
+    "bytes": 434719,
+    "sha256": "8c82a0e42100c5cb53d620e4e4d9fa1e56de2268d030cecdf9ba961c3e1eb4a6"
+  },
+  {
+    "path": "validation/screenshot_registration.json",
+    "bytes": 4509,
+    "sha256": "f66d1fd5254f61c4d64caeab6043c192aa00efb094c29770e258a51a688b6aae"
+  }
+]

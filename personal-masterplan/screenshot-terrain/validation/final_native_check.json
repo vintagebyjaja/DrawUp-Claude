@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "native_full_size_tiles_packed": 16,
+  "building_meshes": 3159,
+  "each_building_one_material": true,
+  "saved_cameras": 4,
+  "active_camera": "Camera_neighborhood",
+  "original_baseline_file_unchanged": true
+}

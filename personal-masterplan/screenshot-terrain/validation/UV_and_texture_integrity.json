@@ -1,0 +1,71 @@
+{
+  "passed": true,
+  "UV_meshes_checked": 4083,
+  "UV_failures": [],
+  "embedded_tile_checks": [
+    {
+      "tile": "screenshot_x00_y00",
+      "embedded_bytes_match_texture_file": true
+    },
+    {
+      "tile": "screenshot_x01_y00",
+      "embedded_bytes_match_texture_file": true
+    },
+    {
+      "tile": "screenshot_x02_y00",
+      "embedded_bytes_match_texture_file": true
+    },
+    {
+      "tile": "screenshot_x03_y00",
+      "embedded_bytes_match_texture_file": true
+    },
+    {
+      "tile": "screenshot_x00_y01",
+      "embedded_bytes_match_texture_file": true
+    },
+    {
+      "tile": "screenshot_x01_y01",
+      "embedded_bytes_match_texture_file": true
+    },
+    {
+      "tile": "screenshot_x02_y01",
+      "embedded_bytes_match_texture_file": true
+    },
+    {
+      "tile": "screenshot_x03_y01",
+      "embedded_bytes_match_texture_file": true
+    },
+    {
+      "tile": "screenshot_x00_y02",
+      "embedded_bytes_match_texture_file": true
+    },
+    {
+      "tile": "screenshot_x01_y02",
+      "embedded_bytes_match_texture_file": true
+    },
+    {
+      "tile": "screenshot_x02_y02",
+      "embedded_bytes_match_texture_file": true
+    },
+    {
+      "tile": "screenshot_x03_y02",
+      "embedded_bytes_match_texture_file": true
+    },
+    {
+      "tile": "screenshot_x00_y03",
+      "embedded_bytes_match_texture_file": true
+    },
+    {
+      "tile": "screenshot_x01_y03",
+      "embedded_bytes_match_texture_file": true
+    },
+    {
+      "tile": "screenshot_x02_y03",
+      "embedded_bytes_match_texture_file": true
+    },
+    {
+      "tile": "screenshot_x03_y03",
+      "embedded_bytes_match_texture_file": true
+    }
+  ]
+}
