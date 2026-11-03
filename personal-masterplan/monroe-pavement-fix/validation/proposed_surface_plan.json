@@ -1,0 +1,5153 @@
+{
+  "width_factor_unverified": 1.5714285714285714,
+  "source_road_segments_rebuilt": 642,
+  "sidewalk_old_segments_rebuilt": 407,
+  "new_roadside_sidewalk_area_m2": 102348.87128044003,
+  "garage_old_area_m2": 70.80310406999988,
+  "garage_new_area_m2": 48.48513009999989,
+  "garage_overlap_with_carriageway_m2": 0.0,
+  "garage_mouth_max_vertical_step_m": 1.251796809143002e-05,
+  "buildings_moved_or_scaled": false,
+  "schedule": [
+    {
+      "source": "road_local_203",
+      "old_nominal_m": 6.7056,
+      "target_width_m": 6.7056,
+      "target_width_ft": 21.999999999999996,
+      "area_constrained_at_buildings_m2": 3.410605131648481e-13,
+      "policy": "22 ft user reference retained"
+    },
+    {
+      "source": "road_local_261",
+      "old_nominal_m": 6.7056,
+      "target_width_m": 6.7056,
+      "target_width_ft": 21.999999999999996,
+      "area_constrained_at_buildings_m2": 3.410605131648481e-13,
+      "policy": "22 ft user reference retained"
+    },
+    {
+      "source": "C_Lincoln_Street_Measured_33ft",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 10.0584,
+      "target_width_ft": 33.0,
+      "area_constrained_at_buildings_m2": 0.0007525855889980448,
+      "policy": "33 ft user reference, extended along the same matched street"
+    },
+    {
+      "source": "road_arterial_0",
+      "old_nominal_m": 10.0,
+      "target_width_m": 15.714285714285714,
+      "target_width_ft": 51.55605549306336,
+      "area_constrained_at_buildings_m2": -4.547473508864641e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_arterial_1",
+      "old_nominal_m": 10.0,
+      "target_width_m": 15.714285714285714,
+      "target_width_ft": 51.55605549306336,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_arterial_10",
+      "old_nominal_m": 10.0,
+      "target_width_m": 15.714285714285714,
+      "target_width_ft": 51.55605549306336,
+      "area_constrained_at_buildings_m2": -3.410605131648481e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_arterial_11",
+      "old_nominal_m": 10.0,
+      "target_width_m": 15.714285714285714,
+      "target_width_ft": 51.55605549306336,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_arterial_12",
+      "old_nominal_m": 10.0,
+      "target_width_m": 15.714285714285714,
+      "target_width_ft": 51.55605549306336,
+      "area_constrained_at_buildings_m2": -2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_arterial_13",
+      "old_nominal_m": 10.0,
+      "target_width_m": 15.714285714285714,
+      "target_width_ft": 51.55605549306336,
+      "area_constrained_at_buildings_m2": 2.8421709430404007e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_arterial_14",
+      "old_nominal_m": 10.0,
+      "target_width_m": 15.714285714285714,
+      "target_width_ft": 51.55605549306336,
+      "area_constrained_at_buildings_m2": -1.1368683772161603e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_arterial_15",
+      "old_nominal_m": 10.0,
+      "target_width_m": 15.714285714285714,
+      "target_width_ft": 51.55605549306336,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_arterial_16",
+      "old_nominal_m": 10.0,
+      "target_width_m": 15.714285714285714,
+      "target_width_ft": 51.55605549306336,
+      "area_constrained_at_buildings_m2": -2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_arterial_17",
+      "old_nominal_m": 10.0,
+      "target_width_m": 15.714285714285714,
+      "target_width_ft": 51.55605549306336,
+      "area_constrained_at_buildings_m2": -5.684341886080802e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_arterial_18",
+      "old_nominal_m": 10.0,
+      "target_width_m": 15.714285714285714,
+      "target_width_ft": 51.55605549306336,
+      "area_constrained_at_buildings_m2": -3.410605131648481e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_arterial_19",
+      "old_nominal_m": 10.0,
+      "target_width_m": 15.714285714285714,
+      "target_width_ft": 51.55605549306336,
+      "area_constrained_at_buildings_m2": 1.8189894035458565e-12,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_arterial_2",
+      "old_nominal_m": 10.0,
+      "target_width_m": 15.714285714285714,
+      "target_width_ft": 51.55605549306336,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_arterial_20",
+      "old_nominal_m": 10.0,
+      "target_width_m": 15.714285714285714,
+      "target_width_ft": 51.55605549306336,
+      "area_constrained_at_buildings_m2": -2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_arterial_21",
+      "old_nominal_m": 10.0,
+      "target_width_m": 15.714285714285714,
+      "target_width_ft": 51.55605549306336,
+      "area_constrained_at_buildings_m2": -6.821210263296962e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_arterial_22",
+      "old_nominal_m": 10.0,
+      "target_width_m": 15.714285714285714,
+      "target_width_ft": 51.55605549306336,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_arterial_23",
+      "old_nominal_m": 10.0,
+      "target_width_m": 15.714285714285714,
+      "target_width_ft": 51.55605549306336,
+      "area_constrained_at_buildings_m2": 1.8189894035458565e-12,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_arterial_24",
+      "old_nominal_m": 10.0,
+      "target_width_m": 15.714285714285714,
+      "target_width_ft": 51.55605549306336,
+      "area_constrained_at_buildings_m2": 2.2737367544323206e-12,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_arterial_25",
+      "old_nominal_m": 10.0,
+      "target_width_m": 15.714285714285714,
+      "target_width_ft": 51.55605549306336,
+      "area_constrained_at_buildings_m2": -3.410605131648481e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_arterial_26",
+      "old_nominal_m": 10.0,
+      "target_width_m": 15.714285714285714,
+      "target_width_ft": 51.55605549306336,
+      "area_constrained_at_buildings_m2": -4.547473508864641e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_arterial_27",
+      "old_nominal_m": 10.0,
+      "target_width_m": 15.714285714285714,
+      "target_width_ft": 51.55605549306336,
+      "area_constrained_at_buildings_m2": 4.547473508864641e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_arterial_28",
+      "old_nominal_m": 10.0,
+      "target_width_m": 15.714285714285714,
+      "target_width_ft": 51.55605549306336,
+      "area_constrained_at_buildings_m2": 1.1368683772161603e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_arterial_29",
+      "old_nominal_m": 10.0,
+      "target_width_m": 15.714285714285714,
+      "target_width_ft": 51.55605549306336,
+      "area_constrained_at_buildings_m2": 1.1368683772161603e-12,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_arterial_3",
+      "old_nominal_m": 10.0,
+      "target_width_m": 15.714285714285714,
+      "target_width_ft": 51.55605549306336,
+      "area_constrained_at_buildings_m2": -1.3642420526593924e-12,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_arterial_30",
+      "old_nominal_m": 10.0,
+      "target_width_m": 15.714285714285714,
+      "target_width_ft": 51.55605549306336,
+      "area_constrained_at_buildings_m2": 1.0913936421275139e-11,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_arterial_31",
+      "old_nominal_m": 10.0,
+      "target_width_m": 15.714285714285714,
+      "target_width_ft": 51.55605549306336,
+      "area_constrained_at_buildings_m2": -2.842170943040401e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_arterial_4",
+      "old_nominal_m": 10.0,
+      "target_width_m": 15.714285714285714,
+      "target_width_ft": 51.55605549306336,
+      "area_constrained_at_buildings_m2": -1.3642420526593924e-12,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_arterial_5",
+      "old_nominal_m": 10.0,
+      "target_width_m": 15.714285714285714,
+      "target_width_ft": 51.55605549306336,
+      "area_constrained_at_buildings_m2": -2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_arterial_6",
+      "old_nominal_m": 10.0,
+      "target_width_m": 15.714285714285714,
+      "target_width_ft": 51.55605549306336,
+      "area_constrained_at_buildings_m2": -6.821210263296962e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_arterial_7",
+      "old_nominal_m": 10.0,
+      "target_width_m": 15.714285714285714,
+      "target_width_ft": 51.55605549306336,
+      "area_constrained_at_buildings_m2": -3.410605131648481e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_arterial_8",
+      "old_nominal_m": 10.0,
+      "target_width_m": 15.714285714285714,
+      "target_width_ft": 51.55605549306336,
+      "area_constrained_at_buildings_m2": -1.8189894035458565e-12,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_arterial_9",
+      "old_nominal_m": 10.0,
+      "target_width_m": 15.714285714285714,
+      "target_width_ft": 51.55605549306336,
+      "area_constrained_at_buildings_m2": 1.1368683772161603e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_0",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": 2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_1",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": -1.1368683772161603e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_10",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": -2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_11",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": -5.684341886080802e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_12",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": -8.526512829121202e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_13",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": 2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_14",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": 9.094947017729282e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_15",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_16",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": -1.1368683772161603e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_17",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": 4.547473508864641e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_18",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": 2.2737367544323206e-12,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_19",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": -9.094947017729282e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_2",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": 5.684341886080802e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_20",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": -6.821210263296962e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_21",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": -2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_22",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": 3.410605131648481e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_23",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": 1.7053025658242404e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_24",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": 5.684341886080802e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_25",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": 5.684341886080802e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_26",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": 5.684341886080802e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_27",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_28",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_29",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": 1.1368683772161603e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_3",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": 2.842170943040401e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_30",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": -2.842170943040401e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_31",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_32",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": 2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_33",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": 2.842170943040401e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_34",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": 1.1368683772161603e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_35",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": 1.8189894035458565e-12,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_36",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_37",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": 1.1368683772161603e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_38",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": 1.1368683772161603e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_39",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": -5.684341886080801e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_4",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": -5.684341886080801e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_40",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": 3.410605131648481e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_41",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": 2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_42",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": -3.410605131648481e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_43",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": -2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_44",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": -2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_45",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": 4.547473508864641e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_46",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": -6.821210263296962e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_47",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": -3.410605131648481e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_48",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": 1.1368683772161603e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_49",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": 5.684341886080802e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_5",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": 2.2737367544323206e-12,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_50",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": 5.684341886080802e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_51",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": 1.1368683772161603e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_52",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": -1.1368683772161603e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_53",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": 2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_54",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": 2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_55",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": 5.684341886080802e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_56",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": -2.9558577807620168e-12,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_57",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": 5.684341886080802e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_58",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_59",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_6",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": 2.842170943040401e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_60",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_61",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_62",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_63",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": -1.1368683772161603e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_64",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": -1.1368683772161603e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_65",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_66",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": -3.410605131648481e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_67",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": -5.684341886080802e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_68",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": -2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_69",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": 1.1368683772161603e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_7",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": 5.684341886080802e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_70",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": -5.684341886080802e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_71",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": 1.1368683772161603e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_72",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": 4.547473508864641e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_73",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": -5.684341886080802e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_74",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": -2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_75",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": 2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_76",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": -3.183231456205249e-12,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_77",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": 4.547473508864641e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_78",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": 1.1368683772161603e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_79",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_8",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": -5.684341886080802e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_80",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": 3.410605131648481e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_81",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": 1.1368683772161603e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_82",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": 1.1368683772161603e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_83",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": 2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_84",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_85",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": 1.1368683772161603e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_86",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": 5.684341886080802e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_87",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": 5.4569682106375694e-12,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_collector_9",
+      "old_nominal_m": 6.0,
+      "target_width_m": 9.428571428571429,
+      "target_width_ft": 30.93363329583802,
+      "area_constrained_at_buildings_m2": -2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_0",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -1.1368683772161603e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_1",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -1.5916157281026244e-12,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_10",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 5.684341886080801e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_100",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_101",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_102",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 3.410605131648481e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_103",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 9.094947017729282e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_104",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -1.1368683772161603e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_105",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 1.3642420526593924e-12,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_106",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -4.547473508864641e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_107",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 1.1368683772161603e-12,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_108",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -1.4210854715202004e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_109",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -8.526512829121202e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_11",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -9.094947017729282e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_110",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 1.4210854715202004e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_111",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 9.094947017729282e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_112",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_113",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 1.1368683772161603e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_114",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 1.1368683772161603e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_115",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -2.842170943040401e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_116",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -4.320099833421409e-12,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_117",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_118",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -3.410605131648481e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_119",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 8.448589134996837,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_12",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_120",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_121",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 4.547473508864641e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_122",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 2.842170943040401e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_123",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -1.0231815394945443e-12,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_124",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -9.094947017729282e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_125",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_126",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 8.526512829121202e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_127",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_128",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_129",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -3.552713678800501e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_13",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -5.9117155615240335e-12,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_130",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -3.410605131648481e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_131",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_132",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_133",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -6.821210263296962e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_134",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -3.410605131648481e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_135",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 4.547473508864641e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_136",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_137",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 5.684341886080802e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_138",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -3.183231456205249e-12,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_139",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -8.526512829121202e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_14",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 1.7053025658242404e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_140",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 6.821210263296962e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_141",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_142",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_143",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 4.547473508864641e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_144",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_145",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -1.5916157281026244e-12,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_146",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 4.547473508864641e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_147",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_148",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -1.1368683772161603e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_149",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_15",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_150",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 2.842170943040401e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_151",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 1.1368683772161603e-12,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_152",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_153",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 2.842170943040401e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_154",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 6.821210263296962e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_155",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_156",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_157",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 1.1368683772161603e-12,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_158",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 3.410605131648481e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_159",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 5.684341886080802e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_16",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -5.684341886080801e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_160",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_161",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 3.410605131648481e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_162",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 1.1368683772161603e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_163",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_164",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -1.7053025658242404e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_165",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -2.842170943040401e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_166",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_167",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 6.821210263296962e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_168",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 6.821210263296962e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_169",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -1.8189894035458565e-12,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_17",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_170",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -1.1368683772161603e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_171",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 8.526512829121202e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_172",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_173",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_174",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_175",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 1.1368683772161603e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_176",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -2.0463630789890885e-12,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_177",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_178",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -2.2737367544323206e-12,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_179",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_18",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 9.094947017729282e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_180",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_181",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -9.094947017729282e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_182",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -1.7053025658242404e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_183",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_184",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 6.821210263296962e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_185",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_186",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 3.410605131648481e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_187",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 9.094947017729282e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_188",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 3.410605131648481e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_189",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -8.526512829121202e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_19",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -7.958078640513122e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_190",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -3.979039320256561e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_191",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 1.1368683772161603e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_192",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -7.105427357601002e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_193",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 5.684341886080802e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_194",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 5.684341886080802e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_195",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 1.4210854715202004e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_196",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 1.1368683772161603e-12,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_197",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_198",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -1.5916157281026244e-12,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_199",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -3.410605131648481e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_2",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -1.1368683772161603e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_20",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 4.547473508864641e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_200",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -2.1600499167107046e-12,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_201",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 5.684341886080802e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_202",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_204",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 5.684341886080802e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_205",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_206",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -1.1368683772161603e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_207",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 9.094947017729282e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_208",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_209",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -1.1368683772161603e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_21",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 3.410605131648481e-12,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_210",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 5.684341886080802e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_211",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_212",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -2.842170943040401e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_213",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -1.1368683772161603e-12,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_214",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -4.547473508864641e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_215",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -9.094947017729282e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_216",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_217",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 1.3642420526593924e-12,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_218",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -4.547473508864641e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_219",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_22",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -1.4210854715202004e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_220",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_221",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_223",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 1.4210854715202004e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_224",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 3.410605131648481e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_225",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_226",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 3.410605131648481e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_227",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 1.3642420526593924e-12,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_228",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 4.547473508864641e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_229",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 5.684341886080802e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_23",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_230",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_231",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -5.684341886080801e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_232",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -4.547473508864641e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_233",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 1.1368683772161603e-12,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_234",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_235",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 2.7284841053187847e-12,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_236",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_237",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_238",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_239",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 1.1368683772161603e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_24",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -5.684341886080801e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_240",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -5.684341886080801e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_241",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -2.0463630789890885e-12,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_242",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_243",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 3.410605131648481e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_244",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 1.8189894035458565e-12,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_245",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 3.410605131648481e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_246",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 3.410605131648481e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_247",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -1.1368683772161603e-12,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_248",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -3.552713678800501e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_249",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -1.1368683772161603e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_25",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_250",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_251",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -2.842170943040401e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_252",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -1.1368683772161603e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_253",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 3.410605131648481e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_254",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -3.410605131648481e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_255",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_256",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_257",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 3.410605131648481e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_258",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_259",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 1.5916157281026244e-12,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_26",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_260",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 4.547473508864641e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_262",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 3.410605131648481e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_263",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -6.821210263296962e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_264",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 1.1368683772161603e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_265",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -6.821210263296962e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_266",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -4.547473508864641e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_267",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_268",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 6.441570165000371,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_269",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 4.547473508864641e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_27",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 2.842170943040401e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_270",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_271",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_272",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_273",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 2.2737367544323206e-12,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_28",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 1.1368683772161603e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_29",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -1.1368683772161603e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_3",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -3.410605131648481e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_30",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -3.410605131648481e-12,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_31",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 3.410605131648481e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_32",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 2.5011104298755527e-12,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_33",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 4.547473508864641e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_34",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -6.821210263296962e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_35",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_36",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -5.684341886080802e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_37",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 2.9558577807620168e-12,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_38",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_39",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 5.684341886080802e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_4",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 3.410605131648481e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_40",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 1.1368683772161603e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_41",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 3.410605131648481e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_42",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 1.4210854715202004e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_43",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_44",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_45",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_46",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 4.547473508864641e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_47",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_48",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -5.684341886080802e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_49",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_5",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 3.410605131648481e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_50",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_51",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 4.547473508864641e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_52",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 5.684341886080801e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_53",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -1.1368683772161603e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_54",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 1.7053025658242404e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_55",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_56",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_57",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_58",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -5.684341886080801e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_59",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -1.7053025658242404e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_6",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -3.410605131648481e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_60",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_61",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 5.684341886080802e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_62",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 2.842170943040401e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_63",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 3.410605131648481e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_64",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -1.1368683772161603e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_65",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_66",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 4.547473508864641e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_67",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -4.263256414560601e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_68",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -9.094947017729282e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_69",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_7",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_70",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -4.547473508864641e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_71",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_72",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 1.1368683772161603e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_73",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_74",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 4.547473508864641e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_75",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 1.4210854715202004e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_76",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_77",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -4.547473508864641e-12,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_78",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 5.684341886080802e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_79",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 1.1368683772161603e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_8",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -1.4210854715202004e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_80",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -2.2737367544323206e-12,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_81",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 5.684341886080802e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_82",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -8.526512829121202e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_83",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -5.002220859751105e-12,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_84",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 5.684341886080802e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_85",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 4.547473508864641e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_86",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -2.842170943040401e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_87",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -9.094947017729282e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_88",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_89",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 3.410605131648481e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_9",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -1.2505552149377763e-12,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_90",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -1.1368683772161603e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_91",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 1.1368683772161603e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_92",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -4.547473508864641e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_93",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 7.105427357601002e-15,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_94",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 5.684341886080802e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_95",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -1.1368683772161603e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_96",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_97",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -1.5916157281026244e-12,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_98",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": 10.992065050006204,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_local_99",
+      "old_nominal_m": 5.4864,
+      "target_width_m": 8.621485714285713,
+      "target_width_ft": 28.28571428571428,
+      "area_constrained_at_buildings_m2": -1.1368683772161603e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_0",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 2.842170943040401e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_1",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -2.842170943040401e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_10",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_100",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_101",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 1.4210854715202004e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_102",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -5.684341886080802e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_103",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -7.105427357601002e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_104",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 4.85896250499718,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_105",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 1.4210854715202004e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_106",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 6.252776074688882e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_107",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 2.842170943040401e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_108",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 1.1368683772161603e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_109",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 5.684341886080802e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_11",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 1.1368683772161603e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_110",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -1.4210854715202004e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_111",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -5.684341886080801e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_112",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -1.7053025658242404e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_113",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -4.263256414560601e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_114",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -1.4210854715202004e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_115",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 1.1368683772161603e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_116",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 1.4210854715202004e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_117",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_118",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 9.24967658999995,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_119",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 1.4210854715202004e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_12",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -5.684341886080802e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_120",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 11.990497210000285,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_121",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 2.5091014199998654,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_122",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 1.7053025658242404e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_123",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_124",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -2.842170943040401e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_125",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_126",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 10.596730475005984,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_127",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -5.684341886080802e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_128",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 5.684341886080802e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_129",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 2.9096514899996464,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_13",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -2.842170943040401e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_130",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -4.547473508864641e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_131",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 5.684341886080802e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_132",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 13.74875762999909,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_133",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -2.842170943040401e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_134",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 2.842170943040401e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_135",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -7.105427357601002e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_136",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 1.1368683772161603e-12,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_137",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 2.2737367544323206e-12,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_138",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 1.3464818099996592,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_139",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 5.684341886080802e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_14",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -1.4210854715202004e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_140",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_141",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 2.1513260950001154,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_142",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -2.842170943040401e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_143",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -2.842170943040401e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_144",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 0.8198748899992552,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_145",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 1.1368683772161603e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_146",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 5.684341886080802e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_147",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 13.04189028499971,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_148",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 0.03809870000006299,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_149",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 2.39529809499993,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_15",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 3.1017291700002048,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_150",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_151",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 0.8871450250023827,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_152",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 1.1368683772161603e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_153",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -5.684341886080802e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_154",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 2.842170943040401e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_155",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -3.410605131648481e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_156",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_157",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_158",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_159",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -2.8421709430404007e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_16",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -5.684341886080802e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_160",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 1.1368683772161603e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_161",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_162",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 1.7053025658242404e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_163",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 0.9810386500003005,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_164",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 0.026223060000035048,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_165",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 2.8421709430404007e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_166",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_167",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 1.8133502599998224,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_168",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 0.2107118100000065,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_169",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -5.684341886080802e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_17",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -1.1368683772161603e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_170",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 3.979039320256561e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_172",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 4.524006779999695,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_173",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -1.0800249583553523e-12,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_174",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 6.252776074688882e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_176",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 0.008820829999933721,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_177",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -8.526512829121202e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_178",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 0.10648050000003195,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_179",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 14.635705050000183,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_18",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -1.7053025658242404e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_180",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 6.495399210000016,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_181",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 2.842170943040401e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_182",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -2.1600499167107046e-12,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_183",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 3.399031920000084,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_184",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -2.842170943040401e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_185",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_186",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 3.979039320256561e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_187",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 7.958078640513122e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_188",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -8.526512829121202e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_189",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 9.113658420002935,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_19",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 3.1078701949999896,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_190",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -2.842170943040401e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_191",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 1.7053025658242404e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_192",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 1.5585025650003104,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_193",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -2.8421709430404007e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_194",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 9.137972675005358,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_195",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 4.948023790000434,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_196",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_197",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 3.028496755000333,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_198",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -3.410605131648481e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_199",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 2.5161571649998677,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_2",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 8.526512829121202e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_20",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 1.4210854715202004e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_200",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_201",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -1.1368683772161603e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_202",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_203",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -5.115907697472721e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_204",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 1.4210854715202004e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_205",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -8.526512829121202e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_206",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_207",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 3.2098831350006094,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_208",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 3.0322261249998803,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_209",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 1.1368683772161603e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_21",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -1.1368683772161603e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_210",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -5.684341886080802e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_211",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_212",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 3.187460195000085,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_213",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 3.2630243749987358,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_214",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 4.263256414560601e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_215",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 5.44157864999994,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_216",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -5.684341886080802e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_218",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 2.2137334249999867,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_219",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_22",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_220",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 4.547473508864641e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_221",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_222",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_223",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 3.410605131648481e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_224",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 8.889252110000172,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_225",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 2.842170943040401e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_226",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_227",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_228",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -1.4210854715202004e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_229",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 9.318601475000094,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_23",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 1.7053025658242404e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_230",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 6.031432700000039,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_231",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 5.684341886080802e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_232",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 11.990497210000285,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_233",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_234",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -1.4210854715202004e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_235",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -1.7053025658242404e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_237",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 2.842170943040401e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_238",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 0.08300380499991888,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_239",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_24",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_240",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 5.684341886080802e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_241",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 5.684341886080802e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_242",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 2.0496400499997947,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_243",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -1.7053025658242404e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_244",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 10.198561550000022,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_245",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 5.684341886080802e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_247",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 0.00036146999991615303,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_248",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -1.7053025658242404e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_249",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -2.8421709430404007e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_25",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 6.821210263296962e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_250",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 6.382385494999539,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_26",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_27",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 9.094947017729282e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_28",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 3.8510428750000756,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_29",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_3",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -8.526512829121202e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_30",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 5.684341886080802e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_31",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 3.446542915000009,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_32",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 1.7053025658242404e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_33",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 1.470347319999803,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_34",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_35",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -2.842170943040401e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_36",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 0.9269634100001838,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_37",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 5.684341886080802e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_38",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_39",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 0.886518430003207,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_4",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 1.4779288903810084e-12,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_40",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -2.842170943040401e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_41",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -2.842170943040401e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_42",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 1.1368683772161603e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_43",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 3.0661203449999164,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_44",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -3.410605131648481e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_45",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -1.9895196601282805e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_46",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 8.701733405000084,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_47",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -7.105427357601002e-15,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_48",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 4.114632469994717,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_49",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -5.684341886080802e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_5",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 1.7053025658242404e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_50",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 9.586445960000532,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_51",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 0.14564337500110014,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_52",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -2.842170943040401e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_53",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 2.842170943040401e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_54",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 1.7053025658242404e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_55",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -1.0231815394945443e-12,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_56",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_57",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 41.41444953999985,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_58",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -2.8421709430404007e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_59",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -2.842170943040401e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_6",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -3.410605131648481e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_60",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 8.740791990000275,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_61",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 1.4210854715202004e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_62",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 2.2737367544323206e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_63",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 0.39835196500155234,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_64",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 1.3581632649994617,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_65",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 0.09465755500150408,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_66",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 0.06023673499862525,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_67",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 3.979039320256561e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_68",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 4.141158169998562,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_69",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 1.4210854715202004e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_7",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 1.4210854715202004e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_70",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 8.701733405000084,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_71",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 6.821210263296962e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_72",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 2.8421709430404007e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_73",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -2.842170943040401e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_74",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 8.561097649999851,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_75",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 0.1648155550001036,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_76",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_77",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -5.115907697472721e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_78",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 1.1368683772161603e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_79",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -1.4210854715202004e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_8",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -1.7053025658242404e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_80",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 1.4210854715202004e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_81",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 2.842170943040401e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_82",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 2.842170943040401e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_83",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -1.1368683772161603e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_84",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 20.619980394998493,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_85",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 1.4210854715202004e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_86",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 6.495399210000016,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_87",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 1.9895196601282805e-13,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_88",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -5.684341886080802e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_89",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_9",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 0.5531927949996316,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_90",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -2.842170943040401e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_91",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 6.533308550000015,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_92",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 12.622288230000223,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_93",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 5.7974835149996125,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_94",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 7.530794375000369,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_95",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -2.842170943040401e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_96",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -8.526512829121202e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_97",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -2.842170943040401e-14,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_98",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 0.0,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "road_service_99",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": 0.3983519650018934,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "C_Trimmed_road_service_171",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -3.552713678800501e-15,
+      "policy": "unverified carriageway widened by 22/14"
+    },
+    {
+      "source": "C_Trimmed_road_service_175",
+      "old_nominal_m": 2.7432,
+      "target_width_m": 4.3107428571428565,
+      "target_width_ft": 14.14285714285714,
+      "area_constrained_at_buildings_m2": -4.547473508864641e-12,
+      "policy": "unverified carriageway widened by 22/14"
+    }
+  ],
+  "footway_overlap_with_vehicle_m2": 0.0,
+  "field_method": "Smooth reference-shaped grass/dirt boundaries, not pixel-run contours. Source building footprints unchanged.",
+  "garage_floor_z_m": 19.634822006225587,
+  "garage_grade_method": "Curb-derived threshold, limited to above the existing building base; original arbitrary raised apron removed."
+}

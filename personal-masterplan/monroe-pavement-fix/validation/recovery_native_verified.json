@@ -1,0 +1,32 @@
+{
+  "existing": {
+    "building_count": 3155,
+    "school_finish": "Reference-informed brick infill, concrete piers/bands and two window rows. Dimensions approximate; original geometry and roof unchanged.",
+    "school_textures": [
+      "F_Monroe_School_Reference_Facade.png"
+    ],
+    "forecourt_meshes": [
+      "F_School_Forecourt_Concrete"
+    ],
+    "forecourt_plan": {
+      "area_m2": 362.132122568798,
+      "vehicle_overlap_m2": 0.0,
+      "reference": "User facade and concrete forecourt aerial, with planted openings; approximate, constrained to fixed footprint and drive."
+    }
+  },
+  "proposed": {
+    "building_count": 3155,
+    "school_finish": "Reference-informed brick infill, concrete piers/bands and two window rows. Dimensions approximate; original geometry and roof unchanged.",
+    "school_textures": [
+      "F_Monroe_School_Reference_Facade.png"
+    ],
+    "forecourt_meshes": [
+      "F_School_Forecourt_Concrete"
+    ],
+    "forecourt_plan": {
+      "area_m2": 365.3346964906797,
+      "vehicle_overlap_m2": 0.0,
+      "reference": "User facade and concrete forecourt aerial, with planted openings; approximate, constrained to fixed footprint and drive."
+    }
+  }
+}

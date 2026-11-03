@@ -1,0 +1,677 @@
+[
+  {
+    "path": "01_Original_Road_Layout/Monroe_Original_Road_Layout.blend",
+    "bytes": 108014804,
+    "sha256": "094f8f0428129a36d620072951408ff57781e860dc7b77776ffbca52f2220187"
+  },
+  {
+    "path": "01_Original_Road_Layout/Monroe_Original_Road_Layout.dae",
+    "bytes": 252305162,
+    "sha256": "f4e08ad6c5629e2a49149df23300338ec94880313b75b0b5ead9249ceaad6cb2"
+  },
+  {
+    "path": "01_Original_Road_Layout/Monroe_Original_Road_Layout.fbx",
+    "bytes": 48127964,
+    "sha256": "7e7a8039bae7e442c3cb7b32e4da6515ff0ec8d13273ffe6b7e3ebc181972f44"
+  },
+  {
+    "path": "02_New_Road_Layout/Monroe_New_Road_Layout.blend",
+    "bytes": 117767428,
+    "sha256": "eaa0d9d7be6f8bfa70dcc4395cd2ec9c2d36593231b2264bf7484b56f3a08ab9"
+  },
+  {
+    "path": "02_New_Road_Layout/Monroe_New_Road_Layout.dae",
+    "bytes": 274205591,
+    "sha256": "d54584e37ae30f2c7c04ce866b337da6babd684d03ead28ce8533f7dcda0eb14"
+  },
+  {
+    "path": "02_New_Road_Layout/Monroe_New_Road_Layout.fbx",
+    "bytes": 52359052,
+    "sha256": "6d9d503d7c6ce4a74c6a827a996d17729f527b0100afe8d61b8f7bd6059a6d7f"
+  },
+  {
+    "path": "Create_SketchUp_File.rb",
+    "bytes": 3111,
+    "sha256": "6063442a49fec55f14e3a722a8c03f53ede3ef4c13ac6164f2753b7c8bf1428f"
+  },
+  {
+    "path": "README.md",
+    "bytes": 4784,
+    "sha256": "4bae6d5979df196dbe7eca9634c2c21e4d36b8b5b0932ccba894ee15adbf6c8a"
+  },
+  {
+    "path": "SKETCHUP_README.md",
+    "bytes": 1805,
+    "sha256": "4bdec0152f41bdf4caeffe88d916092852c3deee47359c5a6a314f6d3e72d7fb"
+  },
+  {
+    "path": "Shared_Textures/Apartment_Courtyard_Brick.png",
+    "bytes": 1834,
+    "sha256": "a21d5d9398a60427d4d0119747239346cc3cf6e605d857e66eb6bf8f8d456a29"
+  },
+  {
+    "path": "Shared_Textures/F_Apartment_Garage_Facade_Atlas.png",
+    "bytes": 335265,
+    "sha256": "827a90313519ac30bfc337505cffe8fe3ca495669202e7bd3e36d10b239cef42"
+  },
+  {
+    "path": "Shared_Textures/F_Monroe_School_Reference_Facade.png",
+    "bytes": 521091,
+    "sha256": "c57c2dca90045c84ad8394cb3fe4e6dd6f2a73067eb952ad1140ada85da23542"
+  },
+  {
+    "path": "Shared_Textures/Fixed_building_1673_Facade_Roof_Atlas.png",
+    "bytes": 51410,
+    "sha256": "57a611ebb117fa114cf3591fa939a58a79e1371396f30933be7911c94780007d"
+  },
+  {
+    "path": "Shared_Textures/Fixed_building_1944_Facade_Roof_Atlas.png",
+    "bytes": 11958,
+    "sha256": "9d25bea204a2963cd3a06896483f26163252c62965ae2d942c5c5b04f748abb8"
+  },
+  {
+    "path": "Shared_Textures/Fixed_building_1992_Facade_Roof_Atlas.png",
+    "bytes": 11379,
+    "sha256": "0ca61273db7f8470ccabf5ce19bc7ced8f9c602ddc91ca8b08ee7510e7a7ab02"
+  },
+  {
+    "path": "Shared_Textures/Fixed_building_2010_Facade_Roof_Atlas.png",
+    "bytes": 11379,
+    "sha256": "0ca61273db7f8470ccabf5ce19bc7ced8f9c602ddc91ca8b08ee7510e7a7ab02"
+  },
+  {
+    "path": "Shared_Textures/Fixed_building_2103_Facade_Roof_Atlas.png",
+    "bytes": 11379,
+    "sha256": "0ca61273db7f8470ccabf5ce19bc7ced8f9c602ddc91ca8b08ee7510e7a7ab02"
+  },
+  {
+    "path": "Shared_Textures/Fixed_building_2200_Facade_Roof_Atlas.png",
+    "bytes": 11379,
+    "sha256": "0ca61273db7f8470ccabf5ce19bc7ced8f9c602ddc91ca8b08ee7510e7a7ab02"
+  },
+  {
+    "path": "Shared_Textures/Fixed_building_2240_Facade_Roof_Atlas.png",
+    "bytes": 11379,
+    "sha256": "0ca61273db7f8470ccabf5ce19bc7ced8f9c602ddc91ca8b08ee7510e7a7ab02"
+  },
+  {
+    "path": "Shared_Textures/Fixed_building_2269_Facade_Roof_Atlas.png",
+    "bytes": 11278,
+    "sha256": "a740eace8c3018c83d5f7ea6d54529ad1d0270bd4560f851db8d6d0844e4ba4a"
+  },
+  {
+    "path": "Shared_Textures/Fixed_building_2281_Facade_Roof_Atlas.png",
+    "bytes": 11379,
+    "sha256": "0ca61273db7f8470ccabf5ce19bc7ced8f9c602ddc91ca8b08ee7510e7a7ab02"
+  },
+  {
+    "path": "Shared_Textures/Fixed_building_2301_Facade_Roof_Atlas.png",
+    "bytes": 11379,
+    "sha256": "0ca61273db7f8470ccabf5ce19bc7ced8f9c602ddc91ca8b08ee7510e7a7ab02"
+  },
+  {
+    "path": "Shared_Textures/Fixed_building_2322_Facade_Roof_Atlas.png",
+    "bytes": 11278,
+    "sha256": "a740eace8c3018c83d5f7ea6d54529ad1d0270bd4560f851db8d6d0844e4ba4a"
+  },
+  {
+    "path": "Shared_Textures/Fixed_building_2349_Facade_Roof_Atlas.png",
+    "bytes": 11819,
+    "sha256": "a4d251e25715cdfc3a256a9262c2bb4f32edf01a1267ee7ba93731085f012610"
+  },
+  {
+    "path": "Shared_Textures/Fixed_building_2434_Facade_Roof_Atlas.png",
+    "bytes": 11379,
+    "sha256": "0ca61273db7f8470ccabf5ce19bc7ced8f9c602ddc91ca8b08ee7510e7a7ab02"
+  },
+  {
+    "path": "Shared_Textures/Fixed_building_2471_Facade_Roof_Atlas.png",
+    "bytes": 11958,
+    "sha256": "9d25bea204a2963cd3a06896483f26163252c62965ae2d942c5c5b04f748abb8"
+  },
+  {
+    "path": "Shared_Textures/Fixed_building_2482_Facade_Roof_Atlas.png",
+    "bytes": 11379,
+    "sha256": "0ca61273db7f8470ccabf5ce19bc7ced8f9c602ddc91ca8b08ee7510e7a7ab02"
+  },
+  {
+    "path": "Shared_Textures/Fixed_building_2486_Facade_Roof_Atlas.png",
+    "bytes": 11379,
+    "sha256": "0ca61273db7f8470ccabf5ce19bc7ced8f9c602ddc91ca8b08ee7510e7a7ab02"
+  },
+  {
+    "path": "Shared_Textures/Fixed_building_2506_Facade_Roof_Atlas.png",
+    "bytes": 11278,
+    "sha256": "a740eace8c3018c83d5f7ea6d54529ad1d0270bd4560f851db8d6d0844e4ba4a"
+  },
+  {
+    "path": "Shared_Textures/Fixed_building_2525_Facade_Roof_Atlas.png",
+    "bytes": 11278,
+    "sha256": "a740eace8c3018c83d5f7ea6d54529ad1d0270bd4560f851db8d6d0844e4ba4a"
+  },
+  {
+    "path": "Shared_Textures/Fixed_building_2566_Facade_Roof_Atlas.png",
+    "bytes": 11379,
+    "sha256": "0ca61273db7f8470ccabf5ce19bc7ced8f9c602ddc91ca8b08ee7510e7a7ab02"
+  },
+  {
+    "path": "Shared_Textures/Fixed_building_2570_Facade_Roof_Atlas.png",
+    "bytes": 11819,
+    "sha256": "a4d251e25715cdfc3a256a9262c2bb4f32edf01a1267ee7ba93731085f012610"
+  },
+  {
+    "path": "Shared_Textures/Fixed_building_2589_Facade_Roof_Atlas.png",
+    "bytes": 11984,
+    "sha256": "e890212ffb0dc2dd5759a8c5003ceedb7321b7b9125ddc770cf3e5db0d859a74"
+  },
+  {
+    "path": "Shared_Textures/Fixed_building_2639_Facade_Roof_Atlas.png",
+    "bytes": 11278,
+    "sha256": "a740eace8c3018c83d5f7ea6d54529ad1d0270bd4560f851db8d6d0844e4ba4a"
+  },
+  {
+    "path": "Shared_Textures/Fixed_building_2664_Facade_Roof_Atlas.png",
+    "bytes": 177088,
+    "sha256": "0f3faa0c26df23c27284ac96bc7907e0beb7f4ede51eb8d98f9c7baf715edd72"
+  },
+  {
+    "path": "Shared_Textures/Fixed_building_2691_Facade_Roof_Atlas.png",
+    "bytes": 11379,
+    "sha256": "0ca61273db7f8470ccabf5ce19bc7ced8f9c602ddc91ca8b08ee7510e7a7ab02"
+  },
+  {
+    "path": "Shared_Textures/Fixed_building_2701_Facade_Roof_Atlas.png",
+    "bytes": 11819,
+    "sha256": "a4d251e25715cdfc3a256a9262c2bb4f32edf01a1267ee7ba93731085f012610"
+  },
+  {
+    "path": "Shared_Textures/Fixed_building_2777_Facade_Roof_Atlas.png",
+    "bytes": 11819,
+    "sha256": "a4d251e25715cdfc3a256a9262c2bb4f32edf01a1267ee7ba93731085f012610"
+  },
+  {
+    "path": "Shared_Textures/Fixed_building_2808_Facade_Roof_Atlas.png",
+    "bytes": 11278,
+    "sha256": "a740eace8c3018c83d5f7ea6d54529ad1d0270bd4560f851db8d6d0844e4ba4a"
+  },
+  {
+    "path": "Shared_Textures/Fixed_building_2923_Facade_Roof_Atlas.png",
+    "bytes": 11379,
+    "sha256": "0ca61273db7f8470ccabf5ce19bc7ced8f9c602ddc91ca8b08ee7510e7a7ab02"
+  },
+  {
+    "path": "Shared_Textures/Fixed_building_2964_Facade_Roof_Atlas.png",
+    "bytes": 11379,
+    "sha256": "0ca61273db7f8470ccabf5ce19bc7ced8f9c602ddc91ca8b08ee7510e7a7ab02"
+  },
+  {
+    "path": "Shared_Textures/Fixed_building_2973_Facade_Roof_Atlas.png",
+    "bytes": 11379,
+    "sha256": "0ca61273db7f8470ccabf5ce19bc7ced8f9c602ddc91ca8b08ee7510e7a7ab02"
+  },
+  {
+    "path": "Shared_Textures/Fixed_building_2978_Facade_Roof_Atlas.png",
+    "bytes": 11958,
+    "sha256": "9d25bea204a2963cd3a06896483f26163252c62965ae2d942c5c5b04f748abb8"
+  },
+  {
+    "path": "Shared_Textures/Fixed_building_3084_Facade_Roof_Atlas.png",
+    "bytes": 11379,
+    "sha256": "0ca61273db7f8470ccabf5ce19bc7ced8f9c602ddc91ca8b08ee7510e7a7ab02"
+  },
+  {
+    "path": "Shared_Textures/Fixed_building_3087_Facade_Roof_Atlas.png",
+    "bytes": 11379,
+    "sha256": "0ca61273db7f8470ccabf5ce19bc7ced8f9c602ddc91ca8b08ee7510e7a7ab02"
+  },
+  {
+    "path": "Shared_Textures/Fixed_building_3142_Facade_Roof_Atlas.png",
+    "bytes": 11958,
+    "sha256": "9d25bea204a2963cd3a06896483f26163252c62965ae2d942c5c5b04f748abb8"
+  },
+  {
+    "path": "Shared_Textures/Neutral_context_tan_brick_03floors_palegray.png",
+    "bytes": 10795,
+    "sha256": "44a6d84d75ca8388b7fc541900f01bce3dc64aec21dc315064cd1845a27e00b0"
+  },
+  {
+    "path": "Shared_Textures/Neutral_context_warm_brick_02floors_charcoal.png",
+    "bytes": 10484,
+    "sha256": "19a289b3ed44cbcab7b65c1803d98556a2cc763383336f907f4326938bbfc25e"
+  },
+  {
+    "path": "Shared_Textures/Neutral_context_warm_brick_02floors_midgray.png",
+    "bytes": 10482,
+    "sha256": "012dda7764525d8b4b2de84853e9235a2d7bdf5abaedf57144e53a93469fa5d5"
+  },
+  {
+    "path": "Shared_Textures/Neutral_context_warm_brick_02floors_palegray.png",
+    "bytes": 10483,
+    "sha256": "d04ed669b515a69ba8390f2f6f4728229153234997372beb58ab37dade9c3d19"
+  },
+  {
+    "path": "Shared_Textures/Neutral_context_warm_brick_03floors_midgray.png",
+    "bytes": 11032,
+    "sha256": "50b5299e9646839d7dd72b39354531067abff667eea06cf39b0d8d9eb64b3256"
+  },
+  {
+    "path": "Shared_Textures/Roughness_context_tan_brick_03floors_palegray.png",
+    "bytes": 2633,
+    "sha256": "52a61891ec9c3baf5d46649bba4f965b240713cfbe49981756d90412102e30d7"
+  },
+  {
+    "path": "Shared_Textures/Roughness_context_warm_brick_02floors_charcoal.png",
+    "bytes": 2600,
+    "sha256": "5618291b5473c8029bb740ebad68daf65d5f3a179b9d351ba08261333a47ec47"
+  },
+  {
+    "path": "Shared_Textures/Roughness_context_warm_brick_02floors_midgray.png",
+    "bytes": 2600,
+    "sha256": "5618291b5473c8029bb740ebad68daf65d5f3a179b9d351ba08261333a47ec47"
+  },
+  {
+    "path": "Shared_Textures/Roughness_context_warm_brick_02floors_palegray.png",
+    "bytes": 2600,
+    "sha256": "5618291b5473c8029bb740ebad68daf65d5f3a179b9d351ba08261333a47ec47"
+  },
+  {
+    "path": "Shared_Textures/Roughness_context_warm_brick_03floors_midgray.png",
+    "bytes": 2633,
+    "sha256": "52a61891ec9c3baf5d46649bba4f965b240713cfbe49981756d90412102e30d7"
+  },
+  {
+    "path": "Shared_Textures/Townhouse_White_context_warm_brick_02floors_charcoal.png",
+    "bytes": 9895,
+    "sha256": "c7a007a97108abc5d07843144fa30b9a3c197bade13d41b25acc5cc2b9f3b34c"
+  },
+  {
+    "path": "Shared_Textures/Townhouse_White_context_warm_brick_02floors_midgray.png",
+    "bytes": 9894,
+    "sha256": "f80a842792926376eccc8707ad77d79432e99d46fbcdb70007cf557ef5af159e"
+  },
+  {
+    "path": "Shared_Textures/building_2099_Unified_Color.png",
+    "bytes": 627973,
+    "sha256": "bb974bc077cd91610b0cec212cea7d16ece56fd47894bd14ed979bb62d4ceee2"
+  },
+  {
+    "path": "Shared_Textures/building_2772_Unified_Color.png",
+    "bytes": 399015,
+    "sha256": "5cab733092f50c2784b8b64443815f88d8a8550a45b1de983ef6da2bb611cdd8"
+  },
+  {
+    "path": "Shared_Textures/context_cream_render_01floors_charcoal.png",
+    "bytes": 3880,
+    "sha256": "80877f77c7f589e7838fb6019f356739f1b50a75ba8c75990a597ae967c60c86"
+  },
+  {
+    "path": "Shared_Textures/context_cream_render_02floors_charcoal.png",
+    "bytes": 4027,
+    "sha256": "f3ea4491b9d1d12d99e63664f39228d5cca1f0af356c2ccdc55100e96dc1ecad"
+  },
+  {
+    "path": "Shared_Textures/context_cream_render_02floors_midgray.png",
+    "bytes": 4030,
+    "sha256": "2d9d700f9c2d1e87c0ff5bcf904ac64d27986bf10e050bc8a665749671ab4a55"
+  },
+  {
+    "path": "Shared_Textures/context_cream_render_02floors_palegray.png",
+    "bytes": 4028,
+    "sha256": "73e3079a69b58961281bdc5dbc7dfbc86f1e13b314b9677d4aa9cde372123b6f"
+  },
+  {
+    "path": "Shared_Textures/context_cream_render_03floors_midgray.png",
+    "bytes": 4174,
+    "sha256": "b4c9ccf70fd4ce567032df276510b5f61e91a8f61dad259ccb8787617d1c3625"
+  },
+  {
+    "path": "Shared_Textures/context_tan_brick_02floors_midgray.png",
+    "bytes": 11537,
+    "sha256": "fdd6a7d8770e501c52b06c41571b487357a01006aff350234643258ffa57eab1"
+  },
+  {
+    "path": "Shared_Textures/context_tan_brick_02floors_palegray.png",
+    "bytes": 11540,
+    "sha256": "3a13bfe7e603c382632ecab29d46493be932380080726e132eb9eb78a48591d0"
+  },
+  {
+    "path": "Shared_Textures/context_tan_brick_03floors_charcoal.png",
+    "bytes": 11954,
+    "sha256": "c60112bb5dcb04c7caaf585d0a039b5d6bed0a8db4b0d74178cc7be108464cb3"
+  },
+  {
+    "path": "Shared_Textures/context_tan_brick_03floors_midgray.png",
+    "bytes": 11956,
+    "sha256": "3b7e5595fdbcd03b7d6028b04ddf0b259d89d14bbcefe9ac6b9e1beb0c38f327"
+  },
+  {
+    "path": "Shared_Textures/context_tan_brick_03floors_palegray.png",
+    "bytes": 11955,
+    "sha256": "63d7f9a16fef9dd82a512413785cae96d2bd6e30865b525e9fd372e129184b40"
+  },
+  {
+    "path": "Shared_Textures/context_tan_brick_04floors_midgray.png",
+    "bytes": 11983,
+    "sha256": "9bc5e9b668f27e2a75092f9ad54a80b68336909fe001eb555f7944c9ff9f4144"
+  },
+  {
+    "path": "Shared_Textures/context_tan_brick_04floors_palegray.png",
+    "bytes": 11981,
+    "sha256": "633a0f312a431743c94380b284b6c5805187248ead5a620cf6aaba63c32afd88"
+  },
+  {
+    "path": "Shared_Textures/context_tan_brick_05floors_midgray.png",
+    "bytes": 11995,
+    "sha256": "1d82417ca50ba5aa5d2120f7056390b0ab1e874be5ea3e976cffa46c496b3bca"
+  },
+  {
+    "path": "Shared_Textures/context_tan_brick_06floors_midgray.png",
+    "bytes": 12404,
+    "sha256": "78c966eecdf98803d8feb8c2b1102d67e72b1b2e69f33f15fedc31fc9e8c0f64"
+  },
+  {
+    "path": "Shared_Textures/context_tan_brick_07floors_midgray.png",
+    "bytes": 12644,
+    "sha256": "cc3ed4da16fe9657bf2670557717702da0774835fe34713b80ce165eb8bf632c"
+  },
+  {
+    "path": "Shared_Textures/context_tan_brick_08floors_midgray.png",
+    "bytes": 12629,
+    "sha256": "ace6963558b66ee0062a86200a583cac9849c36ad6a0c43514ea4edb9298e55b"
+  },
+  {
+    "path": "Shared_Textures/context_warm_brick_01floors_charcoal.png",
+    "bytes": 11276,
+    "sha256": "f59ffbc9e79479823e20823e40e99327c8a4fe1737a8f3fe334a41bdfd6c9116"
+  },
+  {
+    "path": "Shared_Textures/context_warm_brick_01floors_midgray.png",
+    "bytes": 11279,
+    "sha256": "9aa3c4a78d07fe3518d3cc93bda57fa2cb153892b844e2819d17a7693d60ba8b"
+  },
+  {
+    "path": "Shared_Textures/context_warm_brick_01floors_palegray.png",
+    "bytes": 11279,
+    "sha256": "55135bc4d3c6aa240412428f9955b9f7c266f62695f5b0bcce916c21afee2717"
+  },
+  {
+    "path": "Shared_Textures/context_warm_brick_02floors_charcoal.png",
+    "bytes": 11379,
+    "sha256": "a7df272b86e74bfb70afd9d48a1040ce008cae190ef31925ab9d0eadf350407a"
+  },
+  {
+    "path": "Shared_Textures/context_warm_brick_02floors_midgray.png",
+    "bytes": 11384,
+    "sha256": "2b101e7ad7c87c3aa48484ee576e64aec07140bf5d3146c83d3cc039fd7b0927"
+  },
+  {
+    "path": "Shared_Textures/context_warm_brick_02floors_palegray.png",
+    "bytes": 11382,
+    "sha256": "f852ba722009b06ba21cb86cd9de9a71772fa2529d705929acd9d2ae18c6c5b7"
+  },
+  {
+    "path": "Shared_Textures/context_warm_brick_02floors_redbrown.png",
+    "bytes": 11377,
+    "sha256": "8c5a3aa6233ad664291d9b8fa22ff9efcd5ce87749eb55a42d308a8bbe084fcb"
+  },
+  {
+    "path": "Shared_Textures/context_warm_brick_03floors_charcoal.png",
+    "bytes": 11818,
+    "sha256": "4b486894baba9d07865792ff944a88aebf3a1322ad6953e0bb9ef415561479e2"
+  },
+  {
+    "path": "Shared_Textures/context_warm_brick_03floors_midgray.png",
+    "bytes": 11821,
+    "sha256": "5737a4f1ef85779c45158870a58e048192d1f00706577fa44e9eb81f40e8a2a7"
+  },
+  {
+    "path": "Shared_Textures/context_warm_brick_03floors_palegray.png",
+    "bytes": 11821,
+    "sha256": "0c788e1580e82dea2ae2916a4b9530e4c4881821ea819019516c8044980a6892"
+  },
+  {
+    "path": "pipeline/add_school_forecourt.py",
+    "bytes": 1891,
+    "sha256": "0118a2a22a26b6eb28427115e603f89518ea3bb4bff02b8f0e861c9b42f116ba"
+  },
+  {
+    "path": "pipeline/build_fixed_models.py",
+    "bytes": 8771,
+    "sha256": "dc68fcb3d18676c707b3c2dbf5b54b802356c1b1f4aa5cb26a088f452aba1f73"
+  },
+  {
+    "path": "pipeline/check_export_interference.py",
+    "bytes": 2056,
+    "sha256": "8c5604fa8b98f2e14e9a2ed007549f03863e56ae1c0805cc3a915e1a9911d3ea"
+  },
+  {
+    "path": "pipeline/check_shared_buildings.py",
+    "bytes": 2570,
+    "sha256": "47388ec6b24569370cee3ae0c5e2b1654b9124a21e56f382342fdf067bf1ad3c"
+  },
+  {
+    "path": "pipeline/export_collada.py",
+    "bytes": 5439,
+    "sha256": "8596e1e05d176e3d15bdab28071478f871ec252b181ddc5511b82e4fda2baf12"
+  },
+  {
+    "path": "pipeline/extract_auxiliary.py",
+    "bytes": 707,
+    "sha256": "6eade761e1c913d5d04f77632dae27e2d86b56a5c9894341d172a24f3280805a"
+  },
+  {
+    "path": "pipeline/extract_export_surfaces.py",
+    "bytes": 1454,
+    "sha256": "96e1df6477085a6c8c545d027e7f57caaae11d21b3bf6e840b95af9810a7d89d"
+  },
+  {
+    "path": "pipeline/extract_surfaces.py",
+    "bytes": 1666,
+    "sha256": "aa7b6adeb586f40d45c2542e2f6bef2eba4bd23dc42e3e93c907dc4904cc8221"
+  },
+  {
+    "path": "pipeline/finalize_geometry.py",
+    "bytes": 4714,
+    "sha256": "ddf462b9ee9b700ba05427373721836f6977831c04f03cd1de94eab4935f542d"
+  },
+  {
+    "path": "pipeline/finish_auxiliary.py",
+    "bytes": 3075,
+    "sha256": "3066892c586f92de1040e1efa20ea37ff685ad3d5c4b34c15a66cab2b6a973c6"
+  },
+  {
+    "path": "pipeline/garage_facade.py",
+    "bytes": 2095,
+    "sha256": "ff942f00e68d16286be84c83102f98d34e03181c501b31a214aefa64bd031f2f"
+  },
+  {
+    "path": "pipeline/package_delivery.py",
+    "bytes": 2565,
+    "sha256": "040274dc29575fc33719f11328fd7577de0b0b715f385b7f067fe488dfa1751d"
+  },
+  {
+    "path": "pipeline/prepare_repairs.py",
+    "bytes": 10933,
+    "sha256": "08ce7cd0ed9f5b1697f494cc18596c9a99e80ae7d773fab8e5dd33fb708f4a5b"
+  },
+  {
+    "path": "pipeline/render_school_front.py",
+    "bytes": 1436,
+    "sha256": "b9994cf99139c865ab68d89f92399fd903150226c27aa9d5e0210b0578b04fd4"
+  },
+  {
+    "path": "pipeline/school_facade.py",
+    "bytes": 2567,
+    "sha256": "f32235c35ab31b23e5e974216b85f0a9b79fe9a3d5b800d183c62a2eb4bf69d5"
+  },
+  {
+    "path": "pipeline/tie_garage_to_curb.py",
+    "bytes": 1748,
+    "sha256": "e0d261d8b793786ba3d1f3743ea8aaaef8ffe45776bdf6cd26ecfad8d8c99f40"
+  },
+  {
+    "path": "pipeline/validate_collada.py",
+    "bytes": 2755,
+    "sha256": "d0a8753d738294f2d816069a7f02fdde430c8f47ff6dff2675ef9b4a150eb312"
+  },
+  {
+    "path": "pipeline/validate_preview.py",
+    "bytes": 5328,
+    "sha256": "c177d619985ba027afef9e0e29dd1dbb0e55de57d24c1e16d962820474667ee9"
+  },
+  {
+    "path": "previews/before_after.png",
+    "bytes": 1189585,
+    "sha256": "e2bfe3ec2c40569cda5d1eaa701d7b0039ca3aa9bde37c45b4a57011487a73f8"
+  },
+  {
+    "path": "previews/before_existing_01_campus_masterplan.png",
+    "bytes": 3612131,
+    "sha256": "680580963c898a8a19a114250e797863a8752896f7cb22ca775f831efad53ac2"
+  },
+  {
+    "path": "previews/existing_01_campus_masterplan.png",
+    "bytes": 3445331,
+    "sha256": "0c6f1242c135c9843d8bf60eacf53a366aa5bb2dbd838ae5239b42418dfd0a78"
+  },
+  {
+    "path": "previews/existing_21_original_60ft_parking.png",
+    "bytes": 3496359,
+    "sha256": "944867f39ed1865960fff7f87271ee5a515d8dcf2e33cd074fe1a1ad8b3300e4"
+  },
+  {
+    "path": "previews/existing_22_school_facade_forecourt.png",
+    "bytes": 3227166,
+    "sha256": "febca2d80827bae2d5705cb40370fe099cf501883d3ebd6e8d78c746d10dd72a"
+  },
+  {
+    "path": "previews/feature_gallery.png",
+    "bytes": 3150884,
+    "sha256": "44073fb1c3cfc38b1d909db4cff1e94ae5e0c0bd22732762a513819754a62c39"
+  },
+  {
+    "path": "previews/layout_comparison.png",
+    "bytes": 1050706,
+    "sha256": "e0dfe41df875ecb3b182e60c34fb06a764f541a672967cf19c4f3990e86cf587"
+  },
+  {
+    "path": "previews/proposed_01_campus_masterplan.png",
+    "bytes": 3502893,
+    "sha256": "91c7de86c65767c1df26b0c7b6468ec5897181b48671f39f4818d58b170afdfc"
+  },
+  {
+    "path": "previews/proposed_15_garage_curb_fix.png",
+    "bytes": 3281019,
+    "sha256": "c19f55e5836bd09585c80c551b6a2227a0e85140d0a119a3dfd3563893c7ebc7"
+  },
+  {
+    "path": "previews/proposed_16_network_junction_fix.png",
+    "bytes": 3111364,
+    "sha256": "144704a3624bd418cbd553cfda6ec7a61f14e44cc18f6b5fdfef83c117d2e57a"
+  },
+  {
+    "path": "previews/proposed_17_baseball_smooth_boundary.png",
+    "bytes": 2853478,
+    "sha256": "6cee9fe83e582416de4d33159a8a22fd6f765b26ae9e9792fa0afffa77bf0e60"
+  },
+  {
+    "path": "previews/proposed_18_grass_roof_no_imagery.png",
+    "bytes": 3457888,
+    "sha256": "2410f6fd3db3fb2cef94da3d19b376e906f317846a5651ec3615c572c897b4e3"
+  },
+  {
+    "path": "previews/proposed_19_housing_white_roofs_sidewalks.png",
+    "bytes": 3614698,
+    "sha256": "7cc781153f63d9afa1d23e5a65328f26218d07511232e8f3a619551d65a8ee65"
+  },
+  {
+    "path": "previews/proposed_20_corner_brick_white_columns.png",
+    "bytes": 3266483,
+    "sha256": "f28997548bbc400a9dd1416f6c2e4ec743259bf338d018f925228c3721394564"
+  },
+  {
+    "path": "previews/proposed_22_school_facade_forecourt.png",
+    "bytes": 3361916,
+    "sha256": "c342e8e4a22adf4402dd07cfde4014927eb6fe5db1beb7673260a053628627b4"
+  },
+  {
+    "path": "validation/both_versions_validation.json",
+    "bytes": 1025,
+    "sha256": "6b853d2147aa2d3f2d8a03b44a3137d2d048f3b85edcd4b9fff663e798fcff05"
+  },
+  {
+    "path": "validation/existing_collada_checks.json",
+    "bytes": 479,
+    "sha256": "4c71436ea1f8561963797f977aaec70e4f395de3312bc177b035ad5cdd573122"
+  },
+  {
+    "path": "validation/existing_export_interference_checks.json",
+    "bytes": 440,
+    "sha256": "e2bdacbf2c3ea330d147c013a1b1ca3d43ef4600ded5b821b77ff93fce8bc40f"
+  },
+  {
+    "path": "validation/existing_facade_evidence.json",
+    "bytes": 922681,
+    "sha256": "803784a497f9763f4c81ec960b183de165038c79b21ba7b8e6d8e9e205b8ee03"
+  },
+  {
+    "path": "validation/existing_fbx_checks.json",
+    "bytes": 453,
+    "sha256": "34d1a60bbecf982f61959a1a053c17a2f512e1ee065d6de4daee29b45ac8d4b4"
+  },
+  {
+    "path": "validation/existing_native_checks.json",
+    "bytes": 880,
+    "sha256": "7bef42fc74b43e5322964f04e5b8cae8aa30ac8503a4a576203e9099fa072ef1"
+  },
+  {
+    "path": "validation/existing_school_forecourt.json",
+    "bytes": 201,
+    "sha256": "c633f27d21131dcf8746a7622ee630e81066107efbf354b0050e0efa17f98457"
+  },
+  {
+    "path": "validation/existing_surface_plan.json",
+    "bytes": 185887,
+    "sha256": "3463d1f2054224f7d0be4446cd8c3ddcd001e06f3601e22a9960d03c08eea4d6"
+  },
+  {
+    "path": "validation/proposed_collada_checks.json",
+    "bytes": 479,
+    "sha256": "ac77b70e27fbaf4ee4f0f55df18a029c8f95e0156d1df410eb23c5596979b9e3"
+  },
+  {
+    "path": "validation/proposed_export_interference_checks.json",
+    "bytes": 440,
+    "sha256": "e2bdacbf2c3ea330d147c013a1b1ca3d43ef4600ded5b821b77ff93fce8bc40f"
+  },
+  {
+    "path": "validation/proposed_facade_evidence.json",
+    "bytes": 922681,
+    "sha256": "803784a497f9763f4c81ec960b183de165038c79b21ba7b8e6d8e9e205b8ee03"
+  },
+  {
+    "path": "validation/proposed_fbx_checks.json",
+    "bytes": 466,
+    "sha256": "104fe95c2b72f944e14ccc95f40045e242ab571c4a467a61cd61ada06c88a5ef"
+  },
+  {
+    "path": "validation/proposed_native_checks.json",
+    "bytes": 880,
+    "sha256": "8e57626cb6b7dad341874d09efd5b8bad56d9c84ac61d2ca446096d8ce1bb5d5"
+  },
+  {
+    "path": "validation/proposed_school_forecourt.json",
+    "bytes": 202,
+    "sha256": "90fe1ec02ca40aef75b0dbdff8af9546d388ffa0370be845be6dfe7421d885f2"
+  },
+  {
+    "path": "validation/proposed_surface_plan.json",
+    "bytes": 184980,
+    "sha256": "6bc9bdba3c368a26db704baed18f0f09090b6c63675a4aabe3ac93c38e228d1e"
+  },
+  {
+    "path": "validation/shared_buildings_between_options.json",
+    "bytes": 314,
+    "sha256": "235ae20fd87747155d97d87b64b2d28a84850a39f903db4ccbb86d3596a6fd15"
+  }
+]

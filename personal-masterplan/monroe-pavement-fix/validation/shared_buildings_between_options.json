@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "building_count_each_option": 3155,
+  "missing_between_options": [],
+  "geometry_differences": [],
+  "appearance_differences": [],
+  "apartment_and_school_identical": true,
+  "comparison_scope": "Exact world vertices/faces and material/texture/UV signatures. Only site circulation differs."
+}

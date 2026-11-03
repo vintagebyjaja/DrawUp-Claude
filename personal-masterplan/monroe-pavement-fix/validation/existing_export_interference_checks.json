@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "garage_overlap_with_actual_exported_vehicle_surfaces_m2": 0.0,
+  "sidewalk_overlap_with_actual_exported_vehicle_surfaces_m2": 0.0,
+  "actual_exported_street_top_samples": 84384,
+  "minimum_street_height_above_source_terrain_m": 0.039983804677813595,
+  "street_samples_below_terrain": [],
+  "method": "Independent projection of reimported FBX top faces, compared to each other and the original terrain interpolator."
+}

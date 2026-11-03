@@ -5,3 +5,4 @@ personal-masterplan/screenshot-terrain/Monroe_Screenshot_Terrain_Personal_Protot
 personal-masterplan/monroe-two-layouts/Monroe_Original_and_New_Road_Layouts.zip filter=lfs diff=lfs merge=lfs -text
 personal-masterplan/monroe-material-surfaces/Monroe_Material_Surfaces_Original_and_Proposed.zip filter=lfs diff=lfs merge=lfs -text
 personal-masterplan/monroe-reference-corrections/Monroe_Reference_Corrections_Original_and_Proposed.zip filter=lfs diff=lfs merge=lfs -text
+personal-masterplan/monroe-pavement-fix/Monroe_Pavement_and_Material_Fixes_Original_and_Proposed.zip filter=lfs diff=lfs merge=lfs -text
