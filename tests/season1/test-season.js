@@ -24,6 +24,7 @@ const MOCK = { extra: { draw_details: [{ id: 'dd1', owner_id: '11111111-1111-411
   C.ok(await p.evaluate(() => { const c = window.DrawUpStudio._nav.PORTAL_NAV.find(x => x.id === 'details'); return !c.cols; }), 'S1: Details has no tools menu');
   C.ok(!(await navItems(p, 'draw')).some(x => /detail/i.test(x)), 'S1: Draw menu has no detail tools', (await navItems(p, 'draw')).join(', '));
   C.ok(!(await navItems(p, 'firm')).some(x => /details library/i.test(x)), 'S1: Firm menu has no Details library');
+  C.ok(await p.evaluate(() => { const v = document.querySelector('.vdi27-card'); return !v || getComputedStyle(v).display === 'none'; }), 'S1: the Visual Detail Intelligence card is not offered');
   await t.shot('season1-details-gate');
   // Draw: detail routes and buttons
   await p.evaluate(() => { history.replaceState(null, '', '#portal/draw?detail=list'); window.DrawUpPortal.openPortalTab('draw'); }); await p.waitForTimeout(1500);

@@ -8,7 +8,8 @@ html.du-s1 #dw22-details,              /* Draw editor › Details · 3D */
 html.du-s1 .du-dit25-single,           /* Draw it up › Draw a single detail in Details */
 html.du-s1 .du-dit24 [data-work],      /* Draw it up › work on a needed detail */
 html.du-s1 .du-dit24 [data-lib],       /* Draw it up › open the Details library */
-html.du-s1 .dus-pop__item[data-dus-go*='"tab":"details"'] { display: none !important; }
+html.du-s1 .dus-pop__item[data-dus-go*='"tab":"details"'],
+html.du-s1 .vdi27-card { display: none !important; }  /* Visual Detail Intelligence: a Season 2 Details tool */
 
 /* ---------------------------------------------------------------- the Season 2 Details screen */
 .dus2 {
