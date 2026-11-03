@@ -515,7 +515,7 @@ async function memberSection(w,c,mine){const firms=(mine||[]).filter(x=>x&&x.id)
   const host=document.createElement('section');host.className='fk-member';
   host.innerHTML=`<div class="du-section-title"><div><span class="du-kicker">FIRM KIT</span><h2>${firms.length>1?`<select id="fk-mfirm" aria-label="Firm">${firms.map(f=>`<option value="${esc(f.id)}">${esc(f.name)}</option>`).join('')}</select>`:esc(firms[0].name)}</h2></div></div><div class="du-subtabs fk-msub">${PANES.map(([k,l],i)=>`<button type="button" data-fk-mpane="${k}" class="${i?'':'active'}">${l}</button>`).join('')}</div><div class="fk-mbody"></div>`;
   w.appendChild(host);let pane='playbook';
-  const go=async()=>{const id=host.querySelector('#fk-mfirm')?.value||firms[0].id;const firm=firms.find(f=>f.id===id);const b=host.querySelector('.fk-mbody');const admin=firm.role==='admin';try{await mount(b,c,firm,pane,{admin});}catch(e){b.innerHTML=`<article class="du-glass"><p>${esc(e.message||e)}</p></article>`;}};
+  const go=async()=>{const id=host.querySelector('#fk-mfirm')?.value||firms[0].id;const firm=firms.find(f=>f.id===id);const b=host.querySelector('.fk-mbody');const admin=firm.role==='admin';try{await window.DrawUpFirmKit.mount(b,c,firm,pane,{admin});}catch(e){b.innerHTML=`<article class="du-glass"><p>${esc(e.message||e)}</p></article>`;}};
   host.querySelectorAll('[data-fk-mpane]').forEach(b=>b.onclick=()=>{pane=b.dataset.fkMpane;host.querySelectorAll('[data-fk-mpane]').forEach(x=>x.classList.toggle('active',x===b));go();});
   host.querySelector('#fk-mfirm')?.addEventListener('change',go);await go();}
 window.DrawUpFirmKit={panes:PANES,owns:p=>PANES.some(x=>x[0]===p),mount,memberSection,defaults:DEFAULT_SECTIONS,_layout:layoutSlide,_newSpec:newSpec};

@@ -16,6 +16,9 @@
   'use strict';
   const NODE = typeof module === 'object' && module.exports;
   const core = () => (NODE ? require('./drawup-draw-core-v18.js') : root.DrawUpDrawCore);
+  // V29: library components and roof planes show in elevations and sections (optional modules)
+  const opt = (file, name) => { try { return NODE ? require(file) : root[name] || null; } catch (_e) { return null; } };
+  const lib29 = () => opt('./drawup-draw-lib-v29.js', 'DrawUpDrawLib'), geo29 = () => opt('./drawup-draw-ws-geo-v29.js', 'DrawUpWSGeo');
   const EPS = 1e-6;
   const sub = (p, q) => ({ x: p.x - q.x, y: p.y - q.y }), add = (p, q) => ({ x: p.x + q.x, y: p.y + q.y }), mul = (p, k) => ({ x: p.x * k, y: p.y * k });
   const len = p => Math.hypot(p.x, p.y), unit = p => { const l = len(p) || 1; return { x: p.x / l, y: p.y / l }; };
@@ -153,6 +156,24 @@
       if (c) cuts.push(Object.assign({ u0: c.u0, u1: c.u1, h: it.rise, holes: [] }, info));
       else if (v) beyond.push(Object.assign({ u0: v.u0, u1: v.u1, w: v.w, h: it.rise }, info));
     });
+    // V29: components (each 3D part as its outline in the view) and the roof, both seen beyond the line
+    const Lb = lib29(), Gg = geo29();
+    if (Lb) (m.items || []).forEach(it => {
+      if (it.kind !== 'component') return; let parts = []; try { parts = Lb.parts(it); } catch (_e) { return; }
+      const a = (it.rot || 0) * Math.PI / 180, cs = Math.cos(a), sn = Math.sin(a), W = p => toUW({ x: it.at.x + p.x * cs - p.y * sn, y: it.at.y + p.x * sn + p.y * cs });
+      parts.forEach((p, k) => {
+        let loc;
+        if (p.shape === 'box') loc = [[-p.w / 2, -p.d / 2], [p.w / 2, -p.d / 2], [p.w / 2, p.d / 2], [-p.w / 2, p.d / 2]].map(([x, y]) => ({ x: x + (p.x || 0), y: y + (p.y || 0) }));
+        else if (p.shape === 'cyl') { loc = []; for (let i = 0; i < 12; i++) loc.push({ x: (p.x || 0) + p.r * Math.cos(i * Math.PI / 6), y: (p.y || 0) + p.r * Math.sin(i * Math.PI / 6) }); }
+        else if (p.shape === 'ring') { loc = []; for (let i = 0; i < 24; i++) loc.push({ x: p.rx * Math.cos(i * Math.PI / 12), y: p.ry * Math.sin(i * Math.PI / 12) }); }
+        else if (p.shape === 'extrude') loc = p.pts; else return;
+        const v = visiblePart(loc.map(W)); if (!v) return;
+        beyond.push({ type: 'comp', id: it.id, part: k, u0: v.u0, u1: v.u1, w: v.w - 0.01 * k, z0: (it.z || 0) + (p.z || 0), h: (it.z || 0) + (p.z || 0) + p.h, glass: p.mat === 'glass' });
+      });
+    });
+    if (Gg && m.roof) { let planes = []; try { planes = Gg.roofPlanes(m); } catch (_e) { planes = []; }
+      planes.forEach((pl, k) => { if (!pl.pts) return; const q = pl.pts.map(p => Object.assign(toUW(p), { z: p.z })); if (!isCut && q.every(p => p.w < 0)) return; const us = q.map(p => p.u); beyond.push({ type: 'roof', id: 'roof' + k, pts: q.map(p => ({ u: Math.max(0, Math.min(L, p.u)), z: p.z })), u0: Math.max(0, Math.min(...us)), u1: Math.min(L, Math.max(...us)), w: Math.min(...q.map(p => p.w)) - 0.5, h: Math.max(...q.map(p => p.z)) }); });
+    }
     beyond.sort((p, q) => q.w - p.w);
     cuts.sort((p, q) => p.u0 - q.u0);
     // rooms: spaces between cut walls, named by the room tag that sees the section line
@@ -194,6 +215,8 @@
         P.push({ t: 'poly', pts, fill: '#ffffff', lw: LW.beyond, data: { el: 'stair', id: e.id } });
         return;
       }
+      if (e.type === 'comp') { rect(e.u0, e.z0, e.u1, e.h, { fill: e.glass ? 'none' : '#ffffff', lw: LW.fine, data: { el: 'item', id: e.id } }); return; }
+      if (e.type === 'roof') { P.push({ t: 'poly', pts: e.pts.map(p => ({ x: p.u, y: Z(p.z) })), fill: '#ffffff', lw: LW.beyond, data: { el: 'roof', id: e.id } }); return; }
       rect(e.u0, 0, e.u1, e.h, { fill: '#ffffff', lw: LW.beyond, data: { el: e.type, id: e.id, h: e.h } });
       if (e.type === 'stair') for (let i = 1; i < e.risers; i++) line({ x: e.u0, y: Z(i * e.rise / e.risers) }, { x: e.u1, y: Z(i * e.rise / e.risers) }, LW.fine, { data: { el: 'stair', id: e.id } });
       (e.openings || []).forEach(o => {

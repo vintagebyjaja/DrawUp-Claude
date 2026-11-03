@@ -1,0 +1,96 @@
+/* DrawUp Draw — V29 Draw Workspace 2.0 */
+.dw29-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:6px 0 2px}
+.dw29-row .dw21-btn.on{background:linear-gradient(135deg,#1b8cff,#7fe7ff);color:#04121f;border-color:transparent}
+.dw29-badge{display:inline-block;min-width:18px;padding:0 5px;margin-left:4px;border-radius:9px;background:#ff8a3d;color:#160800;font-size:11px;line-height:18px;text-align:center}
+.dw29-badge:empty,.dw29-badge[data-zero]{display:none}
+.dw29-cmd{display:flex;flex:1 1 320px;min-width:240px;gap:6px}
+.dw29-cmd input{flex:1;min-width:0;background:#06182a;color:#e6f6ff;border:1px solid rgba(117,224,255,.3);border-radius:9px;padding:7px 10px;font:500 13px 'IBM Plex Sans',system-ui,sans-serif;min-height:34px}
+.dw29-cmd input:focus{outline:2px solid #7fe7ff;outline-offset:1px}
+.dw29-menu{position:relative}
+.dw29-exppop{left:auto;right:0;display:flex;flex-direction:column;gap:4px;min-width:240px}
+.dw29-exppop[hidden]{display:none}
+.dw29-exppop button{background:#0b2238;color:#cfe9f7;border:1px solid rgba(117,224,255,.2);border-radius:8px;padding:8px 10px;text-align:left;font:600 12.5px 'IBM Plex Sans',system-ui,sans-serif;cursor:pointer}
+.dw29-exppop button:hover{border-color:#7fe7ff}
+.dw29-banner{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:8px 0;padding:10px 12px;border-radius:12px;background:#fff6e5;color:#3a2a10;border:1px solid #f0c27a;font:500 13.5px 'IBM Plex Sans',system-ui,sans-serif}
+.dw29-banner[hidden]{display:none}
+.dw29-banner b{color:#9a4a00;text-transform:uppercase;font-size:11.5px;letter-spacing:.08em}
+.dw29-banner small{flex-basis:100%;color:#6b5330}
+.dw29-banner .dw21-btn{background:#fff;color:#2a1d08;border-color:#e0b46a}
+.dw29-banner .du-draw-warn{margin:0}
+.dw21-flex{flex:1}
+.du-draw-split{position:relative}
+.dw29-previewing .du-draw-canvas{box-shadow:inset 0 0 0 3px #ff8a3d}
+.dw29-previewing .du-draw-tools button[data-tool]{pointer-events:none;opacity:.55}
+.dw29-previewsvg{cursor:not-allowed}
+/* library drawer */
+.dw29-lib{position:absolute;z-index:25;left:10px;top:10px;bottom:10px;width:min(340px,calc(100% - 20px));overflow:auto;padding:12px;border-radius:14px;background:rgba(6,20,34,.97);border:1px solid rgba(117,224,255,.3);box-shadow:0 18px 40px rgba(0,0,0,.45);color:#cfe9f7}
+.dw29-lib[hidden]{display:none}
+.dw29-libhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.dw29-libhead .dd22-close{position:static}
+.dw29-lib input[type=search]{width:100%;box-sizing:border-box;background:#06182a;color:#e6f6ff;border:1px solid rgba(117,224,255,.3);border-radius:9px;padding:8px 10px;font:500 13px 'IBM Plex Sans',system-ui,sans-serif}
+.dw29-cats{display:flex;flex-wrap:wrap;gap:4px;margin:8px 0}
+.dw29-cats button{background:#0b2238;color:#cfe9f7;border:1px solid rgba(117,224,255,.2);border-radius:20px;padding:4px 9px;font:600 11.5px 'IBM Plex Sans',system-ui,sans-serif;cursor:pointer}
+.dw29-cats button.on{background:#7fe7ff;color:#04121f}
+.dw29-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:6px}
+.dw29-comp{display:flex;flex-direction:column;align-items:center;gap:2px;background:#fff;color:#0d1b2a;border:2px solid transparent;border-radius:10px;padding:6px 4px;cursor:grab;font:600 11px 'IBM Plex Sans',system-ui,sans-serif;text-align:center}
+.dw29-comp.on,.dw29-comp:focus-visible{border-color:#1b8cff}
+.dw29-comp svg{width:64px;height:48px}
+.dw29-comp svg polygon,.dw29-comp svg polyline,.dw29-comp svg circle,.dw29-comp svg rect,.dw29-comp svg path{fill:none;stroke:#0d1b2a;stroke-width:1.5;vector-effect:non-scaling-stroke}
+.dw29-comp small{color:#5a6b7b;font-weight:500}
+.dw29-comp.mine{background:#eef6ff}
+.dw29-addown{margin-top:10px}
+.dw29-addown summary{cursor:pointer;font-weight:600}
+.dw29-lib .du-field input,.dw29-lib .du-field select{width:100%;box-sizing:border-box}
+/* 3D */
+.dw29-3d{display:flex;flex-direction:column;gap:6px}
+.dw29-3d[hidden]{display:none}
+.dw29-3dstage{position:relative;background:#eef2f5;border-radius:14px;min-height:560px;height:68vh;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(13,27,42,.12)}
+.dw29-3dstage canvas{display:block;width:100%;height:100%;outline:none}
+.dw29-3dstage>p{padding:20px;color:#33475b}
+.dw29-3dbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.dw29-chk{display:inline-flex;align-items:center;gap:5px;color:#cfe9f7;font:600 12.5px 'IBM Plex Sans',system-ui,sans-serif}
+/* modal (wizard, history, finishes, assumptions) */
+.dw29-modal .dd22-mcard{width:min(1080px,100%)}
+.dw29-modal h3{margin:14px 0 6px;font-size:14px}
+.dw29-drop{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:22px;border:2px dashed rgba(117,224,255,.45);border-radius:14px;cursor:pointer;text-align:center;margin:10px 0}
+.dw29-drop input{position:absolute;opacity:0;width:1px;height:1px}
+.dw29-drop:focus-within{outline:2px solid #7fe7ff}
+.dw29-drop span{color:#8fb0c6;font-size:12.5px}
+.dw29-prev img{max-width:100%;max-height:260px;border-radius:10px;display:block;margin:0 auto 8px;background:#fff}
+.dw29-page{display:block;text-align:center}
+.dw29-page input{width:60px}
+.dw29-opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px;margin:8px 0}
+.dw29-opts fieldset{border:1px solid rgba(117,224,255,.25);border-radius:12px;padding:8px 12px;margin:0}
+.dw29-opts legend{font-weight:700;padding:0 4px}
+.dw29-opts label{display:block;margin:6px 0;line-height:1.35}
+.dw29-opts small{display:block;color:#8fb0c6;margin-left:22px}
+.dw29-review{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(260px,1fr);gap:16px;align-items:start}
+.dw29-stage{background:#fff;border-radius:12px;overflow:hidden;margin-top:8px;max-height:70vh}
+.dw29-stage canvas,.dw29-stage svg{display:block;width:100%;height:auto;max-height:70vh}
+.dw29-stage.dw29-measuring canvas{cursor:crosshair}
+.dw29-rvside{max-height:76vh;overflow:auto;padding-right:4px}
+.dw29-asl{padding-left:18px;margin:4px 0}
+.dw29-asl li{margin:5px 0;line-height:1.4}
+.dw29-chip{display:inline-block;padding:1px 7px;border-radius:10px;font-size:11px;font-weight:700;letter-spacing:.03em;vertical-align:1px}
+.dw29-chip.warn{background:#ffe3c2;color:#7a3e00}
+.dw29-chip.ok{background:#c9f2d6;color:#0d5a2a}
+.dw29-mform{margin:8px 0;padding:10px;border-radius:10px;background:rgba(117,224,255,.07)}
+.dw29-vsave{display:flex;gap:8px;margin:8px 0}
+.dw29-vsave input{flex:1}
+.dw29-vlist{padding-left:18px}
+.dw29-vlist li{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:6px 0}
+.dw29-vlist li .dw21-btn{margin-left:auto}
+.dw29-concepts{display:flex;flex-wrap:wrap;gap:8px}
+.dw29-concept{display:flex;align-items:center;gap:4px;background:#0b2238;color:#cfe9f7;border:1px solid rgba(117,224,255,.25);border-radius:10px;padding:8px 10px;cursor:pointer;font:600 12.5px 'IBM Plex Sans',system-ui,sans-serif}
+.dw29-concept i{width:16px;height:16px;border-radius:4px;display:inline-block;border:1px solid rgba(255,255,255,.3)}
+.dw29-concept b{margin-left:4px}
+.dw29-wtools{margin-top:12px;padding-top:10px;border-top:1px solid rgba(117,224,255,.15)}
+.dw29-wtools .dw21-btn{margin:2px 2px 2px 0}
+.dw29-ih{margin:2px 0 8px}
+.dw29-startcard{border:1px solid rgba(255,138,61,.45)}
+@media (max-width:760px){
+  .dw29-review{grid-template-columns:1fr}
+  .dw29-cmd{flex-basis:100%}
+  .dw29-3dstage{min-height:360px;height:56vh}
+  .dw29-lib{left:6px;right:6px;width:auto}
+}

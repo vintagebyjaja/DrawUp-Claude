@@ -1,4 +1,5 @@
-/* DrawUp Draw core — V18 (V20: heights, wall types, columns, stairs, fixtures, text, dimensions)
+/* DrawUp Draw core — V18 (V20: heights, wall types, columns, stairs, fixtures, text, dimensions;
+ *  V29: library components (furniture, casework, equipment) and curved-wall segments)
  *
  * The drawing is a model, not a picture: walls are segments with a thickness, doors and
  * windows are hosted on walls at an offset, rooms are labels. Every dimension string is
@@ -77,7 +78,10 @@
   function wallType(w) { return WALL_TYPES[wallTypeKey(w)]; }
   const DEFAULT_HEAD = 84, DEFAULT_SILL = 36, DEFAULT_CEILING = 96;
   function defaultWallHeight(w) { return WALL_TYPES[w.wtype] ? WALL_TYPES[w.wtype].height : (w.type === 'exterior' ? 108 : 96); }
-  const ITEM_KINDS = ['column', 'stair', 'text', 'dim', 'fixture', 'shape'];
+  const ITEM_KINDS = ['column', 'stair', 'text', 'dim', 'fixture', 'shape', 'component'];
+  /* V29: components come from the Draw Workspace library (drawup-draw-lib-v29.js). Without it a component draws as its box. */
+  const NODE_ = typeof module === 'object' && module.exports;
+  let lib_ = null; const lib = () => { if (lib_) return lib_; if (NODE_) { try { lib_ = require('./drawup-draw-lib-v29.js'); } catch (_e) { lib_ = null; } return lib_; } return root.DrawUpDrawLib || null; };
   /* V22: free-angle shapes. Points are local to `at` and turn with `rot`, so move / rotate / copy work like any item. */
   const SHAPES = ['line', 'polyline', 'arc', 'circle', 'rect', 'polygon', 'curve'];
   const SHAPE_WEIGHTS = { fine: 'shpf', medium: 'shpm', heavy: 'shph' };
@@ -92,7 +96,7 @@
     m.items = Array.isArray(m.items) ? m.items.filter(it => it && ITEM_KINDS.includes(it.kind) && (it.kind === 'dim' ? okPt(it.a) && okPt(it.b) : okPt(it.at))) : [];
     m.walls.forEach(w => { if (!(w.height > 0)) w.height = defaultWallHeight(w); });
     m.openings.forEach(o => { if (!(o.head > 0)) o.head = DEFAULT_HEAD; if (o.kind === 'window') { if (!(o.sill >= 0)) o.sill = DEFAULT_SILL; } else delete o.sill; });
-    m.rooms.forEach(r => { if (!(r.ceiling > 0)) r.ceiling = DEFAULT_CEILING; });
+    m.rooms.forEach(r => { if (!(r.ceiling > 0)) r.ceiling = DEFAULT_CEILING; if (r.poly != null) { r.poly = Array.isArray(r.poly) ? r.poly.filter(okPt).map(p => ({ x: +p.x, y: +p.y })) : []; if (r.poly.length < 3) delete r.poly; } });
     m.items.forEach(it => {
       if (!isFinite(it.rot)) it.rot = 0;
       if (it.kind === 'column') { it.shape = it.shape === 'round' ? 'round' : 'square'; if (!(it.size > 0)) it.size = 12; }
@@ -100,6 +104,7 @@
       if (it.kind === 'text') { it.text = String(it.text || 'NOTE'); if (!(it.size > 0)) it.size = 0.125; }
       if (it.kind === 'dim') { if (!isFinite(it.off)) it.off = 12; }
       if (it.kind === 'fixture') { if (!FIXTURES[it.fixture]) it.fixture = 'wc'; }
+      if (it.kind === 'component') { it.comp = String(it.comp || 'box').slice(0, 80); ['w', 'd', 'h'].forEach((k, i) => { it[k] = +it[k] > 0 ? Math.min(+it[k], 12000) : [24, 24, 30][i]; }); it.z = isFinite(+it.z) ? +it.z : 0; if (it.label != null) it.label = String(it.label).slice(0, 80); }
       if (it.kind === 'shape') { if (!SHAPES.includes(it.shape)) it.shape = 'line'; it.pts = (Array.isArray(it.pts) ? it.pts : []).filter(okPt).map(p => ({ x: +p.x, y: +p.y })); if (!SHAPE_WEIGHTS[it.weight]) it.weight = 'medium'; it.dash = !!it.dash; if (it.shape === 'circle' && !(it.r > 0)) it.r = 12; }
     });
     m.items = m.items.filter(it => it.kind !== 'shape' || (it.shape === 'circle' ? it.r > 0 : it.pts.length >= 2));
@@ -152,6 +157,7 @@
     if (it.kind === 'column') { const s = it.size / 2; return it.shape === 'round' ? ellipse(0, 0, s, s, 24).map(W) : rect(-s, -s, s, s).map(W); }
     if (it.kind === 'stair') return rect(0, -it.width / 2, it.length, it.width / 2).map(W);
     if (it.kind === 'fixture') return fixtureShapes(it.fixture).box.map(W);
+    if (it.kind === 'component') return rect(-it.w / 2, -it.d / 2, it.w / 2, it.d / 2).map(W);
     if (it.kind === 'text') { const h = it.size * scale, w = Math.max(1, it.text.length) * h * 0.62; return rect(-w / 2, -h * 0.6, w / 2, h * 0.6).map(W); }
     if (it.kind === 'dim') { const g = dimGeometry(it, scale), n = g.n, h = PAPER.text * scale; return [add(g.la, mul(n, -h * 0.4)), add(g.lb, mul(n, -h * 0.4)), add(g.lb, mul(n, h * 1.6)), add(g.la, mul(n, h * 1.6))]; }
     if (it.kind === 'shape') { const L = shapeLocal(it).flat(); const xs = L.map(p => p.x), ys = L.map(p => p.y), pad = 2; return rect(Math.min(...xs) - pad, Math.min(...ys) - pad, Math.max(...xs) + pad, Math.max(...ys) + pad).map(W); }
@@ -429,7 +435,7 @@
       const originV = u => { let best = -Infinity; cornerUV.forEach(p => { if (Math.abs(p.u - u) < 0.01) best = Math.max(best, p.v); }); sideWalls.forEach(w => { const o = outlines.get(w.id), a = T.toUV(o.outerA), b = T.toUV(o.outerB); if (u >= Math.min(a.u, b.u) - 0.01 && u <= Math.max(a.u, b.u) + 0.01) best = Math.max(best, a.v); }); return best === -Infinity ? faceV : best; };
       const st = u => ({ u, v: originV(u) });
       const extents = [st(minU), st(maxU)];
-      const jogs = []; sideWalls.forEach(w => { const o = outlines.get(w.id); jogs.push(st(T.toUV(o.outerA).u), st(T.toUV(o.outerB).u)); });
+      const jogs = []; sideWalls.forEach(w => { const o = outlines.get(w.id); if (!w.curve || w.curve.i === 0) jogs.push(st(T.toUV(o.outerA).u)); if (!w.curve || w.curve.i === w.curve.n - 1) jogs.push(st(T.toUV(o.outerB).u)); }); // V29: a curved wall is dimensioned at its ends only
       const jambs = []; m.openings.forEach(o => { if (!sideWalls.some(w => w.id === o.wall)) return; const g = openingGeometry(m, o); jambs.push(st(T.toUV(g.outer1).u), st(T.toUV(g.outer2).u)); });
       const partitions = []; m.walls.filter(w => w.type !== 'exterior').forEach(w => {
         [w.a, w.b].forEach(p => { sideWalls.forEach(sw => { if (pointOnWall(p, sw, sw.thickness / 2 + 0.01)) partitions.push(st(T.toUV(p).u)); }); });
@@ -468,7 +474,7 @@
     });
 
     // V22: angled exterior walls get an aligned dimension (true length) along their outside face
-    ext.filter(w => !isHorizontal(w) && !isVertical(w)).forEach(w => {
+    ext.filter(w => !isHorizontal(w) && !isVertical(w) && !w.curve).forEach(w => {
       const o = outlines.get(w.id), nrm = o.normal, a = o.outerA, b = o.outerB, value = dist(a, b); if (value < 0.01) return;
       const off = P('firstOffset'), la = add(a, mul(nrm, off)), lb = add(b, mul(nrm, off)), text = formatFtIn(value);
       const g = dimGeometry({ a: la, b: lb, off: 0 }, scale), tw = text.length * P('text') * 0.62;
@@ -655,6 +661,9 @@
     dims: { dxf: 'A-ANNO-DIMS', color: 1, lw: 0.007 }, tick: { dxf: 'A-ANNO-DIMS', color: 1, lw: 0.016 }, iden: { dxf: 'A-AREA-IDEN', color: 3, lw: 0.01 }, tags: { dxf: 'A-ANNO-TAGS', color: 6, lw: 0.008 },
     cols: { dxf: 'S-COLS', color: 5, lw: 0.016 }, strs: { dxf: 'A-FLOR-STRS', color: 3, lw: 0.009 }, fixt: { dxf: 'P-FIXT', color: 4, lw: 0.008 }, anno: { dxf: 'A-ANNO-TEXT', color: 7, lw: 0.008 }, legend: { dxf: 'A-ANNO-LEGN', color: 7, lw: 0.007 },
     shpf: { dxf: 'A-ANNO-SKCH', color: 8, lw: 0.006 }, shpm: { dxf: 'A-ANNO-SKCH', color: 7, lw: 0.012 }, shph: { dxf: 'A-ANNO-SKCH', color: 7, lw: 0.022 },
+    // V29: library components
+    furn: { dxf: 'I-FURN', color: 6, lw: 0.008 }, case: { dxf: 'I-CASE', color: 6, lw: 0.01 }, eqpm: { dxf: 'Q-EQPM', color: 5, lw: 0.008 }, lite: { dxf: 'E-LITE', color: 2, lw: 0.006 },
+    pepl: { dxf: 'G-ANNO-PEOP', color: 8, lw: 0.005 }, plnt: { dxf: 'L-PLNT', color: 3, lw: 0.006 }, vehi: { dxf: 'C-VEHI', color: 8, lw: 0.006 }, sign: { dxf: 'A-SIGN', color: 1, lw: 0.008 },
   };
   function itemPrims(it, scale) {
     const out = [], X = { item: it.id }, W = p => add(it.at, rotV(p, it.rot || 0));
@@ -679,6 +688,16 @@
       const layer = SHAPE_WEIGHTS[it.weight] || 'shpm';
       if (it.shape === 'circle' && !it.rot) out.push(Object.assign({ t: 'circle', layer, c: add(it.at, it.pts[0] || { x: 0, y: 0 }), r: it.r, dash: it.dash }, X));
       else shapeLines(it).forEach(l => { for (let i = 0; i + 1 < l.length; i++) if (dist(l[i], l[i + 1]) > 1e-6) L(layer, l[i], l[i + 1], { dash: it.dash }); });
+    } else if (it.kind === 'component') {
+      // V29: plan symbol from the library, in local inches (x across the width, y across the depth)
+      const S = lib() && lib().symbol ? lib().symbol(it) : null, layer = S && LAYERS[S.layer] ? S.layer : 'furn';
+      if (!S) poly(layer, rect(-it.w / 2, -it.d / 2, it.w / 2, it.d / 2).map(W), null);
+      else {
+        (S.polys || []).forEach(p => { if (p.length > 2) out.push(Object.assign({ t: 'poly', layer, pts: p.map(W), fill: null, comp: it.comp, part: p.part || null }, X)); });
+        (S.lines || []).forEach(([a, b]) => L(layer, W(a), W(b), S.dash ? { dash: true } : null));
+        (S.circles || []).forEach(k => out.push(Object.assign({ t: 'circle', layer, c: W(k.c), r: k.r }, X)));
+      }
+      if (it.note) T('anno', it.at, String(it.note).toUpperCase(), PAPER.text * scale * 0.85, 0, { middle: true });
     } else if (it.kind === 'text') {
       T('anno', it.at, it.text, it.size * scale, it.rot || 0);
     } else if (it.kind === 'dim') {

@@ -274,9 +274,11 @@
     if (m.status === 'failed') badges.push('<span class="du-tm25-badge bad">Not answered</span>');
     if (meta.queued_changes?.length) badges.push('<span class="du-tm25-badge warn">Changes queued for the next revision</span>');
     const atts = (m.attachments || []).length ? `<div class="du-tm25-atts">${m.attachments.map(a => `<span>🖼 ${esc(a.name)}</span>`).join('')}</div>` : '';
-    const body = live && !m.content ? '<span class="du-tm25-typing" aria-label="Writing"><i></i><i></i><i></i></span>' : md(m.content || '');
+    // v29: a question about using DrawUp got a free help answer (no AI, no credits): show it as a help card
+    const helpQ = meta.help && m.reply_to && byId.get(m.reply_to);
+    const body = live && !m.content ? '<span class="du-tm25-typing" aria-label="Writing"><i></i><i></i><i></i></span>' : meta.help && window.DrawUpHelp ? window.DrawUpHelp.cardHtml(meta.help, { question: helpQ?.content || '', ai: 'Ask ' + (NAMES[sp] || 'the team') + ' instead (uses credits)' }) : md(m.content || '');
     let extra = '';
-    if (!live && m.role === 'assistant' && m.status !== 'failed') {
+    if (!live && m.role === 'assistant' && m.status !== 'failed' && !meta.help) {
       if (meta.plays?.length) extra += `<div class="du-tm25-plays">${meta.plays.map((p, i) => `<article><span class="du-kicker">PLAY ${i + 1}</span><h4>${esc(p.title)}</h4><p>${esc(p.summary)}</p><div><button type="button" class="du-btn primary" data-shot="${i}" data-msg="${m.id}">Take the shot (${S.costs?.shot ?? 8} cr)</button><button type="button" class="du-btn ghost" data-saveplay="${i}" data-msg="${m.id}">Save play</button></div></article>`).join('')}</div>`;
       if (meta.proposal && !general) extra += proposalHtml(m);
       if (meta.decision) extra += `<div class="du-tm25-decision">Decision: <b>${esc(meta.decision)}</b> <button type="button" class="du-btn ghost" data-decide="${m.id}">✓ Approve &amp; save decision</button></div>`;
@@ -398,7 +400,7 @@
       }
     } catch (e) { toast(e.message, true); }
 
-    const body = { message: text, request_id: reqId, assistant, legend: lg ? lg.key : undefined, thread_id: S.thread?.id || undefined, project_id: !S.thread ? (S.projectId || undefined) : undefined, images, attachments, continue_of: opts.continueOf || undefined };
+    const body = { message: text, request_id: reqId, assistant, legend: lg ? lg.key : undefined, thread_id: S.thread?.id || undefined, project_id: !S.thread ? (S.projectId || undefined) : undefined, images, attachments, continue_of: opts.continueOf || undefined, no_help: opts.noHelp || undefined };
     let tries = 0, gotMeta = false;
     for (;;) {
       try {
@@ -794,6 +796,8 @@
     history.replaceState(null, '', '#portal/ai-team' + (opts.threadId ? '?thread=' + opts.threadId : ''));
     P()?.openPortalTab?.('ai-team');
   }
+  // v29: "Ask … instead" on a free help card sends the same question to the AI (charged as a normal message)
+  document.addEventListener('drawup:help-ai', e => { const card = document.getElementById(e.detail?.card); const msg = card?.closest('.du-tm25-msg'); if (!msg || !S.host?.contains(msg) || !e.detail.question) return; const m = msgById(msg.dataset.id); send(e.detail.question, { noHelp: true, assistant: m?.speaker && NAMES[m.speaker] ? m.speaker : S.selected }); });
   window.DrawUpTeam = { open, projectCard, ask: (text, assistant) => open({ ask: text, assistant, fresh: true }) };
 
   (async () => {

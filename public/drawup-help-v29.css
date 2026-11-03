@@ -1,0 +1,67 @@
+/* DrawUp v29 Help cards (free answers about using DrawUp) + HQ › Help registry. Uses the v26 studio tokens with fallbacks,
+   so it reads the same in the portal, the AI Team, the public Arch Coach page and the search band. */
+.duh-card{--h-ink:var(--dus-ink,#142238);--h-ink2:var(--dus-ink-2,#4A5770);--h-line:var(--dus-line,#E1E6EE);--h-royal:var(--dus-royal,#2854A1);--h-good:var(--dus-good,#1F9D6B);--h-warn:var(--dus-warn,#C77A12);
+  box-sizing:border-box;margin:6px 0 2px;padding:14px 16px;border:1px solid var(--h-line);border-left:4px solid var(--h-royal);border-radius:var(--dus-r,16px);background:#fff;color:var(--h-ink);
+  box-shadow:var(--dus-shadow-s,0 2px 8px rgba(16,28,51,.06));font-family:var(--dus-font,inherit);font-size:15px;line-height:1.5;max-width:100%;min-width:0;text-align:left;white-space:normal}
+.duh-card *{box-sizing:border-box}
+.duh-head{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin-bottom:8px}
+.duh-ico{display:inline-flex;width:20px;height:20px;color:var(--h-royal)}.duh-ico svg{width:20px;height:20px}
+.duh-k{font-size:11px;font-weight:700;letter-spacing:.16em;color:var(--h-royal)}
+.duh-badge{display:inline-flex;align-items:center;padding:2px 9px;border-radius:999px;font-size:12px;font-weight:650;line-height:1.6}
+.duh-free{background:rgba(31,157,107,.12);color:#13734d}
+.duh-wait{background:rgba(199,122,18,.13);color:#8a5208}
+.duh-text{margin:0 0 8px;color:var(--h-ink)}
+.duh-intro{font-weight:650}
+.duh-path{display:flex;flex-wrap:wrap;align-items:center;gap:4px 6px;margin:0 0 10px;font-size:13px}
+.duh-path span{padding:2px 9px;border-radius:8px;background:var(--dus-grey,#F1F3F6);border:1px solid var(--h-line);color:var(--h-ink);font-weight:600}
+.duh-path i{font-style:normal;color:var(--h-ink2)}
+.duh-steps{margin:0 0 10px;padding-left:20px;color:var(--h-ink2);font-size:14px}.duh-steps li{margin:2px 0}
+.duh-opts{list-style:none;margin:4px 0 10px;padding:0;display:grid;gap:8px}
+.duh-opt{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 12px;border:1px solid var(--h-line);border-radius:12px;background:var(--dus-white,#F8F9FB)}
+.duh-opt div{min-width:0}.duh-opt b{display:block;font-size:14px;color:var(--h-ink)}.duh-opt small{display:block;font-size:12.5px;color:var(--h-ink2)}
+.duh-opt .duh-st{color:#8a5208;font-weight:600}
+.duh-uses,.duh-note{margin:0 0 10px;font-size:13px;color:var(--h-ink2)}
+.duh-acts{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.duh-btn{appearance:none;display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:7px 14px;border-radius:999px;border:1px solid var(--h-royal);background:#fff;color:var(--h-royal);font:inherit;font-size:14px;font-weight:650;cursor:pointer;white-space:nowrap}
+.duh-btn:hover{background:rgba(40,84,161,.07)}
+.duh-btn:focus-visible{outline:3px solid var(--dus-cyan,#55D8FF);outline-offset:2px}
+.duh-primary{background:var(--h-royal);color:#fff}.duh-primary:hover{background:var(--dus-royal-2,#3A6CC4)}
+.duh-ghost{border-color:var(--h-line);color:var(--h-ink2);font-weight:600}
+/* where the card sits */
+.du-coach-messages article.duh-local .duh-card{margin-top:6px}
+.bubble.duh-bubble{background:transparent!important;padding:0!important;border:0!important;max-width:100%!important}
+.bubble.duh-bubble .who{display:block;margin:0 0 2px;color:#A9B7CF}
+.duh-search{margin:14px 0}
+.du-tm25-text .duh-card{margin:4px 0 0}
+.duh-pop{position:fixed;z-index:13500;max-height:calc(100vh - 16px);overflow:auto;border-radius:18px;box-shadow:var(--dus-shadow-l,0 28px 64px rgba(8,23,41,.2))}
+.duh-pop .duh-card{margin:0;padding-right:40px}
+.duh-x{position:absolute;top:8px;right:8px;z-index:1;width:30px;height:30px;border:0;border-radius:50%;background:transparent;color:#4A5770;font-size:22px;line-height:1;cursor:pointer}
+.duh-x:hover{background:#F1F3F6}
+@media (max-width:560px){.duh-card{padding:12px;font-size:14.5px}.duh-opt{flex-wrap:wrap}.duh-opt .duh-btn{margin-left:auto}.duh-btn{min-height:40px}}
+
+/* HQ › Help registry */
+.duh-hq{color:var(--dus-ink,#142238)}
+.duh-hq-head{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;align-items:flex-start}
+.duh-hq h2{margin:4px 0 6px}.duh-hq h3{margin:22px 0 8px;font-size:16px}
+.duh-muted{color:var(--dus-ink-2,#4A5770);font-size:14px;margin:4px 0}
+.duh-warn{padding:10px 12px;border-radius:12px;background:rgba(199,122,18,.12);color:#7a4806;font-weight:600}
+.duh-hq-stats{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
+.duh-hq-stats span{padding:6px 12px;border-radius:12px;background:var(--dus-grey,#F1F3F6);font-size:13.5px}
+.duh-good{color:#13734d}.duh-bad{color:#a3321f}
+.duh-hq-box{margin:10px 0;padding:10px 14px;border-radius:12px;border:1px solid var(--dus-line,#E1E6EE);background:#fff;font-size:14px}
+.duh-hq-box p{margin:4px 0}.duh-hq-new{border-color:#8fd3b6;background:#f2fbf7}.duh-hq-bad{border-color:#f0b4a9;background:#fdf4f2}
+.duh-hq-try,.duh-hq-filter{display:block;margin:14px 0}
+.duh-hq-try input,.duh-hq-filter input,.duh-hq-edit input,.duh-hq-edit textarea,.duh-hq-edit select{display:block;width:100%;max-width:640px;margin-top:4px;padding:9px 11px;border:1px solid var(--dus-line-2,#D3DAE5);border-radius:10px;font:inherit;font-size:14px;background:#fff;color:inherit}
+.duh-hq-list{display:grid;gap:8px}
+.duh-hq-row{border:1px solid var(--dus-line,#E1E6EE);border-radius:14px;background:#fff;padding:10px 12px}
+.duh-hq-row.is-open{border-color:var(--dus-royal,#2854A1)}
+.duh-hq-main{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px}
+.duh-hq-main>div{flex:1 1 260px;min-width:0}.duh-hq-main p{margin:2px 0 0;font-size:13px;color:var(--dus-ink-2,#4A5770)}.duh-hq-main small{color:var(--dus-ink-3,#7B879C)}
+.duh-pill{padding:2px 9px;border-radius:999px;background:var(--dus-grey,#F1F3F6);font-size:12px;font-weight:600;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.duh-pill.ok,.duh-pill.s-live{background:rgba(31,157,107,.12);color:#13734d}.duh-pill.bad{background:rgba(200,65,47,.12);color:#a3321f}
+.duh-pill.warn,.duh-pill.s-building,.duh-pill.s-limited,.duh-pill.s-season2{background:rgba(199,122,18,.13);color:#8a5208}.duh-pill.s-off{background:#e9ecf1;color:#4A5770}
+.duh-hq-edit{margin-top:10px;padding-top:10px;border-top:1px solid var(--dus-line,#E1E6EE);display:grid;gap:10px}
+.duh-hq-edit label{font-size:13.5px;font-weight:600}.duh-check{display:flex!important;align-items:center;gap:8px}.duh-check input{width:auto!important;display:inline!important;margin:0!important}
+.duh-hq-edit code{font-size:12px;word-break:break-all}
+.duh-msg{margin:0;font-size:14px}
+.duh-hq-log p{margin:4px 0;font-size:13.5px}.duh-hq-log small{color:var(--dus-ink-3,#7B879C)}

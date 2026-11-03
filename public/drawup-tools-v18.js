@@ -59,13 +59,13 @@ P.registerTab('draw',async(w,c)=>{
   }
   const {data:row,error:e2}=await c.client.from('drawings').select('*').eq('id',openId).eq('owner_id',c.user.id).maybeSingle();
   if(e2)throw e2;if(!row){history.replaceState(null,'','#portal/draw');w.innerHTML='<div class="du-empty"><h1>Drawing not found.</h1><button class="du-btn primary" data-portal-tab="draw">My drawings</button></div>';return;}
-  let model=D.normalizeModel(row.model),scale=row.scale_denominator||48,tool='select',sel=null,pending=null,undo=[],saveTimer=null,saving=false,revision=row.revision||1,hover=null,measure=null,drag=null,suppressClick=false;
+  let model=D.normalizeModel(row.model),scale=row.scale_denominator||48,tool='select',sel=null,pending=null,undo=[],saveTimer=null,saving=false,revision=row.revision||1,redo=[],hover=null,measure=null,drag=null,suppressClick=false;
   const opt={wall:'wd6',partition:'wd4',column:'square',fixture:'wc'};
   let ext=null,exactPt=null; // V21 extension (drawup-draw-v21.js) and a typed point being placed
   w.innerHTML=`<div class="du-work-head du-draw-head"><div><span class="du-kicker">DRAW · ${c.esc(row.sheet_number||'A101')}</span><h1 id="dw-title">${c.esc(row.name)}</h1></div>
     <div class="du-head-actions"><select id="dw-list">${list.map(d=>`<option value="${d.id}"${d.id===row.id?' selected':''}>${c.esc(d.name)}${d.sheet_number?' · '+c.esc(d.sheet_number):''}</option>`).join('')}</select><button class="du-btn ghost" id="dw-new">New drawing</button></div></div>
   <div class="du-draw-bar du-draw-bar20">
-    <div class="du-draw-tools" role="toolbar" aria-label="Drawing tools">${DRAW_TOOLS.map(([k,l])=>`<button type="button" data-tool="${k}" class="${k==='select'?'on':''}">${l}</button>`).join('')}<button type="button" id="dw-undo" title="Undo (Ctrl+Z)">Undo</button></div>
+    <div class="du-draw-tools" role="toolbar" aria-label="Drawing tools">${DRAW_TOOLS.map(([k,l])=>`<button type="button" data-tool="${k}" class="${k==='select'?'on':''}">${l}</button>`).join('')}<button type="button" id="dw-undo" title="Undo (Ctrl+Z)">Undo</button><button type="button" id="dw-redo" title="Redo (Ctrl+Y or Ctrl+Shift+Z)">Redo</button></div>
     <div class="du-draw-tools du-draw-opts"><span id="dw-opt" class="du-draw-opt"></span><span id="dw-hint" class="du-draw-hint"></span><span class="du-draw-spacer"></span><label>Scale <select id="dw-scale">${SCALES.map(([v,l])=>`<option value="${v}"${v===scale?' selected':''}>${l}</option>`).join('')}</select></label><button type="button" id="dw-pdf">PDF</button><button type="button" id="dw-dxf">DXF</button><button type="button" id="dw-svg">SVG</button><span id="dw-save" class="du-save-status"></span></div>
   </div>
   <div class="du-draw-split"><div class="du-draw-canvas" id="dw-canvas" tabindex="0"><div id="dw-svg-host" class="du-draw-svghost"></div><div id="dw-readout" class="du-draw-readout" hidden></div></div><aside class="du-draw-inspect du-glass" id="dw-inspect"></aside></div>
@@ -73,7 +73,7 @@ P.registerTab('draw',async(w,c)=>{
   const canvas=$q(w,'#dw-canvas'),host=$q(w,'#dw-svg-host'),inspect=$q(w,'#dw-inspect'),saveEl=$q(w,'#dw-save'),readout=$q(w,'#dw-readout');
   const setSave=(t,bad)=>{saveEl.textContent=t;saveEl.style.color=bad?'#ff9a9a':'';};
   const ft=v=>c.esc(D.formatFtIn(v));
-  function commit(){undo.push(JSON.stringify(model));if(undo.length>80)undo.shift();}
+  function commit(){undo.push(JSON.stringify(model));if(undo.length>80)undo.shift();redo.length=0;}
   function scheduleSave(){setSave('Saving…');clearTimeout(saveTimer);saveTimer=setTimeout(save,600);}
   async function save(){if(saving){scheduleSave();return;}saving=true;const rev=revision+1;const {data,error}=await c.client.from('drawings').update({model,scale_denominator:scale,revision:rev,updated_at:new Date().toISOString()}).eq('id',row.id).eq('owner_id',c.user.id).select('revision').single();saving=false;if(error){setSave('Not saved — '+error.message,true);return;}revision=data.revision;setSave('Saved · rev '+revision);}
   const item=id=>(model.items||[]).find(x=>x.id===id);
@@ -171,7 +171,7 @@ P.registerTab('draw',async(w,c)=>{
       render();return;}
     if(pending||(measure&&measure.a&&!measure.b)){const p=toModel(ev);const fine=tool==='dim'||tool==='measure';hover=snapPoint(p,pending||measure.a,{fine,free:ev.shiftKey||(tool==='measure'&&ev.altKey)});if(tool==='measure'){measure.live=hover;setReadout('Distance '+D.formatFtIn(Math.hypot(hover.x-measure.a.x,hover.y-measure.a.y)));}render();}
   });
-  const endDrag=()=>{if(!drag)return;if(drag.moved){undo.push(drag.before);if(undo.length>80)undo.shift();suppressClick=true;scheduleSave();}drag=null;render();};
+  const endDrag=()=>{if(!drag)return;if(drag.moved){undo.push(drag.before);if(undo.length>80)undo.shift();redo.length=0;suppressClick=true;scheduleSave();}drag=null;render();};
   canvas.addEventListener('pointerup',endDrag);canvas.addEventListener('pointercancel',endDrag);
   const onClick=ev=>{
     if(suppressClick){suppressClick=false;return;}
@@ -191,7 +191,7 @@ P.registerTab('draw',async(w,c)=>{
   canvas.addEventListener('keydown',ev=>{
     if(ext&&ext.keydown&&ext.keydown(ev,tool))return;
     if(ev.key==='Escape'){pending=null;hover=null;measure=null;setReadout('');render();return;}
-    if((ev.ctrlKey||ev.metaKey)&&ev.key.toLowerCase()==='z'){ev.preventDefault();$q(w,'#dw-undo').click();return;}
+    if((ev.ctrlKey||ev.metaKey)&&(ev.key.toLowerCase()==='y'||(ev.shiftKey&&ev.key.toLowerCase()==='z'))){ev.preventDefault();$q(w,'#dw-redo').click();return;}if((ev.ctrlKey||ev.metaKey)&&ev.key.toLowerCase()==='z'){ev.preventDefault();$q(w,'#dw-undo').click();return;}
     if(tool!=='select'||!sel)return;
     if(ev.key==='Delete'||ev.key==='Backspace'){ev.preventDefault();remove();return;}
     if(ev.key==='r'||ev.key==='R'){rotateSel();return;}
@@ -199,7 +199,8 @@ P.registerTab('draw',async(w,c)=>{
     const before=JSON.stringify(model);try{if(sel.type==='item')D.moveItem(model,sel.id,a[0]*step,a[1]*step);else if(sel.type==='room'){const r=model.rooms.find(x=>x.id===sel.id);r.at={x:r.at.x+a[0]*step,y:r.at.y+a[1]*step};}else if(sel.type==='opening'){const o=model.openings.find(x=>x.id===sel.id),wl=D.wallById(model,o.wall),L=D.wallLength(wl);D.moveOpening(model,o.id,o.offset+(a[0]*(wl.b.x-wl.a.x)+a[1]*(wl.b.y-wl.a.y))/L*step);}else return;}catch(e){model=D.normalizeModel(JSON.parse(before));c.toast(e.message,true);return;}undo.push(before);render();scheduleSave();
   });
   w.querySelectorAll('[data-tool]').forEach(b=>b.onclick=()=>{tool=b.dataset.tool;pending=null;hover=null;measure=null;setReadout('');if(tool!=='select')sel=null;w.querySelectorAll('[data-tool]').forEach(x=>x.classList.toggle('on',x===b));canvas.style.cursor=tool==='select'?'default':'crosshair';toolOptions();canvas.focus();render();});
-  $q(w,'#dw-undo').onclick=()=>{const prev=undo.pop();if(!prev){c.toast('Nothing to undo.');return;}model=D.normalizeModel(JSON.parse(prev));sel=null;pending=null;render();scheduleSave();};
+  $q(w,'#dw-undo').onclick=()=>{const prev=undo.pop();if(!prev){c.toast('Nothing to undo.');return;}redo.push(JSON.stringify(model));model=D.normalizeModel(JSON.parse(prev));sel=null;pending=null;render();scheduleSave();};
+  $q(w,'#dw-redo').onclick=()=>{const nx=redo.pop();if(!nx){c.toast('Nothing to redo.');return;}undo.push(JSON.stringify(model));model=D.normalizeModel(JSON.parse(nx));sel=null;pending=null;render();scheduleSave();}; // V29: redo
   $q(w,'#dw-scale').onchange=e=>{scale=+e.target.value;render();scheduleSave();};
   $q(w,'#dw-list').onchange=e=>{history.replaceState(null,'','#portal/draw?id='+e.target.value);c.openPortalTab('draw');};
   $q(w,'#dw-new').onclick=()=>{history.replaceState(null,'','#portal/draw?new=1');c.openPortalTab('draw');};
@@ -211,7 +212,7 @@ P.registerTab('draw',async(w,c)=>{
   if(X21&&X21.attach)ext=X21.attach({w,c,D,row,projects,canvas,host,inspect,fileBase,render,commit,scheduleSave,toModel,snapPoint,
     get model(){return model;},set model(v){model=v;},get sel(){return sel;},set sel(v){sel=v;},get scale(){return scale;},get tool(){return tool;},
     get pending(){return pending;},set pending(v){pending=v;},get hover(){return hover;},set hover(v){hover=v;},get revision(){return revision;},
-    pushUndo:s=>{undo.push(s);if(undo.length>80)undo.shift();},
+    pushUndo:s=>{undo.push(s);if(undo.length>80)undo.shift();redo.length=0;},canUndo:()=>undo.length>0,canRedo:()=>redo.length>0,
     clickAt:pt=>{exactPt=pt;try{onClick({__p:pt,shiftKey:true,altKey:false,target:canvas,preventDefault(){}});}finally{exactPt=null;}}})||null;
   toolOptions();setSave('Saved · rev '+revision);render();
 });

@@ -6,6 +6,9 @@ import { recordDetailQuery, recordDetailSources, recordDetailsFromAnswer } from 
 import { awardXp, coachPersona } from '@/lib/drawup-coach-persona';
 import { guestKeys, guestLeft, reserveGuest, GUEST_LIMIT } from '@/lib/drawup-guest';
 import { streamCreate, streamRead, withoutSpeedHints } from '@/lib/drawup-stream';
+import { answerHelp, helpText, platformBrief } from '@/lib/drawup-help';
+import { helpFeatures, logHelp } from '@/lib/drawup-help-server';
+import { isHqAccount } from '@/lib/drawup-server';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -82,6 +85,16 @@ export async function POST(request: Request) {
       .filter((x: any) => (x?.role === 'user' || x?.role === 'assistant') && typeof x?.content === 'string')
       .slice(-16) as ChatTurn[];
     if (!message) return NextResponse.json({ error: 'Message required.' }, { status: 400 });
+    // v29: questions about using DrawUp are answered from the help registry before anything else: no AI, no credits,
+    // no guest question used. "Ask the AI instead" on a help card sends no_help.
+    const features = await helpFeatures();
+    if (!hasFiles && !body?.no_help) {
+      const help = answerHelp(message, { signedIn: !user.is_anonymous, hq: user.is_anonymous ? false : await isHqAccount(user.id).catch(() => false), speaker: user.is_anonymous ? 'guest' : 'coach', hasHistory: history.length > 0, surface: 'coach' }, features);
+      if (help) {
+        await logHelp({ user_id: user.id, surface: 'coach', question: message, answer: help, thread_id: threadId || null });
+        return NextResponse.json({ answer: helpText(help), help, free_help: true, sources: [], researched: false, credits_charged: 0, credits_remaining: null });
+      }
+    }
     await recordDetailQuery(message, 'arch_coach', user.id); // V21 Detail Library: detail questions land in the shared detail database
 
     const notReady = missingConfig();
@@ -109,7 +122,8 @@ export async function POST(request: Request) {
     const allowClarify = useQuick && !body?.clarified;
     // V20: the member's own Arch Coach (blueprint, skills, legend, language). Never blocks an answer.
     const persona = await coachPersona(user.id).catch(() => '');
-    const quickP: Promise<QuickResult | null> = useQuick ? quickCall(quickCoachPrompt(transcript || `USER: ${message}`, location, allowClarify) + (persona ? `\nSTYLE GUIDANCE (keep the JSON format exactly as required):\n${persona}` : ''), allowClarify) : Promise.resolve(null);
+    const brief = platformBrief(message, features);
+    const quickP: Promise<QuickResult | null> = useQuick ? quickCall(quickCoachPrompt(transcript || `USER: ${message}`, location, allowClarify) + (persona ? `\nSTYLE GUIDANCE (keep the JSON format exactly as required):\n${persona}` : '') + `\n${brief}`, allowClarify) : Promise.resolve(null);
     const early = useQuick ? await Promise.race([quickP, sleep(QUICK_HEAD_START_MS).then(() => undefined)]) : null;
     const clarifyReply = (q: QuickResult) => { const c = clarifyOut(q)!; return NextResponse.json({ answer: c.question, clarify: c, needs_clarification: true, sources: [], researched: false, credits_charged: 0 }); };
     if (early && early.kind === 'clarify') return clarifyReply(early);
@@ -139,7 +153,7 @@ export async function POST(request: Request) {
     if (hasFiles) await awardXp(user.id, 'upload', 'img:' + createHash('sha1').update(image || attachments.map((a: any) => a.data.slice(0, 2000)).join('')).digest('hex'));
 
     const fileNote = hasFiles ? `ATTACHMENTS: the user attached ${attachments.map((a: any) => a.name).join(', ') || 'a picture'}. Read them. If an attachment shows a building, drawing or construction condition, answer the question, point out problems and code items to confirm, and end with a section titled "Details to draw" listing each construction detail this project still needs drawn as "- Detail name: why it is needed". Mention that Draw it up (in Arch Coach) can turn a picture into a drawing set.` : '';
-    const input = buildCoachPrompt({ message, transcript, location, extra: [persona, fileNote].filter(Boolean).join('\n\n') });
+    const input = buildCoachPrompt({ message, transcript, location, extra: [persona, fileNote, brief].filter(Boolean).join('\n\n') });
     const models = modelList(process.env.DRAWUP_COACH_MODEL, process.env.DRAWUP_SEARCH_MODEL, 'gpt-5.6-sol');
     const parts: any[] = [{ type: 'input_text', text: input }];
     if (image) parts.push({ type: 'input_image', image_url: image });

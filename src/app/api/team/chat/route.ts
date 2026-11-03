@@ -7,6 +7,8 @@ import {
   type LegendGuest, type Speaker, type Thread,
 } from '@/lib/drawup-team';
 import { isHqAccount } from '@/lib/drawup-server';
+import { answerHelp, helpText, platformBrief, type HelpAnswer } from '@/lib/drawup-help';
+import { helpFeatures, logHelp } from '@/lib/drawup-help-server';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -103,6 +105,7 @@ export async function POST(request: Request) {
 
   // ---- thread + project (permissions are checked on every message, so a removed member loses access at once)
   let thread: Thread | null = null;
+  const hadThread = !!body?.thread_id;
   if (body?.thread_id) {
     thread = await threadFor(user.id, String(body.thread_id));
     if (!thread) return json({ error: 'This conversation belongs to another account.' }, 403);
@@ -134,6 +137,11 @@ export async function POST(request: Request) {
     : speaker === 'coach' ? coachCost(message, false)
     : { action: 'team_chat', cost: costs.chat };
   const jobCost = shot ? costs.shot : layout ? costs.layout : 0;
+  // v29: a question about using DrawUp itself ("where is my project?") is answered from the help registry:
+  // no AI call, no credits. Pictures, legends, continues, 6th Man calls and "Ask the AI instead" (no_help) skip it.
+  const features = await helpFeatures();
+  const help: HelpAnswer | null = !images.length && !attachments.length && !continueOf && !legend && !command && !body?.no_help
+    ? answerHelp(message, { signedIn: true, hq: await isHqAccount(user.id).catch(() => false), speaker, hasHistory: hadThread, surface: 'team' }, features) : null;
 
   // ---- create the thread if needed, then save the user's message (unique per request id = no double answers)
   if (!thread) {
@@ -158,6 +166,7 @@ export async function POST(request: Request) {
     const reply = um ? await adminSelectOne<any>('coach_messages', `reply_to=eq.${um.id}&role=eq.assistant&select=id,content,speaker,status,meta,created_at&order=created_at`) : null;
     return json({ t: 'replay', thread_id: th.id, user_message_id: um?.id || null, message: reply });
   }
+  if (help) return helpReply({ user, th, project, userMsg, routed, dbSpeaker, help, message, general, t0 });
   await recordDetailQuery(message, 'arch_coach', user.id).catch(() => {});
 
   // ---- credits: taken before any AI runs, given back if nothing useful came out
@@ -178,7 +187,9 @@ export async function POST(request: Request) {
   const prompt = await buildTeamPrompt({ userId: user.id, speaker, message, ctx, prefs, command, verifying: verify, continueText, layoutJob: layout, general, legend });
   const content: any[] = [{ type: 'input_text', text: prompt.input }];
   images.forEach((img: string, i: number) => content.push({ type: 'input_text', text: `<user_files>PICTURE ${i + 1}</user_files>` }, { type: 'input_image', image_url: img }));
-  const payload = { instructions: prompt.instructions, input: content.length > 1 ? [{ role: 'user', content }] : prompt.input, max_output_tokens: prefs.concise ? 900 : 1800 };
+  // v29: verified DrawUp feature facts, so the team answers as part of DrawUp and never sends members elsewhere for a DrawUp feature.
+  const instructions = legend ? prompt.instructions : prompt.instructions + '\n\n' + platformBrief(message, features);
+  const payload = { instructions, input: content.length > 1 ? [{ role: 'user', content }] : prompt.input, max_output_tokens: prefs.concise ? 900 : 1800 };
 
   let assistant: any;
   try { assistant = await insert('coach_messages', { thread_id: th.id, role: 'assistant', speaker: dbSpeaker, status: 'streaming', content: '', reply_to: userMsg.id, meta: { continued_from: continueOf || undefined, command: command || undefined, legend: legend ? { key: legend.key, name: legend.name, kind: legend.kind } : undefined } }); }
@@ -317,6 +328,22 @@ export async function POST(request: Request) {
     },
   });
   return new Response(stream, { headers: { 'Content-Type': 'application/x-ndjson; charset=utf-8', 'Cache-Control': 'no-store, no-transform', 'X-Accel-Buffering': 'no' } });
+}
+
+/** v29: the free help answer, saved in the thread like any reply and sent with the same NDJSON lines. */
+async function helpReply(a: { user: { id: string }; th: Thread; project: { id: string } | null; userMsg: any; routed: { named: boolean }; dbSpeaker: string; help: HelpAnswer; message: string; general: boolean; t0: number }) {
+  const text = helpText(a.help);
+  const saved = await insert('coach_messages', { thread_id: a.th.id, role: 'assistant', speaker: a.dbSpeaker, status: 'done', reply_to: a.userMsg.id, content: text,
+    meta: { help: a.help, free: true, ...(a.general ? { general: true } : {}) } });
+  await adminRest(`coach_threads?id=eq.${a.th.id}`, { method: 'PATCH', body: JSON.stringify({ updated_at: new Date().toISOString() }) }).catch(() => {});
+  await logHelp({ user_id: a.user.id, surface: 'team:' + a.dbSpeaker, question: a.message, answer: a.help, thread_id: a.th.id });
+  await metric({ user_id: a.user.id, speaker: a.dbSpeaker, kind: 'help', ok: true, credits: 0, total_ms: Date.now() - a.t0, chars: text.length });
+  const lines = [
+    { t: 'meta', thread_id: a.th.id, thread_title: a.th.title, project_id: a.project?.id || null, user_message_id: a.userMsg.id, message_id: saved.id, speaker: a.dbSpeaker, named: a.routed.named, credits_charged: 0, credits_remaining: null, free_help: true },
+    { t: 'delta', text },
+    { t: 'done', message: saved, credits_remaining: null, free_help: true },
+  ];
+  return new Response(lines.map(l => JSON.stringify(l)).join('\n') + '\n', { headers: { 'Content-Type': 'application/x-ndjson; charset=utf-8', 'Cache-Control': 'no-store' } });
 }
 
 async function refreshMemory(userId: string, thread: Thread, projectId: string | null) {
