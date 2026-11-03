@@ -49,7 +49,7 @@
     constructor(t) { this.t = t; this.f = []; this.mode = 'select'; this.ord = null; this.lim = null; this.one = null; this.head = false; this.cnt = false; }
     select(_c, o) { if (this.mode === 'select') this.mode = 'select'; this.sel = true; if (o && o.head) this.head = true; if (o && o.count) this.cnt = true; return this; }
     insert(v) { this.mode = 'insert'; this.val = v; return this; }
-    upsert(v) { this.mode = 'upsert'; this.val = v; return this; }
+    upsert(v, o) { this.mode = 'upsert'; this.val = v; this.conflict = (o && o.onConflict) || 'id'; return this; }
     update(v) { this.mode = 'update'; this.val = v; return this; }
     delete() { this.mode = 'delete'; return this; }
     eq(c, v) { this.f.push({ op: 'eq', col: c, val: v }); return this; }
@@ -74,7 +74,7 @@
       log.push(this.mode + ' ' + this.t);
       if (this.mode === 'insert' || this.mode === 'upsert') {
         const rows = (Array.isArray(this.val) ? this.val : [this.val]).map(r => Object.assign({ id: 'm' + Math.random().toString(16).slice(2), created_at: new Date().toISOString(), updated_at: new Date().toISOString() }, r));
-        rows.forEach(r => { const i = tbl.findIndex(x => x.id === r.id); if (i >= 0) Object.assign(tbl[i], r); else tbl.push(r); });
+        const key = this.conflict || 'id'; rows.forEach((r, n) => { const i = this.mode === 'upsert' ? tbl.findIndex(x => x[key] != null && x[key] === (Array.isArray(this.val) ? this.val : [this.val])[n][key]) : -1; if (i >= 0) { const keepId = tbl[i].id, keepCreated = tbl[i].created_at; Object.assign(tbl[i], r, { id: keepId || r.id, created_at: keepCreated || r.created_at }); if (this.t === 'project_profiles') tbl[i].rev = (tbl[i].rev || 1) + 1; rows[n] = tbl[i]; } else { if (this.t === 'project_profiles') r.rev = 1; tbl.push(r); } });
         return this.fin(rows);
       }
       let rows = tbl.filter(r => this.f.every(f => match(r, f)));
@@ -96,9 +96,9 @@
   const listeners = [];
   const client = {
     auth: {
-      getSession: async () => ({ data: { session: MOCK.signedOut ? null : { user, access_token: 'mock-token' } }, error: null }),
+      getSession: async () => ({ data: { session: MOCK.signedOut ? null : { user, access_token: 'mock-token-123456789' } }, error: null }),
       getUser: async () => ({ data: { user: MOCK.signedOut ? null : user }, error: null }),
-      onAuthStateChange: cb => { listeners.push(cb); setTimeout(() => cb('INITIAL_SESSION', MOCK.signedOut ? null : { user, access_token: 'mock-token' }), 0); return { data: { subscription: { unsubscribe() {} } } }; },
+      onAuthStateChange: cb => { listeners.push(cb); setTimeout(() => cb('INITIAL_SESSION', MOCK.signedOut ? null : { user, access_token: 'mock-token-123456789' }), 0); return { data: { subscription: { unsubscribe() {} } } }; },
       signOut: async () => ({ error: null }), signInWithPassword: async () => ({ data: { user }, error: null }), signUp: async () => ({ data: { user }, error: null }), signInAnonymously: async () => ({ data: {}, error: null }),
       refreshSession: async () => ({ data: { session: { user } }, error: null })
     },

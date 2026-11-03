@@ -1,0 +1,85 @@
+/* DrawUp Season 1 · Project Information and Project Map (light portal workspace, navy accents like Firm Kit/Specs). */
+#du-workspace-content .dpi-head .du-head-actions { align-items: flex-end; }
+.dpi-tabs { display: inline-flex; gap: 4px; padding: 4px; border-radius: 999px; background: #eef2f8; border: 1px solid #dfe6f0; }
+.dpi-tabs button { border: 0; background: transparent; padding: 9px 16px; border-radius: 999px; font: 600 14px/1 Inter, sans-serif; color: #33445f; cursor: pointer; }
+.dpi-tabs button.active { background: #13233d; color: #fff; }
+.dpi-warn { padding: 14px 18px !important; border-left: 4px solid #e7b766 !important; margin-bottom: 14px; }
+.dpi-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; padding: 14px 18px !important; margin-bottom: 16px; }
+.dpi-bar label { display: flex; align-items: center; gap: 10px; font: 600 12px/1 Inter, sans-serif; letter-spacing: .08em; text-transform: uppercase; color: #5b6b83; }
+.dpi-bar select { min-width: 260px; }
+.dpi-in, html.dus #du-workspace-content .dpi-in { width: 100%; box-sizing: border-box; border: 1px solid #d5deea !important; border-radius: 10px !important; padding: 9px 11px !important; font: 400 14px/1.35 Inter, sans-serif !important; color: #13233d !important; background: #fff !important; min-height: 0 !important; box-shadow: none !important; }
+.dpi-in:focus { outline: 2px solid #2f6fb3; outline-offset: 1px; }
+textarea.dpi-in { resize: vertical; }
+.dpi-meter { width: 140px; height: 8px; border-radius: 99px; background: #e6ecf4; overflow: hidden; }
+.dpi-meter i { display: block; height: 100%; background: linear-gradient(90deg, #2f6fb3, #13233d); }
+.dpi-mtext { font-size: 13px; color: #5b6b83; }
+.dpi-saved { margin-left: auto; font-size: 13px; color: #5b6b83; }
+.dpi-saved.bad { color: #a12a2a; font-weight: 600; }
+.dpi-grid { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 16px; margin-bottom: 16px; }
+.dpi-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0; }
+.dpi-site h2, .dpi-used h2 { margin: 6px 0 12px; font-size: 22px; }
+.dpi-addr { display: flex; gap: 10px; }
+.dpi-addr .dpi-in { flex: 1; }
+.dpi-note { font-size: 13px; line-height: 1.5; color: #5b6b83; margin: 10px 0; }
+.dpi-bad { color: #a12a2a; font-weight: 600; }
+.dpi-look { font-size: 14px; background: #f5f8fc; border: 1px solid #e1e8f2; border-radius: 12px; padding: 10px 14px; margin: 10px 0; }
+.dpi-look p { margin: 0 0 6px; }
+.dpi-src { list-style: none; margin: 0 0 6px; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; }
+.dpi-src .ok { color: #1d6b3a; } .dpi-src .bad { color: #a12a2a; }
+.dpi-na { margin: 8px 0 0; padding-left: 18px; font-size: 13px; color: #33445f; }
+.dpi-na i { color: #5b6b83; }
+.dpi-map iframe { width: 100%; height: 300px; border: 1px solid #dfe6f0; border-radius: 12px; background: #eef2f8; }
+.dpi-nomap { display: grid; place-items: center; height: 160px; border: 1px dashed #cdd8e6; border-radius: 12px; color: #5b6b83; font-size: 14px; margin-top: 10px; }
+.dpi-used-l { list-style: none; margin: 0; padding: 0; }
+.dpi-used-l li { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid #edf1f6; font-size: 15px; }
+.dpi-used-l li b { min-width: 28px; font-size: 18px; color: #13233d; }
+.dpi-link { border: 0; background: none; color: #2f6fb3; font: 600 13px Inter, sans-serif; cursor: pointer; padding: 0 4px; margin-left: auto; }
+.dpi-groups { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.dpi-rows { display: grid; gap: 10px; margin-top: 8px; }
+.dpi-row { display: grid; grid-template-columns: 170px 1fr; gap: 10px; align-items: start; }
+.dpi-row > label { font-size: 13px; font-weight: 600; color: #33445f; padding-top: 10px; }
+.dpi-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 4px; }
+.dpi-prov { font-size: 12px; line-height: 1.4; color: #5b6b83; }
+.dpi-prov a { color: #2f6fb3; }
+.dpi-prov.auto b { color: #8a5a00; } .dpi-prov.auto.ver b, .dpi-prov.user b { color: #1d6b3a; }
+.dpi-prov.na { color: #8a5a00; } .dpi-prov.empty { color: #8a97ab; } .dpi-prov.proj { color: #2f6fb3; }
+.dpi-prov i { font-style: normal; color: #5b6b83; }
+.dpi-ver { font-size: 12px; color: #33445f; display: inline-flex; align-items: center; gap: 4px; }
+.dpi-list, .dpi-files { margin-top: 16px; }
+.dpi-lhead { display: flex; justify-content: space-between; align-items: center; }
+.dpi-total { font-size: 14px; font-weight: 600; color: #13233d; }
+.dpi-tblwrap { overflow-x: auto; margin: 10px 0; }
+.dpi-tbl { width: 100%; border-collapse: collapse; font-size: 14px; }
+.dpi-tbl th { text-align: left; font: 600 12px/1.2 Inter, sans-serif; letter-spacing: .04em; color: #5b6b83; padding: 6px; border-bottom: 1px solid #e1e8f2; }
+.dpi-tbl td { padding: 4px; border-bottom: 1px solid #f0f3f8; }
+.dpi-x { border: 0; background: none; color: #8a97ab; cursor: pointer; font-size: 14px; padding: 6px; }
+.dpi-x:hover { color: #a12a2a; }
+.dpi-up { display: flex; gap: 10px; align-items: center; margin: 10px 0; }
+.dpi-up .dpi-in { max-width: 220px; }
+.dpi-fl { list-style: none; margin: 0; padding: 0; }
+.dpi-fl li { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid #edf1f6; }
+.dpi-fl li b { flex: 1; font-weight: 600; font-size: 14px; overflow-wrap: anywhere; }
+.dpi-fk { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #2f6fb3; background: #eaf2fb; border-radius: 99px; padding: 4px 8px; }
+.dpi-empty { text-align: center; padding: 40px !important; }
+/* map */
+.dpi-mapgrid { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); gap: 16px; }
+.dpi-mapsvg svg { width: 100%; height: auto; display: block; }
+.dpi-pin circle { fill: #13233d; stroke: #fff; stroke-width: 2.5; cursor: pointer; }
+.dpi-pin:hover circle, .dpi-pin:focus circle { fill: #e7b766; outline: none; }
+.dpi-maplist { display: grid; gap: 10px; align-content: start; }
+.dpi-mcard { display: grid; gap: 4px; padding: 14px 16px !important; }
+.dpi-mcard span, .dpi-mcard small { font-size: 13px; color: #5b6b83; }
+.dpi-mcard .du-btn { justify-self: start; margin-top: 6px; }
+.dpi-unplaced span { display: flex; align-items: center; justify-content: space-between; }
+/* project page card */
+.dpi-dl { display: grid; grid-template-columns: repeat(3, auto 1fr); gap: 6px 14px; margin: 8px 0 0; font-size: 14px; }
+.dpi-dl dt { font-weight: 600; color: #5b6b83; } .dpi-dl dd { margin: 0; }
+@media (max-width: 900px) {
+  .dpi-grid, .dpi-grid2, .dpi-groups, .dpi-mapgrid { grid-template-columns: 1fr; }
+  .dpi-dl { grid-template-columns: auto 1fr; }
+}
+@media (max-width: 560px) {
+  .dpi-row { grid-template-columns: 1fr; gap: 2px; } .dpi-row > label { padding-top: 0; }
+  .dpi-addr { flex-direction: column; } .dpi-bar select { min-width: 0; width: 100%; } .dpi-bar label { width: 100%; }
+  .dpi-saved { margin-left: 0; }
+}

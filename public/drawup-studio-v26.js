@@ -186,7 +186,7 @@
       { h: 'Firm', items: [['Firm Workspace', T('firm')], ['Firm Playbook', T('firm', { hash: '#portal/firm?pane=playbook' }), 'Firm admins'], ['Team Management', T('team')], ['Shared Resources', T('firm', { hash: '#portal/firm?pane=library' })]] },
       { h: 'More', small: true, items: [['GM Presentation', T('firm', { hash: '#portal/firm?pane=present' }), 'Firm admins'], ['Firm Details library', T('details', { click: 'Firm' })], ['Locations & studios', T('firm', { hash: '#portal/firm?pane=units' }), 'Firm admins']] }] }
   ];
-  const TAB_SECTION = { dashboard: 'dashboard', projects: 'projects', 'ai-team': 'ai-team', 'arch-coach': 'ai-team', draw: 'draw', check: 'check', swap: 'swap', details: 'details', discover: 'discover', portfolio: 'discover', search: 'discover', connect: 'connect', firm: 'firm', team: 'firm' };
+  const TAB_SECTION = { dashboard: 'dashboard', projects: 'projects', 'project-info': 'projects', documents: 'projects', 'ai-team': 'ai-team', 'arch-coach': 'ai-team', draw: 'draw', check: 'check', swap: 'swap', details: 'details', discover: 'discover', portfolio: 'discover', search: 'discover', connect: 'connect', firm: 'firm', team: 'firm' };
 
   const PUBLIC_NAV = [
     { id: 'discover', label: 'Discover', cols: [
@@ -518,7 +518,7 @@
   }
   const recentKey = 'du-studio-recent-v26';
   function rememberVisit(tab) { if (!tab || tab === 'dashboard') return; try { const list = JSON.parse(localStorage.getItem(recentKey) || '[]').filter(x => x.tab !== tab); list.unshift({ tab, at: Date.now(), hash: location.hash }); localStorage.setItem(recentKey, JSON.stringify(list.slice(0, 6))); } catch (_e) {} }
-  const TAB_INFO = { projects: ['Projects', 'projects'], 'ai-team': ['AI Team', 'team'], 'arch-coach': ['Arch Coach', 'spark'], draw: ['Draw', 'draw'], check: ['CheckUp', 'check'], swap: ['Swap', 'swap'], details: ['Details', 'details'], discover: ['Discover', 'discover'], portfolio: ['Portfolio Review', 'portfolio'], search: ['Search', 'search'], connect: ['Connect', 'connect'], firm: ['Firm', 'firm'], team: ['Team', 'team'], profile: ['Profile', 'user'], account: ['Account', 'gear'] };
+  const TAB_INFO = { projects: ['Projects', 'projects'], 'project-info': ['Project Information', 'projects'], documents: ['Documents', 'projects'], 'ai-team': ['AI Team', 'team'], 'arch-coach': ['Arch Coach', 'spark'], draw: ['Draw', 'draw'], check: ['CheckUp', 'check'], swap: ['Swap', 'swap'], details: ['Details', 'details'], discover: ['Discover', 'discover'], portfolio: ['Portfolio Review', 'portfolio'], search: ['Search', 'search'], connect: ['Connect', 'connect'], firm: ['Firm', 'firm'], team: ['Team', 'team'], profile: ['Profile', 'user'], account: ['Account', 'gear'] };
 
   /* ------------------------------------------------------------------ Arch Coach legends (the member's approved artwork, shown as is)
    * The picture is Jaja's own Arch Coach legends image. Everything you can use on it is real HTML laid over it at the same place:
