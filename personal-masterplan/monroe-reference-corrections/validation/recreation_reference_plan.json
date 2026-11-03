@@ -1,0 +1,182 @@
+{
+  "tennis_nets": [
+    {
+      "name": "S_Woodson_Tennis_Net_00",
+      "x0": 322.1136,
+      "x1": 334.3864,
+      "y": 480.5,
+      "z": 10.528158308130525
+    },
+    {
+      "name": "S_Woodson_Tennis_Net_01",
+      "x0": 340.6136,
+      "x1": 352.8864,
+      "y": 480.5,
+      "z": 10.859234948068266
+    },
+    {
+      "name": "S_Woodson_Tennis_Net_02",
+      "x0": 359.1136,
+      "x1": 371.3864,
+      "y": 480.5,
+      "z": 11.136562576587384
+    },
+    {
+      "name": "S_Woodson_Tennis_Net_03",
+      "x0": 377.6136,
+      "x1": 389.8864,
+      "y": 480.5,
+      "z": 11.254911566613531
+    },
+    {
+      "name": "S_Kelly_North_Tennis_Net_00",
+      "x0": -337.1364,
+      "x1": -324.8636,
+      "y": 65.0,
+      "z": 18.0184138164036
+    },
+    {
+      "name": "S_Kelly_North_Tennis_Net_01",
+      "x0": -317.1364,
+      "x1": -304.8636,
+      "y": 65.0,
+      "z": 17.98172941456709
+    },
+    {
+      "name": "S_Kelly_South_Tennis_Net_00",
+      "x0": -229.1364,
+      "x1": -216.8636,
+      "y": -75.5,
+      "z": 25.78218684290103
+    },
+    {
+      "name": "S_Kelly_South_Tennis_Net_01",
+      "x0": -213.1364,
+      "x1": -200.8636,
+      "y": -75.5,
+      "z": 25.915142098893263
+    },
+    {
+      "name": "S_Kelly_South_Tennis_Net_02",
+      "x0": -197.1364,
+      "x1": -184.8636,
+      "y": -75.5,
+      "z": 26.05121566653625
+    }
+  ],
+  "basketball_hoops": [
+    {
+      "x": -219.6056,
+      "y": -107.5,
+      "side": -1
+    },
+    {
+      "x": -193.3944,
+      "y": -107.5,
+      "side": 1
+    }
+  ],
+  "small_bleachers": [
+    {
+      "name": "S_Woodson_Baseball_Small_Bleachers_A",
+      "bounds": [
+        361.0,
+        375.5,
+        368.0,
+        378.3
+      ],
+      "face": "east"
+    },
+    {
+      "name": "S_Woodson_Baseball_Small_Bleachers_B",
+      "bounds": [
+        375.8,
+        387.0,
+        378.6,
+        394.0
+      ],
+      "face": "east"
+    }
+  ],
+  "complexes": [
+    {
+      "name": "Woodson",
+      "bounds_local_m": [
+        319.0,
+        462.0,
+        393.0,
+        499.0
+      ],
+      "tennis_court_count_interpreted": 4,
+      "centers": [
+        [
+          328.25,
+          480.5
+        ],
+        [
+          346.75,
+          480.5
+        ],
+        [
+          365.25,
+          480.5
+        ],
+        [
+          383.75,
+          480.5
+        ]
+      ]
+    },
+    {
+      "name": "Kelly_North",
+      "bounds_local_m": [
+        -341.0,
+        48.0,
+        -301.0,
+        82.0
+      ],
+      "tennis_court_count_interpreted": 2,
+      "centers": [
+        [
+          -331.0,
+          65.0
+        ],
+        [
+          -311.0,
+          65.0
+        ]
+      ]
+    },
+    {
+      "name": "Kelly_South",
+      "bounds_local_m": [
+        -231.0,
+        -94.0,
+        -183.0,
+        -57.0
+      ],
+      "tennis_court_count_interpreted": 3,
+      "centers": [
+        [
+          -223.0,
+          -75.5
+        ],
+        [
+          -207.0,
+          -75.5
+        ],
+        [
+          -191.0,
+          -75.5
+        ]
+      ]
+    }
+  ],
+  "basketball_bounds": [
+    -232.0,
+    -119.0,
+    -181.0,
+    -96.0
+  ],
+  "accuracy": "Locations interpreted from registered original aerial and user Woodson/Kelly references. Tennis counts interpreted as 4, 2 and 3; standard playing lines fitted within traced surfaces. Basketball full extent/count is not fully visible in the supplied crop; one marked court is illustrative. Nets, hoops and bleacher rows are representative."
+}

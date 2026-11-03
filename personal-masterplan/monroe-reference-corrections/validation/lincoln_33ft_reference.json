@@ -1,0 +1,24 @@
+{
+  "retire_road": "road_local_222",
+  "target_width_m": 10.0584,
+  "target_width_ft": 33,
+  "source": "User supplied 33 ft measurement on the north/south Lincoln Heights street east of Kelly field; applies to the matched northern straight portion of source local_222, with a short transition to the unverified southern bend. Widening clipped at fixed building footprints.",
+  "modeled_sample_widths": [
+    {
+      "sample_y_m": 150,
+      "modeled_perpendicular_width_m": 10.066460697775886,
+      "modeled_width_ft": 33.02644585884477
+    },
+    {
+      "sample_y_m": 165,
+      "modeled_perpendicular_width_m": 10.066251106013226,
+      "modeled_width_ft": 33.02575822182817
+    },
+    {
+      "sample_y_m": 180,
+      "modeled_perpendicular_width_m": 10.066325865234452,
+      "modeled_width_ft": 33.02600349486369
+    }
+  ],
+  "within_0_05ft_of_target_at_samples": true
+}

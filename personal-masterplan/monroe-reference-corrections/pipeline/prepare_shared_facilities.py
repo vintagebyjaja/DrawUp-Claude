@@ -1,0 +1,19 @@
+from pathlib import Path
+import json,numpy as np
+ns={};exec(Path('/workspace/monroe-material-update/scripts/prepare_geometry.py').read_text().split('# Existing image-derived baseball dirt')[0],ns)
+from shapely.geometry import box,LineString,Point,shape
+from shapely.ops import unary_union
+w=Path('/workspace/monroe-townhouse-correction');p=json.loads((w/'driveway_geometry.json').read_text());mesh=ns['mesh_region'];B=ns['B'];records=[];nets=[];complexes=[]
+for name,bounds,count in [('Woodson',(319.,462.,393.,499.),4),('Kelly_North',(-341.,48.,-301.,82.),2),('Kelly_South',(-231.,-94.,-183.,-57.),3)]:
+ outer=box(*bounds).difference(B);records+=mesh('S_'+name+'_Tennis_Apron',outer,.055,.16,'court_green' if name=='Kelly_South' else 'court_red');width=(bounds[2]-bounds[0])/count;centers=[]
+ for i in range(count):
+  cx=bounds[0]+(i+.5)*width;cy=(bounds[1]+bounds[3])/2;patch=box(cx-width/2+.65,bounds[1]+1,cx+width/2-.65,bounds[3]-1).intersection(outer);records+=mesh('S_'+name+'_Tennis_Surface_%02d'%i,patch,.062,.10,'court_blue' if name=='Kelly_South' else 'court_green');W=10.9728/2;L=23.7744/2;court=box(cx-W,cy-L,cx+W,cy+L);lines=[court.boundary.buffer(.045),LineString([(cx-W,cy),(cx+W,cy)]).buffer(.045),LineString([(cx-4.1148,cy-L),(cx-4.1148,cy+L)]).buffer(.045),LineString([(cx+4.1148,cy-L),(cx+4.1148,cy+L)]).buffer(.045),LineString([(cx-4.1148,cy-6.4008),(cx+4.1148,cy-6.4008)]).buffer(.045),LineString([(cx-4.1148,cy+6.4008),(cx+4.1148,cy+6.4008)]).buffer(.045),LineString([(cx,cy-6.4008),(cx,cy+6.4008)]).buffer(.045)];records+=mesh('S_'+name+'_Tennis_Markings_%02d'%i,unary_union(lines).intersection(patch),.073,.006,'paint');nets.append({'name':'S_'+name+'_Tennis_Net_%02d'%i,'x0':cx-W-.65,'x1':cx+W+.65,'y':cy,'z':float(ns['terrain'][int(ns['tree'].nearest(Point(cx,cy)))][1]@np.array([cx,cy,1]))+.07});centers.append([cx,cy])
+ complexes.append({'name':name,'bounds_local_m':bounds,'tennis_court_count_interpreted':count,'centers':centers})
+# The visible Kelly recreation basketball pavement; one full court is modeled within the traced area.
+basket=box(-232,-119,-181,-96).difference(B);records+=mesh('S_Kelly_Basketball_Pavement',basket,.055,.16,'court_green');cx,cy=-206.5,-107.5;W=28.6512/2;H=15.24/2;court=box(cx-W,cy-H,cx+W,cy+H);lines=[court.boundary.buffer(.045),LineString([(cx,cy-H),(cx,cy+H)]).buffer(.045),Point(cx,cy).buffer(1.8288).boundary.buffer(.045)]
+for s in [-1,1]:
+ x=cx+s*(W-4.572);lines.append(box(min(cx+s*W,x),cy-2.4384,max(cx+s*W,x),cy+2.4384).boundary.buffer(.045));lines.append(Point(x,cy).buffer(1.8288).boundary.buffer(.045))
+records+=mesh('S_Kelly_Basketball_Markings',unary_union(lines).intersection(basket),.073,.006,'paint')
+# Reference-shown small baseball bleachers, separate from the existing larger football stands.
+small=[{'name':'S_Woodson_Baseball_Small_Bleachers_A','bounds':[361.,375.5,368.,378.3],'face':'east'},{'name':'S_Woodson_Baseball_Small_Bleachers_B','bounds':[375.8,387.0,378.6,394.0],'face':'east'}]
+p['shared_facilities']={'meshes':records,'tennis_nets':nets,'basketball_hoops':[{'x':cx+s*(W-1.22),'y':cy,'side':s} for s in [-1,1]],'small_bleachers':small,'complexes':complexes,'basketball_bounds':list(basket.bounds),'accuracy':'Locations interpreted from registered original aerial and user Woodson/Kelly references. Tennis counts interpreted as 4, 2 and 3; standard playing lines fitted within traced surfaces. Basketball full extent/count is not fully visible in the supplied crop; one marked court is illustrative. Nets, hoops and bleacher rows are representative.'};(w/'driveway_geometry.json').write_text(json.dumps(p));(w/'delivery/validation/recreation_reference_plan.json').write_text(json.dumps({k:v for k,v in p['shared_facilities'].items() if k!='meshes'},indent=2));print('SHARED_FACILITIES_READY',len(records),len(nets),flush=True)

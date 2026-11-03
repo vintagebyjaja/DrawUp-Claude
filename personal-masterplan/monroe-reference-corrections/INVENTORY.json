@@ -1,0 +1,987 @@
+[
+  {
+    "path": "01_Original_Road_Layout/Monroe_Original_Road_Layout.blend",
+    "bytes": 114080504,
+    "sha256": "848c255c71a96bf07e351151991ee42b09c1bddc5f94fc5a88f4d03a5c19e4ec"
+  },
+  {
+    "path": "01_Original_Road_Layout/Monroe_Original_Road_Layout.dae",
+    "bytes": 202262590,
+    "sha256": "9fcc7530cffb05a40af07ab01c8b08689692c8c73122d9587c1df0ca38dfd495"
+  },
+  {
+    "path": "01_Original_Road_Layout/Monroe_Original_Road_Layout.fbx",
+    "bytes": 42468636,
+    "sha256": "cb90a20c7af7a618aedda3ce1d4699c425356a33e50090a74af5d9ee39f7d281"
+  },
+  {
+    "path": "02_New_Road_Layout/Monroe_New_Road_Layout.blend",
+    "bytes": 135821176,
+    "sha256": "8eb995185c7cec98912c3df4d489a31cb010acf3d596760ba531287943e1a8dd"
+  },
+  {
+    "path": "02_New_Road_Layout/Monroe_New_Road_Layout.dae",
+    "bytes": 220898666,
+    "sha256": "37170d85a3a1635ad3f4697cb5b5e48100280fda64a88cd4d5b5c9d5d7be008a"
+  },
+  {
+    "path": "02_New_Road_Layout/Monroe_New_Road_Layout.fbx",
+    "bytes": 46350284,
+    "sha256": "95943ecb2729595ebf19489a65fb1b631e43b879cde510aeb40b5c99321e60de"
+  },
+  {
+    "path": "Create_SketchUp_File.rb",
+    "bytes": 3111,
+    "sha256": "6063442a49fec55f14e3a722a8c03f53ede3ef4c13ac6164f2753b7c8bf1428f"
+  },
+  {
+    "path": "README.md",
+    "bytes": 9060,
+    "sha256": "2ee6f613787f91b81ef2d67e08be9c0347f3e01e4c697f0149a250a5cf434429"
+  },
+  {
+    "path": "SKETCHUP_README.md",
+    "bytes": 1823,
+    "sha256": "74d2f83b39cb8f4f221daeab149a91c9a2c8a9b77d0b71561b5c338cd91087d8"
+  },
+  {
+    "path": "Shared_Textures/Apartment_Courtyard_Brick.png",
+    "bytes": 1834,
+    "sha256": "a21d5d9398a60427d4d0119747239346cc3cf6e605d857e66eb6bf8f8d456a29"
+  },
+  {
+    "path": "Shared_Textures/Apartment_Red_Brick_Gray_Upper.png",
+    "bytes": 335219,
+    "sha256": "dfe9fcf556aa6470417528b398f744526aed417fe7b428e50b4b5473a9fe9dde"
+  },
+  {
+    "path": "Shared_Textures/Apartment_Red_Gray_With_Garage.png",
+    "bytes": 335125,
+    "sha256": "f55c6fa77d458daa33b2ce3481fa593781a5a8fbd6d2b4a59040b7de9a685336"
+  },
+  {
+    "path": "Shared_Textures/Neutral_building_2603_Unified_Color.png",
+    "bytes": 323191,
+    "sha256": "92f97bb231f067a626c122886e3c9a0f4409354beb20c5b6464c368f5ddbf2c1"
+  },
+  {
+    "path": "Shared_Textures/Neutral_building_2664_Unified_Color.png",
+    "bytes": 160309,
+    "sha256": "11938691d5d7a3956698b196515963668eee4122b9f8ea9fbc027adc45f6e197"
+  },
+  {
+    "path": "Shared_Textures/Neutral_context_cream_render_01floors_charcoal.png",
+    "bytes": 3889,
+    "sha256": "e9932a6e6e80a3f33efb2fca4f1cea50b85a88af6f339baa333a643491f1051b"
+  },
+  {
+    "path": "Shared_Textures/Neutral_context_cream_render_02floors_charcoal.png",
+    "bytes": 4037,
+    "sha256": "633984e41312394ce3ca05f7e65c32592f15305d4be53e75e26b6cd2c4bb5127"
+  },
+  {
+    "path": "Shared_Textures/Neutral_context_cream_render_02floors_midgray.png",
+    "bytes": 4035,
+    "sha256": "126f569159eae41c85aa38bb1c5a1d5adeb5fa3800c7f928a15c8130793481d3"
+  },
+  {
+    "path": "Shared_Textures/Neutral_context_cream_render_02floors_palegray.png",
+    "bytes": 4033,
+    "sha256": "21340b6e22d67af496ab71fbc1c5251ab887b22be5145e77d35d1b0b2f11d057"
+  },
+  {
+    "path": "Shared_Textures/Neutral_context_cream_render_03floors_midgray.png",
+    "bytes": 4179,
+    "sha256": "e6aceadab5d155cb32f9313c936529aff4dff215eb206114a99b38e1db816107"
+  },
+  {
+    "path": "Shared_Textures/Neutral_context_tan_brick_02floors_midgray.png",
+    "bytes": 10637,
+    "sha256": "963bbf71cef975e176c167baa59b4a0beb45f47accc74fe327c37d326e825757"
+  },
+  {
+    "path": "Shared_Textures/Neutral_context_tan_brick_02floors_palegray.png",
+    "bytes": 10638,
+    "sha256": "becac6335a1f4abeaea45466760a5496b87e4767b31f15c5fe94f8134b8c42ef"
+  },
+  {
+    "path": "Shared_Textures/Neutral_context_tan_brick_03floors_charcoal.png",
+    "bytes": 10797,
+    "sha256": "288416d5436ef6b4c4f4d3028e54c434e2115336d33f6e2c67e02592af309305"
+  },
+  {
+    "path": "Shared_Textures/Neutral_context_tan_brick_03floors_midgray.png",
+    "bytes": 10797,
+    "sha256": "31c098c3694c91ae9da70b2a7a539270e452802300986cb3c4f6990df6b9d272"
+  },
+  {
+    "path": "Shared_Textures/Neutral_context_tan_brick_03floors_palegray.png",
+    "bytes": 10795,
+    "sha256": "44a6d84d75ca8388b7fc541900f01bce3dc64aec21dc315064cd1845a27e00b0"
+  },
+  {
+    "path": "Shared_Textures/Neutral_context_tan_brick_04floors_midgray.png",
+    "bytes": 10874,
+    "sha256": "2150360c7d28fcebedbe0b601fd2895a049b78a8325f3c316b5d64f92bfe691b"
+  },
+  {
+    "path": "Shared_Textures/Neutral_context_tan_brick_04floors_palegray.png",
+    "bytes": 10873,
+    "sha256": "8309e73cdf5b2fa17cfdfedb83a5c603d4a1481a28e8d1d7a0b038185088bc49"
+  },
+  {
+    "path": "Shared_Textures/Neutral_context_tan_brick_05floors_midgray.png",
+    "bytes": 10864,
+    "sha256": "ba4398a3df0573291a6f200cfae5a444614d937b0c2955496469a3a3aa39c23a"
+  },
+  {
+    "path": "Shared_Textures/Neutral_context_tan_brick_06floors_midgray.png",
+    "bytes": 11392,
+    "sha256": "f5b1a5ff423093c84718788ee084e3861080a5c6c6ee68d54a5d8ac02101879c"
+  },
+  {
+    "path": "Shared_Textures/Neutral_context_tan_brick_07floors_midgray.png",
+    "bytes": 11419,
+    "sha256": "553b43d50f2dc17202d06bf7b413588d98ebe779b1ca8cd240f139d2ad48fcfe"
+  },
+  {
+    "path": "Shared_Textures/Neutral_context_tan_brick_08floors_midgray.png",
+    "bytes": 11469,
+    "sha256": "e1c63d5daad52c66f644937d1e89ba04eb6cccbca346d02a123d936b84f3b9be"
+  },
+  {
+    "path": "Shared_Textures/Neutral_context_warm_brick_01floors_charcoal.png",
+    "bytes": 10105,
+    "sha256": "5073837e5f2283865db0e59b5b7fa7c8657cdac834456069ccdaf1dfc45669b0"
+  },
+  {
+    "path": "Shared_Textures/Neutral_context_warm_brick_01floors_midgray.png",
+    "bytes": 10103,
+    "sha256": "870f35f515a5b5eb2bd7ceebfc000a00166352b69079cbab2c55aab8d9626c28"
+  },
+  {
+    "path": "Shared_Textures/Neutral_context_warm_brick_01floors_palegray.png",
+    "bytes": 10103,
+    "sha256": "a888626503b05a908fea644654eb5a6ecdde2870edc04329694b3bc793b78572"
+  },
+  {
+    "path": "Shared_Textures/Neutral_context_warm_brick_02floors_charcoal.png",
+    "bytes": 10484,
+    "sha256": "19a289b3ed44cbcab7b65c1803d98556a2cc763383336f907f4326938bbfc25e"
+  },
+  {
+    "path": "Shared_Textures/Neutral_context_warm_brick_02floors_midgray.png",
+    "bytes": 10482,
+    "sha256": "012dda7764525d8b4b2de84853e9235a2d7bdf5abaedf57144e53a93469fa5d5"
+  },
+  {
+    "path": "Shared_Textures/Neutral_context_warm_brick_02floors_palegray.png",
+    "bytes": 10483,
+    "sha256": "d04ed669b515a69ba8390f2f6f4728229153234997372beb58ab37dade9c3d19"
+  },
+  {
+    "path": "Shared_Textures/Neutral_context_warm_brick_02floors_redbrown.png",
+    "bytes": 10479,
+    "sha256": "86b7de58b808c68790d01d55fd0e786da359f54551206d2f5023166cd4e51a89"
+  },
+  {
+    "path": "Shared_Textures/Neutral_context_warm_brick_03floors_charcoal.png",
+    "bytes": 11034,
+    "sha256": "c78618650d2292e2f85743618213131703d158a666a5dbff6f45093cb935b6d4"
+  },
+  {
+    "path": "Shared_Textures/Neutral_context_warm_brick_03floors_midgray.png",
+    "bytes": 11032,
+    "sha256": "50b5299e9646839d7dd72b39354531067abff667eea06cf39b0d8d9eb64b3256"
+  },
+  {
+    "path": "Shared_Textures/Neutral_context_warm_brick_03floors_palegray.png",
+    "bytes": 11033,
+    "sha256": "0828fcb5dead9330ef376f9fc166a6a594f66af7678268810b6abc7e3d6253f3"
+  },
+  {
+    "path": "Shared_Textures/Roughness_context_cream_render_01floors_charcoal.png",
+    "bytes": 2567,
+    "sha256": "79699f94977fd391f206fdd26eb7d4d110d15e6380fc02e1eb06bf71e0e59cfd"
+  },
+  {
+    "path": "Shared_Textures/Roughness_context_cream_render_02floors_charcoal.png",
+    "bytes": 2600,
+    "sha256": "5618291b5473c8029bb740ebad68daf65d5f3a179b9d351ba08261333a47ec47"
+  },
+  {
+    "path": "Shared_Textures/Roughness_context_cream_render_02floors_midgray.png",
+    "bytes": 2600,
+    "sha256": "5618291b5473c8029bb740ebad68daf65d5f3a179b9d351ba08261333a47ec47"
+  },
+  {
+    "path": "Shared_Textures/Roughness_context_cream_render_02floors_palegray.png",
+    "bytes": 2600,
+    "sha256": "5618291b5473c8029bb740ebad68daf65d5f3a179b9d351ba08261333a47ec47"
+  },
+  {
+    "path": "Shared_Textures/Roughness_context_cream_render_03floors_midgray.png",
+    "bytes": 2633,
+    "sha256": "52a61891ec9c3baf5d46649bba4f965b240713cfbe49981756d90412102e30d7"
+  },
+  {
+    "path": "Shared_Textures/Roughness_context_tan_brick_02floors_midgray.png",
+    "bytes": 2600,
+    "sha256": "5618291b5473c8029bb740ebad68daf65d5f3a179b9d351ba08261333a47ec47"
+  },
+  {
+    "path": "Shared_Textures/Roughness_context_tan_brick_02floors_palegray.png",
+    "bytes": 2600,
+    "sha256": "5618291b5473c8029bb740ebad68daf65d5f3a179b9d351ba08261333a47ec47"
+  },
+  {
+    "path": "Shared_Textures/Roughness_context_tan_brick_03floors_charcoal.png",
+    "bytes": 2633,
+    "sha256": "52a61891ec9c3baf5d46649bba4f965b240713cfbe49981756d90412102e30d7"
+  },
+  {
+    "path": "Shared_Textures/Roughness_context_tan_brick_03floors_midgray.png",
+    "bytes": 2633,
+    "sha256": "52a61891ec9c3baf5d46649bba4f965b240713cfbe49981756d90412102e30d7"
+  },
+  {
+    "path": "Shared_Textures/Roughness_context_tan_brick_03floors_palegray.png",
+    "bytes": 2633,
+    "sha256": "52a61891ec9c3baf5d46649bba4f965b240713cfbe49981756d90412102e30d7"
+  },
+  {
+    "path": "Shared_Textures/Roughness_context_tan_brick_04floors_midgray.png",
+    "bytes": 2600,
+    "sha256": "6c20df9038a325dc712a3e55bb2fdcf6972f4934a64c49be4e059b1a194b8a40"
+  },
+  {
+    "path": "Shared_Textures/Roughness_context_tan_brick_04floors_palegray.png",
+    "bytes": 2600,
+    "sha256": "6c20df9038a325dc712a3e55bb2fdcf6972f4934a64c49be4e059b1a194b8a40"
+  },
+  {
+    "path": "Shared_Textures/Roughness_context_tan_brick_05floors_midgray.png",
+    "bytes": 2616,
+    "sha256": "e7ca0cc5e394faa36706535312e2c4c01d89e859717170e0c241d977943b42fa"
+  },
+  {
+    "path": "Shared_Textures/Roughness_context_tan_brick_06floors_midgray.png",
+    "bytes": 2633,
+    "sha256": "d5082bf94540ce7f604330367c27770901e90c902901f9ff20ecee97a58a259d"
+  },
+  {
+    "path": "Shared_Textures/Roughness_context_tan_brick_07floors_midgray.png",
+    "bytes": 2649,
+    "sha256": "4c3b975a21d64f4b5f33a9148181a7bc7bfaba6237a0d2d80f50b6c1c944d390"
+  },
+  {
+    "path": "Shared_Textures/Roughness_context_tan_brick_08floors_midgray.png",
+    "bytes": 2666,
+    "sha256": "20f94a1ff4d4a48eeae4d14ad871fa790abd499191005c60182ba826a6d901ab"
+  },
+  {
+    "path": "Shared_Textures/Roughness_context_warm_brick_01floors_charcoal.png",
+    "bytes": 2567,
+    "sha256": "79699f94977fd391f206fdd26eb7d4d110d15e6380fc02e1eb06bf71e0e59cfd"
+  },
+  {
+    "path": "Shared_Textures/Roughness_context_warm_brick_01floors_midgray.png",
+    "bytes": 2567,
+    "sha256": "79699f94977fd391f206fdd26eb7d4d110d15e6380fc02e1eb06bf71e0e59cfd"
+  },
+  {
+    "path": "Shared_Textures/Roughness_context_warm_brick_01floors_palegray.png",
+    "bytes": 2567,
+    "sha256": "79699f94977fd391f206fdd26eb7d4d110d15e6380fc02e1eb06bf71e0e59cfd"
+  },
+  {
+    "path": "Shared_Textures/Roughness_context_warm_brick_02floors_charcoal.png",
+    "bytes": 2600,
+    "sha256": "5618291b5473c8029bb740ebad68daf65d5f3a179b9d351ba08261333a47ec47"
+  },
+  {
+    "path": "Shared_Textures/Roughness_context_warm_brick_02floors_midgray.png",
+    "bytes": 2600,
+    "sha256": "5618291b5473c8029bb740ebad68daf65d5f3a179b9d351ba08261333a47ec47"
+  },
+  {
+    "path": "Shared_Textures/Roughness_context_warm_brick_02floors_palegray.png",
+    "bytes": 2600,
+    "sha256": "5618291b5473c8029bb740ebad68daf65d5f3a179b9d351ba08261333a47ec47"
+  },
+  {
+    "path": "Shared_Textures/Roughness_context_warm_brick_02floors_redbrown.png",
+    "bytes": 2600,
+    "sha256": "5618291b5473c8029bb740ebad68daf65d5f3a179b9d351ba08261333a47ec47"
+  },
+  {
+    "path": "Shared_Textures/Roughness_context_warm_brick_03floors_charcoal.png",
+    "bytes": 2633,
+    "sha256": "52a61891ec9c3baf5d46649bba4f965b240713cfbe49981756d90412102e30d7"
+  },
+  {
+    "path": "Shared_Textures/Roughness_context_warm_brick_03floors_midgray.png",
+    "bytes": 2633,
+    "sha256": "52a61891ec9c3baf5d46649bba4f965b240713cfbe49981756d90412102e30d7"
+  },
+  {
+    "path": "Shared_Textures/Roughness_context_warm_brick_03floors_palegray.png",
+    "bytes": 2633,
+    "sha256": "52a61891ec9c3baf5d46649bba4f965b240713cfbe49981756d90412102e30d7"
+  },
+  {
+    "path": "Shared_Textures/Sports_Baseball.jpg",
+    "bytes": 67546,
+    "sha256": "887ddfaba68e1afd579ceafa916fa8d0f1b9341154b771ff5ce8f83b989c5fdb"
+  },
+  {
+    "path": "Shared_Textures/Sports_Football_Track.jpg",
+    "bytes": 81412,
+    "sha256": "56c1c76df2cd7c573ef130f04fd504b8231e640b796c4d353c8decee52b60168"
+  },
+  {
+    "path": "Shared_Textures/Sports_Woodson_Baseball.jpg",
+    "bytes": 64722,
+    "sha256": "fba778ab093ef3801bc312603f98663b242c3307c92b4425bbd7d84d2b318790"
+  },
+  {
+    "path": "Shared_Textures/Townhouse_White_context_warm_brick_02floors_charcoal.png",
+    "bytes": 9895,
+    "sha256": "c7a007a97108abc5d07843144fa30b9a3c197bade13d41b25acc5cc2b9f3b34c"
+  },
+  {
+    "path": "Shared_Textures/Townhouse_White_context_warm_brick_02floors_midgray.png",
+    "bytes": 9894,
+    "sha256": "f80a842792926376eccc8707ad77d79432e99d46fbcdb70007cf557ef5af159e"
+  },
+  {
+    "path": "Shared_Textures/Woodson_Pale_Facade_Planted_Roof.png",
+    "bytes": 31838,
+    "sha256": "65e32ec1490600f06dd8dd56437590c731ac3c7467d266c5988d637115cdfd94"
+  },
+  {
+    "path": "Shared_Textures/apartment_brick.png",
+    "bytes": 1504,
+    "sha256": "f8f45878dc25f057fa615268f6f1f11175d40edbe09010cef09b90d3509de412"
+  },
+  {
+    "path": "Shared_Textures/apartment_facade_pattern.png",
+    "bytes": 8461,
+    "sha256": "5ebe1931afd3a374c66d795c3727f356e9b81a8448433f60b3a22a724c7c83a0"
+  },
+  {
+    "path": "Shared_Textures/apartment_facade_reference.jpg",
+    "bytes": 652131,
+    "sha256": "716abe829c3f70cda2c381f09c794234ae40e3cbf3d22a6cb6709711370a1d5e"
+  },
+  {
+    "path": "Shared_Textures/building_2099_Unified_Color.png",
+    "bytes": 627973,
+    "sha256": "bb974bc077cd91610b0cec212cea7d16ece56fd47894bd14ed979bb62d4ceee2"
+  },
+  {
+    "path": "Shared_Textures/building_2356_Unified_Color.png",
+    "bytes": 802816,
+    "sha256": "8639c5cb137b430fa0c55f631c1ff118022d7002cc069e632105b00d001b6151"
+  },
+  {
+    "path": "Shared_Textures/building_2603_Unified_Color.png",
+    "bytes": 461555,
+    "sha256": "1b07032e4e8dc69f96f119531df591a4cb2953b8506003275ac7abc000191adb"
+  },
+  {
+    "path": "Shared_Textures/building_2664_Unified_Color.png",
+    "bytes": 261892,
+    "sha256": "2c9eba2c5e1ec1d5a38cf6d5aef5f35fbe425efe667e7153d784c60763d269d6"
+  },
+  {
+    "path": "Shared_Textures/building_2772_Unified_Color.png",
+    "bytes": 399015,
+    "sha256": "5cab733092f50c2784b8b64443815f88d8a8550a45b1de983ef6da2bb611cdd8"
+  },
+  {
+    "path": "Shared_Textures/context_cream_render_01floors_charcoal.png",
+    "bytes": 3880,
+    "sha256": "80877f77c7f589e7838fb6019f356739f1b50a75ba8c75990a597ae967c60c86"
+  },
+  {
+    "path": "Shared_Textures/context_cream_render_02floors_charcoal.png",
+    "bytes": 4027,
+    "sha256": "f3ea4491b9d1d12d99e63664f39228d5cca1f0af356c2ccdc55100e96dc1ecad"
+  },
+  {
+    "path": "Shared_Textures/context_cream_render_02floors_midgray.png",
+    "bytes": 4030,
+    "sha256": "2d9d700f9c2d1e87c0ff5bcf904ac64d27986bf10e050bc8a665749671ab4a55"
+  },
+  {
+    "path": "Shared_Textures/context_cream_render_02floors_palegray.png",
+    "bytes": 4028,
+    "sha256": "73e3079a69b58961281bdc5dbc7dfbc86f1e13b314b9677d4aa9cde372123b6f"
+  },
+  {
+    "path": "Shared_Textures/context_cream_render_03floors_midgray.png",
+    "bytes": 4174,
+    "sha256": "b4c9ccf70fd4ce567032df276510b5f61e91a8f61dad259ccb8787617d1c3625"
+  },
+  {
+    "path": "Shared_Textures/context_tan_brick_02floors_midgray.png",
+    "bytes": 11537,
+    "sha256": "fdd6a7d8770e501c52b06c41571b487357a01006aff350234643258ffa57eab1"
+  },
+  {
+    "path": "Shared_Textures/context_tan_brick_02floors_palegray.png",
+    "bytes": 11540,
+    "sha256": "3a13bfe7e603c382632ecab29d46493be932380080726e132eb9eb78a48591d0"
+  },
+  {
+    "path": "Shared_Textures/context_tan_brick_03floors_charcoal.png",
+    "bytes": 11954,
+    "sha256": "c60112bb5dcb04c7caaf585d0a039b5d6bed0a8db4b0d74178cc7be108464cb3"
+  },
+  {
+    "path": "Shared_Textures/context_tan_brick_03floors_midgray.png",
+    "bytes": 11956,
+    "sha256": "3b7e5595fdbcd03b7d6028b04ddf0b259d89d14bbcefe9ac6b9e1beb0c38f327"
+  },
+  {
+    "path": "Shared_Textures/context_tan_brick_03floors_palegray.png",
+    "bytes": 11955,
+    "sha256": "63d7f9a16fef9dd82a512413785cae96d2bd6e30865b525e9fd372e129184b40"
+  },
+  {
+    "path": "Shared_Textures/context_tan_brick_04floors_midgray.png",
+    "bytes": 11983,
+    "sha256": "9bc5e9b668f27e2a75092f9ad54a80b68336909fe001eb555f7944c9ff9f4144"
+  },
+  {
+    "path": "Shared_Textures/context_tan_brick_04floors_palegray.png",
+    "bytes": 11981,
+    "sha256": "633a0f312a431743c94380b284b6c5805187248ead5a620cf6aaba63c32afd88"
+  },
+  {
+    "path": "Shared_Textures/context_tan_brick_05floors_midgray.png",
+    "bytes": 11995,
+    "sha256": "1d82417ca50ba5aa5d2120f7056390b0ab1e874be5ea3e976cffa46c496b3bca"
+  },
+  {
+    "path": "Shared_Textures/context_tan_brick_06floors_midgray.png",
+    "bytes": 12404,
+    "sha256": "78c966eecdf98803d8feb8c2b1102d67e72b1b2e69f33f15fedc31fc9e8c0f64"
+  },
+  {
+    "path": "Shared_Textures/context_tan_brick_07floors_midgray.png",
+    "bytes": 12644,
+    "sha256": "cc3ed4da16fe9657bf2670557717702da0774835fe34713b80ce165eb8bf632c"
+  },
+  {
+    "path": "Shared_Textures/context_tan_brick_08floors_midgray.png",
+    "bytes": 12629,
+    "sha256": "ace6963558b66ee0062a86200a583cac9849c36ad6a0c43514ea4edb9298e55b"
+  },
+  {
+    "path": "Shared_Textures/context_warm_brick_01floors_charcoal.png",
+    "bytes": 11276,
+    "sha256": "f59ffbc9e79479823e20823e40e99327c8a4fe1737a8f3fe334a41bdfd6c9116"
+  },
+  {
+    "path": "Shared_Textures/context_warm_brick_01floors_midgray.png",
+    "bytes": 11279,
+    "sha256": "9aa3c4a78d07fe3518d3cc93bda57fa2cb153892b844e2819d17a7693d60ba8b"
+  },
+  {
+    "path": "Shared_Textures/context_warm_brick_01floors_palegray.png",
+    "bytes": 11279,
+    "sha256": "55135bc4d3c6aa240412428f9955b9f7c266f62695f5b0bcce916c21afee2717"
+  },
+  {
+    "path": "Shared_Textures/context_warm_brick_02floors_charcoal.png",
+    "bytes": 11379,
+    "sha256": "a7df272b86e74bfb70afd9d48a1040ce008cae190ef31925ab9d0eadf350407a"
+  },
+  {
+    "path": "Shared_Textures/context_warm_brick_02floors_midgray.png",
+    "bytes": 11384,
+    "sha256": "2b101e7ad7c87c3aa48484ee576e64aec07140bf5d3146c83d3cc039fd7b0927"
+  },
+  {
+    "path": "Shared_Textures/context_warm_brick_02floors_palegray.png",
+    "bytes": 11382,
+    "sha256": "f852ba722009b06ba21cb86cd9de9a71772fa2529d705929acd9d2ae18c6c5b7"
+  },
+  {
+    "path": "Shared_Textures/context_warm_brick_02floors_redbrown.png",
+    "bytes": 11377,
+    "sha256": "8c5a3aa6233ad664291d9b8fa22ff9efcd5ce87749eb55a42d308a8bbe084fcb"
+  },
+  {
+    "path": "Shared_Textures/context_warm_brick_03floors_charcoal.png",
+    "bytes": 11818,
+    "sha256": "4b486894baba9d07865792ff944a88aebf3a1322ad6953e0bb9ef415561479e2"
+  },
+  {
+    "path": "Shared_Textures/context_warm_brick_03floors_midgray.png",
+    "bytes": 11821,
+    "sha256": "5737a4f1ef85779c45158870a58e048192d1f00706577fa44e9eb81f40e8a2a7"
+  },
+  {
+    "path": "Shared_Textures/context_warm_brick_03floors_palegray.png",
+    "bytes": 11821,
+    "sha256": "0c788e1580e82dea2ae2916a4b9530e4c4881821ea819019516c8044980a6892"
+  },
+  {
+    "path": "Shared_Textures/corner_facade.png",
+    "bytes": 7315,
+    "sha256": "649d40ec9b637b39c0abd4cd09e9726193bd15f85665fe422af550fd2ba8452f"
+  },
+  {
+    "path": "Shared_Textures/maptexture.jpg",
+    "bytes": 1394185,
+    "sha256": "9b5575bc7bd820ff7b7c88ac1abf6422312c7e712bf3a99040ad73093fa91f44"
+  },
+  {
+    "path": "Shared_Textures/monroe_facade_reference.jpg",
+    "bytes": 160987,
+    "sha256": "ea42d72d923a5c7061e547c242ef39c0570f18cc831b1d6fa322e34be4bbaef8"
+  },
+  {
+    "path": "Shared_Textures/school_brick.png",
+    "bytes": 1512,
+    "sha256": "9cf7591474e5ad048ebcdb00df9e6964343db441cf87b74c3257416bc4c161b1"
+  },
+  {
+    "path": "Shared_Textures/screenshot_manifest.json",
+    "bytes": 13445,
+    "sha256": "32b54ffa6b2ff4e381173526b5d9dad5b3fd92bd9e8e6c84722076e9a7a48701"
+  },
+  {
+    "path": "Shared_Textures/screenshot_x00_y00_ground.jpg",
+    "bytes": 745399,
+    "sha256": "e7bd093a1d8fb44fe609e552a2942cdce987d34202fcd31a6b05164f39ac546f"
+  },
+  {
+    "path": "Shared_Textures/screenshot_x00_y00_overview.jpg",
+    "bytes": 85622,
+    "sha256": "4fc8475f878899bca19c13fbc5302600ef46517c44de0f373bb3323a1b47b142"
+  },
+  {
+    "path": "Shared_Textures/screenshot_x00_y01_ground.jpg",
+    "bytes": 743875,
+    "sha256": "59d9f3cbf1a214157f233b341210142985eeff1fb9ed410ee60075984fb883b3"
+  },
+  {
+    "path": "Shared_Textures/screenshot_x00_y01_overview.jpg",
+    "bytes": 84790,
+    "sha256": "9bd1cba349c155eba62f794a161e8d57e0433d2ca2075ab4331ac0f530a126f6"
+  },
+  {
+    "path": "Shared_Textures/screenshot_x00_y02_ground.jpg",
+    "bytes": 671322,
+    "sha256": "5bdc73b438bdd617e0a2e0a92ba7edd202350a4247745ecd65021388103a2baa"
+  },
+  {
+    "path": "Shared_Textures/screenshot_x00_y02_overview.jpg",
+    "bytes": 75422,
+    "sha256": "d0301690e71bf9d026f045c17095cd221af9c7b359bb7cdedd54f951e6614228"
+  },
+  {
+    "path": "Shared_Textures/screenshot_x00_y03_ground.jpg",
+    "bytes": 635807,
+    "sha256": "10d11a014cddd479b37d7ce04397969083c3ede058143b6449dcd0a9ccb5b3f9"
+  },
+  {
+    "path": "Shared_Textures/screenshot_x00_y03_overview.jpg",
+    "bytes": 71695,
+    "sha256": "6d6b678dd7105013a232b768ebe2f98a27169f77ee11102f743c4f18fbc2699e"
+  },
+  {
+    "path": "Shared_Textures/screenshot_x01_y00_ground.jpg",
+    "bytes": 732764,
+    "sha256": "9a6ae13f24676b96c88b23584e5b6e721c7163355115d3b478f1760734e12c3b"
+  },
+  {
+    "path": "Shared_Textures/screenshot_x01_y00_overview.jpg",
+    "bytes": 84435,
+    "sha256": "67c1f21c03d7e37f370503a5181719e2ca5d3abe1c73944e69547203cb55f3e0"
+  },
+  {
+    "path": "Shared_Textures/screenshot_x01_y01_ground.jpg",
+    "bytes": 687674,
+    "sha256": "ce89b99ed7da90ce24a7a568117dae7c9383e30eaa2f5c574b89b2080509aa21"
+  },
+  {
+    "path": "Shared_Textures/screenshot_x01_y01_overview.jpg",
+    "bytes": 78308,
+    "sha256": "d0368b6d941ebe02a68dc440cd04417b95433667ccacee364a89117afbdfcbcd"
+  },
+  {
+    "path": "Shared_Textures/screenshot_x01_y02_ground.jpg",
+    "bytes": 642797,
+    "sha256": "7b67df9c923acb0a4e673a25ca682c551a67a0c05641e50554d8930a0eac07c5"
+  },
+  {
+    "path": "Shared_Textures/screenshot_x01_y02_overview.jpg",
+    "bytes": 71382,
+    "sha256": "faf6321f98d2d33832d57a5600cecea3c9f2fa7c29c391abd87ca18a817a306e"
+  },
+  {
+    "path": "Shared_Textures/screenshot_x01_y03_ground.jpg",
+    "bytes": 735763,
+    "sha256": "10115d11cb4a9bfd93f5f1ed47d1209e6c399af99e3024a54accd40b1ddefd04"
+  },
+  {
+    "path": "Shared_Textures/screenshot_x01_y03_overview.jpg",
+    "bytes": 79047,
+    "sha256": "901c7a267913f719342c7125e3886507b466dd257ae51dc99f1ff5463ca859b8"
+  },
+  {
+    "path": "Shared_Textures/screenshot_x02_y00_ground.jpg",
+    "bytes": 769615,
+    "sha256": "6031ef6c673826c7b518515c2df1158c0af88324663286586cf66a90ee99dc60"
+  },
+  {
+    "path": "Shared_Textures/screenshot_x02_y00_overview.jpg",
+    "bytes": 87929,
+    "sha256": "8584f52485a7222bccea09ed8cd9d38882c1bb30d0be891ea95631c9ac357e62"
+  },
+  {
+    "path": "Shared_Textures/screenshot_x02_y01_ground.jpg",
+    "bytes": 739041,
+    "sha256": "1b616e77a6393feb79bd55d7c4081df15901b3e38019cccbb733e4574d66e078"
+  },
+  {
+    "path": "Shared_Textures/screenshot_x02_y01_overview.jpg",
+    "bytes": 84980,
+    "sha256": "fb15c50b72e3499220d527cfb7627fceb39939fa57187dbc4a475543294b9f22"
+  },
+  {
+    "path": "Shared_Textures/screenshot_x02_y02_ground.jpg",
+    "bytes": 616400,
+    "sha256": "757c91f98fc973ce60af50504f8faf7f37e5fae64b5ee3df7d535f7ad374f6fd"
+  },
+  {
+    "path": "Shared_Textures/screenshot_x02_y02_overview.jpg",
+    "bytes": 68606,
+    "sha256": "eab864c92615275a8d0c3704e0a577d78e75e0d20dde70dc5d6e5d965aea5f19"
+  },
+  {
+    "path": "Shared_Textures/screenshot_x02_y03_ground.jpg",
+    "bytes": 659739,
+    "sha256": "cb0f4e9346cdbf4aba5bd91e0c09efc5d55ffd567231b2feda2aa5c112ec5564"
+  },
+  {
+    "path": "Shared_Textures/screenshot_x02_y03_overview.jpg",
+    "bytes": 73053,
+    "sha256": "f1b2598e3e17ec929e61f5126bbd8e50a574af38561195833ad4403c4165299f"
+  },
+  {
+    "path": "Shared_Textures/screenshot_x03_y00_ground.jpg",
+    "bytes": 724668,
+    "sha256": "e0fa1fe0f9e1aa0983162cc9ef89eb60e14bf987a57cee31a619031918e3acb8"
+  },
+  {
+    "path": "Shared_Textures/screenshot_x03_y00_overview.jpg",
+    "bytes": 82610,
+    "sha256": "2a0dcc07b157594730fe9e1319aa642a7203b38ab611cc46a4d2b42c9263f333"
+  },
+  {
+    "path": "Shared_Textures/screenshot_x03_y01_ground.jpg",
+    "bytes": 698168,
+    "sha256": "925d2bc9840704a448b24e2a7a2f8f4f2355a3a969acbf113e7eaeab6694915f"
+  },
+  {
+    "path": "Shared_Textures/screenshot_x03_y01_overview.jpg",
+    "bytes": 78158,
+    "sha256": "53db226c0323c7004ade28eb48ec739721a4ef3ece5a019415753b7f8559eb6a"
+  },
+  {
+    "path": "Shared_Textures/screenshot_x03_y02_ground.jpg",
+    "bytes": 635272,
+    "sha256": "693553f6feaf4020bb8bf4e136d48b0ff7fdf75fdb75396b19f7ac5e52cea21f"
+  },
+  {
+    "path": "Shared_Textures/screenshot_x03_y02_overview.jpg",
+    "bytes": 71049,
+    "sha256": "08e925d140c7b27873f887d738570a82698c657f4b8b48442f45e939d847e5c9"
+  },
+  {
+    "path": "Shared_Textures/screenshot_x03_y03_ground.jpg",
+    "bytes": 647881,
+    "sha256": "cd30f5fb1b6192b3a0b538b422cb6111e92e9d2d27d443200c8546a10637dd19"
+  },
+  {
+    "path": "Shared_Textures/screenshot_x03_y03_overview.jpg",
+    "bytes": 72984,
+    "sha256": "b8cea1139e1cc8e69ce2e7099ff71de0f520ffb25ebfbcc1e9b8f30ea717262e"
+  },
+  {
+    "path": "Shared_Textures/solar_cells.png",
+    "bytes": 1678,
+    "sha256": "bbd0713edd3c260a9032c4ac15cef9ef2937255868255fb6f4093f4aedb4e1c3"
+  },
+  {
+    "path": "pipeline/align_apartment_reference.py",
+    "bytes": 2171,
+    "sha256": "a162c272ef4ad2f6714b2579d5d4e2e23f2f3a9bb784922432056e78060a3140"
+  },
+  {
+    "path": "pipeline/apartment_details.py",
+    "bytes": 6181,
+    "sha256": "fc002ee203be2f6c0497aa077c2327b58f7cffd3be8f2e9dbd792d2a5794cc63"
+  },
+  {
+    "path": "pipeline/build_correction.py",
+    "bytes": 7959,
+    "sha256": "e6bcda809513498721cb0f52b279249a6488e07ea75ad9b5d793768d56a06dce"
+  },
+  {
+    "path": "pipeline/check_drive_clearance.py",
+    "bytes": 4059,
+    "sha256": "d83bb8971250bb6ca598b16a3e7be0558546694519f182eb924df6b9286d699c"
+  },
+  {
+    "path": "pipeline/check_shared_buildings.py",
+    "bytes": 2578,
+    "sha256": "0f6696f66d909eb072dbeebe33de3e43cfe43db5da90f85a869cde93d9d8ae18"
+  },
+  {
+    "path": "pipeline/clip_site_ground.py",
+    "bytes": 2008,
+    "sha256": "f3dde79c4e0a24787ed0e79770821ffeff7d951afc1eda3c4e9d35654fd146a2"
+  },
+  {
+    "path": "pipeline/design_proposed_access_revision.py",
+    "bytes": 24910,
+    "sha256": "5ad035bd0e2cb50fa516170f7d029330f3d919dd9833d209f8ebf3cddbf59e32"
+  },
+  {
+    "path": "pipeline/export_collada.py",
+    "bytes": 5447,
+    "sha256": "33c10f1f601e4a7c29d236d8d5b90655ebc6023a65a920471612c10766a31c1b"
+  },
+  {
+    "path": "pipeline/extract_drive_obstacles.py",
+    "bytes": 816,
+    "sha256": "9c07abd8da7be8c3d1e6eea284c81f540b3c144f2bd1c7c2f4240f19e433ed2e"
+  },
+  {
+    "path": "pipeline/extract_site_surfaces.py",
+    "bytes": 1324,
+    "sha256": "e5f1f93c77a8dc255e212b3d9a14b8d2bce3c1ca01e16c7a7a5d6ae5ba15920d"
+  },
+  {
+    "path": "pipeline/final_trim_paths.py",
+    "bytes": 3321,
+    "sha256": "f056c187f1eb2ae1170e75807322653dbe8002994e8cb5dbdb851769f9d54602"
+  },
+  {
+    "path": "pipeline/finalize_site_plan.py",
+    "bytes": 2375,
+    "sha256": "f1327a6cf450912bcc97568591384506348c541d96b2a27d17b2adcbb72c52aa"
+  },
+  {
+    "path": "pipeline/package_reference_delivery.py",
+    "bytes": 3820,
+    "sha256": "959c7e0c75bfe4d3fbdf0ab57c2355e3fdf068e5f5bd70a65c66a1fac6ee03a1"
+  },
+  {
+    "path": "pipeline/prepare_apartment_site.py",
+    "bytes": 2362,
+    "sha256": "0aa5ca2f74f1f0b11ae3ac3a205cfd5d22a7f72ee2c6d69d3c0529a55a5f04cc"
+  },
+  {
+    "path": "pipeline/prepare_driveway.py",
+    "bytes": 2204,
+    "sha256": "7ebddbc720f3ae3dfc6cd67688d3f64b45e592408f7103b29ded71394f208485"
+  },
+  {
+    "path": "pipeline/prepare_lincoln_width.py",
+    "bytes": 3667,
+    "sha256": "ffb6ad51d200312e174e2856adcfc76006c5411f925bacc48f679fc7ce33123a"
+  },
+  {
+    "path": "pipeline/prepare_original_paving.py",
+    "bytes": 3787,
+    "sha256": "c5083fe77ec15d40ee3b14184b94093a9863ce235f791fdb63702da139b8efbf"
+  },
+  {
+    "path": "pipeline/prepare_shared_facilities.py",
+    "bytes": 3822,
+    "sha256": "b568205714861d2332562ae47014e1de98ad3e12303e3dbfa8840dd708f41c84"
+  },
+  {
+    "path": "pipeline/refine_woodson_roof.py",
+    "bytes": 1770,
+    "sha256": "7c772404623b57647b44c72b1f03b9471e5008741c360020ba9d3cae1beec14e"
+  },
+  {
+    "path": "pipeline/render_woodson_preview.py",
+    "bytes": 1682,
+    "sha256": "dd8c83dac584374ba7b9a772f179d7af8cdddd13d740b20e162ba12631ac3b01"
+  },
+  {
+    "path": "pipeline/shared_facilities.py",
+    "bytes": 6959,
+    "sha256": "9c8b6cc5efdf199480d0e2394dd8d2a211dfc39308fb106f7306232bc8593b55"
+  },
+  {
+    "path": "pipeline/trim_sidewalks.py",
+    "bytes": 1526,
+    "sha256": "724767090745973cc98c894e4684a9a7f59583df2690a7ffe068d9b044985abb"
+  },
+  {
+    "path": "pipeline/validate_collada.py",
+    "bytes": 2763,
+    "sha256": "8ffc89c1bd3b660700bfab30820f6e86e3ed55a3181711d2319663ab47584ed9"
+  },
+  {
+    "path": "pipeline/validate_preview.py",
+    "bytes": 5116,
+    "sha256": "66cf6950b4a4d716761545ae7ff657fc0458fecc11561755dbb53c94e2aabb79"
+  },
+  {
+    "path": "previews/comparison.png",
+    "bytes": 1778255,
+    "sha256": "e0d1005c7956679835db5f471a1968d23a7c63055f92176a26d0cbb65e3b5309"
+  },
+  {
+    "path": "previews/existing_01_campus_masterplan.png",
+    "bytes": 3612131,
+    "sha256": "680580963c898a8a19a114250e797863a8752896f7cb22ca775f831efad53ac2"
+  },
+  {
+    "path": "previews/existing_10_original_asphalt_parking.png",
+    "bytes": 3562558,
+    "sha256": "3120e6e5c3194e38f1db371652c02506b3f1f77054d347d33e764e70b2d854d0"
+  },
+  {
+    "path": "previews/feature_gallery.png",
+    "bytes": 3931798,
+    "sha256": "70cf2375ea56e9c17cf9a4b2ce9a9aa99861da02bed1c445d4af8e629ec70212"
+  },
+  {
+    "path": "previews/proposed_01_campus_masterplan.png",
+    "bytes": 3720231,
+    "sha256": "b4f231e092ddc41fed0c424e8024636a297a4bb562fda7be37669b09a6f429ee"
+  },
+  {
+    "path": "previews/proposed_09_white_townhouses_and_drive.png",
+    "bytes": 3441047,
+    "sha256": "e83f5533e4eaa8ab9291ae25ed2446a09c81e67304c435d5980c2c9f9091dc00"
+  },
+  {
+    "path": "previews/proposed_11_apartment_courtyard_stairs_garage.png",
+    "bytes": 3416877,
+    "sha256": "524c7a6314ccdd29808bfaaa43c8650dcaf5fa6b4046c52df787958200d2f0cb"
+  },
+  {
+    "path": "previews/proposed_12_woodson_courts_and_green_roof.png",
+    "bytes": 3679257,
+    "sha256": "4c4bbce6a8f682b089676538b6e97a60dec2bb8a2ee7cbcbaf54853f3251863a"
+  },
+  {
+    "path": "previews/proposed_13_kelly_tennis_and_basketball.png",
+    "bytes": 3698921,
+    "sha256": "144d6654f4e76c47656046f9419a76e4275f6243bfc4990fed0d3f38dce5225f"
+  },
+  {
+    "path": "previews/proposed_14_lincoln_33ft_street.png",
+    "bytes": 3357492,
+    "sha256": "ba5b4da44bbef68b97bb5b5ce057fb993630ed47bea8e355cabb263596f608ad"
+  },
+  {
+    "path": "validation/both_versions_validation.json",
+    "bytes": 1023,
+    "sha256": "03a5d8e72dced6c5e6930798b66ee12e122ac3851e7cf3e0a401f1d31aaec0c8"
+  },
+  {
+    "path": "validation/driveway_plan.json",
+    "bytes": 638,
+    "sha256": "68341be8f7a31bdc7bc1bab32a122fb0397f94555ef048012d5f58d1b09905d3"
+  },
+  {
+    "path": "validation/existing_apartment_details.json",
+    "bytes": 334,
+    "sha256": "10255c8c7826c3d8ba3066d98fa316351b71977158be9031b03a2f4f86f4215a"
+  },
+  {
+    "path": "validation/existing_collada_checks.json",
+    "bytes": 479,
+    "sha256": "ccb1450d92583d704618644400e32517e4a421033e07ff7b93398d0d4f99ff6f"
+  },
+  {
+    "path": "validation/existing_facade_evidence.json",
+    "bytes": 922623,
+    "sha256": "5a5261083565907cddf6e874e19bfbb5641b3a17440015be8630c261b3986ada"
+  },
+  {
+    "path": "validation/existing_fbx_checks.json",
+    "bytes": 452,
+    "sha256": "0ee2a2ca74652dda06e100e9b20d41448738d384d5d428cd66ae6e187f226138"
+  },
+  {
+    "path": "validation/existing_native_checks.json",
+    "bytes": 381,
+    "sha256": "e930d3260fc3076d4edb8383149e8cdf8799487902390fd01c95a7060770893b"
+  },
+  {
+    "path": "validation/existing_recreation_details.json",
+    "bytes": 762,
+    "sha256": "a65d898356362973ee3ae956832838e0b23b880af2a9a555efc002113923a1ac"
+  },
+  {
+    "path": "validation/lincoln_33ft_reference.json",
+    "bytes": 877,
+    "sha256": "40b6553052c3a8d82ea0cd5fe2b776d7354981d08d1567046707c72b2bd51818"
+  },
+  {
+    "path": "validation/original_paving_plan.json",
+    "bytes": 408,
+    "sha256": "9a649cf850c915cddd293231ea227e6433f92a800d2fc56866462c8fa7d940d0"
+  },
+  {
+    "path": "validation/proposed_apartment_details.json",
+    "bytes": 334,
+    "sha256": "10255c8c7826c3d8ba3066d98fa316351b71977158be9031b03a2f4f86f4215a"
+  },
+  {
+    "path": "validation/proposed_collada_checks.json",
+    "bytes": 479,
+    "sha256": "8913540d497471557b853c2f7357797e98ec035cdc3788fa9350b0f6ff5866b7"
+  },
+  {
+    "path": "validation/proposed_drive_clearance.json",
+    "bytes": 2808,
+    "sha256": "adfa5c15bcc0faf5470d24a801e2e8ffe9611c4a191f889d72c6ade053a7c71b"
+  },
+  {
+    "path": "validation/proposed_facade_evidence.json",
+    "bytes": 922623,
+    "sha256": "5a5261083565907cddf6e874e19bfbb5641b3a17440015be8630c261b3986ada"
+  },
+  {
+    "path": "validation/proposed_fbx_checks.json",
+    "bytes": 465,
+    "sha256": "64c2b9d73e082befe3e6f11535f83a99cf3c68f89de378e11b28c5b683a68a3c"
+  },
+  {
+    "path": "validation/proposed_native_checks.json",
+    "bytes": 381,
+    "sha256": "1d2da6c547457d028a546747cc267e09fc950e5931dc6b7fb906af0a554df5d2"
+  },
+  {
+    "path": "validation/proposed_recreation_details.json",
+    "bytes": 762,
+    "sha256": "a65d898356362973ee3ae956832838e0b23b880af2a9a555efc002113923a1ac"
+  },
+  {
+    "path": "validation/recreation_reference_plan.json",
+    "bytes": 3466,
+    "sha256": "ad0576df48aaf5dfab98956f9e2db72dad9f96395e4fe94691bd07a70a119b33"
+  },
+  {
+    "path": "validation/shared_buildings_between_options.json",
+    "bytes": 314,
+    "sha256": "235ae20fd87747155d97d87b64b2d28a84850a39f903db4ccbb86d3596a6fd15"
+  }
+]

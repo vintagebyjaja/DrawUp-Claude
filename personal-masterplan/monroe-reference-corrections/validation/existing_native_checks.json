@@ -1,0 +1,18 @@
+{
+  "passed": true,
+  "unchanged_buildings": 3155,
+  "building_hash_failures": [],
+  "white_townhouse_source_pieces": [
+    "building_2391",
+    "building_2395",
+    "building_2591",
+    "building_2724",
+    "building_3031",
+    "building_3130"
+  ],
+  "working_meshes": 4949,
+  "driveway_objects": [
+    "C_Townhouse_Concrete_Driveway"
+  ],
+  "native_skp_export_available": false
+}

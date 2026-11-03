@@ -1,0 +1,15 @@
+{
+  "passed": true,
+  "geometry_nodes": 4949,
+  "scene_object_nodes": 4949,
+  "relative_texture_files": 40,
+  "max_numeric_position_error_m": 5.000000555810402e-07,
+  "missing_geometries": [],
+  "failures": [],
+  "duplicate_ids": [],
+  "unresolved_id_references": [],
+  "units": "meters",
+  "up_axis": "Z_UP",
+  "native_skp_tested": false,
+  "scope": "XML structure, object names, triangle/position equivalence and texture availability. Does not verify actual SketchUp import."
+}

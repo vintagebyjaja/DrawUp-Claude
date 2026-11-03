@@ -1,0 +1,11 @@
+{
+  "tennis_courts_interpreted": 9,
+  "tennis_complexes": 3,
+  "basketball_courts_marked": 1,
+  "small_baseball_bleachers_added": 2,
+  "woodson_building_id": "building_1673",
+  "green_roof_atlas_pixels": 4778,
+  "building_geometry_changed": false,
+  "accuracy": "Locations interpreted from registered original aerial and user Woodson/Kelly references. Tennis counts interpreted as 4, 2 and 3; standard playing lines fitted within traced surfaces. Basketball full extent/count is not fully visible in the supplied crop; one marked court is illustrative. Nets, hoops and bleacher rows are representative.",
+  "roof_texture_method": "Registered original aerial roof colors with a planted-zone material accent. No structural roof or panel geometry is regenerated."
+}

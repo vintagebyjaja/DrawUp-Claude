@@ -1,0 +1,92 @@
+{
+  "horizontal_pass": true,
+  "checks": [
+    {
+      "route": "loop",
+      "direction": -1,
+      "vehicle": "4.8 x 1.95 m passenger car, 2.8 m wheelbase",
+      "outside_drivable_area_m2": 0.0,
+      "obstacle_collisions": []
+    },
+    {
+      "route": "loop",
+      "direction": 1,
+      "vehicle": "4.8 x 1.95 m passenger car, 2.8 m wheelbase",
+      "outside_drivable_area_m2": 0.0,
+      "obstacle_collisions": []
+    },
+    {
+      "route": "primary",
+      "direction": -1,
+      "vehicle": "4.8 x 1.95 m passenger car, 2.8 m wheelbase",
+      "outside_drivable_area_m2": 0.0,
+      "obstacle_collisions": []
+    },
+    {
+      "route": "primary",
+      "direction": 1,
+      "vehicle": "4.8 x 1.95 m passenger car, 2.8 m wheelbase",
+      "outside_drivable_area_m2": 0.0,
+      "obstacle_collisions": []
+    },
+    {
+      "route": "secondary",
+      "direction": -1,
+      "vehicle": "4.8 x 1.95 m passenger car, 2.8 m wheelbase",
+      "outside_drivable_area_m2": 0.0,
+      "obstacle_collisions": []
+    },
+    {
+      "route": "secondary",
+      "direction": 1,
+      "vehicle": "4.8 x 1.95 m passenger car, 2.8 m wheelbase",
+      "outside_drivable_area_m2": 0.01228326573046579,
+      "obstacle_collisions": []
+    },
+    {
+      "route": "cross_aisle",
+      "direction": -1,
+      "vehicle": "4.8 x 1.95 m passenger car, 2.8 m wheelbase",
+      "outside_drivable_area_m2": 0.0,
+      "obstacle_collisions": []
+    },
+    {
+      "route": "cross_aisle",
+      "direction": 1,
+      "vehicle": "4.8 x 1.95 m passenger car, 2.8 m wheelbase",
+      "outside_drivable_area_m2": 0.0,
+      "obstacle_collisions": []
+    },
+    {
+      "route": "corner_access",
+      "direction": -1,
+      "vehicle": "4.8 x 1.95 m passenger car, 2.8 m wheelbase",
+      "outside_drivable_area_m2": 0.0,
+      "obstacle_collisions": []
+    },
+    {
+      "route": "corner_access",
+      "direction": 1,
+      "vehicle": "4.8 x 1.95 m passenger car, 2.8 m wheelbase",
+      "outside_drivable_area_m2": 0.0,
+      "obstacle_collisions": []
+    },
+    {
+      "route": "loop",
+      "direction": 1,
+      "vehicle": "9 x 2.5 m concept large vehicle, 5 m wheelbase",
+      "outside_drivable_area_m2": 0.0,
+      "obstacle_collisions": []
+    }
+  ],
+  "campus_carriageway_ft": 22,
+  "nominal_travel_lanes_ft": [
+    9,
+    9
+  ],
+  "parking_aisle_ft": 24,
+  "secondary_local_turn_width_ft": 25.28083989501312,
+  "fixed_buildings_moved_or_resized": false,
+  "limitations": "Concept planar bicycle-envelope clearance, not certified swept-path analysis. Checks horizontal road routes and modeled props, not every parking maneuver, grade break, underbody clearance, accessibility or fire approval. Previous local mesh grades up to 14.15% remain a civil-review item.",
+  "retained_tree_centers_inside_proposed_road": []
+}

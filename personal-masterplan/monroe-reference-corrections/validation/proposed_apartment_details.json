@@ -1,0 +1,8 @@
+{
+  "garage_atlas_pixels": 1971,
+  "garage_representation": "Facade atlas with dark sectional-door appearance and separate sloped apron; not a Boolean opening or drivable interior.",
+  "courtyard_floor_z_m": 25.6,
+  "stair_risers_approximate": 20,
+  "all_dimensions_approximate": true,
+  "existing_building_geometry_preserved": true
+}
