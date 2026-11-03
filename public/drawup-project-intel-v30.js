@@ -312,8 +312,4 @@
   window.DrawUpProjectInfo = { open, afterCreate, data, load: loadProfile, valuesFor, albers };
   register(0); watch();
   // Season 1 Projects menu
-  const addNav = () => { const Sx = window.DrawUpSeason; if (!Sx) return setTimeout(addNav, 200);
-    Sx.addNav({ cat: 'projects', col: 'Projects', item: ['Project Information', { tab: 'project-info' }, 'Site, zoning, program and team, with sources'], after: 'All Projects' });
-    Sx.addNav({ cat: 'projects', col: 'Projects', item: ['Project Map', { tab: 'project-info', hash: '#portal/project-info?view=map' }, 'Every project at its site'], after: 'Project Information' }); };
-  addNav();
 })();

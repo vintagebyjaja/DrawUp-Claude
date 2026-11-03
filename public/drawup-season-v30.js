@@ -64,6 +64,8 @@
       const dr = byId('draw'); if (dr && dr.cols) dr.cols.forEach(col => { if (col.items) col.items = col.items.filter(it => !/detail/i.test(it[0])); });
       // Firm: the firm's detail library is part of Details.
       const fm = byId('firm'); if (fm && fm.cols) fm.cols.forEach(col => { if (col.items) col.items = col.items.filter(it => !/details library/i.test(it[0])); });
+      // the Season 1 menus: Projects, CheckUp and Firm
+      N.forEach(s1Cols);
     }
     extraNav.forEach(x => {
       if (x.season2 && s1) return;
@@ -78,6 +80,58 @@
     Object.keys(x_feature).forEach(id => { const c = byId(id); if (c) c.feature = x_feature[id]; });
     // a top-level link whose menu was emptied opens directly
     document.querySelectorAll('#dus-pnav .dus-link[data-cat]').forEach(b => { const c = byId(b.dataset.cat); if (!c) return; if (c.cols && c.cols.length) b.setAttribute('aria-haspopup', 'true'); else { b.removeAttribute('aria-haspopup'); b.removeAttribute('aria-expanded'); } });
+  }
+  /* The Season 1 menus. Each column lists the Season 1 work in order; everything the menu had before and
+   * that is not named here is kept in a "More" column, so no screen loses its way in. A label only appears
+   * when its screen exists: CheckUp's new reviews register themselves with addNav as they land. */
+  const T = (tab, extra) => ({ tab, ...extra });
+  const S1_COLS = {
+    projects: [
+      { h: 'Projects', items: [
+        ['Overview', T('projects'), 'Every project you are working on'],
+        ['Project Map', T('project-info', { hash: '#portal/project-info?view=map' }), 'Your projects on one map'],
+        ['Project Information', T('project-info'), 'Site, zoning, program, team, decisions and files'],
+        ['Documents', T('documents'), 'Letters, reports, minutes, RFIs and narratives'],
+        ['Specifications', T('firm', { hash: '#portal/firm?pane=specs' }), 'Project manuals and outline specs'],
+        ['Project Management', T('documents', { hash: '#portal/documents?group=PM' }), 'Kickoff agendas, transmittals and meeting minutes'],
+      ] },
+      { h: 'More', small: true, keepRest: true },
+      { h: 'Recent', recent: true },
+    ],
+    check: [
+      { h: 'CheckUp', items: [
+        ['Code Compliance', T('check', { click: 'Building code', scroll: 'New check' })],
+        ['ADA Accessibility', T('check', { click: 'Accessibility', scroll: 'New check' })],
+        ['Life Safety', T('check', { click: 'Life safety / egress', scroll: 'New check' })],
+        ['Drawing Review', T('check', { click: 'Drawing set check', scroll: 'New check' })],
+      ] },
+      { h: 'Results', small: true, items: [
+        ['Findings and Reports', T('check', { scroll: 'Your checks' })],
+        ['Design Narrative Review', T('check', { click: 'Design narrative review', scroll: 'New check' })],
+        ['Narrative vs. Plans', T('check', { click: 'Narrative vs. plans', scroll: 'New check' })],
+      ] },
+    ],
+    firm: [
+      { h: 'Firm', items: [
+        ['Firm Profile', T('firm', { hash: '#portal/firm?pane=details' }), 'Name, logo, discipline and offices'],
+        ['Letterheads', T('firm', { hash: '#portal/firm?pane=specs&view=formats' }), 'Letterhead, margins and page setup for documents'],
+        ['Document Templates', T('documents', { hash: '#portal/documents?new=1' }), 'Start a document from a DrawUp template'],
+        ['Presentation Templates', T('firm', { hash: '#portal/firm?pane=present' }), 'Firm admins'],
+        ['Branding', T('firm', { hash: '#portal/firm?pane=present&focus=brand' }), 'Logo, colors and fonts used on documents and presentations'],
+      ] },
+      { h: 'More', small: true, keepRest: true },
+    ],
+  };
+  /** Rebuild one category's columns from S1_COLS, keeping every item it had that the new lists do not name. */
+  function s1Cols(cat) {
+    const plan = S1_COLS[cat.id]; if (!plan) return;
+    const was = []; (cat.cols || []).forEach(col => (col.items || []).forEach(it => was.push(it)));
+    const named = new Set(); plan.forEach(col => (col.items || []).forEach(it => named.add(it[0].toLowerCase())));
+    const rest = was.filter(it => !named.has(String(it[0]).toLowerCase()));
+    const out = plan.map(col => col.recent ? { h: col.h, recent: true }
+      : { h: col.h, small: !!col.small, items: col.keepRest ? rest.slice() : col.items.map(it => it.slice()) })
+      .filter(col => col.recent || (col.items && col.items.length));
+    if (out.length) cat.cols = out;
   }
   function addNav(x) { extraNav.push(x); applyNav(flags()); }
   function setFeature(cat, feature) { x_feature[cat] = feature; applyNav(flags()); }

@@ -30,6 +30,8 @@
   let ST = null;
 
   const Specs = () => window.DrawUpSpecs;
+  // the hub's group chips, as the menu names them
+  const GROUP_OF = { PM: 'PM', pm: 'PM', CA: 'CA', ca: 'CA', CM: 'CM', cm: 'CM', qaqc: 'QA/QC', 'qa-qc': 'QA/QC', specs: 'Specs' };
   const Data = () => window.DrawUpSpecsData;
   const Xp = () => window.DrawUpSpecsExport;
 
@@ -186,7 +188,7 @@
   /* ------------------------------------------------------------------ the tab */
   async function render(w, c) {
     const q = new URLSearchParams((location.hash.split('?')[1]) || '');
-    ST = { w, c, project: q.get('project') || '', openId: q.get('doc') || '' };
+    ST = { w, c, project: q.get('project') || '', openId: q.get('doc') || '', group: q.get('group') || '', start: q.get('new') === '1' };
     w.innerHTML = '<div class="du-loading">LOADING DOCUMENTS…</div>';
     if (!window.DrawUpSpecs || !window.DrawUpSpecsData) { w.innerHTML = '<article class="du-glass"><h2>Document Studio could not load.</h2><p class="du-muted">The DrawUp Specs files are missing from this build.</p></article>'; return; }
     const host = document.createElement('div'); host.className = 'dds-host';
@@ -194,9 +196,15 @@
     await Specs().mount(host, c, { id: null, name: (c.profile && (c.profile.display_name || c.profile.username)) || 'You' }, {
       scope: { kind: 'personal', table: TABLE },
       hooks: hooks(),
-      onState: S => { ST.S = S; window.__ddsS = S; /* the open workspace, for tests and the console */ },
+      onState: S => {
+        ST.S = S; window.__ddsS = S; // the open workspace, for tests and the console
+        // Projects > Project Management and Firm > Document Templates open this tab with a group or the picker
+        if (ST.group) S.filter.group = GROUP_OF[ST.group] || ST.group;
+        if (ST.project) S.filter.project = ST.project;
+      },
     }).catch(e => { host.innerHTML = `<article class="du-glass"><h2>Documents could not open.</h2><p class="du-muted">${esc(e.message || e)}</p></article>`; });
     decorate(host);
+    if (ST.start && ST.S) { ST.start = false; Specs()._newDocModal(ST.S, { project: ST.project || '' }); }
   }
   /** Document Studio's own wording and buttons on the hub the Specs app rendered. */
   function decorate(host) {
@@ -228,8 +236,4 @@
   }
   window.DrawUpDocStudio = { open, state: () => ST && ST.S, snapshot, listVersions, _blocksFromLines: blocksFromLines, _usedKeys: usedKeys, _hooks: hooks, _importModal: importModal, _pageModal: pageModal };
   register(0);
-  const addNav = () => { const Sx = window.DrawUpSeason; if (!Sx) return setTimeout(addNav, 200);
-    Sx.addNav({ cat: 'projects', col: 'Projects', item: ['Documents', { tab: 'documents' }, 'Letters, reports, minutes, RFIs and outline specs'], after: 'Project Map' });
-    Sx.addNav({ cat: 'projects', col: 'Projects', item: ['Specifications', { tab: 'firm', hash: '#portal/firm?pane=specs' }, 'Project manuals in DrawUp Specs'], after: 'Documents' }); };
-  addNav();
 })();
