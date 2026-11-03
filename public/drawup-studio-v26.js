@@ -53,7 +53,8 @@
     clip: '<path d="M8 12.5 14.5 6a3 3 0 0 1 4.2 4.2l-7.8 7.8a5 5 0 0 1-7-7L11 3.9"/>',
     msg: '<path d="M4 5.5h16v11H9l-5 4z"/>',
     play: '<path d="M8 5.5v13l10-6.5z"/>',
-    layers: '<path d="m12 4 8.5 4.5L12 13 3.5 8.5z"/><path d="m3.5 12.5 8.5 4.5 8.5-4.5M3.5 16.5 12 21l8.5-4.5"/>'
+    layers: '<path d="m12 4 8.5 4.5L12 13 3.5 8.5z"/><path d="m3.5 12.5 8.5 4.5 8.5-4.5M3.5 16.5 12 21l8.5-4.5"/>',
+    portfolio: '<rect x="3" y="5.5" width="18" height="13" rx="1.5"/><path d="M12 5.5v13M5.8 9h3.6M5.8 11.8h3.6M5.8 14.6h2.4"/><path d="M14.4 9h4.2v5.6h-4.2z"/>'
   };
   const ico = (k, cls = 'dus-ico') => `<svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true">${I[k] || ''}</svg>`;
 
@@ -176,7 +177,7 @@
       cols: [{ h: 'Detail Library', items: [['DrawUp 2D', T('details', { click: 'DrawUp 2D' })], ['DrawUp 3D', T('details', { click: 'DrawUp 3D' })], ['My 3D', T('details', { click: 'My 3D' })], ['Firm Details', T('details', { click: 'Firm' })]] },
         { h: 'Tools', small: true, items: [['Draw a detail from a picture', T('details', { scroll: 'Upload one detail' })], ['Find by sheet reference', T('details', { focus: 'input[placeholder*="A601"],input[placeholder*="sheet"]' })], ['Reviews and comments', T('details', { click: 'Reviews + comments' })]] }] },
     { id: 'discover', label: 'Discover', go: T('discover'), cols: [
-      { h: 'Discover', items: [['Search DrawUp', T('search')], ['Projects', T('discover', { sub: 'projects' })], ['Firms', T('discover', { sub: 'firms' })], ['People', T('discover', { sub: 'people' })], ['Universities', T('discover', { sub: 'universities' })]] },
+      { h: 'Discover', items: [['Search DrawUp', T('search')], ['Projects', T('discover', { sub: 'projects' })], ['Firms', T('discover', { sub: 'firms' })], ['People', T('discover', { sub: 'people' })], ['Universities', T('discover', { sub: 'universities' })], ['Portfolio Review', T('portfolio'), 'Scores and fixes for your portfolio PDF']] },
       { h: 'Resources', small: true, items: [['Codes', { embed: 'resources', sub: 'codes' }], ['AIA & NOMA', { embed: 'resources', sub: 'aia' }], ['Education', { embed: 'resources', sub: 'education' }], ['International', { embed: 'resources', sub: 'international' }]] }] },
     { id: 'connect', label: 'Connect', go: T('connect'), cols: [
       { h: 'Connect', items: [['Messages', T('connect', { click: 'Messages' })], ['Group Chats', T('connect', { click: 'Group chats' })], ['Firm Chats', T('connect', { click: 'Firm chats' })], ['Timeline', T('connect', { click: 'Timeline' })]] },
@@ -185,7 +186,7 @@
       { h: 'Firm', items: [['Firm Workspace', T('firm')], ['Firm Playbook', T('firm', { hash: '#portal/firm?pane=playbook' }), 'Firm admins'], ['Team Management', T('team')], ['Shared Resources', T('firm', { hash: '#portal/firm?pane=library' })]] },
       { h: 'More', small: true, items: [['GM Presentation', T('firm', { hash: '#portal/firm?pane=present' }), 'Firm admins'], ['Firm Details library', T('details', { click: 'Firm' })], ['Locations & studios', T('firm', { hash: '#portal/firm?pane=units' }), 'Firm admins']] }] }
   ];
-  const TAB_SECTION = { dashboard: 'dashboard', projects: 'projects', 'ai-team': 'ai-team', 'arch-coach': 'ai-team', draw: 'draw', check: 'check', swap: 'swap', details: 'details', discover: 'discover', search: 'discover', connect: 'connect', firm: 'firm', team: 'firm' };
+  const TAB_SECTION = { dashboard: 'dashboard', projects: 'projects', 'ai-team': 'ai-team', 'arch-coach': 'ai-team', draw: 'draw', check: 'check', swap: 'swap', details: 'details', discover: 'discover', portfolio: 'discover', search: 'discover', connect: 'connect', firm: 'firm', team: 'firm' };
 
   const PUBLIC_NAV = [
     { id: 'discover', label: 'Discover', cols: [
@@ -517,7 +518,7 @@
   }
   const recentKey = 'du-studio-recent-v26';
   function rememberVisit(tab) { if (!tab || tab === 'dashboard') return; try { const list = JSON.parse(localStorage.getItem(recentKey) || '[]').filter(x => x.tab !== tab); list.unshift({ tab, at: Date.now(), hash: location.hash }); localStorage.setItem(recentKey, JSON.stringify(list.slice(0, 6))); } catch (_e) {} }
-  const TAB_INFO = { projects: ['Projects', 'projects'], 'ai-team': ['AI Team', 'team'], 'arch-coach': ['Arch Coach', 'spark'], draw: ['Draw', 'draw'], check: ['CheckUp', 'check'], swap: ['Swap', 'swap'], details: ['Details', 'details'], discover: ['Discover', 'discover'], search: ['Search', 'search'], connect: ['Connect', 'connect'], firm: ['Firm', 'firm'], team: ['Team', 'team'], profile: ['Profile', 'user'], account: ['Account', 'gear'] };
+  const TAB_INFO = { projects: ['Projects', 'projects'], 'ai-team': ['AI Team', 'team'], 'arch-coach': ['Arch Coach', 'spark'], draw: ['Draw', 'draw'], check: ['CheckUp', 'check'], swap: ['Swap', 'swap'], details: ['Details', 'details'], discover: ['Discover', 'discover'], portfolio: ['Portfolio Review', 'portfolio'], search: ['Search', 'search'], connect: ['Connect', 'connect'], firm: ['Firm', 'firm'], team: ['Team', 'team'], profile: ['Profile', 'user'], account: ['Account', 'gear'] };
 
   /* ------------------------------------------------------------------ Arch Coach legends (the member's approved artwork, shown as is)
    * The picture is Jaja's own Arch Coach legends image. Everything you can use on it is real HTML laid over it at the same place:
@@ -642,6 +643,7 @@
         <div class="dus-hero__project" id="dus-hero-project"></div></div></section>
       <div class="dus-sect"><div class="dus-sect__head"><h2>Your workspace</h2><button type="button" class="dus-textlink" data-dus-go='${JSON.stringify(T('projects'))}'>View all projects <span class="dus-circle">${ico('right')}</span></button></div>
         <div class="dus-cards">${CARDS.map(cd => `<button type="button" class="dus-card" data-dus-go='${esc(JSON.stringify(cd[4]))}'><span class="dus-card__art"><img src="${ART}${ART_FOR[cd[0]]}" alt="" loading="lazy" decoding="async"></span><span class="dus-card__ico">${ico(cd[3])}</span><b>${cd[1]}</b><small>${cd[2]}</small><span class="dus-card__go">${ico('right')}</span></button>`).join('')}</div>
+        <button type="button" class="dpr-dash" data-dus-go='${JSON.stringify(T('portfolio'))}' aria-label="Portfolio Review: upload your portfolio PDF for a scored review"><span class="dpr-dash__art" aria-hidden="true"><i></i><i></i><i></i></span><span class="dpr-dash__copy"><span class="dus-kicker">New for Season 1</span><b>Portfolio Review</b><small>Upload your portfolio PDF. Arch Coach scores it for an internship, school or a job and shows what to fix first.</small></span><span class="dpr-dash__go">${ico('portfolio')} Review my portfolio ${ico('right')}</span></button>
         ${legendsSection()}
         <div class="dus-grid3 dus-grid3--two">
           <section class="dus-panel" aria-label="Recent projects"><h3>Recent projects <button type="button" data-dus-go='${JSON.stringify(T('projects'))}'>All projects</button></h3><div id="dus-recent">${'<div class="dus-prow"><i class="dus-skel"></i><div><b class="dus-skel" style="width:70%;height:14px"></b><span class="dus-skel" style="width:50%;height:11px;margin-top:8px"></span></div></div>'.repeat(3)}</div></section>
@@ -655,7 +657,7 @@
     bindLegends(w);
     w.querySelector('[data-dus-new]').onclick = () => go(T('projects', { click: '#du-new-project' }));
     w.querySelector('[data-dus-heromore]').onclick = e => { e.stopPropagation(); quickMenu(e.currentTarget); };
-    const QUICK = [['spark', 'Ask the AI Team', T('ai-team', { fresh: true })], ['draw', 'Draw it up', { fn: () => window.DrawUpDrawIt?.openInCoach?.({}) }], ['check', 'Quick Check a sheet', T('check', { hash: '#portal/check?quick=1' })], ['layers', 'Draw a detail', T('details', { scroll: 'Upload one detail' })], ['swap', 'Start a swap', T('swap')], ['search', 'Search DrawUp', T('search')]];
+    const QUICK = [['spark', 'Ask the AI Team', T('ai-team', { fresh: true })], ['draw', 'Draw it up', { fn: () => window.DrawUpDrawIt?.openInCoach?.({}) }], ['check', 'Quick Check a sheet', T('check', { hash: '#portal/check?quick=1' })], ['layers', 'Draw a detail', T('details', { scroll: 'Upload one detail' })], ['swap', 'Start a swap', T('swap')], ['portfolio', 'Review my portfolio', T('portfolio')], ['search', 'Search DrawUp', T('search')]];
     w.querySelector('#dus-quick').innerHTML = QUICK.map(q => `<button type="button" class="dus-chip" data-dus-go='${esc(JSON.stringify(q[2]))}'>${ico(q[0])}${esc(q[1])}</button>`).join('');
     let recent = []; try { recent = JSON.parse(localStorage.getItem(recentKey) || '[]'); } catch (_e) {}
     const cont = recent.filter(r => TAB_INFO[r.tab]).slice(0, 4);
@@ -684,6 +686,7 @@
       <button class="dus-pop__item" role="menuitem" data-dus-go='${JSON.stringify(T('ai-team', { fresh: true }))}'>New AI Team conversation ${ico('team')}</button>
       <button class="dus-pop__item" role="menuitem" data-dus-go='${JSON.stringify({ fn: null })}' data-dus-drawit>Draw it up from a picture ${ico('draw')}</button>
       <button class="dus-pop__item" role="menuitem" data-dus-go='${JSON.stringify(T('check', { hash: '#portal/check?quick=1' }))}'>Quick Check a sheet ${ico('check')}</button>
+      <button class="dus-pop__item" role="menuitem" data-dus-go='${JSON.stringify(T('portfolio'))}'>Review my portfolio ${ico('portfolio')}</button>
       <button class="dus-pop__item" role="menuitem" data-dus-go='${JSON.stringify(T('projects', { openStarter: true }))}'>Open the starter project ${ico('projects')}</button>
       <div class="dus-pop__sep"></div><button class="dus-pop__item" role="menuitem" data-dus-prefs-open2>Studio preferences ${ico('gear')}</button></div>`);
     const m = $('#dus-qm'); m.querySelector('[data-dus-drawit]').onclick = e => { e.stopPropagation(); m.remove(); window.DrawUpDrawIt?.openInCoach?.({}); };
