@@ -1,0 +1,75 @@
+/* DrawUp Season 1: the Season 2 Details screen and the Season 1 hides (html.du-s1).
+   Hides only remove entry points to Season 2 tools from the Season 1 interface. Nothing is deleted. */
+
+/* ---------------------------------------------------------------- Season 1: Season 2 entry points */
+html.du-s1 #dus-quick .dus-chip[data-dus-go*='"tab":"details"'],
+html.du-s1 .dd22-startcard,            /* Draw › Draw a detail in 3D */
+html.du-s1 #dw22-details,              /* Draw editor › Details · 3D */
+html.du-s1 .du-dit25-single,           /* Draw it up › Draw a single detail in Details */
+html.du-s1 .du-dit24 [data-work],      /* Draw it up › work on a needed detail */
+html.du-s1 .du-dit24 [data-lib],       /* Draw it up › open the Details library */
+html.du-s1 .dus-pop__item[data-dus-go*='"tab":"details"'] { display: none !important; }
+
+/* ---------------------------------------------------------------- the Season 2 Details screen */
+.dus2 {
+  --n0: #0a1730; --n1: #0f1f3d; --n2: #16294d; --line: rgba(160, 190, 235, .22); --ink: #eef3fb; --mute: #b8c6dc;
+  --gold: #e7b766; --gold2: #f3d29a;
+  position: relative; isolation: isolate; overflow: hidden;
+  min-height: calc(100vh - 72px); margin: 0; border-radius: 0;
+  background: radial-gradient(1200px 700px at 50% 30%, #1a2f57 0%, var(--n1) 55%, var(--n0) 100%);
+  color: var(--ink); font-family: Inter, system-ui, sans-serif;
+}
+/* full width under the top bar: the workspace's max-width and padding step aside for this screen */
+html.dus #du-portal #du-workspace-content:has(> .dus2) { max-width: none; padding: 0; }
+.dus2-under { position: absolute; inset: 0; display: grid; grid-template-columns: 250px 1fr; pointer-events: none; user-select: none; }
+.dus2-side { padding: 40px 18px; border-right: 1px solid var(--line); background: rgba(8, 18, 38, .55); }
+.dus2-side h2, html.dus #du-workspace-content .dus2 .dus2-side h2 { margin: 0 0 20px 10px; font: 600 22px/1.2 'Inter Tight', Inter, sans-serif; color: var(--ink) !important; }
+.dus2-side ul { list-style: none; margin: 0; padding: 0; }
+.dus2-side li { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 10px; font-size: 15px; color: #d6e0ef; }
+.dus2-side li.on { background: #1d3a6b; color: #fff; }
+.dus2-side svg { width: 20px; height: 20px; flex: 0 0 auto; opacity: .9; }
+.dus2-side hr { border: 0; border-top: 1px solid var(--line); margin: 18px 6px; }
+/* the real Details workspace, blurred and inert */
+.dus2-real { position: relative; overflow: hidden; padding: 24px 32px; filter: blur(9px) saturate(.75) brightness(.55); transform: scale(1.02); opacity: .9; }
+.dus2-real * { animation: none !important; transition: none !important; }
+.dus2-glass { position: absolute; inset: 0; z-index: 1; background: linear-gradient(180deg, rgba(10, 23, 48, .35), rgba(10, 23, 48, .55)); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+.dus2-side { position: relative; z-index: 2; } /* crisp, like the reference, but inert */
+
+.dus2-msg { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; text-align: center; padding: min(14vh, 140px) 24px 72px; max-width: 920px; margin: 0 auto; }
+.dus2-tile { width: 112px; height: 112px; border-radius: 22px; display: grid; place-items: center; border: 1.5px solid rgba(255, 255, 255, .55);
+  background: linear-gradient(160deg, rgba(255, 255, 255, .14), rgba(255, 255, 255, .03)); box-shadow: 0 18px 50px rgba(0, 0, 0, .35), inset 0 1px 0 rgba(255, 255, 255, .25); }
+.dus2-tile svg { width: 64px; height: 64px; color: #fff; stroke-width: 1.4; }
+.dus2-msg h1, html.dus #du-workspace-content .dus2 .dus2-msg h1 { margin: 22px 0 6px; font: 600 clamp(44px, 6vw, 64px)/1 'Inter Tight', Inter, sans-serif; letter-spacing: -.01em; color: #fff !important; }
+.dus2-kicker, html.dus #du-workspace-content .dus2 .dus2-kicker { display: flex; align-items: center; gap: 18px; margin: 10px 0 18px; font: 700 clamp(18px, 2.4vw, 28px)/1 Inter, sans-serif; letter-spacing: .22em; color: var(--gold) !important;
+  text-shadow: 0 0 24px rgba(231, 183, 102, .35); }
+.dus2-kicker span { width: 70px; height: 2px; background: linear-gradient(90deg, transparent, var(--gold)); }
+.dus2-kicker span:last-child { background: linear-gradient(90deg, var(--gold), transparent); }
+.dus2-lead { max-width: 640px; margin: 0 0 28px; font-size: clamp(16px, 1.6vw, 20px); line-height: 1.5; color: var(--ink); }
+.dus2-tools { list-style: none; margin: 0 0 34px; padding: 6px; display: flex; flex-wrap: wrap; justify-content: center; border: 1px solid rgba(255, 255, 255, .35); border-radius: 18px; background: rgba(255, 255, 255, .05); }
+.dus2-tools li { display: flex; align-items: center; gap: 10px; padding: 12px 22px; font-size: 16px; color: #eef3fb; }
+.dus2-tools li + li { border-left: 1px solid rgba(255, 255, 255, .22); }
+.dus2-tools svg { width: 26px; height: 26px; }
+.dus2-pill, html.dus #du-workspace-content .dus2 .dus2-pill { margin: 0 0 14px; padding: 10px 44px; border: 1.5px solid var(--gold); border-radius: 999px; font: 700 20px/1 Inter, sans-serif; letter-spacing: .24em; color: var(--gold2) !important;
+  background: rgba(231, 183, 102, .07); box-shadow: 0 0 26px rgba(231, 183, 102, .25), inset 0 0 14px rgba(231, 183, 102, .12); }
+.dus2-sub { margin: 0; font-size: 13px; letter-spacing: .26em; color: var(--mute); }
+.dus2-kept { margin: 22px 0 0; font-size: 14px; color: #cfe0ff; }
+.dus2-acts { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 26px; }
+.dus2-btn { appearance: none; border: 1px solid #fff; background: #fff; color: var(--n1); font: 600 14px/1 Inter, sans-serif; padding: 12px 20px; border-radius: 999px; cursor: pointer; }
+.dus2-btn.ghost { background: transparent; color: #fff; border-color: rgba(255, 255, 255, .45); }
+.dus2-btn:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+.dus2-banner { margin: 0 0 16px; padding: 10px 14px; border-radius: 12px; background: #fff4dc; color: #5b3d00; border: 1px solid #e7b766; font-size: 14px; }
+.dus2-banner button { margin-left: 8px; border: 0; background: #0f1f3d; color: #fff; padding: 6px 12px; border-radius: 999px; cursor: pointer; }
+
+@media (max-width: 760px) {
+  .dus2 { min-height: calc(100vh - 60px); }
+  .dus2-under { grid-template-columns: 1fr; }
+  .dus2-side { display: none; }
+  .dus2-msg { padding-top: 56px; }
+  .dus2-tile { width: 88px; height: 88px; } .dus2-tile svg { width: 50px; height: 50px; }
+  .dus2-kicker, html.dus #du-workspace-content .dus2 .dus2-kicker { gap: 10px; letter-spacing: .16em; } .dus2-kicker span { width: 28px; }
+  .dus2-tools { flex-direction: column; width: 100%; max-width: 340px; }
+  .dus2-tools li + li { border-left: 0; border-top: 1px solid rgba(255, 255, 255, .18); }
+  .dus2-pill, html.dus #du-workspace-content .dus2 .dus2-pill { font-size: 17px; padding: 9px 32px; }
+  .dus2-sub { font-size: 11px; letter-spacing: .16em; line-height: 1.6; }
+}
+@media (prefers-reduced-motion: reduce) { .dus2-real { transform: none; } }

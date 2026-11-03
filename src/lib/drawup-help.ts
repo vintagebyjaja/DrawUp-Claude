@@ -29,7 +29,7 @@ export type Feature = {
 
 /* ------------------------------------------------------------------ the registry */
 const P = (tab: string, extra: Partial<Go> = {}): Go => ({ tab, ...extra });
-export const REGISTRY_VERSION = '29.0';
+export const REGISTRY_VERSION = '30.0';
 export const FEATURES: Feature[] = [
   // ---- home
   { id: 'dashboard', name: 'Dashboard', desc: 'Your home in the portal: recent projects, activity, quick actions and the Arch Coach ask bar.', path: ['Dashboard'], go: P('dashboard'), access: 'member', status: 'live', season: 1,
@@ -91,7 +91,7 @@ export const FEATURES: Feature[] = [
     aliases: ['drawitup', 'drawing generation', 'generate drawing', 'generate drawings', 'generate a drawing set', 'picture to drawing', 'photo to plan', 'image to plan', 'sketch to drawing', 'turn picture into drawing', 'make drawings from picture'] },
   { id: 'markup', name: 'Mark Up a File', desc: 'Open a PDF or image and mark it up in DrawUp Draw.', path: ['Draw', 'Mark Up a File'], go: P('draw', { click: 'Markup a file' }), access: 'member', status: 'live', season: 1,
     aliases: ['markup', 'mark up', 'mark up file', 'markup pdf', 'redline', 'redline pdf', 'annotate pdf', 'mark up drawing'] },
-  { id: 'draw-3d-detail', name: 'Draw a Detail in 3D', desc: 'Draw a construction detail as a 3D assembly.', path: ['Draw', 'Draw a Detail in 3D'], go: P('draw', { click: 'New detail' }), access: 'member', status: 'live', season: 1,
+  { id: 'draw-3d-detail', name: 'Draw a Detail in 3D', desc: 'Draw a construction detail as a 3D assembly.', path: ['Draw', 'Draw a Detail in 3D'], go: P('draw', { click: 'New detail' }), access: 'member', status: 'season2', season: 2, note: 'Details tools are built and kept for Season 2 (design development and construction documentation). In Season 1 the Details tab shows the Season 2 screen; your saved details are kept.',
     aliases: ['3d detail', 'draw 3d detail', 'detail in 3d', 'new 3d detail', 'my 3d details'] },
 
   // ---- CheckUp
@@ -115,16 +115,16 @@ export const FEATURES: Feature[] = [
     aliases: ['swap', 'drawup swap', 'material swap', 'change materials', 'swap materials', 'photoreal render', 'render', 'rendering', 'interior visualization', 'saved visualizations', 'new swap', 'lets play'] },
 
   // ---- Details
-  { id: 'details', name: 'DrawUp Details', desc: 'The detail library: DrawUp 2D, DrawUp 3D, your 3D details and your firm\'s details.', path: ['Details'], go: P('details'), publicGo: { page: 'details' }, access: 'member', status: 'live', season: 1, brand: true,
+  { id: 'details', name: 'DrawUp Details', desc: 'The detail library: DrawUp 2D, DrawUp 3D, your 3D details and your firm\'s details.', path: ['Details'], go: P('details'), publicGo: { page: 'details' }, access: 'member', status: 'season2', season: 2, note: 'Details tools are built and kept for Season 2 (design development and construction documentation). In Season 1 the Details tab shows the Season 2 screen; your saved details are kept.', brand: true,
     steps: ['Open Details in the top menu.', 'Switch between DrawUp 2D, DrawUp 3D, My 3D and Firm.'],
     aliases: ['details', 'detail library', 'details library', 'drawup 2d', 'drawup 3d', 'construction details', 'standard details', 'typical details', 'library'] },
-  { id: 'draw-a-detail', name: 'Draw a detail from a picture', desc: 'Upload one detail and get the flaws, the fixes and a clean drawing.', path: ['Details', 'Draw a detail from a picture'], go: P('details', { scroll: 'Upload one detail' }), access: 'member', status: 'live', season: 1, credits: '15 credits',
+  { id: 'draw-a-detail', name: 'Draw a detail from a picture', desc: 'Upload one detail and get the flaws, the fixes and a clean drawing.', path: ['Details', 'Draw a detail from a picture'], go: P('details', { scroll: 'Upload one detail' }), access: 'member', status: 'season2', season: 2, note: 'Details tools are built and kept for Season 2 (design development and construction documentation). In Season 1 the Details tab shows the Season 2 screen; your saved details are kept.', credits: '15 credits',
     aliases: ['draw detail', 'draw a detail', 'upload detail', 'upload a detail', 'fix my detail', 'detail from picture', 'redraw detail'] },
-  { id: 'detail-lookup', name: 'Find a detail by sheet reference', desc: 'Type a reference like D4-A601 to open that detail.', path: ['Details', 'Find by sheet reference'], go: P('details', { focus: 'input[placeholder*="A601"],input[placeholder*="sheet"]' }), access: 'member', status: 'live', season: 1,
+  { id: 'detail-lookup', name: 'Find a detail by sheet reference', desc: 'Type a reference like D4-A601 to open that detail.', path: ['Details', 'Find by sheet reference'], go: P('details', { focus: 'input[placeholder*="A601"],input[placeholder*="sheet"]' }), access: 'member', status: 'season2', season: 2, note: 'Details tools are built and kept for Season 2 (design development and construction documentation). In Season 1 the Details tab shows the Season 2 screen; your saved details are kept.',
     aliases: ['sheet reference', 'find detail by sheet', 'detail reference', 'detail number', 'find a detail'] },
-  { id: 'firm-details', name: 'Firm Details library', desc: 'Details shared inside your firm.', path: ['Details', 'Firm Details'], go: P('details', { click: 'Firm' }), access: 'member', status: 'live', season: 1,
+  { id: 'firm-details', name: 'Firm Details library', desc: 'Details shared inside your firm.', path: ['Details', 'Firm Details'], go: P('details', { click: 'Firm' }), access: 'member', status: 'season2', season: 2, note: 'Details tools are built and kept for Season 2 (design development and construction documentation). In Season 1 the Details tab shows the Season 2 screen; your saved details are kept.',
     aliases: ['firm details', 'firm detail library', 'office details', 'our details'] },
-  { id: 'vdi', name: 'Visual Detail Intelligence', desc: 'Find the Flaws, Understand the Fix, DrawUp Ready: a full detail review with code, references and a corrected 2D + 3D detail.', path: ['Details', 'Review a detail'], go: { fn: 'vdi' }, access: 'member', status: 'live', season: 1, brand: true, credits: '20 credits a review',
+  { id: 'vdi', name: 'Visual Detail Intelligence', desc: 'Find the Flaws, Understand the Fix, DrawUp Ready: a full detail review with code, references and a corrected 2D + 3D detail.', path: ['Details', 'Review a detail'], go: { fn: 'vdi' }, access: 'member', status: 'season2', season: 2, note: 'Details tools are built and kept for Season 2 (design development and construction documentation). In Season 1 the Details tab shows the Season 2 screen; your saved details are kept.', brand: true, credits: '20 credits a review',
     aliases: ['visual detail intelligence', 'find the flaws', 'understand the fix', 'detail review', 'review my detail', 'review a detail', 'flaws in my detail'] },
 
   // ---- Discover
@@ -189,7 +189,7 @@ export const FEATURES: Feature[] = [
   // ---- more menu destinations (each one is an item in the DrawUp menu)
   { id: 'example-plan', name: 'The example plan', desc: 'Open the example floor plan in DrawUp Draw to try the tools.', path: ['Draw', 'The example plan'], go: P('draw', { click: 'Open example plan' }), access: 'member', status: 'live', season: 1,
     aliases: ['example plan', 'sample plan', 'demo plan', 'try draw'] },
-  { id: 'my-3d-details', name: 'My 3D details', desc: 'The 3D details you drew.', path: ['Draw', 'My 3D details'], go: P('draw', { click: 'My details' }), access: 'member', status: 'live', season: 1,
+  { id: 'my-3d-details', name: 'My 3D details', desc: 'The 3D details you drew.', path: ['Draw', 'My 3D details'], go: P('draw', { click: 'My details' }), access: 'member', status: 'season2', season: 2, note: 'Details tools are built and kept for Season 2 (design development and construction documentation). In Season 1 the Details tab shows the Season 2 screen; your saved details are kept.',
     aliases: ['my 3d details', 'my details', 'my detail drawings', 'saved 3d details'] },
   { id: 'drawing-review', name: 'Drawing set check', desc: 'Start a CheckUp of a whole drawing set.', path: ['CheckUp', 'Drawing Review'], go: P('check', { click: 'Drawing set check', scroll: 'New check' }), access: 'member', status: 'live', season: 1,
     aliases: ['drawing set check', 'check drawing set', 'check my set', 'set review', 'qa qc', 'qaqc'] },
@@ -199,9 +199,9 @@ export const FEATURES: Feature[] = [
     aliases: ['photoreal render', 'photorealistic render', 'make a render', 'render my model', 'realistic render'] },
   { id: 'material-changes', name: 'Material Changes', desc: 'Swap materials on a real picture.', path: ['Swap', 'Material Changes'], go: P('swap', { click: 'Materials' }), access: 'member', status: 'live', season: 1,
     aliases: ['material changes', 'try materials', 'change finishes', 'swap finishes', 'change flooring in picture'] },
-  { id: 'my-3d', name: 'My 3D (Details)', desc: 'Your own 3D details in the Details library.', path: ['Details', 'My 3D'], go: P('details', { click: 'My 3D' }), access: 'member', status: 'live', season: 1,
+  { id: 'my-3d', name: 'My 3D (Details)', desc: 'Your own 3D details in the Details library.', path: ['Details', 'My 3D'], go: P('details', { click: 'My 3D' }), access: 'member', status: 'season2', season: 2, note: 'Details tools are built and kept for Season 2 (design development and construction documentation). In Season 1 the Details tab shows the Season 2 screen; your saved details are kept.',
     aliases: ['my 3d', 'my uploaded details'] },
-  { id: 'detail-reviews', name: 'Detail reviews and comments', desc: 'Comments and architect verifications on details.', path: ['Details', 'Reviews and comments'], go: P('details', { click: 'Reviews + comments' }), access: 'member', status: 'live', season: 1,
+  { id: 'detail-reviews', name: 'Detail reviews and comments', desc: 'Comments and architect verifications on details.', path: ['Details', 'Reviews and comments'], go: P('details', { click: 'Reviews + comments' }), access: 'member', status: 'season2', season: 2, note: 'Details tools are built and kept for Season 2 (design development and construction documentation). In Season 1 the Details tab shows the Season 2 screen; your saved details are kept.',
     aliases: ['detail reviews', 'detail comments', 'verify detail', 'detail verification', 'reviews and comments'] },
   { id: 'timeline', name: 'Timeline', desc: 'The Connect timeline: posts from people and firms.', path: ['Connect', 'Timeline'], go: P('connect', { click: 'Timeline' }), access: 'member', status: 'live', season: 1,
     aliases: ['timeline', 'news feed', 'make a post', 'post something', 'share a post'] },

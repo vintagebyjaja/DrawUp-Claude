@@ -1,0 +1,218 @@
+[
+{
+"q": "Where do I review my portfolio?",
+"want": "portfolio-review"
+},
+{
+"q": "How do I upload a drawing?",
+"want": "task-upload"
+},
+{
+"q": "Where is my project?",
+"want": "projects"
+},
+{
+"q": "How do I access DrawUp Details?",
+"want": "details"
+},
+{
+"q": "How do I change my subscription?",
+"want": "subscription"
+},
+{
+"q": "Where can I find my previous CheckUp reports?",
+"want": "checkup-reports"
+},
+{
+"q": "where's the locker room",
+"want": "locker-room"
+},
+{
+"q": "how can i talk to 6th man",
+"want": "sixth-man"
+},
+{
+"q": "take me to my account settings",
+"want": "account"
+},
+{
+"q": "How many credits do I have left?",
+"want": "account"
+},
+{
+"q": "how do i start a new project",
+"want": "new-project"
+},
+{
+"q": "I can't find my drawing sets",
+"want": "drawing-sets"
+},
+{
+"q": "where do I edit my profile picture",
+"want": "profile"
+},
+{
+"q": "how do I mark up a PDF",
+"want": "markup"
+},
+{
+"q": "Is there a way to turn a photo into drawings?",
+"want": "draw-it-up"
+},
+{
+"q": "where are my old conversations",
+"want": "ai-team"
+},
+{
+"q": "how do I delete a chat",
+"want": "delete-conversation"
+},
+{
+"q": "open checkup",
+"want": "checkup"
+},
+{
+"q": "how do I run an ADA check on my plans",
+"want": "checkup-ada"
+},
+{
+"q": "where do I message someone",
+"want": "messages"
+},
+{
+"q": "how do I find a firm",
+"want": "discover-firms"
+},
+{
+"q": "where can I pick my legend",
+"want": "legends"
+},
+{
+"q": "how do I customize my arch coach",
+"want": "coach-creator"
+},
+{
+"q": "where are the learning videos",
+"want": "watch-learn"
+},
+{
+"q": "how do i upgrade to the student plan",
+"want": "subscription"
+},
+{
+"q": "how do I sign out",
+"want": "account"
+},
+{
+"q": "what is CheckUp?",
+"want": "checkup"
+},
+{
+"q": "portfolio review",
+"want": "portfolio-review"
+},
+{
+"q": "where do I invite my coworkers",
+"want": "team-management"
+},
+{
+"q": "how do I swap materials on a photo",
+"want": "swap"
+},
+{
+"q": "where can I see my XP and badges",
+"want": "learning"
+},
+{
+"q": "how do I draw a detail from a picture",
+"want": "draw-a-detail"
+},
+{
+"q": "How do I make a floor plan?",
+"want": "space-planning"
+},
+{
+"q": "where is the quick check",
+"want": "quick-check"
+},
+{
+"q": "how do I get my drawings reviewed",
+"want": "task-review-drawings"
+},
+{
+"q": "where is it",
+"want": "clarify"
+},
+{
+"q": "Coach, where do I find the firm playbook?",
+"want": "firm-playbook"
+},
+{
+"q": "Coach, where do I run an ADA check on my plans?",
+"want": "checkup-ada"
+},
+{
+"q": "where is the locker room, 6th Man?",
+"want": "locker-room"
+},
+{
+"q": "Teammate, how do I find my drawing sets?",
+"want": "drawing-sets"
+},
+{
+"q": "6th Man, check in.",
+"want": "AI"
+},
+{
+"q": "where's the HQ admin panel",
+"want": "hq"
+},
+{
+"q": "How do I detail a parapet with metal coping at brick veneer?",
+"want": "AI"
+},
+{
+"q": "What is the minimum egress width for a corridor?",
+"want": "AI"
+},
+{
+"q": "What is a sill pan flashing?",
+"want": "AI"
+},
+{
+"q": "how do i calculate occupant load for an assembly space",
+"want": "AI"
+},
+{
+"q": "can you help me brainstorm a lobby layout",
+"want": "AI"
+},
+{
+"q": "What would you do with this roof?",
+"want": "AI"
+},
+{
+"q": "how do I size a header over a 6 foot opening",
+"want": "AI"
+},
+{
+"q": "where should the restroom go in my plan?",
+"want": "AI"
+},
+{
+"q": "6th Man, draw up a play",
+"want": "AI"
+},
+{
+"q": "show me what a window detail looks like",
+"want": "AI"
+},
+{
+"q": "How do I make my portfolio stand out for grad school?",
+"want": "AI"
+},
+{
+"q": "what is the best material for a flat roof",
+"want": "AI"
+}
+]

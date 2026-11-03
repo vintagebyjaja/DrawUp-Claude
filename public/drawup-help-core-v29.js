@@ -35,7 +35,7 @@ var DrawUpHelpCore = (() => {
     withOverrides: () => withOverrides
   });
   var P = (tab, extra = {}) => ({ tab, ...extra });
-  var REGISTRY_VERSION = "29.0";
+  var REGISTRY_VERSION = "30.0";
   var FEATURES = [
     // ---- home
     {
@@ -324,8 +324,9 @@ var DrawUpHelpCore = (() => {
       path: ["Draw", "Draw a Detail in 3D"],
       go: P("draw", { click: "New detail" }),
       access: "member",
-      status: "live",
-      season: 1,
+      status: "season2",
+      season: 2,
+      note: "Details tools are built and kept for Season 2 (design development and construction documentation). In Season 1 the Details tab shows the Season 2 screen; your saved details are kept.",
       aliases: ["3d detail", "draw 3d detail", "detail in 3d", "new 3d detail", "my 3d details"]
     },
     // ---- CheckUp
@@ -434,8 +435,9 @@ var DrawUpHelpCore = (() => {
       go: P("details"),
       publicGo: { page: "details" },
       access: "member",
-      status: "live",
-      season: 1,
+      status: "season2",
+      season: 2,
+      note: "Details tools are built and kept for Season 2 (design development and construction documentation). In Season 1 the Details tab shows the Season 2 screen; your saved details are kept.",
       brand: true,
       steps: ["Open Details in the top menu.", "Switch between DrawUp 2D, DrawUp 3D, My 3D and Firm."],
       aliases: ["details", "detail library", "details library", "drawup 2d", "drawup 3d", "construction details", "standard details", "typical details", "library"]
@@ -447,8 +449,9 @@ var DrawUpHelpCore = (() => {
       path: ["Details", "Draw a detail from a picture"],
       go: P("details", { scroll: "Upload one detail" }),
       access: "member",
-      status: "live",
-      season: 1,
+      status: "season2",
+      season: 2,
+      note: "Details tools are built and kept for Season 2 (design development and construction documentation). In Season 1 the Details tab shows the Season 2 screen; your saved details are kept.",
       credits: "15 credits",
       aliases: ["draw detail", "draw a detail", "upload detail", "upload a detail", "fix my detail", "detail from picture", "redraw detail"]
     },
@@ -459,8 +462,9 @@ var DrawUpHelpCore = (() => {
       path: ["Details", "Find by sheet reference"],
       go: P("details", { focus: 'input[placeholder*="A601"],input[placeholder*="sheet"]' }),
       access: "member",
-      status: "live",
-      season: 1,
+      status: "season2",
+      season: 2,
+      note: "Details tools are built and kept for Season 2 (design development and construction documentation). In Season 1 the Details tab shows the Season 2 screen; your saved details are kept.",
       aliases: ["sheet reference", "find detail by sheet", "detail reference", "detail number", "find a detail"]
     },
     {
@@ -470,8 +474,9 @@ var DrawUpHelpCore = (() => {
       path: ["Details", "Firm Details"],
       go: P("details", { click: "Firm" }),
       access: "member",
-      status: "live",
-      season: 1,
+      status: "season2",
+      season: 2,
+      note: "Details tools are built and kept for Season 2 (design development and construction documentation). In Season 1 the Details tab shows the Season 2 screen; your saved details are kept.",
       aliases: ["firm details", "firm detail library", "office details", "our details"]
     },
     {
@@ -481,8 +486,9 @@ var DrawUpHelpCore = (() => {
       path: ["Details", "Review a detail"],
       go: { fn: "vdi" },
       access: "member",
-      status: "live",
-      season: 1,
+      status: "season2",
+      season: 2,
+      note: "Details tools are built and kept for Season 2 (design development and construction documentation). In Season 1 the Details tab shows the Season 2 screen; your saved details are kept.",
       brand: true,
       credits: "20 credits a review",
       aliases: ["visual detail intelligence", "find the flaws", "understand the fix", "detail review", "review my detail", "review a detail", "flaws in my detail"]
@@ -792,8 +798,9 @@ var DrawUpHelpCore = (() => {
       path: ["Draw", "My 3D details"],
       go: P("draw", { click: "My details" }),
       access: "member",
-      status: "live",
-      season: 1,
+      status: "season2",
+      season: 2,
+      note: "Details tools are built and kept for Season 2 (design development and construction documentation). In Season 1 the Details tab shows the Season 2 screen; your saved details are kept.",
       aliases: ["my 3d details", "my details", "my detail drawings", "saved 3d details"]
     },
     {
@@ -848,8 +855,9 @@ var DrawUpHelpCore = (() => {
       path: ["Details", "My 3D"],
       go: P("details", { click: "My 3D" }),
       access: "member",
-      status: "live",
-      season: 1,
+      status: "season2",
+      season: 2,
+      note: "Details tools are built and kept for Season 2 (design development and construction documentation). In Season 1 the Details tab shows the Season 2 screen; your saved details are kept.",
       aliases: ["my 3d", "my uploaded details"]
     },
     {
@@ -859,8 +867,9 @@ var DrawUpHelpCore = (() => {
       path: ["Details", "Reviews and comments"],
       go: P("details", { click: "Reviews + comments" }),
       access: "member",
-      status: "live",
-      season: 1,
+      status: "season2",
+      season: 2,
+      note: "Details tools are built and kept for Season 2 (design development and construction documentation). In Season 1 the Details tab shows the Season 2 screen; your saved details are kept.",
       aliases: ["detail reviews", "detail comments", "verify detail", "detail verification", "reviews and comments"]
     },
     {
