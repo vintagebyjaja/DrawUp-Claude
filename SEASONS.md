@@ -69,3 +69,25 @@ Season 1 features are listed in `src/lib/drawup-season.ts` by phase, from pre-de
 - the `?season2=1` development switch
 
 `tests/season1/test-help-unit.js` re-runs the 54 saved Help questions.
+
+## Season 1 menus (v30)
+
+`S1_COLS` in `public/drawup-season-v30.js` is the one place the Season 1 menus are written:
+
+- **Projects** — Overview, Project Map, Project Information, Documents, Specifications, Project Management
+- **CheckUp** — Code Compliance, ADA Accessibility, Life Safety, Drawing Review, Portfolio Review,
+  Specifications Review, DD Readiness. **Results** — Findings and Reports, Design Narrative Review,
+  Narrative vs. Plans, Review History. Quick Check stays the menu's feature card.
+- **Firm** — Firm Profile, Letterheads, Document Templates, Presentation Templates, Branding
+
+Anything a menu had before and that these lists do not name is kept in a "More" column, so no screen
+loses its way in, and Recent projects stays. Only the Season 2 Details entries are hidden. A screen that
+does not exist yet is not in the table: it registers itself with `DrawUpSeason.addNav` when it lands.
+
+## The rest of v30
+
+- **Document Studio** (`drawup-docstudio-v30.js`) opens the DrawUp Specs editor on the member's own store
+  (`project_documents`, SQL 0077) instead of the firm's. SQL run order and limitations:
+  `V30-FILES-AND-RUN-ORDER.md`.
+- **CheckUp** (`drawup-checkup-v30.js`) adds Specifications Review, DD Readiness and Review History by
+  wrapping `DrawUpCheckV22.route`; the drawing, narrative and portfolio reviews are untouched.

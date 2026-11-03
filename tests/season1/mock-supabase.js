@@ -92,7 +92,7 @@
     }
     then(res, rej) { return Promise.resolve().then(() => this.run()).then(res, rej); }
   }
-  const RPC = { is_drawup_admin: !!MOCK.admin, drawup_my_firms: [], detail_review_summary: [], connect_my_chats: [], drawup_search: { firms: [], projects: [] }, vendor_slot_board: [], vendor_recommendations: [] };
+  const RPC = Object.assign({ is_drawup_admin: !!MOCK.admin, drawup_my_firms: [], detail_review_summary: [], connect_my_chats: [], drawup_search: { firms: [], projects: [] }, vendor_slot_board: [], vendor_recommendations: [] }, MOCK.rpc || {});
   const listeners = [];
   const client = {
     auth: {
