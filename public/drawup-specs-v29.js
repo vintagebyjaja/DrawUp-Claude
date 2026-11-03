@@ -279,6 +279,9 @@ function pullInto(S, doc, b, br) {
 function openEditor(S, doc) {
   if (!doc) return renderHub(S);
   setHashParam('doc', doc.id);
+  // v30: a CheckUp finding opens the section it came from
+  let want = null; try { want = sessionStorage.getItem('du-specs-section'); if (want) sessionStorage.removeItem('du-specs-section'); } catch (_e) { /* private mode */ }
+  if (want && doc.kind === 'spec' && doc.sections.some(s => s.id === want)) S.secId = want;
   S.doc = doc; S.side = S.side || null; S.showChanges = false; S.secId = doc.kind === 'spec' ? ((doc.sections.find(s => s.id === S.secId) || sortedSecs(doc)[0] || {}).id || null) : null; S.part = S.part || 2; S.dirty = false; S.loadedAt = doc.updated_at;
   const b = S.body, p = project(S, doc.project_thread_id), t = TYPE[doc.doc_type];
   b.innerHTML = `<div class="sp-wrap sp-ed ${doc.kind === 'spec' ? 'spec' : 'letter'}" data-sp="editor">

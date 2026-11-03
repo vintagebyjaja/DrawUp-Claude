@@ -1,0 +1,38 @@
+/* DrawUp Season 1 · CheckUp: Specifications Review, DD Readiness and Review History.
+   Only what these screens add; the Check tab's own styling (du-glass, du-findings, du-sev-*) is reused. */
+.cu-pick { padding: 18px 20px !important; }
+.cu-row2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 16px; }
+.cu-row2 label { display: grid; gap: 6px; }
+.cu-row2 label span { font: 600 12px/1 Inter, sans-serif; letter-spacing: .08em; text-transform: uppercase; color: #5b6b83; }
+.cu-in, html.dus #du-workspace-content .cu-in { width: 100%; box-sizing: border-box; border: 1px solid #d5deea !important; border-radius: 10px !important; padding: 10px 12px !important; font: 400 15px/1.3 Inter, sans-serif !important; color: #13233d !important; background: #fff !important; min-height: 0 !important; }
+.cu-note { font-size: 13px; line-height: 1.5; color: #5b6b83; margin: 12px 0 0; }
+.cu-bad { color: #a12a2a; font-weight: 600; font-size: 14px; }
+.cu-ok { font-size: 14px; color: #1d6b3a; }
+.cu-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 14px; }
+.cu-st, .cu-st2 { font-size: 13px; color: #5b6b83; }
+.cu-head2 { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.cu-head2 .cu-bar { margin-top: 0; }
+.cu-src { font-size: 12.5px; line-height: 1.5; color: #5b6b83; margin: 6px 0 0; }
+.cu-src i { font-style: normal; }
+.cu-open { margin-top: 10px; }
+.cu-prev .du-row { cursor: pointer; }
+.cu-score { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px; }
+.cu-score strong { display: block; font: 700 46px/1 Inter, sans-serif; color: #13233d; }
+.cu-score strong small { font-size: 18px; font-weight: 600; color: #5b6b83; }
+.cu-score p { max-width: 52ch; margin: 6px 0 0; font-size: 13px; }
+.cu-list { list-style: none; margin: 14px 0 0; padding: 0; }
+.cu-list li { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-bottom: 1px solid #edf1f6; }
+.cu-list li > div { flex: 1; display: grid; gap: 3px; }
+.cu-list b { font-size: 15.5px; color: #13233d; }
+.cu-list small { font-size: 13.5px; color: #5b6b83; }
+.cu-list em { font-style: normal; font-size: 12.5px; color: #2f6fb3; }
+.cu-dot { width: 11px; height: 11px; border-radius: 99px; margin-top: 6px; flex: 0 0 auto; background: #cdd8e6; }
+.cu-missing .cu-dot { background: #c0392b; }
+.cu-partial .cu-dot { background: #e7a13a; }
+.cu-done .cu-dot { background: #1d6b3a; }
+.cu-hist .du-row { cursor: pointer; }
+.cu-hist .du-status-pill { margin-left: 6px; }
+@media (max-width: 760px) {
+  .cu-row2 { grid-template-columns: 1fr; }
+  .cu-score strong { font-size: 38px; }
+}

@@ -27,10 +27,10 @@ const COLS = p => p.evaluate(() => {
 
   // ---------------------------------------------------------------- CheckUp and Results
   const ck = N.check.cols;
-  C.ok(ck[0].h === 'CheckUp' && ck[0].items.map(i => i[0]).join(' | ') === 'Code Compliance | ADA Accessibility | Life Safety | Drawing Review | Portfolio Review',
-    'CheckUp: Code Compliance, ADA, Life Safety, Drawing Review, Portfolio Review', ck[0].items.map(i => i[0]).join(' | '));
-  C.ok(ck[1].h === 'Results' && ck[1].items.map(i => i[0]).join(' | ') === 'Findings and Reports | Design Narrative Review | Narrative vs. Plans',
-    'Results: Findings and Reports, Design Narrative Review, Narrative vs. Plans', ck[1].items.map(i => i[0]).join(' | '));
+  C.ok(ck[0].h === 'CheckUp' && ck[0].items.map(i => i[0]).join(' | ') === 'Code Compliance | ADA Accessibility | Life Safety | Drawing Review | Portfolio Review | Specifications Review | DD Readiness',
+    'CheckUp: Code Compliance, ADA, Life Safety, Drawing Review, Portfolio Review, Specifications Review, DD Readiness', ck[0].items.map(i => i[0]).join(' | '));
+  C.ok(ck[1].h === 'Results' && ck[1].items.map(i => i[0]).join(' | ') === 'Findings and Reports | Design Narrative Review | Narrative vs. Plans | Review History',
+    'Results: Findings and Reports, Design Narrative Review, Narrative vs. Plans, Review History', ck[1].items.map(i => i[0]).join(' | '));
   C.ok(/Quick Check/i.test(N.check.feature || ''), 'CheckUp: Quick Check is still the first thing in the menu', N.check.feature);
 
   // ---------------------------------------------------------------- Firm
