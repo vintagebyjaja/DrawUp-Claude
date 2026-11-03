@@ -5,6 +5,9 @@
    - Details members asked Arch Coach / DrawUp Search for (table detail_finds, filled by the
      server) show as COMMUNITY · AI-FOUND · UNCONFIRMED until an admin reviews them.
    - Firm uploads (details.firm_id) carry the firm name and can appear on the firm profile.
+   - v25.1: details DrawUp AI redrew from a member's upload (details.source = 'drawup_ai', drawn by
+     drawup-detail-draw-v25.js) show as COMMUNITY · AI-DRAWN, with their flaws and fixes. closestCatalog() lets
+     Draw it up point a set's needed details at them.
    Requires: drawup-details-kit-v21.js, drawup-details-catalog-v21.js (load before this file). */
 (function(){
 'use strict';
@@ -19,7 +22,7 @@ const urlOf=d=>'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svgOf(d));
 const slug=s=>String(s||'detail').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,60);
 const words=s=>String(s||'').toLowerCase().replace(/[^a-z0-9 ]+/g,' ').split(/\s+/).filter(w=>w.length>1).map(w=>w.replace(/(?<=[a-z]{3})s$/,''));
 const STOP=new Set('detail typical the and for with at of a an to in on how do what is drawing section'.split(' '));
-const SRC={arch_coach:'Arch Coach',search:'DrawUp Search'};
+const SRC={arch_coach:'Arch Coach',search:'DrawUp Search',drawings:'Draw it up'};
 function toast(m,bad){let t=document.getElementById('du-toast');if(!t){t=document.createElement('div');t.id='du-toast';t.className='du-toast';document.body.appendChild(t);}t.textContent=m;t.dataset.state=bad?'bad':'good';t.classList.add('open');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('open'),bad?6000:2600);}
 
 /* ---------------------------------------------------------------- matching + search */
@@ -47,24 +50,29 @@ async function pdfOf(d){
   return new Blob(parts,{type:'application/pdf'});
 }
 async function download(d,fmt){
-  const base='drawup-typical-'+(d.code||'').toLowerCase()+'-'+slug(d.title);
+  const base=d.fileBase||((d.bubble==='AI'?'drawup-ai-detail-':'drawup-typical-')+(d.code||'').toLowerCase()+'-'+slug(d.title));
   try{if(fmt==='svg')saveBlob(new Blob([svgOf(d)],{type:'image/svg+xml'}),base+'.svg');else if(fmt==='png')saveBlob(await raster(d,2,'image/png'),base+'.png');else saveBlob(await pdfOf(d),base+'.pdf');}
   catch(e){toast('Download failed: '+(e.message||e),true);}
 }
 
 /* ---------------------------------------------------------------- data */
-const state={finds:[],uploads:[],mine:[],admin:false,user:null,loaded:false};
+const state={finds:[],uploads:[],mine:[],ai:[],admin:false,user:null,loaded:false};
+const AIDRAW=()=>window.DrawUpDetailDraw;
+/* v25.1-03: one card per AI detail: its approved revision, else its newest (every revision opens from the viewer). */
+function latestRevisions(rows){const by=new Map();for(const r of rows){const k=r.root_id||r.id,c=by.get(k);if(!c||(r.approved_at&&!c.approved_at)||(!!r.approved_at===!!c.approved_at&&(r.revision||0)>(c.revision||0)))by.set(k,r);}return rows.filter(r=>by.get(r.root_id||r.id)===r);}
 async function loadData(){
   const c=sb();if(!c)return;
   const u=await c.auth.getSession().then(x=>x.data.session?.user||null,()=>null);state.user=u&&!u.is_anonymous?u:null;
   const sel='id,title,category,description,status,visibility,preview_url,material,assembly,firm_id,show_on_firm,owner_id,created_at,firms(name,slug),detail_assets(id,file_name,file_ext,public_url)';
-  const [f,up,mine,adm]=await Promise.all([
+  const [f,up,mine,adm,ai]=await Promise.all([
     c.from('detail_finds').select('id,title,category,first_query,sources,sources_seen,hits,status,created_at,last_seen_at').order('last_seen_at',{ascending:false}).limit(300).then(x=>x.data||[],()=>[]),
     c.from('details').select(sel).eq('status','published').order('created_at',{ascending:false}).limit(200).then(x=>x.data||[],()=>[]),
     state.user?c.from('details').select(sel).eq('owner_id',state.user.id).order('created_at',{ascending:false}).limit(100).then(x=>x.data||[],()=>[]):[],
-    state.user?c.rpc('is_drawup_admin').then(x=>x.data===true,()=>false):false]);
-  state.finds=f;state.mine=mine;state.admin=adm;
-  const seen=new Set();state.uploads=[...up,...mine].filter(d=>!seen.has(d.id)&&(seen.add(d.id),true));state.loaded=true;
+    state.user?c.rpc('is_drawup_admin').then(x=>x.data===true,()=>false):false,
+    /* v25.1: before SQL v25.1-02 the source column is missing; the query fails and the list stays empty. */
+    c.from('details').select('*').eq('source','drawup_ai').order('created_at',{ascending:false}).limit(300).then(x=>x.error?[]:(x.data||[]),()=>[])]);
+  state.finds=f;state.mine=mine;state.admin=adm;state.ai=latestRevisions((ai||[]).filter(r=>r.drawing&&r.status!=='removed'));
+  const aiIds=new Set(state.ai.map(r=>r.id)),seen=new Set();state.uploads=[...up,...mine].filter(d=>!aiIds.has(d.id)&&!seen.has(d.id)&&(seen.add(d.id),true));state.loaded=true;
 }
 
 /* ---------------------------------------------------------------- cards */
@@ -81,6 +89,11 @@ function uploadCard(d){const a=d.detail_assets||[],img=d.preview_url||a.find(x=>
   <div class="dd21-body"><span class="dd21-kick ${firm?'dd21-firm':''}">${firm?esc(firm)+' · FIRM DETAIL':'MEMBER UPLOAD'} · ${esc(d.category)}${d.status!=='published'?' · '+esc(String(d.status).toUpperCase()):''}</span><h3>${esc(d.title)}</h3>${d.description?`<p class="dd21-meta">${esc(d.description)}</p>`:''}${firm?`<p class="dd21-note">Uploaded by ${esc(firm)}${d.show_on_firm?' · shown on the firm profile':''}.</p>`:''}
   <div class="dd21-acts">${a.filter(x=>x.public_url).map(x=>`<a href="${esc(x.public_url)}" target="_blank" rel="noopener" download>${esc((x.file_ext||'file').toUpperCase())} · ${esc(x.file_name)}</a>`).join('')||'<span class="dd21-note">No files</span>'}</div></div></article>`;}
 
+function aiCard(r){const d=AIDRAW()?.toDetail(r);if(!d)return '';const n=(r.review?.flaws||[]).length;
+  return `<article class="dd21-card dd21-find" data-kind="ai" data-id="${esc(r.id)}" data-cat="${esc(r.category)}"><div class="dd21-thumb"><img src="${AIDRAW().urlOf(r)}" alt="${esc(r.title)}" loading="lazy" decoding="async"></div>
+  <div class="dd21-body"><span class="dd21-kick dd21-ai">COMMUNITY · AI-DRAWN · ${esc(r.sheet_ref?r.sheet_ref+' · ':'')}${esc(d.code)} · ${esc(r.category)}${r.visibility==='private'?' · PRIVATE':''}${r.approved_at?' · APPROVED':''}</span><h3>${esc(r.title)}</h3><p class="dd21-meta">${esc([r.material,r.assembly,d.scale].filter(Boolean).join(' · '))}${n?` · ${n} flaw${n===1?'':'s'} fixed`:''}</p>
+  <div class="dd21-acts"><button type="button" class="dd21-open" data-open-ai="${esc(r.id)}">Open</button><button type="button" data-dl-ai="pdf" data-id="${esc(r.id)}">PDF</button><button type="button" data-dl-ai="png" data-id="${esc(r.id)}">PNG</button><button type="button" data-dl-ai="svg" data-id="${esc(r.id)}">SVG</button>${state.admin?`<button type="button" data-ai-hide="${esc(r.id)}">Hide</button>`:''}</div></div></article>`;}
+
 /* ---------------------------------------------------------------- viewer */
 function viewer(d,find){
   document.getElementById('dd21-view')?.remove();
@@ -88,8 +101,8 @@ function viewer(d,find){
   document.body.insertAdjacentHTML('beforeend',`<div id="dd21-view" class="dd21-view" role="dialog" aria-modal="true" aria-label="${esc(find?find.title:t.title)}"><div class="dd21-vcard">
     <button type="button" class="dd21-x" aria-label="Close">×</button>
     <div class="dd21-vimg"><img src="${urlOf(t)}" alt="${esc(t.title)}"></div>
-    <aside class="dd21-vside">${find?`<span class="dd21-kick dd21-ai">COMMUNITY · AI-FOUND · ${find.status==='reviewed'?'REVIEWED':'UNCONFIRMED'}</span><h2>${esc(find.title)}</h2><p class="dd21-meta">${esc(find.category)} · asked ${find.hits||1}× via ${esc((find.sources_seen||[]).map(s=>SRC[s]||s).join(' + '))}</p>
-      <p class="dd21-note">Members searched for this detail in Arch Coach / DrawUp Search. It is not reviewed by DrawUp yet. The drawing shown is DrawUp's closest typical (<b>${esc(t.code)} ${esc(t.title)}</b>), not a drawing taken from the cited sources.</p>
+    <aside class="dd21-vside" data-detail-key="${esc(find?'find:'+find.id:'typical:'+t.id)}">${find?`<span class="dd21-kick dd21-ai">COMMUNITY · AI-FOUND · ${find.status==='reviewed'?'REVIEWED':'UNCONFIRMED'}</span><h2>${esc(find.title)}</h2><p class="dd21-meta">${esc(find.category)} · asked ${find.hits||1}× via ${esc((find.sources_seen||[]).map(s=>SRC[s]||s).join(' + '))}</p>
+      <p class="dd21-note">Members searched for this detail in Arch Coach / DrawUp Search, or a Draw it up set flagged it as needed. It is not reviewed by DrawUp yet. The drawing shown is DrawUp's closest typical (<b>${esc(t.code)} ${esc(t.title)}</b>), not a drawing taken from the cited sources.</p>
       ${src.length?`<h4>Public sources the answer cited</h4><ul class="dd21-src">${src.map(s=>`<li><a href="${esc(s.url)}" target="_blank" rel="noopener noreferrer">${esc(s.title||s.url)}</a></li>`).join('')}</ul>`:''}`
       :`<span class="dd21-kick">DRAWUP TYPICAL · ${esc(t.code)} · ${esc(t.cat)}</span><h2>${esc(t.title)}</h2>`}
       <dl class="dd21-dl"><dt>Category</dt><dd>${esc(t.cat)}</dd><dt>Material</dt><dd>${esc(t.mat)}</dd><dt>Assembly</dt><dd>${esc(t.asm)}</dd><dt>Scale</dt><dd>${esc(t.scale)} (true on the PDF, 8 x 6 in)</dd></dl>
@@ -105,11 +118,14 @@ function bindActs(root){
   root.querySelectorAll('[data-full]').forEach(b=>b.onclick=()=>{const d=CAT().find(x=>x.id===b.dataset.full);if(d)window.open(URL.createObjectURL(new Blob([svgOf(d)],{type:'image/svg+xml'})),'_blank','noopener');});
   root.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>{const d=CAT().find(x=>x.id===b.dataset.open);if(d)viewer(d);});
   root.querySelectorAll('[data-open-find]').forEach(b=>b.onclick=()=>{const f=state.finds.find(x=>x.id===b.dataset.openFind);if(!f)return;const t=closestTypical(f.title,f.category);if(t)viewer(t,f);else openFindNoDrawing(f);});
+  root.querySelectorAll('[data-open-ai]').forEach(b=>b.onclick=()=>{const r=state.ai.find(x=>x.id===b.dataset.openAi);if(r)AIDRAW()?.viewer(r);});
+  root.querySelectorAll('[data-dl-ai]').forEach(b=>b.onclick=e=>{e.stopPropagation();const r=state.ai.find(x=>x.id===b.dataset.id);if(r&&AIDRAW())download(AIDRAW().toDetail(r),b.dataset.dlAi);});
+  root.querySelectorAll('[data-ai-hide]').forEach(b=>b.onclick=async()=>{const {error}=await sb().from('details').update({status:'removed',updated_at:new Date().toISOString()}).eq('id',b.dataset.aiHide);if(error)return toast(error.message,true);toast('Hidden from the catalog.');await loadData();rerender();});
   root.querySelectorAll('[data-ask]').forEach(b=>b.onclick=()=>{document.getElementById('dd21-view')?.remove();askCoach(b.dataset.ask);});
   root.querySelectorAll('[data-review]').forEach(b=>b.onclick=async()=>{const {error}=await sb().from('detail_finds').update({status:b.dataset.to,updated_at:new Date().toISOString()}).eq('id',b.dataset.review);if(error)return toast(error.message,true);toast('Saved.');await loadData();rerender();});
 }
 function openFindNoDrawing(f){document.getElementById('dd21-view')?.remove();const src=f.sources||[];
-  document.body.insertAdjacentHTML('beforeend',`<div id="dd21-view" class="dd21-view" role="dialog" aria-modal="true"><div class="dd21-vcard dd21-narrow"><button type="button" class="dd21-x" aria-label="Close">×</button><aside class="dd21-vside"><span class="dd21-kick dd21-ai">COMMUNITY · AI-FOUND · UNCONFIRMED</span><h2>${esc(f.title)}</h2><p class="dd21-meta">${esc(f.category)} · asked ${f.hits||1}×</p><p class="dd21-note">DrawUp has not drawn a typical for this detail yet. It is in the queue because members asked for it.</p>${src.length?`<h4>Public sources the answer cited</h4><ul class="dd21-src">${src.map(s=>`<li><a href="${esc(s.url)}" target="_blank" rel="noopener noreferrer">${esc(s.title||s.url)}</a></li>`).join('')}</ul>`:''}${window.DrawUpPortal?.isSignedIn?.()?`<button type="button" class="dd21-ask" data-ask="${esc(f.title)}">Ask Arch Coach about this detail</button>`:''}</aside></div></div>`);
+  document.body.insertAdjacentHTML('beforeend',`<div id="dd21-view" class="dd21-view" role="dialog" aria-modal="true"><div class="dd21-vcard dd21-narrow"><button type="button" class="dd21-x" aria-label="Close">×</button><aside class="dd21-vside" data-detail-key="${esc('find:'+f.id)}"><span class="dd21-kick dd21-ai">COMMUNITY · AI-FOUND · UNCONFIRMED</span><h2>${esc(f.title)}</h2><p class="dd21-meta">${esc(f.category)} · asked ${f.hits||1}×</p><p class="dd21-note">DrawUp has not drawn a typical for this detail yet. It is in the queue because members asked for it.</p>${src.length?`<h4>Public sources the answer cited</h4><ul class="dd21-src">${src.map(s=>`<li><a href="${esc(s.url)}" target="_blank" rel="noopener noreferrer">${esc(s.title||s.url)}</a></li>`).join('')}</ul>`:''}${window.DrawUpPortal?.isSignedIn?.()?`<button type="button" class="dd21-ask" data-ask="${esc(f.title)}">Ask Arch Coach about this detail</button>`:''}</aside></div></div>`);
   const v=document.getElementById('dd21-view');v.querySelector('.dd21-x').onclick=()=>v.remove();v.onclick=e=>{if(e.target===v)v.remove();};bindActs(v);}
 function askCoach(title){const P=window.DrawUpPortal;if(!P?.isSignedIn?.())return;P.openPortalTab('arch-coach');setTimeout(()=>{const i=document.querySelector('#du-workspace-content textarea, #du-workspace-content input[type=text]');if(i){i.value='Explain the typical '+title+': layers, flashing / sealant order, and what must be verified for my project.';i.focus();}},500);}
 
@@ -121,15 +137,17 @@ function filtered(){
   const typ=ui.src&&ui.src!=='typical'?[]:CAT().filter(d=>inCat(d.cat)&&mat(d.mat)&&asm(d.asm)&&(!q||matches(hay(d),q)));
   const fin=ui.src&&ui.src!=='find'||ui.mat||ui.asm?[]:state.finds.filter(f=>f.status!=='hidden'&&inCat(f.category)&&(!q||matches([f.title,f.category,f.first_query].join(' '),q)));
   const upl=ui.src&&ui.src!=='upload'?[]:state.uploads.filter(d=>inCat(d.category)&&mat(d.material)&&asm(d.assembly)&&(!q||matches([d.title,d.category,d.description,d.material,d.assembly,d.firms?.name].join(' '),q)));
-  return {typ,fin,upl};
+  const ai=ui.src&&ui.src!=='ai'?[]:state.ai.filter(r=>inCat(r.category)&&mat(r.material)&&asm(r.assembly)&&(!q||matches([r.title,r.category,r.description,r.material,r.assembly,r.detail_code,r.sheet_ref,r.detail_no&&r.sheet_no?r.detail_no+'/'+r.sheet_no:'',r.project_name].join(' '),q)));
+  return {typ,fin,upl,ai};
 }
-function counts(){const n={};CAT().forEach(d=>n[d.cat]=(n[d.cat]||0)+1);state.finds.forEach(f=>n[f.category]=(n[f.category]||0)+1);state.uploads.forEach(d=>n[d.category]=(n[d.category]||0)+1);return n;}
-function rerender(){const g=host&&host.isConnected&&host.querySelector('#dd21-results');if(!g)return;const {typ,fin,upl}=filtered(),total=typ.length+fin.length+upl.length;
+function counts(){const n={};CAT().forEach(d=>n[d.cat]=(n[d.cat]||0)+1);state.finds.forEach(f=>n[f.category]=(n[f.category]||0)+1);state.uploads.forEach(d=>n[d.category]=(n[d.category]||0)+1);state.ai.forEach(d=>n[d.category]=(n[d.category]||0)+1);return n;}
+function rerender(){const g=host&&host.isConnected&&host.querySelector('#dd21-results');if(!g)return;const {typ,fin,upl,ai}=filtered(),total=typ.length+fin.length+upl.length+ai.length;
   try{localStorage.setItem('dd21-filter',JSON.stringify({cat:ui.cat,mat:ui.mat,asm:ui.asm,src:ui.src}));}catch(e){}
   host.querySelector('#dd21-count').textContent=`${total} detail${total===1?'':'s'}${ui.q?` for “${ui.q}”`:''}${ui.cat?' in '+ui.cat:''}`;
   const sec=(k,t,sub,list,fn)=>list.length?`<section class="dd21-sec" data-sec="${k}"><div class="dd21-sechead"><h2>${t} <small>${list.length}</small></h2><p>${sub}</p></div><div class="dd21-grid">${list.map(fn).join('')}</div></section>`:'';
   g.innerHTML=(sec('typical','DrawUp typical details','One detail per drawing, drawn by DrawUp at a stated scale. Learning content: adapt and verify with a licensed professional.',typ,typicalCard)
-    +sec('find','Asked in Arch Coach + Search','Details members searched for. Recorded automatically, de-duplicated, with the public sources the answer cited. Unconfirmed until reviewed.',fin,findCard)
+    +sec('ai','Drawn by DrawUp AI from member uploads','Members uploaded a detail; DrawUp found the flaws, explained each fix and redrew it to scale. Not reviewed by DrawUp: verify before use.',ai,aiCard)
+    +sec('find','Asked in Arch Coach + Search + flagged by Draw it up','Details members searched for, and details Draw it up and Arch Coach flagged as still needed on real projects. Recorded automatically, de-duplicated, with any public sources cited. Unconfirmed until reviewed.',fin,findCard)
     +sec('upload','Firm + member uploads','Uploaded by firms and members with their own files. Firm details show the firm that uploaded them.',upl,uploadCard))
     ||`<div class="dd21-empty"><h3>No details match.</h3><p>Try another word or category${state.user?', or ask Arch Coach: what you ask for gets added here.':'.'}</p></div>`;
   host.querySelectorAll('.dd21-chips button').forEach(b=>b.classList.toggle('on',b.dataset.cat===ui.cat));bindActs(g);
@@ -143,7 +161,7 @@ function shell(publicPage){
   <p class="dd21-disc"><b>Typical details are learning content.</b> They are drawn by DrawUp, are not the work of any firm, and must be adapted and verified by a licensed professional for the project, the adopted code and the AHJ.</p>
   <div class="dd21-filters" role="search"><input id="dd21-q" type="search" placeholder="Search details: parapet, storefront sill, grab bar…" value="${esc(ui.q)}" aria-label="Search details">
     <select id="dd21-mat" aria-label="Material"><option value="">Any material</option>${opts(mats,ui.mat)}</select><select id="dd21-asm" aria-label="Assembly"><option value="">Any assembly</option>${opts(asms,ui.asm)}</select>
-    <select id="dd21-src" aria-label="Source"><option value="">All sources</option><option value="typical"${ui.src==='typical'?' selected':''}>DrawUp typical</option><option value="find"${ui.src==='find'?' selected':''}>Asked in Coach + Search</option><option value="upload"${ui.src==='upload'?' selected':''}>Firm + member uploads</option></select></div>
+    <select id="dd21-src" aria-label="Source"><option value="">All sources</option><option value="typical"${ui.src==='typical'?' selected':''}>DrawUp typical</option><option value="find"${ui.src==='find'?' selected':''}>Asked in Coach + Search</option><option value="upload"${ui.src==='upload'?' selected':''}>Firm + member uploads</option><option value="ai"${ui.src==='ai'?' selected':''}>Drawn by DrawUp AI</option></select></div>
   <div class="dd21-chips" role="tablist"><button type="button" data-cat="">All</button>${CATS.map(c=>`<button type="button" data-cat="${esc(c)}">${esc(c)}${n[c]?` <span>${n[c]}</span>`:''}</button>`).join('')}</div>
   <p class="dd21-count" id="dd21-count" aria-live="polite"></p><div id="dd21-results"></div></div>`;
 }
@@ -214,5 +232,16 @@ function hydratePublic(){const pg=document.getElementById('page-details');if(!pg
 function watchPublic(){const pg=document.getElementById('page-details');if(!pg)return;const go=()=>{if(!pg.hidden)hydratePublic();};go();new MutationObserver(go).observe(pg,{attributes:true,attributeFilter:['hidden','class','style']});}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',watchPublic);else watchPublic();
 
-window.DrawUpDetails={render,closestTypical,download,svgOf,urlOf,viewer:id=>{const d=CAT().find(x=>x.id===id);if(d)viewer(d);},reload:async()=>{await loadData();rerender();},state};
+/* v25.1: the catalog detail (AI-drawn first, then DrawUp typical) that best matches a needed detail, for Draw it up. */
+function closestCatalog(title,category){
+  const code=(String(title).match(/\bAI-[A-Z0-9]{3,8}\b/i)||[])[0];
+  if(code){const r=state.ai.find(x=>String(x.detail_code).toUpperCase()===code.toUpperCase());if(r)return {kind:'ai',id:r.id,code:r.detail_code,title:r.title};}
+  const q=words(title).filter(w=>!STOP.has(w));let best=null,bs=0;
+  if(q.length)for(const r of state.ai){const h=' '+words([r.title,r.assembly,r.material].join(' ')).join(' ')+' ';let s=0;for(const w of q)if(h.includes(' '+w+' '))s+=1;if(s&&r.category===category)s+=.5;if(s>bs){bs=s;best=r;}}
+  if(best&&(bs>=2||(bs>=1.5&&q.length<=2)))return {kind:'ai',id:best.id,code:best.detail_code,title:best.title};
+  const t=closestTypical(title,category);return t?{kind:'typical',id:t.id,code:t.code,title:t.title}:null;
+}
+function openCatalog(kind,id){if(kind==='ai'){const r=state.ai.find(x=>x.id===id);if(r)AIDRAW()?.viewer(r);}else{const d=CAT().find(x=>x.id===id);if(d)viewer(d);}}
+async function ensureLoaded(){if(!state.loaded)await loadData().catch(()=>{});return state;}
+window.DrawUpDetails={render,closestTypical,closestCatalog,openCatalog,ensureLoaded,download,svgOf,urlOf,viewer:id=>{const d=CAT().find(x=>x.id===id);if(d)viewer(d);},reload:async()=>{await loadData();rerender();},state};
 })();

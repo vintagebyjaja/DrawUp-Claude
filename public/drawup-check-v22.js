@@ -726,15 +726,18 @@
   async function runProgress(w, c, r, art, alive, done, phase) {
     const rewrite = phase === 'rewrite', narrative = (r.mode || 'plans') !== 'plans';
     const pages = r.page_count || Math.max(2, Math.round((r.file_size || 3e6) / 6e5));
-    const est = rewrite ? 60 + 4 * pages : narrative ? 45 + 6 * pages : 30 + 9 * pages;
+    const est = rewrite ? 60 + 4 * pages : narrative ? 45 + 6 * pages : 30 + 60 * pages; // V23: sheet-by-sheet reviews take about a minute a sheet
     const t0 = rewrite ? Date.now() : new Date(r.started_at || r.created_at).getTime();
     const watchMs = X.WATCHDOG_MS || Math.max(180000, est * 3000);
     art.innerHTML = `<h2>${rewrite ? 'Writing the revised document…' : narrative ? 'Reviewing the document…' : 'Reviewing your sheets…'}</h2><div class="du-ckp"><div class="du-ckp-top"><b class="du-ckp-pct">0%</b><span class="du-ckp-phase">Starting…</span></div><div class="du-ckp-meter"><i></i></div><small class="du-ckp-note"></small></div>
       <div class="du-ck22-bg" hidden role="status"></div>
       <div class="du-check-live" hidden aria-live="polite"><h3>Reading…</h3><ul class="du-check-found"></ul><p class="du-muted">Not final yet. The full ${rewrite ? 'document' : 'report'} replaces this list.</p></div>`;
-    let cursor = 0, streamed = true, text = '', bg = false;
+    let cursor = 0, streamed = true, text = '', bg = false, sheetRev = null;
+    // V23: sheet-by-sheet reviews save findings on the row after each sheet; show them as they land.
+    const sheetDone = () => sheetRev ? (sheetRev.sheet_completed || []).length + (sheetRev.sheet_failed || []).length : 0;
     const items = () => {
       const out = []; let m;
+      if (!rewrite && sheetRev && (sheetRev.findings || []).length) return sheetRev.findings.map(f => ({ sev: f.severity || 'info', s: (f.sheet ? f.sheet + ': ' : '') + f.issue }));
       if (rewrite) { const re = /"heading"\s*:\s*"((?:[^"\\]|\\.)*)"/g; while ((m = re.exec(text))) out.push({ sev: 'info', s: JSON.parse('"' + m[1] + '"') }); return out; }
       if (narrative) { const re = /"(comment|plans_show|proposed_text)"\s*:\s*"((?:[^"\\]|\\.)*)"/g; while ((m = re.exec(text))) { let s = m[2]; try { s = JSON.parse('"' + s + '"'); } catch (_e) { } out.push({ sev: m[1] === 'plans_show' ? 'major' : 'info', s: (m[1] === 'plans_show' ? 'Conflict with plans: ' : m[1] === 'proposed_text' ? 'Should cover: ' : '') + s }); } return out; }
       const re = /"severity"\s*:\s*"(critical|major|minor|info)"/g;
@@ -745,8 +748,9 @@
       if (!document.body.contains(art)) return;
       const el = (Date.now() - t0) / 1000, its = items(); let f = Math.min(0.9, el / est * 0.85 + 0.03);
       if (its.length) f = Math.max(f, Math.min(0.94, 0.55 + its.length * 0.04));
+      if (sheetRev && sheetRev.sheet_total) f = Math.min(0.97, Math.max(0.03, (sheetDone() + Math.min(0.9, (el % 120) / 120)) / sheetRev.sheet_total));
       const pct = Math.round(f * 100); art.querySelector('.du-ckp-pct').textContent = pct + '%'; art.querySelector('.du-ckp-meter i').style.width = pct + '%';
-      art.querySelector('.du-ckp-phase').textContent = bg ? 'Still working in the background' : activity === 'searching' ? 'Checking current code and jurisdiction sources…' : its.length ? (rewrite ? 'Writing sections · ' : 'Writing findings · ') + its.length + ' so far' : el > est * 1.5 ? 'Taking longer than usual — still working' : rewrite ? 'Applying your approved changes…' : narrative ? 'Reading the document' + (r.plans_path ? ' and the plans' : '') + '…' : 'Reading ' + pages + ' page' + (pages === 1 ? '' : 's') + '…';
+      art.querySelector('.du-ckp-phase').textContent = sheetRev && sheetRev.sheet_total && !bg ? `Reviewing sheet ${Math.min(sheetRev.sheet_total, sheetDone() + 1)} of ${sheetRev.sheet_total} · ${its.length} finding${its.length === 1 ? '' : 's'} so far` : bg ? 'Still working in the background' : activity === 'searching' ? 'Checking current code and jurisdiction sources…' : its.length ? (rewrite ? 'Writing sections · ' : 'Writing findings · ') + its.length + ' so far' : el > est * 1.5 ? 'Taking longer than usual — still working' : rewrite ? 'Applying your approved changes…' : narrative ? 'Reading the document' + (r.plans_path ? ' and the plans' : '') + '…' : 'Reading ' + pages + ' page' + (pages === 1 ? '' : 's') + '…';
       const mm = Math.floor(el / 60), ss = Math.floor(el % 60);
       art.querySelector('.du-ckp-note').textContent = `${mm}:${String(ss).padStart(2, '0')} elapsed · usually about ${Math.max(1, Math.round(est / 60))} min. The meter is an estimate; items appear below as soon as they are written.`;
       const live = art.querySelector('.du-check-live');
@@ -762,6 +766,7 @@
       try {
         const d = await api(c, '/api/check?id=' + encodeURIComponent(r.id) + (rewrite ? '&phase=rewrite' : '') + (streamed ? '&after=' + cursor : ''));
         const still = rewrite ? d.review?.rewrite_status === 'writing' : d.review?.status === 'reviewing';
+        if (!rewrite && d.review && d.review.sheet_total) { sheetRev = d.review; paint(); }
         if (streamed && typeof d.cursor === 'number') { cursor = d.cursor; if (d.delta) text += d.delta; paint(d.activity); if (still) continue; }
         if (streamed && still && typeof d.cursor !== 'number') streamed = false;
         if (d.review && !still) { clearInterval(tick); return done(); }

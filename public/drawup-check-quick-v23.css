@@ -1,0 +1,49 @@
+/* DrawUp Quick Check V23: upload, what's wrong, the fix on your template. Dark glass + hologram cyan. */
+.du-qk23{margin:0 0 18px;border:1px solid rgba(127,231,255,.45);box-shadow:0 0 0 1px rgba(127,231,255,.08),0 18px 50px rgba(0,0,0,.35)}
+.du-qk23 h2{margin:6px 0 6px}
+.du-qk23-drop{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:120px;margin:14px 0;padding:18px;border:2px dashed rgba(127,231,255,.45);border-radius:16px;background:rgba(127,231,255,.05);cursor:pointer;text-align:center;transition:background .15s,border-color .15s}
+.du-qk23-drop input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+.du-qk23-drop b{font-size:18px;color:#fff}
+.du-qk23-drop span{color:#9fb3c8;overflow-wrap:anywhere}
+.du-qk23-drop.over,.du-qk23-drop:focus-within{background:rgba(127,231,255,.12);border-color:#7fe7ff}
+.du-qk23-drop.has{border-style:solid}
+.du-qk23-drop.has span{color:#dff8ff}
+.du-qk23-tpls{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:10px}
+.du-qk23-tpl{display:grid;justify-items:start;gap:2px;padding:10px 12px;border-radius:12px;border:1px solid rgba(127,231,255,.25);background:rgba(4,18,32,.45);color:#cfe9f5;text-align:left;cursor:pointer;font:inherit;min-height:44px}
+.du-qk23-tpl svg{width:60px;height:40px;color:#7fe7ff;margin-bottom:4px}
+.du-qk23-tpl small{color:#9fb3c8}
+.du-qk23-tpl[aria-checked="true"]{border-color:#7fe7ff;background:rgba(127,231,255,.14);box-shadow:inset 0 0 0 1px #7fe7ff;color:#fff}
+.du-qk23-custom{margin:4px 0 8px}
+.du-qk23-more{margin:6px 0 4px}
+.du-qk23-more summary{cursor:pointer;color:#8edcff;min-height:36px;display:flex;align-items:center}
+.du-qk23-go{margin:12px 0 6px}
+.du-qk23-out{margin-top:18px;display:grid;gap:18px}
+.du-qk23-steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.du-qk23-steps li{display:grid;gap:2px;padding:10px 12px;border-radius:14px;border:1px solid rgba(127,231,255,.2);color:#9fb3c8;font-weight:700}
+.du-qk23-steps li span{font-size:12px;letter-spacing:.12em;color:#7fe7ff}
+.du-qk23-steps li.on{background:#e4f8ff;color:#06121e;border-color:#e4f8ff}
+.du-qk23-steps li.on span{color:#06121e}
+.du-qk23-out h3{margin:0 0 8px}
+.du-qk23-live{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.du-qk23-live li{padding:10px 12px;border-radius:12px;background:rgba(4,18,32,.45);border:1px solid rgba(127,231,255,.15);line-height:1.45}
+.du-qk23-sum{color:#cfe9f5;margin:10px 0 0}
+.du-qk23-fixes{display:grid;gap:10px}
+.du-qk23-fixes p{margin:6px 0}
+.du-qk23-delta{display:inline-grid;place-items:center;width:26px;height:24px;color:#2bd67b;font-weight:800;font-size:13px;clip-path:polygon(50% 0,100% 100%,0 100%);background:rgba(43,214,123,.18);padding-top:6px;box-sizing:border-box}
+.du-qk23-vbar{margin:0 0 10px}
+.du-qk23-seg{display:inline-flex;flex-wrap:wrap;gap:4px;padding:4px;border-radius:99px;border:1px solid rgba(127,231,255,.3)}
+.du-qk23-seg button{min-height:40px;padding:8px 16px;border-radius:99px;border:0;background:transparent;color:#cfe9f5;font:inherit;font-weight:700;cursor:pointer}
+.du-qk23-seg button[aria-checked="true"]{background:#7fe7ff;color:#06121e}
+.du-qk23-sheets{display:grid;gap:16px;max-height:80vh;overflow:auto;padding:10px;border-radius:14px;border:1px solid rgba(127,231,255,.22);background:#0b1622;overscroll-behavior:contain}
+.du-qk23-pg{margin:0}
+.du-qk23-sheets.zoom .du-qk23-pg canvas{width:220%;max-width:none}
+.du-qk23-vbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.du-qk23-zoom{min-height:40px}
+.du-qk23-pg canvas{display:block;width:100%;height:auto;background:#fff;box-shadow:0 8px 30px rgba(0,0,0,.45);border-radius:2px}
+.du-qk23-pg figcaption{color:#9fb3c8;font-size:13px;margin-top:6px}
+.du-qk23-dl{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px}
+@media (max-width:640px){
+  .du-qk23-steps{grid-template-columns:1fr}
+  .du-qk23-tpls{grid-template-columns:repeat(2,1fr)}
+  .du-qk23-dl .du-btn{flex:1 1 100%}
+}

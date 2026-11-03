@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
+import { runtimeEnv, supabaseAnonKey, supabaseUrl } from '@/lib/drawup-env';
 export const runtime='nodejs'; export const dynamic='force-dynamic';
-const url=process.env.NEXT_PUBLIC_SUPABASE_URL||''; const anon=process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY||''; const service=process.env.SUPABASE_SERVICE_ROLE_KEY||'';
+const url=supabaseUrl(); const anon=supabaseAnonKey(); const service=runtimeEnv('SUPABASE_SERVICE_ROLE_KEY'); // V23.1: read at run time
 async function uid(req:Request){const a=req.headers.get('authorization')||'';if(!a.startsWith('Bearer ')||!url||!anon||!service)return null;const r=await fetch(url+'/auth/v1/user',{headers:{apikey:anon,Authorization:a},cache:'no-store'});if(!r.ok)return null;return (await r.json()).id||null}
 async function rest(path:string,init:RequestInit={}){return fetch(url+'/rest/v1/'+path,{...init,cache:'no-store',headers:{apikey:service,Authorization:'Bearer '+service,'Content-Type':'application/json',Prefer:'return=representation',...(init.headers||{})}})}
 async function jsonOr<T>(r:Response,fallback:T):Promise<T>{try{return r.ok?await r.json():fallback}catch{return fallback}}

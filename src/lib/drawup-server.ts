@@ -3,13 +3,15 @@
 // the OpenAI key, so it must only be imported from src/app/api/**.
 
 import { createHmac, timingSafeEqual } from 'node:crypto';
+import { runtimeEnv, supabaseAnonKey, supabaseUrl } from '@/lib/drawup-env';
 
-export const SB_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-export const SB_ANON = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || '';
-const SB_SERVICE = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
-const OPENAI_KEY = process.env.OPENAI_API_KEY || '';
+// V23.1: read at run time (see drawup-env.ts), so a Cloudflare build variable can't override the Worker's settings.
+export const SB_URL = supabaseUrl();
+export const SB_ANON = supabaseAnonKey();
+const SB_SERVICE = runtimeEnv('SUPABASE_SERVICE_ROLE_KEY');
+const OPENAI_KEY = runtimeEnv('OPENAI_API_KEY');
 // Overridable so the whole flow can be tested against a local stand-in.
-const OPENAI_BASE = (process.env.OPENAI_BASE_URL || 'https://api.openai.com/v1').replace(/\/$/, '');
+const OPENAI_BASE = (runtimeEnv('OPENAI_BASE_URL') || 'https://api.openai.com/v1').replace(/\/$/, '');
 
 export const PRIVATE_BUCKET = 'drawup-private';
 
@@ -85,6 +87,20 @@ export async function storageUpload(bucket: string, path: string, bytes: Uint8Ar
     body: bytes as unknown as BodyInit,
   });
   if (!r.ok) throw new Error(`The result could not be saved (${r.status}): ${await r.text()}`);
+}
+
+/** V25.1: short-lived links to private Storage files, in the same order (null where one could not be signed). */
+export async function storageSignedUrls(bucket: string, paths: string[], expiresIn: number): Promise<(string | null)[]> {
+  const r = await fetch(`${SB_URL}/storage/v1/object/sign/${bucket}`, {
+    method: 'POST',
+    headers: { apikey: SB_SERVICE, Authorization: 'Bearer ' + SB_SERVICE, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ expiresIn, paths }),
+    cache: 'no-store',
+  });
+  if (!r.ok) throw new Error(`Storage links could not be made (${r.status}).`);
+  const out = await r.json().catch(() => []);
+  const byPath = new Map<string, string>((Array.isArray(out) ? out : []).filter((x: any) => x?.signedURL && !x.error).map((x: any) => [x.path, x.signedURL]));
+  return paths.map(p => { const u = byPath.get(p); return u ? `${SB_URL}/storage/v1${u.startsWith('/') ? '' : '/'}${u}` : null; });
 }
 
 /* ------------------------------------------------------------------ credits */
@@ -199,6 +215,30 @@ export async function openaiCreate(payload: Record<string, unknown>, modelList: 
     last = data?.error?.message || `The AI service returned ${r.status}.`;
     // Only fall through to the next model when this one is unknown/unavailable.
     if (![400, 404].includes(r.status) || !/model/i.test(last)) break;
+  }
+  throw new Error(last);
+}
+
+/** V25.1: starts a stored background response (POST /responses, background + store), trying each model; if a model
+ *  rejects the reasoning setting it is retried without it. Returns at once with the response id. */
+export async function openaiBackground(payload: Record<string, unknown>, modelList: string[]) {
+  let last = 'The AI request failed.';
+  for (const model of modelList) {
+    for (const withHint of [true, false]) {
+      const body: any = { ...payload, model, background: true, store: true };
+      if (!withHint) delete body.reasoning;
+      const r = await fetch(OPENAI_BASE + '/responses', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${OPENAI_KEY}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      const data = await r.json().catch(() => ({}));
+      if (r.ok && data?.id) return { id: String(data.id), model };
+      last = data?.error?.message || `The AI service returned ${r.status}.`;
+      if (r.status === 400 && withHint && body.reasoning && /reasoning|effort/i.test(last)) continue;
+      if ([400, 404].includes(r.status) && /model/i.test(last)) break;
+      throw new Error(last);
+    }
   }
   throw new Error(last);
 }

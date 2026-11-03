@@ -73,8 +73,20 @@ function createHub(host,opts){
   const signIn=()=>{const b=$('drawup-signin');if(b)b.click();else H.toast('Sign in to take part.',true);};
   const signInCard=(what)=>`<div class="dc-empty"><span class="du-kicker">CONNECT</span><h2>Sign in to ${esc(what)}.</h2><p>Anyone can read the Timeline and Boards. Sign in to message people, join group and firm chats, post and reply.</p><button type="button" class="du-btn dc-btn primary" data-dc-signin>Sign in</button></div>`;
 
+  // V23.1: Connect is for members and lives in the portal. On the public site visitors get a join card and
+  // members get a button into their portal, instead of the hub (or a database error).
+  const memberGate=signedIn=>{
+    host.innerHTML=signedIn
+      ?`<div class="dc-empty dc-gate"><span class="du-kicker">CONNECT · MEMBERS</span><h2>Connect lives in your portal.</h2><p>Messages, firm and school chats, Boards and the Timeline are all in your DrawUp portal.</p><button type="button" class="du-btn dc-btn primary" data-dc-portal>Open Connect</button></div>`
+      :`<div class="dc-empty dc-gate"><span class="du-kicker">CONNECT · MEMBERS ONLY</span><h2>Join Free Agency to Connect.</h2><p>Connect is where DrawUp members message each other, join firm and school chats, and post to the Timeline. Joining is free.</p><p class="dc-gate-acts"><button type="button" class="du-btn dc-btn primary" data-dc-join>Join Free Agency</button> <button type="button" class="du-btn dc-btn" data-dc-signin>Sign in</button></p></div>`;
+    host.querySelector('[data-dc-portal]')?.addEventListener('click',()=>{window.DrawUpPortal?.openPortal?.('connect');});
+    host.querySelector('[data-dc-join]')?.addEventListener('click',()=>{const j=document.querySelector('.join-preseason');if(j)j.click();else signIn();});
+    host.querySelector('[data-dc-signin]')?.addEventListener('click',signIn);
+  };
   async function boot(){
-    H.c=await db();if(!H.c){host.innerHTML='<div class="dc-empty"><h2>Connect is unavailable.</h2><p>The DrawUp database is not connected.</p></div>';return;}
+    H.c=await db();
+    if(H.mode==='public'){let u=null;if(H.c){const {data}=await H.c.auth.getSession();u=data.session?.user&&!data.session.user.is_anonymous?data.session.user:null;}memberGate(!!u);return;}
+    if(!H.c){host.innerHTML='<div class="dc-empty"><h2>Connect is unavailable.</h2><p>DrawUp could not reach its database. Refresh the page in a minute.</p></div>';return;}
     const {data}=await H.c.auth.getSession();H.user=data.session?.user&&!data.session.user.is_anonymous?data.session.user:null;
     if(H.user){await profilesFor([H.user.id]);H.me=H.profiles.get(H.user.id)||{id:H.user.id};}
     let want=null;try{want=sessionStorage.getItem('drawup_connect_section_'+H.mode);}catch(_e){}
@@ -484,6 +496,7 @@ Connect.messageUser=async(userId,displayName)=>{
 async function openHub(stillPending){
   const portalOpen=$('du-portal')?.classList.contains('open')&&window.DrawUpPortal?.openPortalTab;
   if(portalOpen){await window.DrawUpPortal.openPortalTab('connect');}
+  else if(window.DrawUpPortal?.openPortal&&(window.DrawUpPortal.openPortal('connect'),await sleep(300),$('du-portal')?.classList.contains('open'))){/* V23.1: members use Connect in the portal */}
   else{const link=document.querySelector('.nav-link[data-page="connect"]');if(link)link.click();else location.hash='#connect';await mountPublic(false);if(stillPending())await Connect.mount(pubHost,{mode:'public'});}
 }
 /* Open the Connect timeline composer, optionally with a school tagged (university profiles).

@@ -1,0 +1,34 @@
+/* DrawUp V24 Detail reviews: architect verification + comments. */
+.dr24-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:8px}
+.dr24-badges{display:flex;flex-wrap:wrap;gap:6px;flex:1 1 auto}
+.dr24-ver,.dr24-unver,.dr24-cnt{display:inline-flex;align-items:center;padding:3px 8px;border-radius:999px;font-size:12px;line-height:1.3}
+.dr24-ver{background:#0f4a2c;color:#9ff5c4;border:1px solid #2fbf71;font-weight:700}
+.dr24-ver.cond{background:#43380c;color:#ffe08a;border-color:#d9b23a}
+.dr24-unver{color:#9fb3c8;border:1px dashed rgba(159,179,200,.4)}
+.dr24-cnt{color:#cfe9f5;background:rgba(127,231,255,.1)}
+.dr24-open{min-height:32px;padding:4px 10px;border-radius:8px;border:1px solid rgba(127,231,255,.35);background:rgba(4,18,32,.55);color:#8edcff;font:inherit;font-size:12px;cursor:pointer}
+.dr24-panel{margin-top:14px;display:grid;gap:14px}
+.dr24-sec h4{margin:0 0 8px;color:#fff;font-size:15px}
+.dr24-sec h4 small{color:#9fb3c8;font-weight:400}
+.dr24-note{color:#9fb3c8;font-size:13px;margin:4px 0}
+.dr24-vlist,.dr24-clist{list-style:none;margin:0 0 10px;padding:0;display:grid;gap:8px}
+.dr24-vlist li,.dr24-clist li{display:grid;gap:4px;padding:10px;border-radius:10px;border:1px solid rgba(127,231,255,.18);background:rgba(4,18,32,.45);color:#cfe9f5;font-size:13px}
+.dr24-vlist b{color:#9ff5c4}
+.dr24-clist p{margin:0;white-space:pre-wrap;color:#fff}
+.dr24-clist small,.dr24-vlist small{color:#9fb3c8}
+.dr24-clist li.dr24-hidden{opacity:.55}
+.dr24-pill{justify-self:start;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700;letter-spacing:.02em}
+.dr24-pill.ok{background:#0f4a2c;color:#9ff5c4}.dr24-pill.cond{background:#43380c;color:#ffe08a}.dr24-pill.bad{background:#5a1020;color:#ffb3c0}.dr24-pill.q{background:rgba(127,231,255,.15);color:#8edcff}
+.dr24-cacts{display:flex;gap:6px;flex-wrap:wrap}
+.dr24-vlist button,.dr24-cacts button{justify-self:start;min-height:30px;padding:3px 9px;border-radius:8px;border:1px solid rgba(127,231,255,.3);background:transparent;color:#8edcff;font:inherit;font-size:12px;cursor:pointer}
+.dr24-form{display:grid;gap:8px}
+.dr24-form label{display:grid;gap:4px;color:#cfe9f5;font-size:13px}
+.dr24-form input,.dr24-form select,.dr24-form textarea{width:100%;box-sizing:border-box;min-height:40px;padding:8px 10px;border-radius:10px;border:1px solid rgba(127,231,255,.25);background:rgba(4,18,32,.55);color:#fff;font:inherit}
+.dr24-form [hidden]{display:none}
+.dr24-lic summary{cursor:pointer;color:#8edcff;min-height:36px;display:flex;align-items:center}
+.dr24-hq{margin:0 0 16px;padding:14px;border-radius:14px;border:1px solid #d9b23a;background:rgba(67,56,12,.35)}
+.dr24-hq h3{margin:0 0 4px}
+.dr24-hq ul{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:8px}
+.dr24-hq li{display:flex;flex-wrap:wrap;align-items:center;gap:8px;color:#cfe9f5}
+.dr24-hq li .dr24-cacts{margin-left:auto}
+.dd21-narrow{max-width:560px}

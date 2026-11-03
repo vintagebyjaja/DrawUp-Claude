@@ -39,16 +39,6 @@
 - In the AI Team, under the latest answer, "**[Legend] can chime in on this**" with a **Hear from [surname]** button. The legend then answers in the thread with their own label and colour.
 - Legends answer in the spirit of their documented work. They are told never to quote or invent facts about the real person, and every bio says it is DrawUp's interpretation, not an endorsement.
 
-**8. The top header stays on screen.** On phones and desktop, the header (DrawUp logo, search, Get Started and menu) and the Season 1 tip-off bar now stay pinned at the top while you scroll. The Portal's header already stayed pinned, and it still does.
-- The cause: an old rule meant to stop sideways scrolling had turned the page body into its own scroll box, so the pinned header scrolled away with it. The fix keeps sideways scrolling blocked and lets the header stick.
-- **Back to the top:** tap any empty spot on the header or on the tip-off bar to scroll back to the top. A round ↑ button also appears at the bottom right after you scroll down a few screens, and it sits above the phone tab bar. Both work on the public site and in the Portal.
-- The site runs inside a full-screen frame (`index.html`), so the iPhone's own "tap the clock" shortcut cannot scroll it. That is why the header tap and the ↑ button are there.
-
-**9. One search.** Discover and the header's DrawUp search now run the same search.
-- Each Discover search box has a **Search DrawUp →** button, and pressing Enter does the same thing. It runs the same full DrawUp search as the header, with the Discover tab as the type (Projects, Firms or People).
-- Typing in a Discover box still filters the Discover list right away, as before.
-- Signed in, results open in the Portal's DrawUp Search tab, with your words and type already filled in. Signed out, they open in the public search, exactly like the header's search.
-
 ## Tested
 
 The tests ran on the real `drawup-preview.html`, with a stand-in database and stand-in API answers. They ran on desktop (1440 wide) and phone (390 wide), as a member and as HQ.
@@ -58,7 +48,6 @@ The tests ran on the real `drawup-preview.html`, with a stand-in database and st
 - Deleting a conversation removed it.
 - Choosing a legend saved it.
 - TypeScript type-check passed.
-- Header and search: 30 of 30 checks passed on phone and desktop, signed in and signed out (`_work/tests/test-nav-v28.js`; previews `nav-*.png`).
 
 **The pictures and videos in the previews are labelled stand-ins.** This test machine cannot reach Wikimedia or YouTube. Real results show up once it is deployed. Each stand-in is marked "test data" or "stand-in".
 

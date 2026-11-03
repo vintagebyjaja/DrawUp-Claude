@@ -12,11 +12,12 @@
 (()=>{'use strict';
 const $=id=>document.getElementById(id);
 const TAB_KEY='drawup_portal_tab_v17';
-const TABS=['dashboard','search','profile','projects','ai-team','draw','arch-coach','check','swap','details','discover','connect','firm','team','account','hq'];
-/* V18: Draw, Check, Swap and HQ live in drawup-tools-v18.js and register here. */
+const TABS=['dashboard','search','profile','projects','ai-team','draw','arch-coach','check','swap','details','discover','portfolio','connect','firm','team','account','hq'];
+/* V18: Draw, Check, Swap and HQ live in drawup-tools-v18.js and register here. Portfolio Review (Season 1) registers
+   'portfolio' from drawup-portfolio-review-s1.js. */
 const EXT={};
 const STARTER_KEY='athletic-storage-v1';
-const TAB_LABELS=['Dashboard','Search','Profile','Projects','AI Team','Draw','Arch Coach','Check','Swap','Details','Discover','Connect','Firm','Team','Account','HQ'];
+const TAB_LABELS=['Dashboard','Search','Profile','Projects','AI Team','Draw','Arch Coach','Check','Swap','Details','Discover','Portfolio Review','Connect','Firm','Team','Account','HQ'];
 let client=null,currentUser=null,currentProfile=null,step=0,pendingAvatar=null,pendingAvatarFile=null,authRun=null,authUserId=null,portalReady=false;
 const interests=new Set(),disciplines=new Set();
 

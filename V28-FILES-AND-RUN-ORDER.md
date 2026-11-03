@@ -1,6 +1,6 @@
 # DrawUp v28: files and run order
 
-v28 sits on top of v27. It adds picture answers in the AI Team, a YouTube shelf in Arch Coach › Learning, readable Learning pages, a regular-chat mode, deleting a conversation, slower transitions, Hall of Fame legend bios with chime-ins, a top header that stays on screen with tap-to-top, and one shared search for Discover and the header. Nothing is removed. The approved design stays; only text colours on the Learning page and the video tiles change.
+v28 sits on top of v27. It adds picture answers in the AI Team, a YouTube shelf in Arch Coach › Learning, readable Learning pages, a regular-chat mode, deleting a conversation, slower transitions and Hall of Fame legend bios with chime-ins. Nothing is removed. The approved design stays; only text colours on the Learning page and the video tiles change.
 
 ## Run order
 
@@ -17,7 +17,6 @@ v28 sits on top of v27. It adds picture answers in the AI Team, a YouTube shelf 
      - `public/drawup-legends-v28.js` and `.css`
      - `public/drawup-team-v28.css`
      - `public/drawup-learn-v28.css`
-     - `public/drawup-nav-v28.js` and `.css` (pinned header, back to top, one search)
    - Changed files:
      - `src/lib/drawup-team.ts`
      - `src/app/api/team/chat/route.ts`
@@ -27,7 +26,7 @@ v28 sits on top of v27. It adds picture answers in the AI Team, a YouTube shelf 
      - `public/drawup-studio-fx-v26.js`
    - `public/drawup-preview.html` has two kinds of edit:
      - 4 cache numbers change to `?v=28.0`, on the lines for drawup-team-v25.js, drawup-playbook-v21.js, drawup-studio-v26.js and drawup-studio-fx-v26.js.
-     - 8 lines are added at the very end, after the v27 lines. If your copy has changed, paste just these:
+     - 6 lines are added at the very end, after the v27 lines. If your copy has changed, paste just these:
        ```
        <link rel="stylesheet" href="/drawup-visual-v28.css?v=28.0">
        <link rel="stylesheet" href="/drawup-team-v28.css?v=28.0">
@@ -35,8 +34,6 @@ v28 sits on top of v27. It adds picture answers in the AI Team, a YouTube shelf 
        <link rel="stylesheet" href="/drawup-legends-v28.css?v=28.0">
        <script src="/drawup-visual-v28.js?v=28.0"></script>
        <script src="/drawup-legends-v28.js?v=28.0"></script>
-       <link rel="stylesheet" href="/drawup-nav-v28.css?v=28.0">
-       <script src="/drawup-nav-v28.js?v=28.0"></script>
        ```
    - `supabase/migrations/0071_...` is the same SQL as step 1.
 3. **Cloudflare settings: nothing is required.** The settings below are optional.
@@ -67,4 +64,4 @@ The new features use these credit costs. HQ accounts are free, as everywhere els
 
 ## Roll back
 
-Delete the 8 lines at the end of `drawup-preview.html`, then put back the v27 copies of the 6 changed files. The new tables can stay, because nothing else reads them.
+Delete the 6 lines at the end of `drawup-preview.html`, then put back the v27 copies of the 6 changed files. The new tables can stay, because nothing else reads them.

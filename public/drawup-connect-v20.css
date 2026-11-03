@@ -259,3 +259,7 @@ select.dc-input option{background:#0b2238;color:#fff}
 .dc-list-sub{margin:14px 12px 4px;font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;opacity:.7}
 .dc-tag{display:inline-block;padding:1px 7px;border-radius:999px;background:rgba(127,231,255,.16);color:#7fe7ff;font-size:11px;font-weight:700}
 .dc-check{cursor:pointer}.dc-check input{margin-right:8px;width:18px;height:18px;accent-color:#7fe7ff}
+
+/* V23.1 members-only gate on the public site */
+.dc-gate-acts{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:4px 0 0}
+.dc-gate .du-kicker{margin-bottom:0}

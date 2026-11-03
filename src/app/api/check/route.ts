@@ -1,8 +1,9 @@
 import { PDFDocument } from 'pdf-lib';
 import { NextResponse } from 'next/server';
-import { streamCreate, streamRead } from '@/lib/drawup-stream';
+import { streamCreate, streamRead, withoutSpeedHints } from '@/lib/drawup-stream';
 import { awardXp } from '@/lib/drawup-coach-persona';
 import { docxNumberedText } from '@/lib/drawup-docx';
+import { BOX, CATEGORIES, INSTRUCTIONS, SCHEMA, goodBox, normFindings, parseReport, strs } from '@/lib/drawup-check-core';
 import {
   PRIVATE_BUCKET, adminRest, adminSelectOne, adminUpdate, bytesToBase64, creditMessage, missingConfig, models,
   openaiCancel, openaiCreate, openaiGet, outputText, pathIsOwn, refundCredits, reserveCredits, signedInUser, sourcesFrom,
@@ -29,57 +30,7 @@ export const dynamic = 'force-dynamic';
 
 const MAX_BYTES = 32 * 1024 * 1024;
 const MAX_RUN_MS = 25 * 60 * 1000;
-const CATEGORIES = ['code', 'accessibility', 'life_safety', 'coordination', 'dimensions', 'documentation', 'structural', 'mep', 'site'];
 const LABELS = ['document_states', 'verified_requirement', 'recommendation', 'needs_confirmation'];
-const BOX = {
-  type: 'object', additionalProperties: false, required: ['x', 'y', 'w', 'h'],
-  properties: { x: { type: 'number' }, y: { type: 'number' }, w: { type: 'number' }, h: { type: 'number' } },
-};
-const FIX = {
-  type: 'object', additionalProperties: false, required: ['type', 'symbol', 'label', 'lines', 'box'],
-  properties: {
-    type: { type: 'string', enum: ['dimension', 'tag', 'note', 'code_summary', 'table', 'none'] },
-    symbol: { type: 'string', enum: ['door', 'window', 'wall', 'room', 'keynote', 'none'] },
-    label: { type: 'string' },
-    lines: { type: 'array', items: { type: 'string' } },
-    box: BOX,
-  },
-};
-
-const SCHEMA = {
-  type: 'object',
-  additionalProperties: false,
-  required: ['summary', 'page_count', 'sheets_reviewed', 'code_basis', 'findings', 'limitations'],
-  properties: {
-    summary: { type: 'string' },
-    page_count: { type: 'integer' },
-    sheets_reviewed: { type: 'array', items: { type: 'string' } },
-    code_basis: { type: 'string' },
-    findings: {
-      type: 'array',
-      items: {
-        type: 'object',
-        additionalProperties: false,
-        required: ['category', 'severity', 'sheet', 'page', 'box', 'anchors', 'location', 'issue', 'recommendation', 'fix', 'reference', 'confidence'],
-        properties: {
-          category: { type: 'string', enum: CATEGORIES },
-          severity: { type: 'string', enum: ['critical', 'major', 'minor', 'info'] },
-          sheet: { type: 'string' },
-          page: { type: 'integer' },
-          box: BOX,
-          anchors: { type: 'array', items: { type: 'string' } },
-          location: { type: 'string' },
-          issue: { type: 'string' },
-          recommendation: { type: 'string' },
-          fix: FIX,
-          reference: { type: 'string' },
-          confidence: { type: 'string', enum: ['high', 'medium', 'low'] },
-        },
-      },
-    },
-    limitations: { type: 'string' },
-  },
-};
 
 const str = { type: 'string' };
 const NARRATIVE_SCHEMA = {
@@ -125,7 +76,6 @@ const REWRITE_SCHEMA = {
   },
 };
 
-const clamp01 = (n: number) => Math.max(0, Math.min(0.98, n));
 
 function countPdfPages(bytes: ArrayBuffer) {
   const text = Buffer.from(bytes).toString('latin1');
@@ -136,19 +86,6 @@ function priceFor(pages: number | null) {
   return pages && pages > 10 ? { action: 'large_document_analysis', cost: 150 } : { action: 'plan_analysis', cost: 30 };
 }
 
-const INSTRUCTIONS = `You are DrawUp Check, a plan reviewer for architecture, engineering and construction drawing sets.
-Review ONLY the attached PDF. Every finding must point to something you can actually see in it: give the sheet number/title and where on the sheet.
-Never invent sheets, rooms, dimensions or notes that are not in the file. If the set is too incomplete to judge an item, say so in limitations instead of guessing.
-Review for: building code (use the jurisdiction and adopted code edition when given; otherwise state the model code you assumed), accessibility (2010 ADA Standards / ICC A117.1), life safety and egress, coordination between plans/sections/elevations/schedules, dimension strings that do not add up or are missing, documentation completeness (title block, scale, north arrow, sheet index, references), and obvious structural/MEP/site coordination gaps.
-Cite the specific code section in "reference" only when you are confident of it; otherwise write the topic (for example "IBC egress width — verify section for adopted edition").
-Severity: critical = life-safety or likely permit rejection; major = must be fixed before issue; minor = drafting/quality; info = note for the designer.
-For every finding also give "page" (the 1-based page number of the PDF where it is) and "box": the region on that page as fractions of the page width and height measured from the TOP-LEFT corner (x, y, w, h each between 0 and 1). The box is used to draw a redline cloud on the sheet, so cover the whole area concerned, a little generously. For a sheet-wide issue (title block, missing note) use the area you would mark up by hand.
-"sheet" is the sheet number exactly as printed in the title block (for example A101). If one issue repeats on several sheets, give the first sheet where it occurs and list the others in "location".
-"anchors": up to 4 short text strings printed on that sheet right at the issue (room name, door or wall tag, grid label, keynote, note heading), copied EXACTLY as printed. DrawUp finds them in the PDF text layer to place the cloud precisely, so never paraphrase them and never list text that is not on the sheet.
-Write "recommendation" as the specific change to make on the drawing (for example: Add 32 in. minimum clear width dimension at Door 101).
-"fix" describes how that part of THIS sheet should look once corrected, so DrawUp can draw it on top of the original sheet in drafting style. Never redesign the building or invent a different layout. type: "dimension" (label = the dimension text, for example 3'-0" CLR MIN.), "tag" (symbol = door/window/wall/room/keynote; label = the tag text), "note" (lines = note text in drafting capitals), "code_summary" (lines = "LABEL: value" rows), "table" (lines = rows with cells separated by |), or "none". Use only values that are shown in the set or are the code minimum you cite; for anything the set does not establish write NEEDS CONFIRMATION instead of a value. "fix.box" is where to draw it on the same page (same fractions as box): an empty area next to the issue for notes and tables, the dimensioned span for dimensions.
-A TEXT LAYER may follow: the text printed on each page, extracted from the PDF by DrawUp. Use it to confirm page numbers and copy anchors exactly.
-This is guidance for the design team, not a permit approval. Return JSON only, matching the schema.`;
 
 // Jaja's AEC Professional Document + Design Narrative Reviewer brief, condensed for the review pass.
 const NARRATIVE_INSTRUCTIONS = `DRAWUP NARRATIVE REVIEW. You are an expert AEC document reviewer, technical editor, proposal strategist and professional document designer. Review the uploaded document (design narrative, project approach, proposal, report, study, programming or basis-of-design document). Your goal is NOT to rewrite it now: review first, recommend, and wait for the user to approve changes.
@@ -174,64 +111,6 @@ async function loadOwned(id: string, userId: string) {
   return row && row.owner_id === userId ? row : null;
 }
 
-/* ---------------------------------------------------------------- partial output (V22) */
-/** Complete objects already written inside the JSON array `key`, even when the text is cut off. */
-function arrayObjects(text: string, key: string): any[] {
-  const k = text.indexOf('"' + key + '"');
-  if (k < 0) return [];
-  let i = text.indexOf('[', k);
-  if (i < 0) return [];
-  const out: any[] = [];
-  let depth = 0, start = -1, inStr = false, esc = false;
-  for (i = i + 1; i < text.length; i++) {
-    const ch = text[i];
-    if (inStr) { if (esc) esc = false; else if (ch === '\\') esc = true; else if (ch === '"') inStr = false; continue; }
-    if (ch === '"') { inStr = true; continue; }
-    if (ch === '{') { if (depth === 0) start = i; depth++; }
-    else if (ch === '}') { depth--; if (depth === 0 && start >= 0) { try { out.push(JSON.parse(text.slice(start, i + 1))); } catch {} start = -1; } }
-    else if (ch === ']' && depth === 0) break;
-  }
-  return out;
-}
-function stringField(text: string, key: string) {
-  const m = text.match(new RegExp('"' + key + '"\\s*:\\s*"((?:[^"\\\\]|\\\\.)*)"'));
-  try { return m ? JSON.parse('"' + m[1] + '"') : ''; } catch { return ''; }
-}
-/** Parses the model's JSON; when it was cut off, keeps every complete item that arrived. */
-function parseReport(text: string, arrays: string[], strings: string[]): { report: any; partial: boolean } | null {
-  try { const r = JSON.parse(text); if (r && typeof r === 'object') return { report: r, partial: false }; } catch {}
-  if (!text || !text.trim().startsWith('{')) return null;
-  const r: any = {};
-  arrays.forEach(k => { r[k] = arrayObjects(text, k); });
-  strings.forEach(k => { r[k] = stringField(text, k); });
-  return { report: r, partial: true };
-}
-
-/* ---------------------------------------------------------------- normalizers */
-const goodBox = (b: any) => b && [b.x, b.y, b.w, b.h].every((n: any) => typeof n === 'number' && isFinite(n)) && b.w > 0 && b.h > 0
-  ? { x: clamp01(b.x), y: clamp01(b.y), w: Math.max(0.02, Math.min(1, b.w)), h: Math.max(0.02, Math.min(1, b.h)) } : null;
-const strs = (a: any, n = 8) => (Array.isArray(a) ? a : []).filter((s: any) => typeof s === 'string' && s.trim()).map((s: string) => s.trim().slice(0, 240)).slice(0, n);
-function normFix(x: any) {
-  if (!x || typeof x !== 'object') return null;
-  const type = ['dimension', 'tag', 'note', 'code_summary', 'table'].includes(x.type) ? x.type : null;
-  if (!type) return null;
-  return { type, symbol: ['door', 'window', 'wall', 'room', 'keynote'].includes(x.symbol) ? x.symbol : 'none', label: String(x.label || '').slice(0, 120), lines: strs(x.lines, 14), box: goodBox(x.box) };
-}
-function normFindings(list: any): any[] {
-  return (Array.isArray(list) ? list : [])
-    .filter((f: any) => f && typeof f.issue === 'string' && f.issue.trim())
-    .map((f: any) => ({
-      category: CATEGORIES.includes(f.category) ? f.category : 'documentation',
-      severity: ['critical', 'major', 'minor', 'info'].includes(f.severity) ? f.severity : 'info',
-      sheet: String(f.sheet || ''), location: String(f.location || ''), issue: String(f.issue),
-      page: Number.isInteger(f.page) && f.page > 0 ? f.page : null,
-      box: goodBox(f.box),
-      anchors: strs(f.anchors, 4),
-      recommendation: String(f.recommendation || ''), reference: String(f.reference || ''),
-      fix: normFix(f.fix),
-      confidence: ['high', 'medium', 'low'].includes(f.confidence) ? f.confidence : 'medium',
-    }));
-}
 const lab = (s: any) => (LABELS.includes(s) ? s : 'needs_confirmation');
 function normNarrative(r: any) {
   const S = (v: any) => String(v ?? '').trim();
@@ -323,7 +202,9 @@ function docParts(doc: Doc, name: string, label: string, layer: string) {
 async function startJob(payload: Record<string, unknown>) {
   const list = models(process.env.DRAWUP_CHECK_MODEL, process.env.DRAWUP_COACH_MODEL);
   return streamCreate(payload, list).then(d => ({ data: d as any, model: d.model }))
-    .catch(() => openaiCreate({ ...payload, background: true, store: true }, list));
+    // V23: retry without the speed hint if a model rejects it, then fall back to a plain background job.
+    .catch(() => streamCreate(withoutSpeedHints(payload), list).then(d => ({ data: d as any, model: d.model })))
+    .catch(() => openaiCreate({ ...withoutSpeedHints(payload), background: true, store: true }, list));
 }
 
 /* V22.1: one-page durable jobs. Every completed page is committed before advancing.
@@ -349,6 +230,8 @@ async function startSheet(review: any, userId: string) {
     const context = `This is ONLY ORIGINAL PDF PAGE ${index + 1} of ${total}. Report every finding with page=${index + 1}. Never infer compliance on other pages. Project: ${review.title || 'unknown'}. Jurisdiction: ${review.jurisdiction || 'not supplied'}. Building type: ${review.building_type || 'not supplied'}. Review focus: ${(review.focus || CATEGORIES).join(', ')}.`;
     const payload = { instructions: INSTRUCTIONS + '\nIMPORTANT: Review this SINGLE sheet only. page_count=1; use original PDF page number for findings. Do not claim to have checked the rest of the set.',
       input: [{ role: 'user', content: [{ type: 'input_file', filename: `sheet-${index + 1}.pdf`, file_data: 'data:application/pdf;base64,' + Buffer.from(bytes).toString('base64') }, { type: 'input_text', text: context }] }],
+      // V23 speed: low reasoning effort per sheet (startJob retries without it if a model rejects it).
+      reasoning: { effort: process.env.DRAWUP_CHECK_EFFORT || 'low' },
       text: { format: { type: 'json_schema', name: 'drawup_check_report', strict: true, schema: SCHEMA } } };
     const { data, model } = await startJob(payload);
     return await adminUpdate('check_reviews', review.id, { response_id: data.id, model, sheet_state: 'running', sheet_started_at: new Date().toISOString(), error: null }, 'sheet_state=eq.starting');
@@ -493,7 +376,8 @@ export async function POST(request: Request) {
       payload = {
         instructions: INSTRUCTIONS,
         input: [{ role: 'user', content: [...docParts(doc, review.file_name, 'DRAWING SET', textLayer(body?.page_text, 'TEXT LAYER')), { type: 'input_text', text: context }] }],
-        tools: review.jurisdiction ? [{ type: 'web_search' }] : [],
+        // V23 speed: web search is off for drawing sets unless DRAWUP_CHECK_WEB_SEARCH=on.
+        tools: review.jurisdiction && process.env.DRAWUP_CHECK_WEB_SEARCH === 'on' ? [{ type: 'web_search' }] : [],
         text: { format: { type: 'json_schema', name: 'drawup_check_report', strict: true, schema: SCHEMA } },
       };
     } else {
@@ -672,10 +556,24 @@ async function finishRewrite(userId: string, review: any, data: any) {
   return adminUpdate('check_reviews', review.id, { rewrite_status: 'complete', rewrite: rw, rewrite_error: null }, 'rewrite_status=eq.writing');
 }
 
+/**
+ * V23: a quick check streams on the page's own request (no response_id, no sheet_state). If that page closed
+ * before the answer was saved, the row would sit at "reviewing" forever: after QUICK_STALE_MS it is marked
+ * failed and refunded. Sheet-by-sheet reviews (sheet_state set) are never touched here.
+ */
+const QUICK_STALE_MS = 15 * 60 * 1000;
+async function failStaleQuick(userId: string, row: any) {
+  if (row.status !== 'reviewing' || row.response_id || row.sheet_state || Date.now() - new Date(row.started_at || row.created_at).getTime() < QUICK_STALE_MS) return null;
+  const r = await adminUpdate('check_reviews', row.id, { status: 'failed', error: 'The quick check stopped when its page was closed before the answer was saved. Your credits were refunded. Run it again and keep the page open (about a minute).', completed_at: new Date().toISOString() }, 'status=eq.reviewing&response_id=is.null&sheet_state=is.null');
+  if (r) await refundCredits(userId, row.credit_access, 'check_refund');
+  return r;
+}
+
 /** Checks one review (and its rewrite) without streaming. Used when the member comes back. */
 async function reconcileRow(userId: string, row: any) {
   let done = false;
   try {
+    if (await failStaleQuick(userId, row)) return true;
     if (row.status === 'reviewing' && row.mode === 'plans' && row.sheet_state) {
       const r = await advanceSheets(row, userId);
       if (r?.status === 'complete' || r?.status === 'failed') { done = true; await notify(userId, r, 'DrawUp Check review finished', r.summary || 'Sheet review finished.'); }
@@ -725,6 +623,7 @@ export async function GET(request: Request) {
     const r = await advanceSheets(review, user.id);
     return NextResponse.json({ review: r || await loadOwned(review.id, user.id) });
   }
+  if (review.status === 'reviewing' && !review.response_id && !review.sheet_state) return NextResponse.json({ review: (await failStaleQuick(user.id, review)) || review });
   if (review.status !== 'reviewing' || !review.response_id) return NextResponse.json({ review });
   let j: JobRead;
   try { j = await readJob(review.response_id, after); }

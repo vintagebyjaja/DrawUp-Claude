@@ -83,7 +83,8 @@ function layoutNotes(notes){
       n.lines.map((l,i)=>`<text x="${NX+1}" y="${r2(n.ty+7+i*LH)}" font-size="9.2">${escX(l)}</text>`).join('');}).join('');
 }
 
-/* Full single-detail image: drawing, notes, title block, disclaimer. */
+/* Full single-detail image: drawing, notes, title block, disclaimer.
+   v25.1: d.badge / d.bubble / d.foot1 relabel the title block (AI-drawn details from drawup-detail-draw-v25.js). */
 function sheet(d){
   const S={out:[],notes:[],maxX:0};
   d.draw((k,ox,oy)=>kit(k,ox,oy,S));
@@ -94,11 +95,11 @@ function sheet(d){
 <g>${S.out.join('')}</g><g>${layoutNotes(S.notes)}</g>
 <line x1="6" y1="536" x2="${W-6}" y2="536" stroke="#111" stroke-width="1"/>
 <circle cx="44" cy="566" r="21" fill="#fff" stroke="#111" stroke-width="1.6"/><line x1="23" y1="566" x2="65" y2="566" stroke="#111" stroke-width="1"/>
-<text x="44" y="561" font-size="13" font-weight="700" text-anchor="middle">${escX(d.no||'1')}</text><text x="44" y="580" font-size="9" font-weight="700" text-anchor="middle">TYP</text>
+<text x="44" y="561" font-size="13" font-weight="700" text-anchor="middle">${escX(d.no||'1')}</text><text x="44" y="580" font-size="9" font-weight="700" text-anchor="middle">${escX(d.bubble||'TYP')}</text>
 <text x="76" y="560" font-size="${r2(ts)}" font-weight="700">${escX(tl)}</text><line x1="76" y1="566" x2="${r2(76+Math.min(440,tl.length*ts*.64))}" y2="566" stroke="#111" stroke-width="2"/>
 <text x="76" y="582" font-size="9.5">SCALE: ${escX(d.scale||'')}${d.views?'  ·  '+escX(d.views):''}</text>
-<text x="${W-16}" y="553" font-size="9" font-weight="700" text-anchor="end">DRAWUP TYPICAL DETAIL · ${escX(d.code||d.id.toUpperCase())}</text>
-<text x="${W-16}" y="567" font-size="8.4" text-anchor="end">LEARNING CONTENT · NOT FOR CONSTRUCTION</text>
+<text x="${W-16}" y="553" font-size="9" font-weight="700" text-anchor="end">${escX(d.badge||'DRAWUP TYPICAL DETAIL')} · ${escX(d.code||d.id.toUpperCase())}</text>
+<text x="${W-16}" y="567" font-size="8.4" text-anchor="end">${escX(d.foot1||'LEARNING CONTENT · NOT FOR CONSTRUCTION')}</text>
 <text x="${W-16}" y="580" font-size="8.4" text-anchor="end">ADAPT + VERIFY BY A LICENSED PROFESSIONAL AND THE AHJ</text>
 </svg>`;
 }
