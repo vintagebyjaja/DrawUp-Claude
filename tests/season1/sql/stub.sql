@@ -1,7 +1,14 @@
+do $$ begin create role anon nologin; exception when duplicate_object then null; end $$;
+do $$ begin create role authenticated nologin; exception when duplicate_object then null; end $$;
 -- Minimal Supabase stand-in for SQL tests (roles, auth.uid() from request.jwt.claims, the tables the Season 1
 -- migrations reference). Test-only.
-create role anon nologin; create role authenticated nologin;
+
 create schema auth; create schema storage;
+create table storage.buckets(id text primary key, name text, public boolean);
+create table storage.objects(id serial primary key, bucket_id text, name text);
+create function storage.foldername(name text) returns text[] language sql as $$ select string_to_array(name,'/') $$;
+alter table storage.objects enable row level security;
+insert into storage.buckets values ('drawup-private','drawup-private',false);
 create table auth.users(id uuid primary key);
 create function auth.uid() returns uuid language sql stable as $$ select nullif(current_setting('request.jwt.claims', true)::json->>'sub','')::uuid $$;
 create table public.profiles(id uuid primary key references auth.users(id), display_name text, account_type text default 'free');

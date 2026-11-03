@@ -3,7 +3,7 @@
    Formats: the DrawUp format (DRAWUP_FORMAT below), the firm standard format and client formats share one
    settings shape. A format may carry a PDF letterhead (drawn under the page) and a Word template (.docx) whose
    styles, headers and footers are kept when exporting to Word.
-   window.DrawUpSpecsExport = { DRAWUP_FORMAT, fixFormat, resolve, flatten, layout, pdf, docx, readDocxText, readPdfText, parseSpecText } */
+   window.DrawUpSpecsExport = { pageSize, PAGES, DRAWUP_FORMAT, fixFormat, resolve, flatten, layout, pdf, docx, readDocxText, readPdfText, parseSpecText } */
 (function () {
 'use strict';
 if (window.DrawUpSpecsExport) return;
@@ -28,11 +28,15 @@ const DRAWUP_FORMAT = {
   cover: true, toc: true, background: null, word_template: null, label: 'DrawUp'
 };
 const isObj = v => v && typeof v === 'object' && !Array.isArray(v);
+/* v30 Document Studio: page size with orientation. Landscape swaps width and height everywhere (preview, PDF
+   and Word), so one setting drives all three. */
+function pageSize(fmt) { const [w, h] = PAGES[(fmt && fmt.page) || 'letter'] || PAGES.letter; return (fmt && fmt.orientation === 'landscape') ? [h, w] : [w, h]; }
 function fixFormat(s) {
   const d = DRAWUP_FORMAT; s = isObj(s) ? s : {};
   const o = { ...d, ...s };
   ['margins', 'header', 'footer', 'letter_footer', 'letterhead'].forEach(k => { o[k] = { ...d[k], ...(isObj(s[k]) ? s[k] : {}) }; });
   if (!PAGES[o.page]) o.page = 'letter'; if (!FONTS[o.font]) o.font = 'Helvetica';
+  if (!['portrait', 'landscape'].includes(o.orientation)) o.orientation = 'portrait';
   o.size = Math.min(14, Math.max(7, +o.size || 10)); o.line = Math.min(2, Math.max(1, +o.line || 1.3)); o.indent = Math.min(1, Math.max(0.2, +o.indent || 0.5));
   ['t', 'r', 'b', 'l'].forEach(k => { o.margins[k] = Math.min(2.5, Math.max(0.25, +o.margins[k] || d.margins[k])); });
   if (!/^#[0-9a-f]{6}$/i.test(o.accent || '')) o.accent = d.accent; if (!['csi', 'decimal'].includes(o.numbering)) o.numbering = 'csi';
@@ -124,7 +128,7 @@ function flatten(doc, ctx, fmt, opts) {
 function wrap(text, maxW, width) { const out = []; const words = String(text).split(/(\s+)/); let line = ''; for (const w of words) { if (!w) continue; const tryLine = line + w; if (width(tryLine.trimEnd()) <= maxW || !line.trim()) { if (width(tryLine.trimEnd()) > maxW && !line.trim()) { let chunk = ''; for (const ch of w) { if (width(chunk + ch) > maxW && chunk) { out.push(chunk); chunk = ''; } chunk += ch; } line = chunk; } else line = tryLine; } else { out.push(line.trimEnd()); line = w.trimStart(); } } out.push(line.trimEnd()); return out.length ? out : ['']; }
 // metrics(font, bold) -> (text, size) => width in points
 function layout(blocks, fmt, metrics, ctx) {
-  fmt = fixFormat(fmt); const [pw, ph] = PAGES[fmt.page]; const W = pw * 72, H = ph * 72, M = fmt.margins;
+  fmt = fixFormat(fmt); const [pw, ph] = pageSize(fmt); const W = pw * 72, H = ph * 72, M = fmt.margins;
   const L = M.l * 72, Rt = W - M.r * 72, top = H - M.t * 72 - 22, bottom = M.b * 72 + 22, CW = Rt - L, size = fmt.size, lh = size * fmt.line, IND = fmt.indent * 72;
   const pages = []; let pg = null, y = 0, sec = { number: '', title: '' }, secPage = 0, isLetter = false;
   const newPage = () => { pg = { items: [], section: { ...sec }, secPage: ++secPage, letter: isLetter }; pages.push(pg); y = top; };
@@ -260,7 +264,7 @@ function docxBody(blocks, fmt, styles, sectPr) {
       const head = b.t === 'table' ? b.cols : null, rows = b.t === 'table' ? b.rows : b.rows;
       const border = b.t === 'table' ? '<w:tblBorders><w:top w:val="single" w:sz="4" w:color="94A3B8"/><w:left w:val="single" w:sz="4" w:color="94A3B8"/><w:bottom w:val="single" w:sz="4" w:color="94A3B8"/><w:right w:val="single" w:sz="4" w:color="94A3B8"/><w:insideH w:val="single" w:sz="4" w:color="94A3B8"/><w:insideV w:val="single" w:sz="4" w:color="94A3B8"/></w:tblBorders>' : '';
       const cell = (t, o) => `<w:tc><w:tcPr>${o.fill ? `<w:shd w:val="clear" w:color="auto" w:fill="${o.fill}"/>` : ''}</w:tcPr>${String(t || '').split('\n').map(line => P(line ? run(line, { bold: o.bold, size: o.size }) : '', { after: 0 })).join('')}</w:tc>`;
-      const ncol = (head || rows[0] || ['']).length, tw = TW(PAGES[fmt.page][0] - fmt.margins.l - fmt.margins.r), gw = b.t === 'fields' ? [Math.round(tw * 0.28), tw - Math.round(tw * 0.28)] : Array.from({ length: ncol }, () => Math.floor(tw / ncol));
+      const ncol = (head || rows[0] || ['']).length, tw = TW(pageSize(fmt)[0] - fmt.margins.l - fmt.margins.r), gw = b.t === 'fields' ? [Math.round(tw * 0.28), tw - Math.round(tw * 0.28)] : Array.from({ length: ncol }, () => Math.floor(tw / ncol));
       let x = `<w:tbl><w:tblPr><w:tblW w:w="5000" w:type="pct"/>${border}<w:tblCellMar><w:left w:w="80" w:type="dxa"/><w:right w:w="80" w:type="dxa"/></w:tblCellMar></w:tblPr><w:tblGrid>${gw.map(w => `<w:gridCol w:w="${w}"/>`).join('')}</w:tblGrid>`;
       if (head) x += `<w:tr><w:trPr><w:tblHeader/></w:trPr>${head.map(h => cell(h, { bold: true, fill: 'EEF2F7' })).join('')}</w:tr>`;
       (rows.length ? rows : [head.map(() => '')]).forEach(r => { x += `<w:tr>${r.map((c, i) => cell(c, b.t === 'fields' && i === 0 ? { bold: true, size: fmt.size - 1.5 } : {})).join('')}</w:tr>`; });
@@ -271,7 +275,7 @@ function docxBody(blocks, fmt, styles, sectPr) {
 }
 function fieldRun(instr, rpr) { rpr = rpr || ''; return `<w:r>${rpr}<w:fldChar w:fldCharType="begin"/></w:r><w:r>${rpr}<w:instrText xml:space="preserve"> ${instr} </w:instrText></w:r><w:r>${rpr}<w:fldChar w:fldCharType="separate"/></w:r><w:r>${rpr}<w:t>1</w:t></w:r><w:r>${rpr}<w:fldChar w:fldCharType="end"/></w:r>`; }
 function hfXml(tag, cells, fmt, R) { // three tab-separated parts: left, center, right. {page} becomes a PAGE field, {pages} NUMPAGES.
-  const W = TW(PAGES[fmt.page][0] - fmt.margins.l - fmt.margins.r), font = FONTS[fmt.font][2];
+  const W = TW(pageSize(fmt)[0] - fmt.margins.l - fmt.margins.r), font = FONTS[fmt.font][2];
   const rpr = `<w:rPr><w:rFonts w:ascii="${font}" w:hAnsi="${font}"/><w:color w:val="334155"/><w:sz w:val="${Math.round((fmt.size - 2) * 2)}"/></w:rPr>`;
   const runs = s => R(s).replace(/\[[^\]]*\]/g, '').split(/(\{page\}|\{pages\})/).map(part => part === '{page}' ? fieldRun('PAGE', rpr) : part === '{pages}' ? fieldRun('NUMPAGES', rpr) : part ? `<w:r>${rpr}<w:t xml:space="preserve">${xe(part)}</w:t></w:r>` : '').join('');
   return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:${tag} xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><w:p><w:pPr><w:tabs><w:tab w:val="center" w:pos="${Math.round(W / 2)}"/><w:tab w:val="right" w:pos="${W}"/></w:tabs></w:pPr>${runs(cells[0] || '')}<w:r><w:tab/></w:r>${runs(cells[1] || '')}<w:r><w:tab/></w:r>${runs(cells[2] || '')}</w:p></w:${tag}>`;
@@ -293,7 +297,7 @@ async function docx(doc, ctx, fmt, files, opts) {
     for (const name of Object.keys(zip.files)) if (/^word\/(header|footer)\d*\.xml$/.test(name)) zip.file(name, fillXml(await zip.file(name).async('string')));
     return zip.generateAsync({ type: 'uint8array' });
   }
-  const zip = new JSZip(); const [pw, ph] = PAGES[fmt.page], M = fmt.margins, font = FONTS[fmt.font][2];
+  const zip = new JSZip(); const [pw, ph] = pageSize(fmt), M = fmt.margins, font = FONTS[fmt.font][2];
   const isLetter = (doc.kind || 'spec') !== 'spec';
   const hdr = isLetter ? ['', '', ''] : [fmt.header.left, '', fmt.header.right];
   const ftr = isLetter ? [fmt.letter_footer.left, fmt.letter_footer.center, fmt.letter_footer.right] : [fmt.footer.left, fmt.footer.center, fmt.footer.right];
@@ -303,7 +307,7 @@ async function docx(doc, ctx, fmt, files, opts) {
   const ctypes = [];
   zip.file('word/header1.xml', hfXml('hdr', hdr, fmt, R)); rels.push('<Relationship Id="rH1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/header" Target="header1.xml"/>'); ctypes.push('<Override PartName="/word/header1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml"/>');
   secs.forEach((s, i) => { const f = ftr.map(c => fill(c, { section_number: s.section.number, section_title: s.section.title })); zip.file(`word/footer${i + 1}.xml`, hfXml('ftr', f, fmt, R)); rels.push(`<Relationship Id="rF${i + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/footer" Target="footer${i + 1}.xml"/>`); ctypes.push(`<Override PartName="/word/footer${i + 1}.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml"/>`); });
-  const sectFor = (i, next) => `<w:sectPr><w:headerReference w:type="default" r:id="rH1"/><w:footerReference w:type="default" r:id="rF${i + 1}"/>${next ? '<w:type w:val="nextPage"/>' : ''}<w:pgSz w:w="${TW(pw)}" w:h="${TW(ph)}"/><w:pgMar w:top="${TW(M.t + 0.35)}" w:right="${TW(M.r)}" w:bottom="${TW(M.b + 0.35)}" w:left="${TW(M.l)}" w:header="${TW(M.t)}" w:footer="${TW(M.b)}" w:gutter="0"/><w:pgNumType w:start="1"/></w:sectPr>`;
+  const sectFor = (i, next) => `<w:sectPr><w:headerReference w:type="default" r:id="rH1"/><w:footerReference w:type="default" r:id="rF${i + 1}"/>${next ? '<w:type w:val="nextPage"/>' : ''}<w:pgSz w:w="${TW(pw)}" w:h="${TW(ph)}"${fmt.orientation === 'landscape' ? ' w:orient="landscape"' : ''}/><w:pgMar w:top="${TW(M.t + 0.35)}" w:right="${TW(M.r)}" w:bottom="${TW(M.b + 0.35)}" w:left="${TW(M.l)}" w:header="${TW(M.t)}" w:footer="${TW(M.b)}" w:gutter="0"/><w:pgNumType w:start="1"/></w:sectPr>`;
   // build body: split per section so each section break carries its own footer
   let body = ''; const chunks = []; let curChunk = [];
   blocks.forEach(b => { if ((b.t === 'break' && b.restart) && curChunk.length) { chunks.push(curChunk); curChunk = []; } if (!(b.t === 'break' && b.restart)) curChunk.push(b); });
@@ -358,5 +362,5 @@ function parseSpecText(lines) {
 }
 function rid() { return (crypto.randomUUID ? crypto.randomUUID() : 'x' + Date.now().toString(36) + Math.random().toString(36).slice(2)).slice(0, 13); }
 
-window.DrawUpSpecsExport = { DRAWUP_FORMAT, PAGES, FONTS, fixFormat, tokens, untokens, resolve, openItems, fill, paraLabels, flatten, layout, pdf, docx, readDocxText, readPdfText, parseSpecText, rid, pdfLib, pdfjs, zipLib };
+window.DrawUpSpecsExport = { DRAWUP_FORMAT, PAGES, pageSize, FONTS, fixFormat, tokens, untokens, resolve, openItems, fill, paraLabels, flatten, layout, pdf, docx, readDocxText, readPdfText, parseSpecText, rid, pdfLib, pdfjs, zipLib };
 })();

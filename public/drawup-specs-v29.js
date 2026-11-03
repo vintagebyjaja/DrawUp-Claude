@@ -33,6 +33,14 @@ const slug = s => String(s || 'document').toLowerCase().replace(/[^a-z0-9]+/g, '
 const STATE_NAMES = () => { const m = {}; Object.entries(window.DRAWUP_US_STATES || {}).forEach(([a, s]) => { m[s.n.toLowerCase()] = a; }); return m; };
 function stateOf(loc) { const s = String(loc || ''); let m = s.match(/,\s*([A-Z]{2})\b/) || s.match(/\b([A-Z]{2})\s*\d{5}/) || s.match(/^\s*([A-Z]{2})\s*$/); if (m && (window.DRAWUP_US_STATES || {})[m[1]]) return m[1]; const names = STATE_NAMES(); const low = s.toLowerCase(); for (const n of Object.keys(names).sort((a, b) => b.length - a.length)) if (low.includes(n)) return names[n]; return ''; }
 
+/* v30 Document Studio: the same editor serves two stores. A firm scope keeps documents in firm_documents
+   (the firm's own, SQL 0075). A personal scope keeps them in project_documents (the member's own, SQL 0077).
+   Everything below goes through DOCS(S), scopeFilter and scopeFields, so neither store is special-cased. */
+const DOCS = S => (S.scope && S.scope.table) || 'firm_documents';
+const scopeFilter = (S, q) => S.scope && S.scope.kind === 'personal' ? q.eq('owner_id', S.me) : q.eq('firm_id', S.firm.id);
+const scopeFields = S => S.scope && S.scope.kind === 'personal' ? { owner_id: S.me } : { firm_id: S.firm.id };
+const isPersonal = S => !!(S.scope && S.scope.kind === 'personal');
+
 /* ------------------------------------------------------------------ document model */
 function makeSection(number, title, outline) {
   const src = D.MASTER[number] || D.genericSection(number, title || catTitle(number) || 'Section'); const parts = {};
@@ -41,7 +49,7 @@ function makeSection(number, title, outline) {
 }
 function fromRow(r) {
   const t = TYPE[r.doc_type] || TYPE.narrative, kind = t.kind;
-  const doc = { id: r.id, firm_id: r.firm_id, title: r.title, doc_type: TYPE[r.doc_type] ? r.doc_type : 'narrative', kind, type_label: t.label, project_thread_id: r.project_thread_id || null, format_id: r.format_id || null, status: r.status || 'draft', doc_number: r.doc_number || '', assigned_to: r.assigned_to || null, source: r.source || 'manual', created_by: r.created_by, updated_by: r.updated_by, updated_at: r.updated_at, created_at: r.created_at, data: (r.cover && r.cover.data) || {} };
+  const doc = { id: r.id, firm_id: r.firm_id, owner_id: r.owner_id, title: r.title, doc_type: TYPE[r.doc_type] ? r.doc_type : 'narrative', kind, type_label: t.label, project_thread_id: r.project_thread_id || null, format_id: r.format_id || null, status: r.status || 'draft', doc_number: r.doc_number || '', assigned_to: r.assigned_to || null, source: r.source || 'manual', created_by: r.created_by, updated_by: r.updated_by, updated_at: r.updated_at, created_at: r.created_at, data: (r.cover && r.cover.data) || {} };
   if (kind === 'spec') { doc.sections = Array.isArray(r.sections) ? r.sections : []; doc.outline = !!(r.fields && r.fields.outline) || !!t.outline; }
   else { doc.blocks = Array.isArray(r.sections) ? r.sections : []; doc.fields = (r.fields && Array.isArray(r.fields.list)) ? r.fields.list : []; doc.heading = (r.fields && r.fields.heading) || t.label; }
   return doc;
@@ -57,10 +65,10 @@ function openCount(doc, ctx) { let n = 0; const add = t => { n += X.openItems(t,
 
 /* ------------------------------------------------------------------ data access */
 async function loadAll(S) {
-  const c = S.c, f = S.firm.id;
+  const c = S.c, f = isPersonal(S) ? '00000000-0000-0000-0000-000000000000' : S.firm.id;
   const q = await Promise.all([
-    c.client.from('firm_documents').select('*').eq('firm_id', f).order('updated_at', { ascending: false }),
-    c.client.from('firm_spec_formats').select('*').eq('firm_id', f).order('updated_at', { ascending: false }),
+    scopeFilter(S, c.client.from(DOCS(S)).select('*')).order('updated_at', { ascending: false }),
+    (isPersonal(S) ? c.client.from('firm_spec_formats').select('*') : c.client.from('firm_spec_formats').select('*').eq('firm_id', f)).order('updated_at', { ascending: false }),
     c.client.rpc('drawup_spec_projects', { p_firm: f }),
     c.client.from('firm_project_info').select('*').eq('firm_id', f),
     c.client.from('firm_members').select('user_id,role').eq('firm_id', f),
@@ -86,11 +94,26 @@ const memberName = (S, id) => (S.members.find(m => m.id === id) || {}).name || (
 const project = (S, id) => S.projects.find(p => p.id === id) || null;
 function officeAddress(S) { const o = S.offices.find(x => x.is_headquarters) || S.offices[0]; if (!o) return ''; return [o.address, [o.city, o.state].filter(Boolean).join(', ')].filter(Boolean).join(', '); }
 function autoInfo(S, p) { const a = { architect_name: S.firm.name, architect_address: officeAddress(S) }; if (p) Object.assign(a, { project_name: p.project_name, project_location: p.location, building_type: p.project_type, phase: p.project_phase, project_description: p.description, owner_name: p.client_nickname }); return a; }
-function projectData(S, pid) { const p = project(S, pid); const auto = autoInfo(S, p); const saved = (pid && S.info[pid] && S.info[pid].info) || {}; const out = { ...auto }; Object.entries(saved).forEach(([k, v]) => { if (v != null && String(v).trim() !== '') out[k] = v; }); return { data: out, auto, saved, p }; }
+function projectData(S, pid) {
+  const p = project(S, pid); const auto = autoInfo(S, p);
+  // v30: Project Information (project_profiles) is the project's own record; the firm's saved info still applies
+  // on top of it for firm documents. Both are "saved" values, so neither is overwritten by a document.
+  const intel = (pid && S.intel && S.intel[pid]) || {};
+  const saved = { ...intel, ...((pid && S.info[pid] && S.info[pid].info) || {}) };
+  const out = { ...auto }; Object.entries(saved).forEach(([k, v]) => { if (v != null && String(v).trim() !== '') out[k] = v; });
+  return { data: out, auto, saved, p };
+}
 function ctxFor(S, doc) {
   const base = doc.project_thread_id ? projectData(S, doc.project_thread_id).data : { ...autoInfo(S, null), ...doc.data };
   const brief = doc.project_thread_id && S.briefs[doc.project_thread_id];
   return { data: { ...base, today: new Date().toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' }), firm_name: S.firm.name, document_number: doc.doc_number || '', document_title: doc.title || '', sheet_count: brief ? String(brief.sheets.length) : '', sheet_list: brief && brief.sheets.length ? brief.sheets.map(x => (x.sheet_number || '') + '   ' + (x.sheet_title || '')).join('\n') : '' }, labels: LABELS };
+}
+/** v30: the project's own Project Information values (project_profiles), cached per project. */
+async function intelFor(S, pid) {
+  if (!pid || !window.DrawUpProjectInfo) return null; S.intel = S.intel || {};
+  if (S.intel[pid]) return S.intel[pid];
+  try { const d = await window.DrawUpProjectInfo.data(pid); S.intel[pid] = (d && d.values) || {}; } catch (_e) { S.intel[pid] = {}; }
+  return S.intel[pid];
 }
 async function brief(S, pid) { if (!pid) return null; if (S.briefs[pid]) return S.briefs[pid]; const r = await S.c.client.rpc('drawup_spec_project_brief', { p_project: pid }); const b = r.data && typeof r.data === 'object' ? r.data : {}; S.briefs[pid] = { sheets: Array.isArray(b.sheets) ? b.sheets : [], reviews: Array.isArray(b.reviews) ? b.reviews : [] }; return S.briefs[pid]; }
 async function bytesOf(S, path) { if (!path) return null; if (S.bytes[path]) return S.bytes[path]; const r = await S.c.client.storage.from(BUCKET).download(path); if (r.error) throw r.error; const b = new Uint8Array(await r.data.arrayBuffer()); S.bytes[path] = b; return b; }
@@ -104,9 +127,17 @@ async function uploadSpecFile(S, file) {
   S.bytes[path] = new Uint8Array(await file.arrayBuffer()); S.kitFiles.unshift(r.data); return r.data;
 }
 function formatRow(S, id) { return id ? S.formats.find(f => f.id === id) || null : null; }
+/** v30: the format's settings with this document's own page setup on top (size, orientation, margins). */
+function pageOver(settings, doc) {
+  const o = (doc && doc.data && doc.data.page) || null; if (!o) return settings;
+  const out = { ...settings, ...(o.page ? { page: o.page } : {}), ...(o.orientation ? { orientation: o.orientation } : {}) };
+  if (o.margins) out.margins = { ...settings.margins, ...o.margins };
+  return X.fixFormat(out);
+}
+const fmtFor = (S, doc) => pageOver(X.fixFormat((formatRow(S, doc.format_id) || {}).settings), doc);
 function formatName(S, id) { const f = formatRow(S, id); return f ? (f.kind === 'firm' ? 'Firm standard' : 'Client: ' + (f.client_name || f.name)) : 'DrawUp format'; }
-async function formatFiles(S, row) { // settings + bytes for export
-  const settings = X.fixFormat(row ? row.settings : null), files = {};
+async function formatFiles(S, row, doc) { // settings + bytes for export
+  const settings = pageOver(X.fixFormat(row ? row.settings : null), doc), files = {};
   if (row) { if (settings.background && settings.background.path) { try { settings.background = { ...settings.background, bytes: await bytesOf(S, settings.background.path) }; } catch (_e) { settings.background = null; } }
     if (row.template_file_id) { const kf = S.kitFiles.find(k => k.id === row.template_file_id); if (kf) try { files.wordTemplate = await bytesOf(S, kf.storage_path); } catch (_e) { /* falls back to the DrawUp Word layout */ } } }
   const logo = settings.letterhead.logo; let url = null;
@@ -142,11 +173,14 @@ function diffHTML(a, b) { // word diff: what changed from the starter text (a) t
 
 /* ------------------------------------------------------------------ mount */
 async function mountSpecs(body, c, firm, opts) {
-  const fr = await c.client.from('firms').select('id,name,slug,logo_url,website').eq('id', firm.id).maybeSingle();
-  const S = { c, body, firm: { ...firm, ...(fr.data || {}) }, admin: !!(opts && opts.admin), me: c.user.id, briefs: {}, bytes: {}, view: 'docs', filter: { group: 'All', project: '', q: '' }, mapF: { state: '', type: '', phase: '', docs: false, mine: false, src: 'all' } };
+  const scope = (opts && opts.scope) || { kind: 'firm', table: 'firm_documents' };
+  const fr = scope.kind === 'personal' ? { data: null } : await c.client.from('firms').select('id,name,slug,logo_url,website').eq('id', firm.id).maybeSingle();
+  const S = { c, body, scope, firm: { ...firm, ...(fr.data || {}) }, admin: !!(opts && opts.admin), me: c.user.id, briefs: {}, bytes: {}, view: 'docs', filter: { group: 'All', project: '', q: '' }, mapF: { state: '', type: '', phase: '', docs: false, mine: false, src: 'all' } };
   body.innerHTML = '<div class="du-loading">LOADING DRAWUP SPECS…</div>';
   await loadAll(S);
-  S.admin = S.admin || S.roles[S.me] === 'admin';
+  S.admin = S.admin || S.roles[S.me] === 'admin' || isPersonal(S);
+  if (opts && opts.hooks) S.hooks = opts.hooks;
+  if (opts && opts.onState) opts.onState(S);
   const params = new URLSearchParams((location.hash.split('?')[1]) || ''); let openId = params.get('doc');
   try { const k = sessionStorage.getItem('du-specs-open'); if (k) { openId = k; sessionStorage.removeItem('du-specs-open'); } } catch (_e) { /* private mode */ }
   const want = openId && S.docs.find(d => d.id === openId);
@@ -223,12 +257,12 @@ function newDocModal(S, pre) {
     catch (e) { st.textContent = 'Not created: ' + (sqlMissing(e) ? 'run the DrawUp Specs SQL first.' : (e.message || e)); v('spn-go').disabled = false; } };
 }
 async function createDoc(S, o) {
-  const t = TYPE[o.type]; const doc = { firm_id: S.firm.id, doc_type: o.type, kind: t.kind, type_label: t.label, title: o.title || t.label, doc_number: o.number || '', project_thread_id: o.project, format_id: o.format, status: 'draft', data: {} };
+  const t = TYPE[o.type]; const doc = { ...scopeFields(S), doc_type: o.type, kind: t.kind, type_label: t.label, title: o.title || t.label, doc_number: o.number || '', project_thread_id: o.project, format_id: o.format, status: 'draft', data: {} };
   if (t.kind === 'spec') { doc.outline = !!t.outline; doc.sections = (o.sections || t.starter || []).map(n => makeSection(n, null, doc.outline)); }
   else { doc.fields = JSON.parse(JSON.stringify(t.fields || [])); doc.heading = t.label; doc.blocks = JSON.parse(JSON.stringify(o.blocks || t.blocks || [])).map(b => ({ id: X.rid(), ...b }));
     if (o.project) { const br = await brief(S, o.project).catch(() => null); doc.blocks.forEach(b => { if (b.pull) pullInto(S, doc, b, br); }); } }
-  const row = { firm_id: S.firm.id, created_by: S.me, source: o.source || 'specs', ...toRow(doc, S.me) };
-  const r = await S.c.client.from('firm_documents').insert(row).select('*').single(); if (r.error) throw r.error;
+  const row = { ...scopeFields(S), created_by: S.me, source: o.source || 'specs', ...toRow(doc, S.me) };
+  const r = await S.c.client.from(DOCS(S)).insert(row).select('*').single(); if (r.error) throw r.error;
   const d = fromRow(r.data); S.docs.unshift(d); return d;
 }
 // Fill a table block from the project: drawing sheets, Check findings or the project team.
@@ -254,7 +288,7 @@ function openEditor(S, doc) {
       <label class="sp-mini"><span>Project</span><select data-top="project"><option value="">No project</option>${S.projects.map(x => `<option value="${x.id}" ${x.id === doc.project_thread_id ? 'selected' : ''}>${esc(x.project_name)}</option>`).join('')}</select></label>
       <label class="sp-mini"><span>Format</span><select data-top="format"><option value="">DrawUp format</option>${S.formats.map(f => `<option value="${f.id}" ${f.id === doc.format_id ? 'selected' : ''}>${f.kind === 'firm' ? 'Firm standard: ' + esc(f.name) : 'Client: ' + esc(f.client_name || f.name)}</option>`).join('')}</select></label>
       <label class="sp-mini"><span>Status</span><select data-top="status">${DOC_STATUS.map(([k, l]) => `<option value="${k}" ${k === doc.status ? 'selected' : ''}>${l}</option>`).join('')}</select></label>
-      <button class="du-btn ghost" type="button" data-side="data">Project data</button><button class="du-btn primary" type="button" data-side="preview">Preview &amp; export</button>
+      ${(S.hooks && S.hooks.topHTML) ? S.hooks.topHTML(doc, S) : ''}<button class="du-btn ghost" type="button" data-side="data">Project data</button><button class="du-btn primary" type="button" data-side="preview">Preview &amp; export</button>
       <button class="du-btn ghost sp-more" type="button" aria-label="More" data-more>⋯</button>
     </div></div>
   <div class="sp-conflict" hidden></div>
@@ -262,23 +296,25 @@ function openEditor(S, doc) {
   const savedEl = b.querySelector('.sp-saved'); S.savedEl = savedEl; showSaved(S);
   b.querySelector('.sp-back').onclick = async () => { await flush(S); S.doc = null; renderHub(S); };
   b.querySelector('.sp-title').oninput = e => { doc.title = e.target.value; dirty(S); };
-  b.querySelector('[data-top="project"]').onchange = async e => { doc.project_thread_id = e.target.value || null; dirty(S); if (doc.project_thread_id) await brief(S, doc.project_thread_id).catch(() => null); redraw(S); if (S.side) openSide(S, S.side); };
+  b.querySelector('[data-top="project"]').onchange = async e => { doc.project_thread_id = e.target.value || null; dirty(S); if (doc.project_thread_id) await Promise.all([brief(S, doc.project_thread_id).catch(() => null), intelFor(S, doc.project_thread_id).catch(() => null)]); redraw(S); if (S.side) openSide(S, S.side); };
   b.querySelector('[data-top="format"]').onchange = e => { doc.format_id = e.target.value || null; dirty(S); if (S.side === 'preview') openSide(S, 'preview'); };
   b.querySelector('[data-top="status"]').onchange = e => { doc.status = e.target.value; dirty(S); };
   b.querySelectorAll('[data-side]').forEach(x => x.onclick = () => S.side === x.dataset.side ? closeSide(S) : openSide(S, x.dataset.side));
   b.querySelector('[data-more]').onclick = e => moreMenu(S, e.currentTarget);
-  if (doc.project_thread_id) brief(S, doc.project_thread_id).then(() => { if (S.doc === doc) redraw(S); }).catch(() => null);
+  if (S.hooks && S.hooks.bindTop) S.hooks.bindTop(b, doc, S);
+  if (doc.project_thread_id) Promise.all([brief(S, doc.project_thread_id), intelFor(S, doc.project_thread_id)]).then(() => { if (S.doc === doc) { redraw(S); if (S.side) openSide(S, S.side); } }).catch(() => null);
   redraw(S); if (S.side) openSide(S, S.side);
 }
 function moreMenu(S, at) {
   const doc = S.doc; document.querySelector('.sp-menu')?.remove();
-  const items = [['dup', 'Duplicate document'], ...(doc.kind === 'spec' ? [['changes', S.showChanges ? 'Hide changes' : 'Show changes from the starter text']] : []), ['del', 'Delete document']];
+  const items = [['dup', 'Duplicate document'], ...(doc.kind === 'spec' ? [['changes', S.showChanges ? 'Hide changes' : 'Show changes from the starter text']] : []), ...((S.hooks && S.hooks.menuItems) ? S.hooks.menuItems(doc, S) : []), ['del', 'Delete document']];
   const r = at.getBoundingClientRect(); document.body.insertAdjacentHTML('beforeend', `<div class="sp-menu" role="menu" style="top:${r.bottom + 6 + window.scrollY}px;left:${Math.max(8, r.right - 260 + window.scrollX)}px">${items.map(([k, l]) => `<button type="button" role="menuitem" data-m="${k}">${l}</button>`).join('')}</div>`);
   const m = document.querySelector('.sp-menu'); const close = e => { if (!m.contains(e.target)) { m.remove(); document.removeEventListener('mousedown', close); } }; setTimeout(() => document.addEventListener('mousedown', close));
   m.querySelectorAll('[data-m]').forEach(x => x.onclick = async () => { m.remove();
+    if (S.hooks && S.hooks.menuPick && await S.hooks.menuPick(x.dataset.m, doc, S)) return;
     if (x.dataset.m === 'changes') { S.showChanges = !S.showChanges; redraw(S); }
     if (x.dataset.m === 'dup') { await flush(S); try { const copy = JSON.parse(JSON.stringify(doc)); const d = await createDoc(S, { type: doc.doc_type, title: doc.title + ' (copy)', number: doc.doc_number, project: doc.project_thread_id, format: doc.format_id, sections: [] }); Object.assign(d, { sections: copy.sections, blocks: copy.blocks, fields: copy.fields, heading: copy.heading, data: copy.data, outline: copy.outline }); S.doc = d; await save(S, true); openEditor(S, d); toast(S, 'Copy made.'); } catch (e) { toast(S, e.message || String(e), true); } }
-    if (x.dataset.m === 'del') { if (!confirm('Delete “' + doc.title + '”? This cannot be undone.')) return; const r2 = await S.c.client.from('firm_documents').delete().eq('id', doc.id).select('id'); if (r2.error || !r2.data?.length) { toast(S, r2.error?.message || 'Only the person who made it or a firm admin can delete it.', true); return; } S.docs = S.docs.filter(d => d.id !== doc.id); S.doc = null; clearTimeout(S.timer); S.dirty = false; renderHub(S); toast(S, 'Document deleted.'); }
+    if (x.dataset.m === 'del') { if (!confirm('Delete “' + doc.title + '”? This cannot be undone.')) return; const r2 = await S.c.client.from(DOCS(S)).delete().eq('id', doc.id).select('id'); if (r2.error || !r2.data?.length) { toast(S, r2.error?.message || 'Only the person who made it or a firm admin can delete it.', true); return; } S.docs = S.docs.filter(d => d.id !== doc.id); S.doc = null; clearTimeout(S.timer); S.dirty = false; renderHub(S); toast(S, 'Document deleted.'); }
   });
 }
 function redraw(S) { if (S.doc.kind === 'spec') { renderTree(S); renderSection(S); } else renderLetter(S); }
@@ -289,16 +325,17 @@ async function save(S, force) {
   const doc = S.doc; if (!doc || (!S.dirty && !force)) return; if (S.saving) { S.again = true; return; }
   S.saving = true; S.saveError = ''; showSaved(S);
   try {
-    if (!force) { const cur = await S.c.client.from('firm_documents').select('updated_at,updated_by').eq('id', doc.id).maybeSingle();
+    if (!force) { const cur = await S.c.client.from(DOCS(S)).select('updated_at,updated_by').eq('id', doc.id).maybeSingle();
       if (cur.data && S.loadedAt && cur.data.updated_at && cur.data.updated_at !== S.loadedAt && cur.data.updated_by && cur.data.updated_by !== S.me && !S.overwrite) { S.saving = false; conflict(S, cur.data); return; } }
     const row = toRow(doc, S.me); S.dirty = false;
-    const r = await S.c.client.from('firm_documents').update(row).eq('id', doc.id).select('updated_at,updated_by'); if (r.error) throw r.error; if (!r.data?.length) throw new Error('the database did not confirm the save');
+    const r = await S.c.client.from(DOCS(S)).update(row).eq('id', doc.id).select('updated_at,updated_by'); if (r.error) throw r.error; if (!r.data?.length) throw new Error('the database did not confirm the save');
     doc.updated_at = r.data[0].updated_at || row.updated_at; doc.updated_by = S.me; S.loadedAt = doc.updated_at;
+    if (S.hooks && S.hooks.afterSave) { try { await S.hooks.afterSave(doc, S); } catch (e) { console.warn('Document Studio version', e); } }
   } catch (e) { S.dirty = true; S.saveError = sqlMissing(e) ? 'run the DrawUp Specs SQL' : (e.message || String(e)); }
   S.saving = false; showSaved(S); if (S.again) { S.again = false; save(S); }
 }
 function conflict(S, cur) { const el = S.body.querySelector('.sp-conflict'); if (!el) return; el.hidden = false; el.innerHTML = `<b>${esc(memberName(S, cur.updated_by) || 'Someone')} saved this document at ${esc(stamp(cur.updated_at))}.</b> <button class="du-btn ghost" type="button" data-c="reload">Load their version</button> <button class="du-btn ghost" type="button" data-c="keep">Keep mine and save</button>`;
-  el.querySelector('[data-c="reload"]').onclick = async () => { const r = await S.c.client.from('firm_documents').select('*').eq('id', S.doc.id).single(); if (r.data) { const d = fromRow(r.data); S.docs = S.docs.map(x => x.id === d.id ? d : x); S.dirty = false; openEditor(S, d); } };
+  el.querySelector('[data-c="reload"]').onclick = async () => { const r = await S.c.client.from(DOCS(S)).select('*').eq('id', S.doc.id).single(); if (r.data) { const d = fromRow(r.data); S.docs = S.docs.map(x => x.id === d.id ? d : x); S.dirty = false; openEditor(S, d); } };
   el.querySelector('[data-c="keep"]').onclick = () => { S.overwrite = true; el.hidden = true; save(S).then(() => { S.overwrite = false; }); }; }
 
 /* ------------------------------------------------------------------ spec editor: tree */
@@ -368,7 +405,7 @@ function importModal(S) {
 function renderSection(S) {
   const doc = S.doc, el = S.body.querySelector('.sp-doc'); const s = doc.sections.find(x => x.id === S.secId);
   if (!s) { el.innerHTML = `<div class="sp-blank"><h3>${doc.sections.length ? 'Pick a section on the left.' : 'Add the first section.'}</h3><p class="du-muted">Sections follow CSI MasterFormat. Each one has Part 1 General, Part 2 Products and Part 3 Execution.</p><button class="du-btn primary" type="button" data-add2>＋ Add section</button></div>`; el.querySelector('[data-add2]').onclick = () => addSectionModal(S); return; }
-  const ctx = ctxFor(S, doc), part = S.part, arts = s.parts[part] || (s.parts[part] = []), fmt = X.fixFormat((formatRow(S, doc.format_id) || {}).settings);
+  const ctx = ctxFor(S, doc), part = S.part, arts = s.parts[part] || (s.parts[part] = []), fmt = fmtFor(S, doc);
   const n = X.openItems(JSON.stringify(s.parts), ctx);
   el.innerHTML = `<div class="sp-parts" role="tablist">${[1, 2, 3].map(k => `<button type="button" role="tab" class="${k === part ? 'on' : ''}" data-part="${k}" aria-selected="${k === part}">Part ${k} - ${{ 1: 'General', 2: 'Products', 3: 'Execution' }[k]}</button>`).join('')}</div>
   <div class="sp-sheet">
@@ -451,7 +488,7 @@ function bindInsert(S, root) {
 
 /* ------------------------------------------------------------------ letter editor */
 function renderLetter(S) {
-  const doc = S.doc, el = S.body.querySelector('.sp-doc'), ctx = ctxFor(S, doc), fmt = X.fixFormat((formatRow(S, doc.format_id) || {}).settings);
+  const doc = S.doc, el = S.body.querySelector('.sp-doc'), ctx = ctxFor(S, doc), fmt = fmtFor(S, doc);
   const lh = X.resolve(fmt.letterhead.lines || '', ctx).split('\n').map(s => s.replace(/\[[^\]]*\]/g, '').trim()).filter(Boolean);
   el.innerHTML = `<div class="sp-tools-bar" role="toolbar" aria-label="Insert"><button type="button" data-ins="blank">＋ Blank</button><button type="button" data-ins="opt">＋ Choice</button><button type="button" data-ins="data">＋ Project data</button><span class="sp-sep"></span><span class="sp-openn ${openCount(doc, ctx) ? 'has' : ''}"><b>Open items:</b> ${openCount(doc, ctx)}</span></div>
   <div class="sp-page" style="--sp-accent:${fmt.accent}">
@@ -525,12 +562,12 @@ async function openSide(S, kind, focusKey) {
     const opts = secOnly ? { sectionId: S.secId } : {}; const row = formatRow(S, doc.format_id);
     el.querySelector('.sp-fmtnote').textContent = formatName(S, doc.format_id) + (row && row.template_file_id ? ' · Word export uses the uploaded Word template' : '') + '. Open items print in [brackets] so they are easy to find.';
     el.querySelectorAll('[data-exp]').forEach(x => x.onclick = async () => { x.disabled = true; const k = x.dataset.exp; const old = x.textContent; x.textContent = 'Building…';
-      try { await flush(S); const { settings, files } = await formatFiles(S, row); const ctx = ctxFor(S, doc); const name = slug(doc.title) + (secOnly ? '-' + slug(doc.sections.find(s => s.id === S.secId)?.number) : '');
+      try { await flush(S); const { settings, files } = await formatFiles(S, row, doc); const ctx = ctxFor(S, doc); const name = slug(doc.title) + (secOnly ? '-' + slug(doc.sections.find(s => s.id === S.secId)?.number) : '');
         if (k === 'pdf') { const r = await X.pdf(doc, ctx, settings, files, opts); download(r.bytes, name + '.pdf', 'application/pdf'); }
         else { const b = await X.docx(doc, ctx, settings, files, opts); download(b, name + '.docx', DOCX_MIME); }
         if (ctx.warnings && ctx.warnings.length) toast(S, ctx.warnings.join(' '), true); }
       catch (e) { toast(S, 'Export failed: ' + (e.message || e), true); } x.disabled = false; x.textContent = old; });
-    try { const { settings, files } = await formatFiles(S, row); const ctx = ctxFor(S, doc); const r = await X.pdf(doc, ctx, settings, files, opts); if (S.side !== 'preview') return; await renderPdf(el.querySelector('.sp-pv'), r.bytes, 30); }
+    try { const { settings, files } = await formatFiles(S, row, doc); const ctx = ctxFor(S, doc); const r = await X.pdf(doc, ctx, settings, files, opts); if (S.side !== 'preview') return; await renderPdf(el.querySelector('.sp-pv'), r.bytes, 30); }
     catch (e) { el.querySelector('.sp-pv').innerHTML = `<p class="sp-bad">The preview could not be made: ${esc(e.message || e)}</p>`; }
   }
 }
@@ -697,5 +734,5 @@ function register() {
   return true;
 }
 if (!register()) document.addEventListener('DOMContentLoaded', register);
-window.DrawUpSpecs = { mount: mountSpecs, makeSection, newDocument: newDocumentFromCheck, _stateOf: stateOf, _richHTML: richHTML, _serialize: serialize };
+window.DrawUpSpecs = { mount: mountSpecs, _intelFor: intelFor, _projectData: projectData, _openEditor: openEditor, _createDoc: createDoc, _modal: modal, _TYPE: () => TYPE, makeSection, newDocument: newDocumentFromCheck, _stateOf: stateOf, _richHTML: richHTML, _serialize: serialize, _dirty: dirty, _flush: flush, _renderHub: renderHub, _newDocModal: newDocModal };
 })();
