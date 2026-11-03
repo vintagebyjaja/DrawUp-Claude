@@ -1,0 +1,29 @@
+{
+  "variant": "proposed",
+  "new_sidewalk_meshes": 192,
+  "sidewalk_area_m2": 144464.81321807078,
+  "sidewalk_overlap_with_vehicle_pavement_m2": 0.0,
+  "sidewalk_overlap_with_fixed_buildings_m2": 0.0,
+  "new_crosswalks": 574,
+  "crosswalk_status": "Illustrative proposed markings at source-geometry junction candidates; locations not surveyed or authority approved.",
+  "sports_partitions": [
+    {
+      "field": "E_Baseball_Field",
+      "grass_area_m2": 10980.852220272312,
+      "dirt_area_m2": 1109.6060699101363,
+      "grass_dirt_overlap_m2": 0.0,
+      "partition_missing_m2": 0.0,
+      "method": "Warm-earth pixel mask on the existing registered reference; approximate, manually review boundary."
+    },
+    {
+      "field": "E_Woodson_Baseball_Practice_Field",
+      "grass_area_m2": 9859.335328744066,
+      "dirt_area_m2": 1312.3241937472337,
+      "grass_dirt_overlap_m2": 0.0,
+      "partition_missing_m2": 0.0,
+      "method": "Warm-earth pixel mask on the existing registered reference; approximate, manually review boundary."
+    }
+  ],
+  "football_marking_status": "Illustrative standard-size 120-yard rectangle centered inside existing image-traced turf; not independently surveyed.",
+  "track_marking_status": "Illustrative lanes interpolated inside image-traced track, not a regulation track certification."
+}

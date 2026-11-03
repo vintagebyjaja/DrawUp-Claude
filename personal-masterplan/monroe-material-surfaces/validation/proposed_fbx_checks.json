@@ -1,0 +1,19 @@
+{
+  "passed": true,
+  "mesh_objects": 5554,
+  "building_meshes": 3155,
+  "authorized_bleacher_replacements": [
+    "S_Bleachers_1336",
+    "S_Bleachers_1530",
+    "S_Bleachers_1548",
+    "S_Bleachers_1850"
+  ],
+  "max_fbx_point_error_m": 3.0517578125e-05,
+  "failures": [],
+  "extra_objects": [],
+  "closed_new_pavement_sports_bodies": 198,
+  "open_bodies": [],
+  "terrain_still_using_aerial_images": [],
+  "unpacked_used_images": [],
+  "native_skp_tested": false
+}

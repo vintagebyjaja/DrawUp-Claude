@@ -1,0 +1,83 @@
+{
+  "passed": true,
+  "unchanged_buildings": 3155,
+  "authorized_bleacher_replacements": [
+    {
+      "replaced_source_mass": "building_1336",
+      "rows_illustrative": 6,
+      "bounds_m": [
+        [
+          473.4019470214844,
+          365.6130676269531,
+          11.423904418945312
+        ],
+        [
+          478.988037109375,
+          393.8851318359375,
+          19.542253494262695
+        ]
+      ],
+      "status": "Bleacher location consistent with aerial and user correction; row count and construction illustrative."
+    },
+    {
+      "replaced_source_mass": "building_1530",
+      "rows_illustrative": 7,
+      "bounds_m": [
+        [
+          472.94293212890625,
+          296.0900573730469,
+          11.355324745178223
+        ],
+        [
+          478.9919738769531,
+          324.36297607421875,
+          19.596202850341797
+        ]
+      ],
+      "status": "Bleacher location consistent with aerial and user correction; row count and construction illustrative."
+    },
+    {
+      "replaced_source_mass": "building_1548",
+      "rows_illustrative": 9,
+      "bounds_m": [
+        [
+          471.54296875,
+          328.5338439941406,
+          11.363553047180176
+        ],
+        [
+          478.9910888671875,
+          361.44189453125,
+          19.717208862304688
+        ]
+      ],
+      "status": "Bleacher location consistent with aerial and user correction; row count and construction illustrative."
+    },
+    {
+      "replaced_source_mass": "building_1850",
+      "rows_illustrative": 12,
+      "bounds_m": [
+        [
+          371.95294189453125,
+          322.04010009765625,
+          11.041990280151367
+        ],
+        [
+          387.3121032714844,
+          366.53509521484375,
+          20.55083465576172
+        ]
+      ],
+      "status": "Bleacher location consistent with aerial and user correction; row count and construction illustrative."
+    }
+  ],
+  "building_hash_failures": [],
+  "terrain_meshes_with_grass_material": 48,
+  "apartment": {
+    "threshold_world_z_m": 39.076318359375,
+    "lower_wall_pixels": 553148,
+    "upper_wall_pixels": 11543
+  },
+  "working_meshes": 4897,
+  "native_skp_export_available": false
+}
