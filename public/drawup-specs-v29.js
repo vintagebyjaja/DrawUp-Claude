@@ -292,7 +292,7 @@ function openEditor(S, doc) {
       <label class="sp-mini"><span>Project</span><select data-top="project"><option value="">No project</option>${S.projects.map(x => `<option value="${x.id}" ${x.id === doc.project_thread_id ? 'selected' : ''}>${esc(x.project_name)}</option>`).join('')}</select></label>
       <label class="sp-mini"><span>Format</span><select data-top="format" title="Changes the layout only. The text stays exactly as it is."><option value="">DrawUp standard</option>${S.formats.map(f => `<option value="${f.id}" ${f.id === doc.format_id ? 'selected' : ''}>${f.kind === 'firm' ? 'Firm standard: ' + esc(f.name) : 'Client: ' + esc(f.client_name || f.name)}</option>`).join('')}</select></label>
       <label class="sp-mini"><span>Status</span><select data-top="status">${DOC_STATUS.map(([k, l]) => `<option value="${k}" ${k === doc.status ? 'selected' : ''}>${l}</option>`).join('')}</select></label>
-      ${(S.hooks && S.hooks.topHTML) ? S.hooks.topHTML(doc, S) : ''}${doc.kind === 'spec' && window.DrawUpSpecsAI ? '<button class="du-btn ghost" type="button" data-sp-ai>Draft with AI</button>' : ''}<button class="du-btn ghost" type="button" data-side="data">Project data</button><button class="du-btn primary" type="button" data-side="preview">Preview &amp; export</button>
+      ${(S.hooks && S.hooks.topHTML) ? S.hooks.topHTML(doc, S) : ''}${doc.kind === 'spec' && window.DrawUpSpecsAI ? '<button class="du-btn ghost" type="button" data-sp-ai>Draft with AI</button>' : ''}${window.DrawUpMarks ? `<button class="du-btn ghost" type="button" data-sp-marks>Seal & signature${(doc.data && Array.isArray(doc.data.marks) && doc.data.marks.length) ? ` (${doc.data.marks.length})` : ''}</button>` : ''}<button class="du-btn ghost" type="button" data-side="data">Project data</button><button class="du-btn primary" type="button" data-side="preview">Preview &amp; export</button>
       <button class="du-btn ghost sp-more" type="button" aria-label="More" data-more>⋯</button>
     </div></div>
   <div class="sp-conflict" hidden></div>
@@ -307,6 +307,7 @@ function openEditor(S, doc) {
   b.querySelector('[data-more]').onclick = e => moreMenu(S, e.currentTarget);
   if (S.hooks && S.hooks.bindTop) S.hooks.bindTop(b, doc, S);
   { const ai = b.querySelector('[data-sp-ai]'); if (ai) ai.onclick = () => window.DrawUpSpecsAI.open(S); } // v30 AI drafting
+  { const mk = b.querySelector('[data-sp-marks]'); if (mk) mk.onclick = () => window.DrawUpMarks.open(S); } // v30 seals and signatures
   if (doc.project_thread_id) Promise.all([brief(S, doc.project_thread_id), intelFor(S, doc.project_thread_id)]).then(() => { if (S.doc === doc) { redraw(S); if (S.side) openSide(S, S.side); } }).catch(() => null);
   redraw(S); if (S.side) openSide(S, S.side);
 }
@@ -553,7 +554,7 @@ async function openSide(S, kind, focusKey) {
     const persist = async vals => { st.textContent = 'Saving…';
       try { if (pid) { const row = { firm_id: S.firm.id, project_thread_id: pid, info: vals, updated_by: S.me, updated_at: new Date().toISOString() }; const cur = S.info[pid];
           const r = cur && cur.id ? await S.c.client.from('firm_project_info').update(row).eq('id', cur.id).select('*') : await S.c.client.from('firm_project_info').upsert(row, { onConflict: 'firm_id,project_thread_id' }).select('*'); if (r.error) throw r.error; S.info[pid] = (r.data && r.data[0]) || row; }
-        else { doc.data = vals; dirty(S); }
+        else { const keep = {}; ['page', 'import', 'imports', 'marks'].forEach(k => { if (doc.data && doc.data[k] != null) keep[k] = doc.data[k]; }); doc.data = { ...vals, ...keep }; dirty(S); } // v30: page setup, import log and seals stay
         st.textContent = 'Saved.'; } catch (e) { st.textContent = 'Not saved: ' + (sqlMissing(e) ? 'run the DrawUp Specs SQL.' : (e.message || e)); } };
     const read = () => { const v = {}; el.querySelectorAll('[data-k]').forEach(i => { if (i.value.trim()) v[i.dataset.k] = i.value.trim(); }); return v; };
     el.querySelectorAll('[data-k]').forEach(i => i.oninput = () => { clearTimeout(tm); tm = setTimeout(async () => { await persist(read()); refreshChips(S); }, 700); });

@@ -91,6 +91,15 @@ function paraLabels(paras, numbering, art) { // CSI: A. 1. a. 1) ; decimal: 1.1.
 }
 const PART_TITLES = { 1: 'GENERAL', 2: 'PRODUCTS', 3: 'EXECUTION' };
 
+/* ------------------------------------------------------------------ v30: seals and signatures on a document
+   doc.data.marks: [{ id, kind: 'seal'|'signature', img: 'data:image/png;base64,…', w, h, name, role, at, by }]
+   Each one was applied by the person it belongs to (see drawup-doc-marks-v30.js). Exports place them as images
+   with the person's name and the date they were applied. */
+function marksOf(doc) { const m = doc && doc.data && Array.isArray(doc.data.marks) ? doc.data.marks : []; return m.filter(x => x && /^data:image\/(png|jpeg);base64,/.test(x.img || '') && x.w > 0 && x.h > 0); }
+function markBox(m) { const maxW = m.kind === 'seal' ? 1.6 : 2.4, maxH = m.kind === 'seal' ? 1.6 : 0.75; const r = Math.min(maxW / m.w, maxH / m.h); return [m.w * r, m.h * r]; } // inches
+function markCaption(m) { const d = m.at ? new Date(m.at) : null; const ds = d && !isNaN(d) ? d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : ''; return [m.name || '', m.role || '', (m.kind === 'seal' ? 'Sealed ' : 'Signed ') + ds].filter(x => String(x).trim()); }
+function dataBytes(u) { const b = atob(String(u).split(',')[1] || ''); const a = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) a[i] = b.charCodeAt(i); return a; }
+
 /* ------------------------------------------------------------------ flatten a document into blocks
    Block types: h (heading), p (paragraph with optional hanging label), table, fields, break, rule, toc */
 function flatten(doc, ctx, fmt, opts) {
@@ -107,6 +116,9 @@ function flatten(doc, ctx, fmt, opts) {
       let div = '';
       secs.forEach(s => { const d = String(s.number).slice(0, 2); if (d !== div) { div = d; out.push({ t: 'h', text: 'DIVISION ' + d + ' - ' + ((window.DrawUpSpecsData && window.DrawUpSpecsData.DIVISIONS[d]) || '').toUpperCase(), bold: true, before: 8, after: 4 }); } out.push({ t: 'toc', number: showNumber(s.number, fmt), title: R(s.title).toUpperCase() }); });
     }
+    // v30: seals and signatures applied to this manual get their own page before the first section
+    const mk = marksOf(doc);
+    if (!only && mk.length) { const ms = { number: '00 01 07', title: 'SEALS PAGE' }; out.push(out.length ? { t: 'break', section: ms, restart: true } : { t: 'mark', section: ms, restart: true }); out.push({ t: 'h', text: 'SEALS AND SIGNATURES', align: 'center', bold: true, after: 14, size: fmt.size + 1, style: 'Title' }); out.push({ t: 'marks', items: mk }); }
     secs.forEach((s, si) => {
       const sec = { number: showNumber(s.number, fmt), title: R(s.title).toUpperCase() };
       if (out.length) out.push({ t: 'break', section: sec, restart: true }); else out.push({ t: 'mark', section: sec, restart: true });
@@ -149,6 +161,7 @@ function flatten(doc, ctx, fmt, opts) {
     if (b.table) out.push({ t: 'table', cols: b.table.cols.map(R), rows: (b.table.rows || []).map(r => r.map(R)), after: 8 });
     else String(b.p || '').split('\n').forEach((line, i, all) => out.push({ t: 'p', text: R(line), lvl: -2, after: i === all.length - 1 ? 8 : 0, blank: !line.trim() }));
   });
+  const mk = marksOf(doc); if (mk.length) { out.push({ t: 'h', text: 'Signed and sealed', bold: true, before: 14, after: 6, keep: true, style: 'Heading2' }); out.push({ t: 'marks', items: mk }); } // v30
   return out;
 }
 
@@ -189,6 +202,16 @@ function layout(blocks, fmt, metrics, ctx) {
       if (b.label && lvl !== -2) text(labX, b.label, { size: sz, bold: b.bold });
       lines.forEach((l, i) => { if (i) ensure(bh); text(textX, l, { size: sz, bold: b.bold }); y -= bh; });
       y -= b.after || 0; continue;
+    }
+    if (b.t === 'marks') { // v30: images in a row, each with its caption
+      const per = Math.max(1, Math.min(3, Math.floor(CW / (2.2 * 72)))), cellW = CW / per;
+      for (let i = 0; i < b.items.length; i += per) { // images sit on one baseline, captions line up under them
+        const row = b.items.slice(i, i + per).map(m => { const [wi, hi] = markBox(m); const k = Math.min(1, (cellW - 14) / (wi * 72)); return { m, w: wi * 72 * k, h: hi * 72 * k, cap: markCaption(m) }; });
+        const ih = Math.max(...row.map(r => r.h)), need = ih + Math.max(...row.map(r => r.cap.length)) * lh + 18; ensure(need); const top0 = y;
+        row.forEach((r, ci) => { const cx = L + ci * cellW; pg.items.push({ k: 'img', x: cx, y: top0 - ih, w: r.w, h: r.h, src: r.m.id }); let yy = top0 - ih - 6; r.cap.forEach((c, k) => { pg.items.push({ k: 'text', x: cx, y: yy, t: c, size: k ? size - 1 : size, bold: !k, color: '#000000' }); yy -= lh; }); });
+        y = top0 - need;
+      }
+      y -= 6; continue;
     }
     if (b.t === 'fields') { const lw = Math.min(130, CW * 0.28); b.rows.forEach(([k, v]) => { const lines = wrap(v, CW - lw, wfn(false, size)); ensure(lh * lines.length); text(L, k.toUpperCase(), { size: size - 1.5, bold: true, color: '#475569' }); lines.forEach(l => { text(L + lw, l, { size }); y -= lh; }); y -= 2; }); y -= b.after || 0; continue; }
     if (b.t === 'table') {
@@ -249,6 +272,7 @@ async function pdf(doc, ctx, fmt, files, opts) {
   let bg = null, logo = null;
   if (fmt.background && fmt.background.bytes) { try { const src = await P.PDFDocument.load(fmt.background.bytes, { ignoreEncryption: true }); const idx = Math.max(0, Math.min(src.getPageCount() - 1, (fmt.background.page || 1) - 1)); [bg] = await out.embedPdf(src, [idx]); } catch (e) { (ctx.warnings = ctx.warnings || []).push('The letterhead PDF could not be read: ' + (e.message || e)); } }
   const logoBytes = files && files.logo; if (logoBytes && fmt.letterhead.logo !== 'none') { try { logo = files.logoType === 'image/png' ? await out.embedPng(logoBytes) : await out.embedJpg(logoBytes); } catch (_e) { logo = null; } }
+  const imgs = {}; for (const m of marksOf(doc)) { try { imgs[m.id] = /png/.test(m.img.slice(5, 16)) ? await out.embedPng(dataBytes(m.img)) : await out.embedJpg(dataBytes(m.img)); } catch (_e) { /* skipped */ } }
   L.pages.forEach((p, i) => {
     const page = out.addPage([L.W, L.H]);
     const bgMode = fmt.background && fmt.background.mode; if (bg && (bgMode === 'all' || (bgMode === 'first' && i === 0) || (bgMode === 'letters' && p.letterhead))) page.drawPage(bg, { x: 0, y: 0, width: L.W, height: L.H });
@@ -257,6 +281,7 @@ async function pdf(doc, ctx, fmt, files, opts) {
     p.items.forEach(it => {
       if (it.k === 'text') { const s = clean(it.t); if (s) page.drawText(s, { x: it.x, y: it.y - it.size * 0.8, size: it.size, font: it.bold ? bold : reg, color: hex(P, it.color) }); }
       else if (it.k === 'line') page.drawLine({ start: { x: it.x1, y: it.y }, end: { x: it.x2, y: it.y2 != null ? it.y2 : it.y }, thickness: it.w, color: hex(P, it.color) });
+      else if (it.k === 'img') { if (imgs[it.src]) page.drawImage(imgs[it.src], { x: it.x, y: it.y, width: it.w, height: it.h }); }
       else if (it.k === 'rect') page.drawRectangle({ x: it.x, y: it.y, width: it.w, height: it.h, color: it.fill ? hex(P, it.fill) : undefined, borderColor: hex(P, it.stroke), borderWidth: 0.6 });
     });
   });
@@ -302,6 +327,13 @@ function docxBody(blocks, fmt, styles, sectPr) {
       parts.push(P(label + run(b.text, { bold: b.bold }), { before: b.before, after: b.after, keep: b.keep, style: b.style, ind: `<w:tabs><w:tab w:val="left" w:pos="${left}"/></w:tabs><w:ind w:left="${left}" w:hanging="${hang}"/>` }));
       continue;
     }
+    if (b.t === 'marks') { // v30: one borderless table row of seals and signatures, each with its caption
+      const EMU = 914400; let n = 0;
+      const pic = m => { const [wi, hi] = markBox(m), cx = Math.round(wi * EMU), cy = Math.round(hi * EMU), id = 900 + (n++); return `<w:r><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="${cx}" cy="${cy}"/><wp:docPr id="${id}" name="${m.kind === 'seal' ? 'Seal' : 'Signature'} ${id}"/><a:graphic><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic><pic:nvPicPr><pic:cNvPr id="${id}" name="mark${id}.png"/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="rMk${xe(String(m.id).replace(/[^\w]/g, ''))}"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="${cx}" cy="${cy}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r>`; };
+      const cell = m => `<w:tc><w:tcPr><w:tcW w:w="${TW(2.7)}" w:type="dxa"/><w:vAlign w:val="bottom"/></w:tcPr>${P(pic(m), { after: 3 })}${markCaption(m).map((c, i) => P(run(c, { bold: !i }), { after: 0 })).join('')}</w:tc>`;
+      for (let i = 0; i < b.items.length; i += 3) { const row = b.items.slice(i, i + 3); parts.push(`<w:tbl><w:tblPr><w:tblW w:w="0" w:type="auto"/><w:tblLook w:val="0000"/></w:tblPr><w:tblGrid>${row.map(() => `<w:gridCol w:w="${TW(2.7)}"/>`).join('')}</w:tblGrid><w:tr>${row.map(cell).join('')}</w:tr></w:tbl>`, P('', { after: 6 })); }
+      continue;
+    }
     if (b.t === 'fields' || b.t === 'table') {
       const head = b.t === 'table' ? b.cols : null, rows = b.t === 'table' ? b.rows : b.rows;
       const border = b.t === 'table' ? '<w:tblBorders><w:top w:val="single" w:sz="4" w:color="94A3B8"/><w:left w:val="single" w:sz="4" w:color="94A3B8"/><w:bottom w:val="single" w:sz="4" w:color="94A3B8"/><w:right w:val="single" w:sz="4" w:color="94A3B8"/><w:insideH w:val="single" w:sz="4" w:color="94A3B8"/><w:insideV w:val="single" w:sz="4" w:color="94A3B8"/></w:tblBorders>' : '';
@@ -341,7 +373,15 @@ async function docx(doc, ctx, fmt, files, opts) {
     const sm = docXml.match(/<w:sectPr[\s\S]*?<\/w:sectPr>\s*<\/w:body>/); const sectPr = sm ? sm[0].replace(/<\/w:body>$/, '').trim() : '<w:sectPr/>';
     const bodyStart = docXml.indexOf('<w:body>'), bodyEnd = docXml.lastIndexOf('</w:body>'); if (bodyStart < 0 || bodyEnd < 0) throw new Error('This Word file could not be read.');
     const body = docxBody(blocks, fmt, { ids, direct: false }, sectPr);
+    { const mk = marksOf(doc); if (mk.length) { // v30: seal and signature images in the client's or firm's template
+      const rp = 'word/_rels/document.xml.rels'; let rx = (await zip.file(rp)?.async('string')) || '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>';
+      mk.forEach(m => { const k = String(m.id).replace(/[^\w]/g, ''), ext = /png/.test(m.img.slice(5, 16)) ? 'png' : 'jpeg'; zip.file(`word/media/mark_${k}.${ext}`, dataBytes(m.img)); rx = rx.replace('</Relationships>', `<Relationship Id="rMk${k}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/mark_${k}.${ext}"/></Relationships>`); });
+      zip.file(rp, rx); let ct = (await zip.file('[Content_Types].xml')?.async('string')) || '';
+      ['png', 'jpeg'].forEach(e => { if (ct && !new RegExp(`Extension="${e}"`, 'i').test(ct)) ct = ct.replace(/<Types([^>]*)>/, `<Types$1><Default Extension="${e}" ContentType="image/${e}"/>`); }); if (ct) zip.file('[Content_Types].xml', ct);
+    } }
     zip.file('word/document.xml', docXml.slice(0, bodyStart + 8) + body + (blocks.some(b => b.restart) ? sectWith(sectPr, false) : sectPr) + docXml.slice(bodyEnd));
+    if (marksOf(doc).length) { let dx = await zip.file('word/document.xml').async('string'); const NSX = { wp: 'http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing', a: 'http://schemas.openxmlformats.org/drawingml/2006/main', pic: 'http://schemas.openxmlformats.org/drawingml/2006/picture', r: 'http://schemas.openxmlformats.org/officeDocument/2006/relationships' };
+      dx = dx.replace(/<w:document\b([^>]*)>/, (m0, at) => '<w:document' + at + Object.entries(NSX).filter(([k]) => !new RegExp('xmlns:' + k + '=').test(at)).map(([k, v]) => ` xmlns:${k}="${v}"`).join('') + '>'); zip.file('word/document.xml', dx); } // v30: images need these namespaces
     for (const name of Object.keys(zip.files)) if (/^word\/(header|footer)\d*\.xml$/.test(name)) zip.file(name, fillXml(await zip.file(name).async('string')));
     return zip.generateAsync({ type: 'uint8array' });
   }
@@ -365,6 +405,7 @@ async function docx(doc, ctx, fmt, files, opts) {
   const lhLines = isLetter && fmt.letterhead.show ? R(fmt.letterhead.lines || '').split('\n').map(s => s.replace(/\[[^\]]*\]/g, '').trim()).filter(Boolean) : [];
   let logoRun = '';
   if (isLetter && files && files.logo && fmt.letterhead.logo !== 'none') { const ext = files.logoType === 'image/png' ? 'png' : 'jpeg'; zip.file('word/media/logo.' + ext, files.logo); rels.push(`<Relationship Id="rLogo" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/logo.${ext}"/>`); const ratio = (files.logoW || 4) / (files.logoH || 1); const h = 457200, w = Math.round(Math.min(5 * 457200, h * ratio)); logoRun = `<w:r><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="${w}" cy="${h}"/><wp:docPr id="1" name="Logo"/><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="1" name="logo"/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="rLogo"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="${w}" cy="${h}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r>`; }
+  marksOf(doc).forEach(m => { const k = String(m.id).replace(/[^\w]/g, ''), ext = /png/.test(m.img.slice(5, 16)) ? 'png' : 'jpeg'; zip.file(`word/media/mark_${k}.${ext}`, dataBytes(m.img)); rels.push(`<Relationship Id="rMk${k}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/mark_${k}.${ext}"/>`); }); // v30
   if (logoRun) body += `<w:p><w:pPr><w:jc w:val="${fmt.letterhead.align === 'right' ? 'right' : 'left'}"/></w:pPr>${logoRun}</w:p>`;
   lhLines.forEach((t, j) => { body += `<w:p><w:pPr><w:spacing w:after="0"/><w:jc w:val="${fmt.letterhead.align === 'right' ? 'right' : 'left'}"/></w:pPr><w:r><w:rPr><w:rFonts w:ascii="${font}" w:hAnsi="${font}"/>${j ? '' : '<w:b/>'}<w:color w:val="${j ? '475569' : fmt.accent.slice(1)}"/><w:sz w:val="${Math.round((j ? fmt.size - 1.5 : fmt.size + 3) * 2)}"/></w:rPr><w:t xml:space="preserve">${xe(t)}</w:t></w:r></w:p>`; });
   if (lhLines.length) body += '<w:p><w:pPr><w:pBdr><w:bottom w:val="single" w:sz="4" w:space="1" w:color="CBD5E1"/></w:pBdr><w:spacing w:after="240"/></w:pPr></w:p>';
@@ -410,5 +451,5 @@ function parseSpecText(lines) {
 }
 function rid() { return (crypto.randomUUID ? crypto.randomUUID() : 'x' + Date.now().toString(36) + Math.random().toString(36).slice(2)).slice(0, 13); }
 
-window.DrawUpSpecsExport = { DRAWUP_FORMAT, PAGES, pageSize, FONTS, fixFormat, tokens, untokens, resolve, openItems, fill, paraLabels, flatten, layout, pdf, docx, readDocxText, readPdfText, parseSpecText, rid, pdfLib, pdfjs, zipLib };
+window.DrawUpSpecsExport = { marksOf, markBox, markCaption, DRAWUP_FORMAT, PAGES, pageSize, FONTS, fixFormat, tokens, untokens, resolve, openItems, fill, paraLabels, flatten, layout, pdf, docx, readDocxText, readPdfText, parseSpecText, rid, pdfLib, pdfjs, zipLib };
 })();

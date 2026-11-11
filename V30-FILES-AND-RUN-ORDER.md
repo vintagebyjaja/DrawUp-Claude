@@ -58,6 +58,7 @@ Full detail in `SEASONS.md`.
 | `src/lib/drawup-spec-draft.ts`, `src/app/api/specs/draft/route.ts` | AI spec drafting: the prompt, the cleaning rules (no code citations, no named products or certifications, references only from real standards bodies and marked to confirm), credits reserved and refunded on failure. |
 | `public/drawup-specs-ai-v30.js` | The "Draft with AI" panel in the spec editor: ask, review the questions and assumptions, then add sections. It never replaces text that was typed. |
 | `public/drawup-specs-import-v30.js` | Spec imports from four sources (client, firm standard, DrawUp standard, consultant). Reads Word list numbering and typed numbering, keeps every word (notes, schedules, table rows, cover and contents pages included), checks each file word for word, keeps a duplicate section number beside the original, runs a same-format check, logs each import on the document, and offers the three layout settings. It can save a client's page layout as a client format. |
+| `public/drawup-doc-marks-v30.js` | Seals and signatures. Each person keeps their own images in their private folder (`drawup-private/<uid>/marks/`). One goes on a document only when that person applies it and confirms it is theirs; the document records the name, role or license, date and who applied it. Exports place them on a Seals page at the front of a manual, or at the end of a letter or form, in PDF and Word. Only the person who applied one can take it off. |
 | `public/drawup-portfolio-sources-v30.js` | Portfolio Review can use the member's own project files and firm kit as sources. |
 | `public/drawup-pm-tracker-v30.js` / `.css` | Project Management tracker: RFIs, submittals, punch lists, NCRs and the other CA documents, with state, ball in court, due dates (the usual turnaround is labeled as such), a dated log and CSV. |
 | `tools/specs/combine.py`, `tools/specs/verify.py` | Combine a folder of spec sections into one Word document with each section's own headers, footers and numbering, then verify that no text was lost. Used for the Division 01 set. |
@@ -92,6 +93,7 @@ node tests/season1/test-checkup.js        37 checks   the rules, a real run, ope
 node tests/season1/test-acceptance.js     the 12 acceptance tests, in order
 node tests/season1/test-spec-ai.js        27 checks   AI drafting: cleaning rules, the route, credits, the editor flow
 node tests/season1/test-spec-import.js    18 checks   all 27 Division 01 files and the combined manual, word for word; consultant merge; three layouts
+node tests/season1/test-marks.js          17 checks   seals and signatures: private folder, confirmation, PDF and Word exports, taking off
 node tests/season1/test-portfolio-sources.js 13 checks
 node tests/season1/test-tracker.js        18 checks
 node tests/season1/test-details-s1.js      9 checks   Details out of the main menu, links still land on the Season 2 screen, the public page
@@ -164,4 +166,5 @@ Supabase stand-in and, where a route is involved, the real route code.
    email notifications or reminders for due dates yet.
 8. **DD Readiness is advisory.** It measures how much of a checklist of your own records is in place. It is
    not a prediction, a grade, or any kind of approval, and it says that on screen and in the exported PDF.
-9. **Nothing is deployed.** Merging to `main` and deploying is waiting on your explicit go-ahead.
+9. **Seals and signatures are images, not digital certificates.** A placed seal is a picture with the name and date the person applied it; it is not a cryptographic (PKI) digital signature, and jurisdictions that require one need it applied in a signing tool after export. Seals on drawing sheets are not covered yet; the title block still has an empty Seal box.
+10. **Nothing is deployed.** Merging to `main` and deploying is waiting on your explicit go-ahead.
