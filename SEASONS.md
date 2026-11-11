@@ -40,7 +40,10 @@ Variables) takes effect without a rebuild. An unset or unreadable value counts a
 
 ## What Season 1 does with Details (flag off)
 
-- The **Details** tab stays in the top menu and the mobile More sheet. It opens a full-screen Details screen with
+- The **Details** tab is no longer in the portal's main menu (member request). Every link into Details, including
+  `#portal/details`, still opens the Season 2 screen described here. On the public marketing site, the Details
+  page shows the same Season 2 preview over the real page, with links to Products and CheckUp.
+- The Details screen is a full-screen Season 2 screen with
   a blurred, non-interactive copy of the real Details workspace underneath. The copy is marked `inert`, so it gets
   no clicks and no keyboard focus. The centered message reads "DETAILS — COMING IN SEASON 2". The screen also tells
   members that their saved details are kept.
@@ -91,3 +94,9 @@ does not exist yet is not in the table: it registers itself with `DrawUpSeason.a
   `V30-FILES-AND-RUN-ORDER.md`.
 - **CheckUp** (`drawup-checkup-v30.js`) adds Specifications Review, DD Readiness and Review History by
   wrapping `DrawUpCheckV22.route`; the drawing, narrative and portfolio reviews are untouched.
+- **Spec imports** (`drawup-specs-import-v30.js`) bring in client, firm standard, DrawUp standard and consultant
+  specifications without removing any text, check each file word for word, and let the member switch the layout
+  between the firm standard, a client standard and the DrawUp standard. The DrawUp standard layout follows the
+  Division 01 set the member supplied.
+- **Project Management tracker** (`drawup-pm-tracker-v30.js`) tracks RFIs, submittals, punch lists and the other
+  CA documents. Tracking is saved on the document and never changes its text.

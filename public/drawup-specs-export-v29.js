@@ -18,28 +18,47 @@ async function pdfjs() { if (!window.pdfjsLib) await loadScript(VENDOR.pdfjs); w
 const PAGES = { letter: [8.5, 11, 'Letter (8.5 × 11 in.)'], legal: [8.5, 14, 'Legal (8.5 × 14 in.)'], a4: [8.27, 11.69, 'A4 (210 × 297 mm)'] };
 const FONTS = { Helvetica: ['Helvetica', 'HelveticaBold', 'Arial', 'Helvetica / Arial'], Times: ['TimesRoman', 'TimesRomanBold', 'Times New Roman', 'Times / Times New Roman'], Courier: ['Courier', 'CourierBold', 'Courier New', 'Courier'] };
 // The DrawUp format: CSI SectionFormat and PageFormat conventions, DrawUp letterhead for letters.
+/* v30: the DrawUp standard layout follows the Division 01 set a member uploaded (KEi Architects): a bold four-line
+   project block with a rule under it, "SECTION 01 1000" and the title centered, PART 1 - GENERAL, articles numbered
+   1.01, paragraphs A. / 1. / a., Arial 9 pt, and a footer rule with the section title on the left and
+   "01 1000 - Page 1 of 4" on the right (pages counted per section). It is the default until a firm saves its own
+   standard. Formats saved before v30 keep the v29 look: anything they do not set comes from LEGACY_FORMAT. */
 const DRAWUP_FORMAT = {
-  name: 'DrawUp format', page: 'letter', margins: { t: 0.75, r: 1, b: 0.75, l: 1 }, font: 'Helvetica', size: 10, line: 1.3, accent: '#13233d',
-  numbering: 'csi', indent: 0.5, caps_articles: true, part_style: 'PART {n} - {title}', section_title: 'SECTION {number}\n{title}', end_text: 'END OF SECTION {number}',
-  header: { left: '<<project_name>>', right: '<<project_number>>' },
-  footer: { left: '<<issue_purpose>>', center: '{section_title} {section_number} - {page}', right: '<<issue_date>>' },
+  name: 'DrawUp standard', standard: 'drawup-v30', page: 'letter', margins: { t: 0.5, r: 0.7, b: 0.5, l: 1 }, font: 'Helvetica', size: 9, line: 1.25, accent: '#000000',
+  numbering: 'csi', indent: 0.55, caps_articles: true, article_style: '01', number_style: 'compact', part_style: 'PART {n} - {title}', section_title: 'SECTION {number}\n{title}', end_text: 'END OF SECTION {number}',
+  header: { block: '<<owner_name>>\n<<project_name>>\n<<architect_name>> Project Number:\t<<project_number>>\nOwner Project Number:\t<<owner_project_number>>', left: '', right: '', rule: true, bold: true },
+  footer: { left: '{section_title}', center: '', right: '{section_number} - Page {page} of {section_pages}', rule: true, bold: true },
   letter_footer: { left: '<<firm_name>>', center: '', right: 'Page {page} of {pages}' },
   letterhead: { show: true, logo: 'firm', align: 'left', lines: '<<firm_name>>\n<<architect_address>>' },
   cover: true, toc: true, background: null, word_template: null, label: 'DrawUp'
 };
+const LEGACY_FORMAT = {
+  name: 'DrawUp format', page: 'letter', margins: { t: 0.75, r: 1, b: 0.75, l: 1 }, font: 'Helvetica', size: 10, line: 1.3, accent: '#13233d',
+  numbering: 'csi', indent: 0.5, caps_articles: true, article_style: '1', number_style: 'spaced', part_style: 'PART {n} - {title}', section_title: 'SECTION {number}\n{title}', end_text: 'END OF SECTION {number}',
+  header: { block: '', left: '<<project_name>>', right: '<<project_number>>', rule: false, bold: false },
+  footer: { left: '<<issue_purpose>>', center: '{section_title} {section_number} - {page}', right: '<<issue_date>>', rule: false, bold: false },
+  letter_footer: { left: '<<firm_name>>', center: '', right: 'Page {page} of {pages}' },
+  letterhead: { show: true, logo: 'firm', align: 'left', lines: '<<firm_name>>\n<<architect_address>>' },
+  cover: true, toc: true, background: null, word_template: null, label: 'DrawUp'
+};
+/** "01 10 00" written the way the format writes section numbers ("01 1000" in the DrawUp standard). Display only. */
+function showNumber(n, fmt) { const s = String(n || ''); return fmt && fmt.number_style === 'compact' ? s.replace(/^(\d{2}) (\d{2}) (\d{2})/, '$1 $2$3') : s; }
 const isObj = v => v && typeof v === 'object' && !Array.isArray(v);
 /* v30 Document Studio: page size with orientation. Landscape swaps width and height everywhere (preview, PDF
    and Word), so one setting drives all three. */
 function pageSize(fmt) { const [w, h] = PAGES[(fmt && fmt.page) || 'letter'] || PAGES.letter; return (fmt && fmt.orientation === 'landscape') ? [h, w] : [w, h]; }
 function fixFormat(s) {
-  const d = DRAWUP_FORMAT; s = isObj(s) ? s : {};
+  s = isObj(s) ? s : {};
+  // no settings, or settings made from the v30 standard: the DrawUp standard. Saved firm and client formats from
+  // before v30 keep their look (their unset keys come from the v29 layout).
+  const d = !Object.keys(s).length || s.standard === 'drawup-v30' ? DRAWUP_FORMAT : LEGACY_FORMAT;
   const o = { ...d, ...s };
   ['margins', 'header', 'footer', 'letter_footer', 'letterhead'].forEach(k => { o[k] = { ...d[k], ...(isObj(s[k]) ? s[k] : {}) }; });
   if (!PAGES[o.page]) o.page = 'letter'; if (!FONTS[o.font]) o.font = 'Helvetica';
   if (!['portrait', 'landscape'].includes(o.orientation)) o.orientation = 'portrait';
   o.size = Math.min(14, Math.max(7, +o.size || 10)); o.line = Math.min(2, Math.max(1, +o.line || 1.3)); o.indent = Math.min(1, Math.max(0.2, +o.indent || 0.5));
   ['t', 'r', 'b', 'l'].forEach(k => { o.margins[k] = Math.min(2.5, Math.max(0.25, +o.margins[k] || d.margins[k])); });
-  if (!/^#[0-9a-f]{6}$/i.test(o.accent || '')) o.accent = d.accent; if (!['csi', 'decimal'].includes(o.numbering)) o.numbering = 'csi';
+  if (!/^#[0-9a-f]{6}$/i.test(o.accent || '')) o.accent = d.accent; if (!['csi', 'decimal'].includes(o.numbering)) o.numbering = 'csi'; if (!['1', '01'].includes(String(o.article_style))) o.article_style = d.article_style; if (!['spaced', 'compact'].includes(o.number_style)) o.number_style = d.number_style;
   return o;
 }
 
@@ -65,7 +84,7 @@ function fill(tpl, vars) { return String(tpl || '').replace(/\{(\w+)\}/g, (m, k)
 const ALPHA = n => { let s = ''; n++; while (n > 0) { const r = (n - 1) % 26; s = String.fromCharCode(65 + r) + s; n = Math.floor((n - 1) / 26); } return s; };
 function paraLabels(paras, numbering, art) { // CSI: A. 1. a. 1) ; decimal: 1.1.1, 1.1.1.1
   const c = [0, 0, 0, 0], out = [];
-  paras.forEach(p => { if (p.off) { out.push(''); return; } const l = Math.min(3, Math.max(0, p.lvl | 0)); c[l]++; for (let i = l + 1; i < 4; i++) c[i] = 0;
+  paras.forEach(p => { if (p.off || p.plain) { out.push(''); return; } const l = Math.min(3, Math.max(0, p.lvl | 0)); c[l]++; for (let i = l + 1; i < 4; i++) c[i] = 0;
     if (numbering === 'decimal') out.push(art + '.' + c.slice(0, l + 1).join('.'));
     else out.push(l === 0 ? ALPHA(c[0] - 1) + '.' : l === 1 ? c[1] + '.' : l === 2 ? String.fromCharCode(96 + ((c[2] - 1) % 26) + 1) + '.' : c[3] + ')'); });
   return out;
@@ -86,24 +105,33 @@ function flatten(doc, ctx, fmt, opts) {
     if (!only && fmt.toc) {
       out.push({ t: 'h', text: 'TABLE OF CONTENTS', align: 'center', bold: true, after: 12, section: { number: '00 01 10', title: 'TABLE OF CONTENTS' } });
       let div = '';
-      secs.forEach(s => { const d = String(s.number).slice(0, 2); if (d !== div) { div = d; out.push({ t: 'h', text: 'DIVISION ' + d + ' - ' + ((window.DrawUpSpecsData && window.DrawUpSpecsData.DIVISIONS[d]) || '').toUpperCase(), bold: true, before: 8, after: 4 }); } out.push({ t: 'toc', number: s.number, title: R(s.title).toUpperCase() }); });
+      secs.forEach(s => { const d = String(s.number).slice(0, 2); if (d !== div) { div = d; out.push({ t: 'h', text: 'DIVISION ' + d + ' - ' + ((window.DrawUpSpecsData && window.DrawUpSpecsData.DIVISIONS[d]) || '').toUpperCase(), bold: true, before: 8, after: 4 }); } out.push({ t: 'toc', number: showNumber(s.number, fmt), title: R(s.title).toUpperCase() }); });
     }
     secs.forEach((s, si) => {
-      const sec = { number: s.number, title: R(s.title).toUpperCase() };
+      const sec = { number: showNumber(s.number, fmt), title: R(s.title).toUpperCase() };
       if (out.length) out.push({ t: 'break', section: sec, restart: true }); else out.push({ t: 'mark', section: sec, restart: true });
-      fill(fmt.section_title, { number: s.number, title: sec.title }).split('\n').forEach((line, i) => out.push({ t: 'h', text: line, align: 'center', bold: true, after: i ? 14 : 2, size: fmt.size + 1, style: 'Title' }));
+      // v30 imports: notes that sat above the SECTION line in the source (for example editor's notes) stay above it
+      const lead = (((s.parts || {})[1] || [])[0] || {}).lead ? s.parts[1][0] : null;
+      if (lead && !lead.off) (lead.paras || []).filter(p => !p.off).forEach(p => R(p.t).split('\n').forEach(line => out.push({ t: 'p', label: '', text: line, lvl: 0, after: 4 })));
+      fill(fmt.section_title, { number: sec.number, title: sec.title }).split('\n').forEach((line, i) => out.push({ t: 'h', text: line, align: 'center', bold: true, after: i ? 14 : 2, size: fmt.size + 1, style: 'Title' }));
       [1, 2, 3].forEach(n => {
         const part = (s.parts || {})[n] || [];
         if (doc.outline && n !== 2 && !part.length) return;
-        out.push({ t: 'h', text: fill(fmt.part_style, { n, title: PART_TITLES[n] }), bold: true, before: n === 1 ? 4 : 14, after: 8, keep: true, style: 'Heading1' });
-        part.filter(a => !a.off).forEach((a, ai) => {
-          const num = n + '.' + (ai + 1);
-          out.push({ t: 'p', label: num, text: fmt.caps_articles ? R(a.title).toUpperCase() : R(a.title), lvl: -1, bold: true, before: 8, after: 4, keep: true, style: 'Heading2' });
+        if (s.front && !part.filter(a => !a.lead).length) return;
+        // v30 imports: a part title the source used (for example PART 2 - MATERIALS) is kept; front matter has no PART line
+        if (!s.front) out.push({ t: 'h', text: fill(fmt.part_style, { n, title: (s.part_titles && s.part_titles[n]) || PART_TITLES[n] }), bold: true, before: n === 1 ? 4 : 14, after: 8, keep: true, style: 'Heading1' });
+        let ai = 0;
+        part.filter(a => !a.off && !a.lead).forEach(a => {
+          // v30 imports: text that came before the first article (notes, schedules) has no article line or number
+          const titled = !a.untitled || String(a.title || '').trim();
+          if (titled) ai++;
+          const num = n + '.' + (String(fmt.article_style) === '01' ? String(Math.max(ai, 1)).padStart(2, '0') : Math.max(ai, 1));
+          if (titled) out.push({ t: 'p', label: num, text: fmt.caps_articles ? R(a.title).toUpperCase() : R(a.title), lvl: -1, bold: true, before: 8, after: 4, keep: true, style: 'Heading2' });
           const paras = (a.paras || []).filter(p => !p.off), labs = paraLabels(paras, fmt.numbering, num);
           paras.forEach((p, pi) => R(p.t).split('\n').forEach((line, li, all) => out.push({ t: 'p', label: li ? '' : labs[pi], text: line, lvl: Math.min(3, p.lvl | 0), after: li === all.length - 1 ? 4 : 0 })));
         });
       });
-      out.push({ t: 'h', text: fill(fmt.end_text, { number: s.number, title: sec.title }), align: 'center', bold: true, before: 18 });
+      if (!s.front) out.push({ t: 'h', text: fill(fmt.end_text, { number: sec.number, title: sec.title }), align: 'center', bold: true, before: 18 });
     });
     return out;
   }
@@ -129,7 +157,9 @@ function wrap(text, maxW, width) { const out = []; const words = String(text).sp
 // metrics(font, bold) -> (text, size) => width in points
 function layout(blocks, fmt, metrics, ctx) {
   fmt = fixFormat(fmt); const [pw, ph] = pageSize(fmt); const W = pw * 72, H = ph * 72, M = fmt.margins;
-  const L = M.l * 72, Rt = W - M.r * 72, top = H - M.t * 72 - 22, bottom = M.b * 72 + 22, CW = Rt - L, size = fmt.size, lh = size * fmt.line, IND = fmt.indent * 72;
+  const hb = String((fmt.header && fmt.header.block) || '').split('\n').filter(x => x.trim()).length, fsz = fmt.size;
+  const hdrH = hb ? hb * fsz * 1.2 + 26 : 22, ftrH = fmt.footer && fmt.footer.rule ? 30 : 22;
+  const L = M.l * 72, Rt = W - M.r * 72, top = H - M.t * 72 - hdrH, bottom = M.b * 72 + ftrH, CW = Rt - L, size = fmt.size, lh = size * fmt.line, IND = fmt.indent * 72;
   const pages = []; let pg = null, y = 0, sec = { number: '', title: '' }, secPage = 0, isLetter = false;
   const newPage = () => { pg = { items: [], section: { ...sec }, secPage: ++secPage, letter: isLetter }; pages.push(pg); y = top; };
   const ensure = h => { if (!pg) newPage(); if (y - h < bottom) newPage(); };
@@ -177,13 +207,25 @@ function layout(blocks, fmt, metrics, ctx) {
   // header and footer
   const total = pages.length, D = (ctx && ctx.data) || {}; const R = t => resolve(t, { data: D, labels: ctx && ctx.labels });
   // section page counts for {pages} in a section
+  const secTotals = []; let run = []; pages.forEach(p => { if (p.secPage === 1 && run.length) { run.forEach(q => secTotals.push(run.length)); run = []; } run.push(p); }); run.forEach(() => secTotals.push(run.length));
   pages.forEach((p, i) => {
     if (p.cover) return;
-    const vars = { page: p.secPage, pages: total, page_total: i + 1, section_number: p.section.number, section_title: p.section.title };
+    const vars = { page: p.secPage, pages: total, section_pages: secTotals[i] || 1, page_total: i + 1, section_number: p.section.number, section_title: p.section.title };
     const hdr = p.letter ? { left: '', right: '' } : fmt.header, ftr = p.letter ? fmt.letter_footer : fmt.footer;
-    const put = (str, where, yy, sz2) => { const s = R(fill(str, p.letter ? { ...vars, page: i + 1 } : vars)).replace(/\[[^\]]*\]/g, '').replace(/\s{2,}/g, ' ').trim(); if (!s || /^-\s*\d*$/.test(s)) return; const w = metrics(false)(s, sz2); const x = where === 'left' ? L : where === 'right' ? Rt - w : L + (CW - w) / 2; p.items.push({ k: 'text', x, y: yy, t: s, size: sz2, bold: false, color: '#334155' }); };
-    if (!(p.letter && p.letterhead)) { put(hdr.left, 'left', H - M.t * 72, size - 2); put(hdr.right, 'right', H - M.t * 72, size - 2); }
-    put(ftr.left, 'left', M.b * 72, size - 2); put(ftr.center, 'center', M.b * 72, size - 2); put(ftr.right, 'right', M.b * 72, size - 2);
+    const hfBold = o => !!(o && o.bold), hfColor = o => o && o.bold ? '#000000' : '#334155', hfSize = o => o && o.bold ? size : size - 2;
+    const put = (str, where, yy, sz2, o) => { const s = R(fill(str, p.letter ? { ...vars, page: i + 1 } : vars)).replace(/\[[^\]]*\]/g, '').replace(/\s{2,}/g, ' ').trim(); if (!s || /^-\s*\d*$/.test(s)) return; const w = metrics(hfBold(o))(s, sz2); const x = where === 'left' ? L : where === 'right' ? Rt - w : L + (CW - w) / 2; p.items.push({ k: 'text', x, y: yy, t: s, size: sz2, bold: hfBold(o), color: hfColor(o) }); };
+    if (!(p.letter && p.letterhead)) {
+      const block = p.letter ? '' : String(hdr.block || '');
+      if (block.trim()) { // the project block: one line each, a tab lines the value up
+        let yy = H - M.t * 72 - size; const tabX = L + 1.6 * 72;
+        block.split('\n').forEach(line => { const [a, b] = line.split('\t'); const ra = R(a || '').replace(/\[[^\]]*\]/g, '').trim(), rb = b != null ? R(b).replace(/\[[^\]]*\]/g, '').trim() : null; if (!ra && !rb) return;
+          p.items.push({ k: 'text', x: L, y: yy, t: ra, size, bold: !!hdr.bold, color: '#000000' }); if (rb) p.items.push({ k: 'text', x: Math.max(tabX, L + metrics(!!hdr.bold)(ra, size) + 8), y: yy, t: rb, size, bold: !!hdr.bold, color: '#000000' }); yy -= size * 1.2; });
+        if (hdr.rule) p.items.push({ k: 'line', x1: L, x2: Rt, y: yy + size * 0.2 - 3, w: 0.9, color: '#000000' });
+      } else { put(hdr.left, 'left', H - M.t * 72, hfSize(hdr), hdr); put(hdr.right, 'right', H - M.t * 72, hfSize(hdr), hdr); if (hdr.rule && !p.letter) p.items.push({ k: 'line', x1: L, x2: Rt, y: H - M.t * 72 - 5, w: 0.9, color: '#000000' }); }
+    }
+    const fo = p.letter ? null : ftr;
+    if (fo && fo.rule) p.items.push({ k: 'line', x1: L, x2: Rt, y: M.b * 72 + hfSize(fo) + 2, w: 0.9, color: '#000000' });
+    put(ftr.left, 'left', M.b * 72, hfSize(fo), fo); put(ftr.center, 'center', M.b * 72, hfSize(fo), fo); put(ftr.right, 'right', M.b * 72, hfSize(fo), fo);
     if (p.letter && p.letterhead && fmt.letterhead.show) {
       const lines = R(fmt.letterhead.lines || '').split('\n').map(s => s.replace(/\[[^\]]*\]/g, '').trim()).filter(Boolean);
       p.lh = { lines, x: L, xr: Rt, y: H - M.t * 72, align: fmt.letterhead.align, logo: fmt.letterhead.logo };
@@ -255,7 +297,7 @@ function docxBody(blocks, fmt, styles, sectPr) {
     if (b.t === 'p') {
       if (b.blank) { parts.push(P('', {})); continue; }
       const lvl = b.lvl; let left, hang;
-      if (lvl === -2) { left = 0; hang = 0; } else if (lvl === -1) { left = TW(ind); hang = TW(ind); } else { left = TW(ind * (lvl + 2)); hang = TW(ind); }
+      if (lvl === -2) { left = 0; hang = 0; } else if (lvl === -1) { left = TW(ind); hang = TW(ind); } else { left = TW(ind * (lvl + 2)); hang = b.label ? TW(ind) : 0; }
       const label = b.label && lvl !== -2 ? run(b.label, { bold: b.bold }) + '<w:r><w:tab/></w:r>' : '';
       parts.push(P(label + run(b.text, { bold: b.bold }), { before: b.before, after: b.after, keep: b.keep, style: b.style, ind: `<w:tabs><w:tab w:val="left" w:pos="${left}"/></w:tabs><w:ind w:left="${left}" w:hanging="${hang}"/>` }));
       continue;
@@ -274,11 +316,17 @@ function docxBody(blocks, fmt, styles, sectPr) {
   return parts.join('');
 }
 function fieldRun(instr, rpr) { rpr = rpr || ''; return `<w:r>${rpr}<w:fldChar w:fldCharType="begin"/></w:r><w:r>${rpr}<w:instrText xml:space="preserve"> ${instr} </w:instrText></w:r><w:r>${rpr}<w:fldChar w:fldCharType="separate"/></w:r><w:r>${rpr}<w:t>1</w:t></w:r><w:r>${rpr}<w:fldChar w:fldCharType="end"/></w:r>`; }
-function hfXml(tag, cells, fmt, R) { // three tab-separated parts: left, center, right. {page} becomes a PAGE field, {pages} NUMPAGES.
-  const W = TW(pageSize(fmt)[0] - fmt.margins.l - fmt.margins.r), font = FONTS[fmt.font][2];
-  const rpr = `<w:rPr><w:rFonts w:ascii="${font}" w:hAnsi="${font}"/><w:color w:val="334155"/><w:sz w:val="${Math.round((fmt.size - 2) * 2)}"/></w:rPr>`;
-  const runs = s => R(s).replace(/\[[^\]]*\]/g, '').split(/(\{page\}|\{pages\})/).map(part => part === '{page}' ? fieldRun('PAGE', rpr) : part === '{pages}' ? fieldRun('NUMPAGES', rpr) : part ? `<w:r>${rpr}<w:t xml:space="preserve">${xe(part)}</w:t></w:r>` : '').join('');
-  return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:${tag} xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><w:p><w:pPr><w:tabs><w:tab w:val="center" w:pos="${Math.round(W / 2)}"/><w:tab w:val="right" w:pos="${W}"/></w:tabs></w:pPr>${runs(cells[0] || '')}<w:r><w:tab/></w:r>${runs(cells[1] || '')}<w:r><w:tab/></w:r>${runs(cells[2] || '')}</w:p></w:${tag}>`;
+function hfXml(tag, cells, fmt, R, o) { // three tab-separated parts: left, center, right. {page} becomes a PAGE field, {pages} NUMPAGES, {section_pages} SECTIONPAGES.
+  o = o || {}; const W = TW(pageSize(fmt)[0] - fmt.margins.l - fmt.margins.r), font = FONTS[fmt.font][2];
+  const rpr = `<w:rPr><w:rFonts w:ascii="${font}" w:hAnsi="${font}" w:cs="${font}"/>${o.bold ? '<w:b/>' : ''}<w:color w:val="${o.bold ? '000000' : '334155'}"/><w:sz w:val="${Math.round((o.bold ? fmt.size : fmt.size - 2) * 2)}"/></w:rPr>`;
+  const runs = s => R(s).replace(/\[[^\]]*\]/g, '').split(/(\{page\}|\{pages\}|\{section_pages\}|\t)/).map(part => part === '{page}' ? fieldRun('PAGE', rpr) : part === '{pages}' ? fieldRun('NUMPAGES', rpr) : part === '{section_pages}' ? fieldRun('SECTIONPAGES', rpr) : part === '\t' ? `<w:r>${rpr}<w:tab/></w:r>` : part ? `<w:r>${rpr}<w:t xml:space="preserve">${xe(part)}</w:t></w:r>` : '').join('');
+  const bdr = side => `<w:pBdr><w:${side} w:val="single" w:sz="6" w:space="${side === 'top' ? 4 : 1}" w:color="000000"/></w:pBdr>`;
+  const NS = 'xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"';
+  if (o.block) { // the project block: one paragraph per line, a rule under the last one
+    const lines = o.block.split('\n').filter(x => x.trim());
+    return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:${tag} ${NS}>${lines.map((l, i) => `<w:p><w:pPr>${o.rule && i === lines.length - 1 ? bdr('bottom') : ''}<w:tabs><w:tab w:val="left" w:pos="${TW(1.6)}"/></w:tabs><w:spacing w:after="0" w:line="240" w:lineRule="auto"/></w:pPr>${runs(l)}</w:p>`).join('')}</w:${tag}>`;
+  }
+  return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:${tag} ${NS}><w:p><w:pPr>${o.rule ? bdr(tag === 'ftr' ? 'top' : 'bottom') : ''}<w:tabs><w:tab w:val="center" w:pos="${Math.round(W / 2)}"/><w:tab w:val="right" w:pos="${W}"/></w:tabs></w:pPr>${runs(cells[0] || '')}<w:r><w:tab/></w:r>${runs(cells[1] || '')}<w:r><w:tab/></w:r>${runs(cells[2] || '')}</w:p></w:${tag}>`;
 }
 async function docx(doc, ctx, fmt, files, opts) {
   const JSZip = await zipLib(); fmt = fixFormat(fmt); const blocks = flatten(doc, ctx, fmt, opts);
@@ -305,8 +353,8 @@ async function docx(doc, ctx, fmt, files, opts) {
   const secs = []; let cur = null; blocks.forEach(b => { if (b.t === 'break' || b.t === 'mark') { if (b.restart || !cur) { cur = { section: b.section }; secs.push(cur); } } }); if (!secs.length) secs.push({ section: { number: doc.doc_number || '', title: R(doc.title || '') } });
   const rels = ['<Relationship Id="rStyles" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>', '<Relationship Id="rSettings" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/settings" Target="settings.xml"/>'];
   const ctypes = [];
-  zip.file('word/header1.xml', hfXml('hdr', hdr, fmt, R)); rels.push('<Relationship Id="rH1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/header" Target="header1.xml"/>'); ctypes.push('<Override PartName="/word/header1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml"/>');
-  secs.forEach((s, i) => { const f = ftr.map(c => fill(c, { section_number: s.section.number, section_title: s.section.title })); zip.file(`word/footer${i + 1}.xml`, hfXml('ftr', f, fmt, R)); rels.push(`<Relationship Id="rF${i + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/footer" Target="footer${i + 1}.xml"/>`); ctypes.push(`<Override PartName="/word/footer${i + 1}.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml"/>`); });
+  zip.file('word/header1.xml', hfXml('hdr', hdr, fmt, R, isLetter ? {} : { block: fmt.header.block, rule: fmt.header.rule, bold: fmt.header.bold })); rels.push('<Relationship Id="rH1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/header" Target="header1.xml"/>'); ctypes.push('<Override PartName="/word/header1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml"/>');
+  secs.forEach((s, i) => { const f = ftr.map(c => fill(c, { section_number: s.section.number, section_title: s.section.title })); zip.file(`word/footer${i + 1}.xml`, hfXml('ftr', f, fmt, R, isLetter ? {} : { rule: fmt.footer.rule, bold: fmt.footer.bold })); rels.push(`<Relationship Id="rF${i + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/footer" Target="footer${i + 1}.xml"/>`); ctypes.push(`<Override PartName="/word/footer${i + 1}.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml"/>`); });
   const sectFor = (i, next) => `<w:sectPr><w:headerReference w:type="default" r:id="rH1"/><w:footerReference w:type="default" r:id="rF${i + 1}"/>${next ? '<w:type w:val="nextPage"/>' : ''}<w:pgSz w:w="${TW(pw)}" w:h="${TW(ph)}"${fmt.orientation === 'landscape' ? ' w:orient="landscape"' : ''}/><w:pgMar w:top="${TW(M.t + 0.35)}" w:right="${TW(M.r)}" w:bottom="${TW(M.b + 0.35)}" w:left="${TW(M.l)}" w:header="${TW(M.t)}" w:footer="${TW(M.b)}" w:gutter="0"/><w:pgNumType w:start="1"/></w:sectPr>`;
   // build body: split per section so each section break carries its own footer
   let body = ''; const chunks = []; let curChunk = [];

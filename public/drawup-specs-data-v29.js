@@ -126,6 +126,7 @@ const PROJECT_FIELDS = [
   ['owner_name', 'Owner', 'Team', 'Client or owner'],
   ['owner_address', 'Owner address', 'Team', ''],
   ['owner_rep', 'Owner representative', 'Team', ''],
+  ['owner_project_number', 'Owner project or PO number', 'Team', ''],
   ['architect_name', 'Architect', 'Team', 'From the firm'],
   ['architect_address', 'Architect address', 'Team', 'From the firm office'],
   ['pm_name', 'Project manager', 'Team', ''],
