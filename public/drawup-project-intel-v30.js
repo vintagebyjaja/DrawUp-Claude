@@ -84,8 +84,8 @@
       const un = lastUnavailable(key);
       return un ? `<span class="dpi-prov na" title="${esc(un.next)}">Not available: ${esc(un.reason)}</span>` : '<span class="dpi-prov empty">Not set</span>';
     }
-    if (f.by === 'user') return `<span class="dpi-prov user">${f.verified ? '<b>Verified</b> · ' : ''}Entered by ${esc(f.src || 'a member')}${f.at ? ' · ' + esc(day(f.at)) : ''}</span>`;
-    return `<span class="dpi-prov auto${f.verified ? ' ver' : ''}">${f.verified ? '<b>Verified</b> · ' : '<b>Unverified</b> · '}${f.url ? `<a href="${esc(f.url)}" target="_blank" rel="noopener">${esc(f.src)}</a>` : esc(f.src)}${f.at ? ' · ' + esc(day(f.at)) : ''}${f.conf ? ' · ' + esc(LEVELS[f.conf] || f.conf) + ' confidence' : ''}${f.note ? `<i title="${esc(f.note)}"> ⓘ ${esc(f.note)}</i>` : ''}</span>`;
+    if (f.by === 'user') return `<span class="dpi-prov user">${f.verified ? '<b>Verified</b> · ' : ''}Entered by ${esc(f.src || 'a member')}${f.at ? ' · ' + esc(day(f.at)) : ''}</span> <select class="dpi-kindsel" data-kind="${esc(key)}" aria-label="Where this value came from">${['member', 'website', 'estimate', '3d', 'aerial', 'official'].map(k => `<option value="${k}" ${(f.kind || 'member') === k ? 'selected' : ''}>${esc(k === 'member' ? 'Source: you' : 'Source: ' + KL[k])}</option>`).join('')}</select>`;
+    return `${chip(f.kind || 'official')}<span class="dpi-prov auto${f.verified ? ' ver' : ''}">${f.verified ? '<b>Verified</b> · ' : '<b>Unverified</b> · '}${f.url ? `<a href="${esc(f.url)}" target="_blank" rel="noopener">${esc(f.src)}</a>` : esc(f.src)}${f.at ? ' · ' + esc(day(f.at)) : ''}${f.conf ? ' · ' + esc(LEVELS[f.conf] || f.conf) + ' confidence' : ''}${f.note ? `<i title="${esc(f.note)}"> ⓘ ${esc(f.note)}</i>` : ''}</span>`;
   }
   function lastUnavailable(key) { const L = S && S.row.lookups && S.row.lookups[0]; return L && Array.isArray(L.unavailable) ? L.unavailable.find(u => u.key === key) : null; }
   function projectFallback(key) {
@@ -132,12 +132,11 @@
         <div class="dpi-addr"><input id="dpi-addr" class="dpi-in" placeholder="Street address, city, state ZIP" value="${esc((f.project_address && f.project_address.v) || '')}" aria-label="Site address"><button class="du-btn primary" type="button" id="dpi-look">Look up site data</button></div>
         <p class="dpi-note">Free. DrawUp asks the U.S. Census geocoder, the FEMA flood map and the USGS elevation service, plus the county parcel records and the city zoning map where DrawUp covers the place. Covered now: ${esc(Core.COVERAGE_TEXT || 'none')}. It fills only empty fields; values you typed or verified are never replaced. Public data is preliminary; nothing here is a survey, a zoning determination or legal verification.</p>
         <div id="dpi-lookres">${look ? lookupHTML(look) : ''}</div>
-        ${site.zoning || site.parcel ? zoningHTML(site) : ''}
-        ${site.lat && site.lng ? siteMaps(site) : '<div class="dpi-nomap">Add a site address to place the project on the map.</div>'}
+        ${site.lat && site.lng ? siteSections(site) : '<div class="dpi-nomap">Add a site address to place the project on the map.</div>'}
       </article>
       <article class="du-glass dpi-used"><span class="du-kicker">USED BY</span><h2>Where this information goes</h2><div id="dpi-usedby"><p class="du-muted">Checking…</p></div></article>
     </div>
-    <div class="dpi-groups">${Core.FIELD_GROUPS.map(g => `<article class="du-glass dpi-group" data-g="${g.id}"><span class="du-kicker">${esc(g.label.toUpperCase())}</span><div class="dpi-rows">${g.fields.map(([k, label]) => fieldRow(k, label)).join('')}</div></article>`).join('')}</div>
+    <div class="dpi-groups">${Core.FIELD_GROUPS.map(g => { const n = g.fields.filter(([k]) => (f[k] && String(f[k].v || '').trim()) || projectFallback(k)).length; return `<article class="du-glass dpi-group" data-g="${g.id}"><details data-sec="g-${g.id}"${openSet().has('g-' + g.id) ? ' open' : ''}><summary><span class="du-kicker">${esc(g.label.toUpperCase())}</span><span class="dpi-gcount">${n} of ${g.fields.length} filled</span></summary><div class="dpi-rows">${g.fields.map(([k, label]) => fieldRow(k, label)).join('')}</div></details></article>`; }).join('')}</div>
     <article class="du-glass dpi-list" data-l="program"><div class="dpi-lhead"><span class="du-kicker">BUILDING PROGRAM</span><span class="dpi-total" id="dpi-total"></span></div>${listTable('program')}</article>
     <div class="dpi-grid2"><article class="du-glass dpi-list" data-l="team"><span class="du-kicker">PROJECT TEAM AND CONSULTANTS</span>${listTable('team')}</article>
       <article class="du-glass dpi-list" data-l="milestones"><span class="du-kicker">MILESTONES</span>${listTable('milestones')}</article></div>
@@ -174,7 +173,7 @@
     w.querySelector('#dpi-proj').onchange = async e => { await save(); S.pid = e.target.value; renderInfo(); };
     w.querySelectorAll('[data-f]').forEach(inp => inp.oninput = () => {
       const k = inp.dataset.f, cur = S.row.fields[k] || {}; const me = S.c.profile && (S.c.profile.display_name || S.c.profile.username) || 'you';
-      S.row.fields[k] = { v: inp.value, by: 'user', src: me, at: nowIso(), verified: !!cur.verified && cur.v === inp.value };
+      S.row.fields[k] = { v: inp.value, by: 'user', src: me, at: nowIso(), verified: !!cur.verified && cur.v === inp.value, kind: cur.by === 'user' && cur.kind ? cur.kind : 'member' };
       const meta = inp.closest('.dpi-row').querySelector('.dpi-meta'); meta.innerHTML = badge(S.row.fields[k], k) + `<label class="dpi-ver"><input type="checkbox" data-ver="${k}"> Verified</label>`; bindVer(meta); dirty();
     });
     bindVer(w);
@@ -187,7 +186,8 @@
     w.querySelector('#dpi-file').onchange = e => upload([...e.target.files]);
     bindFiles();
   }
-  function bindVer(root) { root.querySelectorAll('[data-ver]').forEach(cb => cb.onchange = () => { const f = S.row.fields[cb.dataset.ver]; if (!f) return; f.verified = cb.checked; f.verified_at = cb.checked ? nowIso() : null; const meta = cb.closest('.dpi-meta'); meta.innerHTML = badge(f, cb.dataset.ver) + `<label class="dpi-ver"><input type="checkbox" data-ver="${cb.dataset.ver}" ${f.verified ? 'checked' : ''}> Verified</label>`; bindVer(meta); dirty(); }); }
+  function bindKind(root) { root.querySelectorAll('[data-kind]').forEach(sel => sel.onchange = () => { const f = S.row.fields[sel.dataset.kind]; if (!f) return; f.kind = sel.value; dirty(); }); }
+  function bindVer(root) { bindKind(root); root.querySelectorAll('[data-ver]').forEach(cb => cb.onchange = () => { const f = S.row.fields[cb.dataset.ver]; if (!f) return; f.verified = cb.checked; f.verified_at = cb.checked ? nowIso() : null; const meta = cb.closest('.dpi-meta'); meta.innerHTML = badge(f, cb.dataset.ver) + `<label class="dpi-ver"><input type="checkbox" data-ver="${cb.dataset.ver}" ${f.verified ? 'checked' : ''}> Verified</label>`; bindVer(meta); dirty(); }); }
   function refreshList(n) { const art = S.w.querySelector(`[data-l="${n}"]`); const keep = art.querySelector('.du-kicker').outerHTML; const extra = n === 'decisions' ? '<p class="dpi-note">Open decisions show up in DD Readiness.</p>' : n === 'program' ? '' : ''; art.innerHTML = (n === 'program' ? '<div class="dpi-lhead"><span class="du-kicker">BUILDING PROGRAM</span><span class="dpi-total" id="dpi-total"></span></div>' : keep + extra) + listTable(n); bindInfoLists(art); total_(); }
   function bindInfoLists(art) {
     art.querySelectorAll('[data-li]').forEach(inp => inp.oninput = inp.onchange = () => { const [n, i, k] = inp.dataset.li.split(':'); S.row[n][+i][k] = inp.value; total_(); dirty(); });
@@ -210,41 +210,86 @@
       <p class="dpi-note">Pin at the ${S && S.row.site && S.row.site.from === 'parcel' ? 'parcel point' : 'geocoded point'} (${(+lat).toFixed(5)}, ${(+lng).toFixed(5)}). ${S && S.row.site && S.row.site.boundary ? 'Parcel lines are on the Vicinity tab.' : 'Property lines are not shown: no parcel source is connected for this site.'} Map © OpenStreetMap contributors. <a href="https://www.openstreetmap.org/?mlat=${lat}&amp;mlon=${lng}#map=18/${lat}/${lng}" target="_blank" rel="noopener">Open larger map</a></p></div>`;
   }
 
-  /* ------------------------------------------------------------------ parcel, zoning and vicinity (jurisdiction layer) */
+  /* ------------------------------------------------------------------ parcel, zoning, buildings, parking, map (collapsible sections) */
   const money = n => n ? '$' + Math.round(n).toLocaleString() : '';
-  function zoningHTML(site) {
-    const P = site.parcel, Z = site.zoning, D = Z && Z.district, look = S.row.lookups[0] || {};
-    const gaps = (look.unavailable || []).filter(u => ['zoning_district', 'setbacks', 'height_limit', 'min_lot_area', 'min_lot_width', 'lot_coverage', 'far', 'density'].includes(u.key));
-    const parcel = P ? `<div class="dpi-parcel"><div class="dpi-zhead"><span class="du-kicker">PARCEL</span><a href="${esc(P.url)}" target="_blank" rel="noopener">Open in Polaris ↗</a></div>
-      <dl class="dpi-pdl"><dt>Parcel ID</dt><dd><b>${esc(P.id)}</b>${P.how === 'point' ? ' <span class="dpi-tag warn" title="Found at the map point, not by the address">check lot</span>' : ''}</dd>
-        ${P.lotSf ? `<dt>Lot size</dt><dd>${Math.round(P.lotSf).toLocaleString()} sf · ${esc(P.lotAcres)} ac <small>(${esc(P.lotFrom)})</small></dd>` : ''}
-        ${P.owner ? `<dt>Owner of record</dt><dd>${esc(P.owner)}</dd>` : ''}
-        ${P.landUse ? `<dt>Assessor land use</dt><dd>${esc(P.landUse)}</dd>` : ''}
-        ${P.totalValue ? `<dt>Assessed value</dt><dd>${money(P.totalValue)}${P.assessedYear ? ` <small>(tax year ${esc(P.assessedYear)})</small>` : ''}</dd>` : ''}
-        ${P.heatedSf ? `<dt>Heated area</dt><dd>${Math.round(P.heatedSf).toLocaleString()} sf</dd>` : ''}
-        ${P.lastSale ? `<dt>Last sale</dt><dd>${esc(P.lastSale)}</dd>` : ''}</dl>
-      <p class="dpi-src1"><b>Unverified</b> · <a href="${esc(P.srcUrl)}" target="_blank" rel="noopener">${esc(P.src)}</a> · ${esc(day(look.at))}</p></div>` : '';
-    if (!Z || !D) return `<div class="dpi-zone">${parcel}${gaps.length ? `<div class="dpi-zgap"><b>Zoning not available.</b> ${esc(gaps[0].reason)} <i>${esc(gaps[0].next)}</i></div>` : ''}</div>`;
-    const tags = [D.conditional ? '<span class="dpi-tag warn">Conditional (CD)</span>' : '', D.exception ? '<span class="dpi-tag warn">Exception (EX)</span>' : '', D.kind === 'legacy' ? '<span class="dpi-tag warn">Pre-UDO district</span>' : '', ...(D.overlays || []).map(o => `<span class="dpi-tag ov" title="${esc(o.ref || '')}">${esc(o.name)}</span>`), (site.vicinity && site.vicinity.rezonings && site.vicinity.rezonings.length) ? `<span class="dpi-tag rz">${site.vicinity.rezonings.length} pending rezoning${site.vicinity.rezonings.length === 1 ? '' : 's'} nearby</span>` : ''].join('');
-    const rows = (Z.standards || []).map(x => `<tr><th scope="row">${esc(x.label)}</th><td>${esc(x.value)}${x.note ? `<small>${esc(x.note)}</small>` : ''}</td><td class="dpi-ref"><a href="${esc(D.articleUrl || Z.jurisdiction.ordinanceUrl)}" target="_blank" rel="noopener">${esc(x.ref)}</a></td></tr>`).join('');
-    const gapRows = gaps.filter(g => g.key !== 'zoning_district').map(g => `<tr class="na"><th scope="row">${esc(Core.FIELD_LABEL[g.key] || g.key)}</th><td colspan="2">${esc(g.reason)}</td></tr>`).join('');
-    const fr = Z.frontage ? `<details class="dpi-front"><summary>${esc(Z.frontage.title)} <small>${esc(Z.frontage.ref)}</small></summary><div class="dpi-tblwrap"><table class="dpi-tbl"><thead><tr>${Z.frontage.cols.map(c => `<th>${esc(c)}</th>`).join('')}</tr></thead><tbody>${Z.frontage.rows.map(r => `<tr>${r.map(c => `<td>${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></div><p class="dpi-note">${esc(Z.frontage.note)}</p></details>` : '';
-    const rz = site.vicinity && site.vicinity.rezonings && site.vicinity.rezonings.length ? `<details class="dpi-front"><summary>Pending rezonings within about 650 ft</summary><ul class="dpi-rzl">${site.vicinity.rezonings.map(r => `<li><b>${r.url ? `<a href="${esc(r.url)}" target="_blank" rel="noopener">${esc(r.petition)}</a>` : esc(r.petition)}</b> ${esc(r.existing || '?')} → ${esc(r.requested || '?')}${r.acres ? ` · ${esc(r.acres)} ac` : ''}${r.received ? ` · filed ${esc(r.received)}` : ''}</li>`).join('')}</ul></details>` : '';
-    return `<div class="dpi-zone">${parcel}<div class="dpi-zcard">
-      <div class="dpi-zhead"><span class="du-kicker">ZONING · ${esc(Z.jurisdiction.name.toUpperCase())}</span>${D.petitionUrl ? `<a href="${esc(D.petitionUrl)}" target="_blank" rel="noopener">Rezoning petition ${esc(D.petition || '')} ↗</a>` : ''}</div>
-      <div class="dpi-zcode"><b>${esc(D.raw)}</b><span>${esc(D.name || '')}${D.article ? ` · <a href="${esc(D.articleUrl)}" target="_blank" rel="noopener">${esc(D.article)}</a>` : ''}</span></div>
-      ${tags ? `<div class="dpi-tags">${tags}</div>` : ''}
-      ${(Z.notes || []).map(n => `<p class="dpi-znote">${esc(n)}</p>`).join('')}
-      ${rows || gapRows ? `<div class="dpi-tblwrap"><table class="dpi-ztbl"><tbody>${rows}${gapRows}</tbody></table></div>` : ''}
-      ${fr}${rz}
-      <p class="dpi-src1"><b>Unverified</b> · district from the <a href="${esc(Z.jurisdiction.mapUrl)}" target="_blank" rel="noopener">${esc(Z.jurisdiction.mapName)}</a>${rows ? `; limits from the <a href="${esc(Z.jurisdiction.ordinanceUrl)}" target="_blank" rel="noopener">${esc(Z.jurisdiction.ordinance)}</a>` : ''} · ${esc(day(look.at))}${Z.transcribed && rows ? ` · ${esc(Z.transcribed)}` : ''} Not a zoning determination: for a binding answer ask the city for a zoning verification letter.</p>
-    </div></div>`;
+  const KL = Core.KIND_LABEL || { official: 'Official record', website: 'Website', estimate: 'Estimate', '3d': '3D file', aerial: 'Aerial imagery', member: 'Entered by you' };
+  const chip = k => k ? `<span class="dpi-kind k-${esc(k)}" title="Where this value came from">${esc(KL[k] || k)}</span>` : '';
+  const OPEN_KEY = 'du-dpi-open-v1';
+  const openSet = () => { try { return new Set(JSON.parse(localStorage.getItem(OPEN_KEY) || '[]')); } catch (_e) { return new Set(); } };
+  function sec(id, title, sum, body, k) {
+    return `<details class="dpi-sec" data-sec="${id}"${openSet().has(id) ? ' open' : ''}><summary><span class="dpi-sect">${esc(title)}</span><span class="dpi-secs">${sum}</span>${k ? chip(k) : ''}</summary><div class="dpi-secb">${body}</div></details>`;
+  }
+  function bindSecs(root) {
+    (root || S.w).querySelectorAll('details[data-sec]').forEach(d => d.ontoggle = () => { const o = openSet(); d.open ? o.add(d.dataset.sec) : o.delete(d.dataset.sec); try { localStorage.setItem(OPEN_KEY, JSON.stringify([...o])); } catch (_e) { /* private mode */ } });
+  }
+  const gapsFor = keys => ((S.row.lookups[0] || {}).unavailable || []).filter(u => keys.includes(u.key));
+  const gapHTML = (g, links) => `<div class="dpi-zgap"><b>Not available.</b> ${esc(g.reason)} <i>${esc(g.next)}</i>${links ? ' <a href="#" data-opensec="find">Look it up yourself</a>' : ''}</div>`;
+
+  function siteSections(site) {
+    const f = S.row.fields, look = S.row.lookups[0] || {}; const fv = k => f[k] && String(f[k].v || '').trim() ? f[k].v : '';
+    const out = [];
+    // zoning and limits
+    const Z = site.zoning, D = Z && Z.district;
+    if (D) {
+      const tags = [D.conditional ? '<span class="dpi-tag warn">Conditional (CD)</span>' : '', D.exception ? '<span class="dpi-tag warn">Exception (EX)</span>' : '', D.kind === 'legacy' ? '<span class="dpi-tag warn">Pre-UDO district</span>' : '', ...(D.overlays || []).map(o => `<span class="dpi-tag ov" title="${esc(o.ref || '')}">${esc(o.name)}</span>`), (site.vicinity && site.vicinity.rezonings && site.vicinity.rezonings.length) ? `<span class="dpi-tag rz">${site.vicinity.rezonings.length} pending rezoning${site.vicinity.rezonings.length === 1 ? '' : 's'} nearby</span>` : ''].join('');
+      const gaps = gapsFor(['setbacks', 'height_limit', 'min_lot_area', 'min_lot_width', 'lot_coverage', 'far', 'density']);
+      const rows = (Z.standards || []).map(x => `<tr><th scope="row">${esc(x.label)}</th><td>${esc(x.value)}${x.note ? `<small>${esc(x.note)}</small>` : ''}</td><td class="dpi-ref">${chip(Z.kind || 'official')}<a href="${esc(D.articleUrl || Z.jurisdiction.ordinanceUrl)}" target="_blank" rel="noopener">${esc(x.ref)}</a></td></tr>`).join('');
+      const gapRows = gaps.map(g => `<tr class="na"><th scope="row">${esc(Core.FIELD_LABEL[g.key] || g.key)}</th><td colspan="2">${esc(g.reason)}</td></tr>`).join('');
+      const fr = Z.frontage ? `<details class="dpi-front"><summary>${esc(Z.frontage.title)} <small>${esc(Z.frontage.ref)}</small></summary><div class="dpi-tblwrap"><table class="dpi-tbl"><thead><tr>${Z.frontage.cols.map(c => `<th>${esc(c)}</th>`).join('')}</tr></thead><tbody>${Z.frontage.rows.map(r => `<tr>${r.map(c => `<td>${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></div><p class="dpi-note">${esc(Z.frontage.note)}</p></details>` : '';
+      const rz = site.vicinity && site.vicinity.rezonings && site.vicinity.rezonings.length ? `<details class="dpi-front"><summary>Pending rezonings within about 650 ft</summary><ul class="dpi-rzl">${site.vicinity.rezonings.map(r => `<li><b>${r.url ? `<a href="${esc(r.url)}" target="_blank" rel="noopener">${esc(r.petition)}</a>` : esc(r.petition)}</b> ${esc(r.existing || '?')} → ${esc(r.requested || '?')}${r.acres ? ` · ${esc(r.acres)} ac` : ''}${r.received ? ` · filed ${esc(r.received)}` : ''}</li>`).join('')}</ul></details>` : '';
+      const body = `<div class="dpi-zcard"><div class="dpi-zhead"><span class="du-kicker">ZONING · ${esc(Z.jurisdiction.name.toUpperCase())}</span>${D.petitionUrl ? `<a href="${esc(D.petitionUrl)}" target="_blank" rel="noopener">Rezoning petition ${esc(D.petition || '')} ↗</a>` : ''}</div>
+        <div class="dpi-zcode"><b>${esc(D.raw)}</b><span>${esc(D.name || '')}${D.article ? ` · <a href="${esc(D.articleUrl)}" target="_blank" rel="noopener">${esc(D.article)}</a>` : ''}</span></div>
+        ${tags ? `<div class="dpi-tags">${tags}</div>` : ''}${(Z.notes || []).map(n => `<p class="dpi-znote">${esc(n)}</p>`).join('')}
+        ${rows || gapRows ? `<div class="dpi-tblwrap"><table class="dpi-ztbl"><tbody>${rows}${gapRows}</tbody></table></div>` : ''}${fr}${rz}
+        <p class="dpi-src1"><b>Unverified</b> · district from the <a href="${esc(Z.jurisdiction.mapUrl)}" target="_blank" rel="noopener">${esc(Z.jurisdiction.mapName)}</a>${rows ? `; limits from the <a href="${esc(Z.jurisdiction.ordinanceUrl)}" target="_blank" rel="noopener">${esc(Z.jurisdiction.ordinance)}</a>` : ''} · ${esc(day(look.at))}${Z.transcribed && rows ? ` · ${esc(Z.transcribed)}` : ''} Not a zoning determination: for a binding answer ask the city for a zoning verification letter.</p></div>`;
+      const sb = (Z.standards || []).filter(x => ['front', 'side', 'rear'].includes(x.key)).map(x => x.value.replace(/ from the street right-of-way/, '').split(';')[0]);
+      const hh = (Z.standards || []).find(x => x.key === 'height');
+      out.push(sec('zoning', 'Zoning and limits', `<b>${esc(D.raw)}</b>${sb.length === 3 && !/frontage/.test(sb[0]) ? ` · setbacks ${esc(sb.join(' / '))}` : ''}${hh ? ` · height ${esc(hh.value.split(';')[0].replace(/ residential$/, ''))}` : ''}`, body, Z.kind || 'official'));
+    } else {
+      const g = gapsFor(['zoning_district'])[0];
+      out.push(sec('zoning', 'Zoning and limits', '<span class="dpi-na2">Not available here</span>', g ? gapHTML(g, true) : '<p class="dpi-note">Run a lookup to see the zoning.</p>'));
+    }
+    // parcel
+    const P = site.parcel;
+    if (P) {
+      out.push(sec('parcel', 'Parcel', `<b>${esc(P.id)}</b>${P.lotSf ? ` · ${Math.round(P.lotSf).toLocaleString()} sf` : ''}${P.owner ? ` · ${esc(P.owner)}` : ''}`, `<div class="dpi-parcel"><div class="dpi-zhead"><span class="du-kicker">PARCEL</span><a href="${esc(P.url)}" target="_blank" rel="noopener">Open the county record ↗</a></div>
+        <dl class="dpi-pdl"><dt>Parcel ID</dt><dd><b>${esc(P.id)}</b>${P.how === 'point' ? ' <span class="dpi-tag warn" title="Found at the map point, not by the address">check lot</span>' : ''}</dd>
+        ${P.lotSf ? `<dt>Lot size</dt><dd>${Math.round(P.lotSf).toLocaleString()} sf · ${esc(P.lotAcres)} ac <small>(${esc(P.lotFrom)})</small></dd>` : ''}${P.owner ? `<dt>Owner of record</dt><dd>${esc(P.owner)}</dd>` : ''}
+        ${P.landUse ? `<dt>Assessor land use</dt><dd>${esc(P.landUse)}</dd>` : ''}${P.totalValue ? `<dt>Assessed value</dt><dd>${money(P.totalValue)}${P.assessedYear ? ` <small>(tax year ${esc(P.assessedYear)})</small>` : ''}</dd>` : ''}
+        ${P.heatedSf ? `<dt>Heated area</dt><dd>${Math.round(P.heatedSf).toLocaleString()} sf</dd>` : ''}${P.lastSale ? `<dt>Last sale</dt><dd>${esc(P.lastSale)}</dd>` : ''}</dl>
+        <p class="dpi-src1"><b>Unverified</b> · <a href="${esc(P.srcUrl)}" target="_blank" rel="noopener">${esc(P.src)}</a> · ${esc(day(look.at))}</p></div>`, 'official'));
+    } else {
+      const g = gapsFor(['parcel_id'])[0];
+      out.push(sec('parcel', 'Parcel', '<span class="dpi-na2">Not available here</span>', g ? gapHTML(g, true) : '<p class="dpi-note">Run a lookup to find the parcel.</p>'));
+    }
+    // buildings
+    const B = site.buildings || [], sel = B.find(b => b.id === site.building);
+    const lim = Z && (Z.standards || []).find(x => x.key === 'height'); const cov = Z && (Z.standards || []).find(x => x.key === 'lot_coverage');
+    const val = (k, label) => fv(k) ? `<dt>${esc(label)}</dt><dd>${esc(fv(k))} ${chip(f[k].by === 'user' ? (f[k].kind || 'member') : (f[k].kind || 'official'))}${f[k].note ? `<small>${esc(f[k].note)}</small>` : ''}</dd>` : `<dt>${esc(label)}</dt><dd class="dpi-na2">Not known${(gapsFor([k])[0] || {}).reason ? ': ' + esc(gapsFor([k])[0].reason) : ''}</dd>`;
+    const selHTML = (sel || fv('existing_building')) ? `<dl class="dpi-pdl">${val('existing_building', 'Building')}${val('existing_footprint', 'Footprint')}${val('existing_height', 'Height')}${val('existing_stories', 'Floors')}${val('existing_floor_area', 'Floor area')}</dl>
+      ${lim || cov ? `<p class="dpi-cmp">For comparison, the zoning allows: ${lim ? `height ${esc(lim.value)}` : ''}${lim && cov ? '; ' : ''}${cov ? `building coverage ${esc(cov.value)}` : ''}${sel && site.parcel && site.parcel.lotSf && sel.onParcel ? `. This footprint covers about ${Math.round(sel.footprintSf / site.parcel.lotSf * 100)}% of the lot.` : '.'}</p>` : ''}` : (gapsFor(['existing_building'])[0] ? gapHTML(gapsFor(['existing_building'])[0], true) : '');
+    const list = B.length ? `<details class="dpi-front"${sel ? '' : ' open'}><summary>Pick a building (${B.length} mapped within about 400 ft)</summary><ul class="dpi-blist">${B.slice(0, 40).map(b => `<li><label><input type="radio" name="dpi-bsel" data-bsel="${esc(b.id)}" ${b.id === site.building ? 'checked' : ''}> <b>${esc(b.name || (b.use ? b.use[0].toUpperCase() + b.use.slice(1) : 'Building'))}</b>${b.onParcel ? ' <span class="dpi-tag ov">on this parcel</span>' : ''} <span>${b.footprintSf.toLocaleString()} sf footprint${b.heightFt ? ` · ${b.heightFt} ft` : ''}${b.levels ? ` · ${b.levels} fl` : ''}</span> ${chip(b.heightKind || b.kind)}</label></li>`).join('')}</ul><p class="dpi-note">Or click a building on the vicinity map.</p></details>` : '';
+    out.push(sec('building', 'Buildings', sel ? `<b>${esc(fv('existing_footprint') || '')}</b>${fv('existing_height') ? ' · ' + esc(fv('existing_height')) + ' tall' : ''}${fv('existing_floor_area') ? ' · ' + esc(fv('existing_floor_area').split(' (')[0]) : ''}` : B.length ? `${B.length} nearby` : '<span class="dpi-na2">None found</span>',
+      `${selHTML}${list}<p class="dpi-note">Footprints, heights and floors come from OpenStreetMap, a free map people edit; heights worked out from a floor count are labelled Estimate. Have a better number from a 3D file, a survey or Google Earth? Type it in Existing building below and pick where it came from.</p>`, sel ? (sel.heightKind || sel.kind) : ''));
+    // parking
+    const PK = Z && Z.parking;
+    if (PK) out.push(sec('parking', 'Parking', `<b>${esc(PK.tier)}</b> · ${esc(/no .*maximums\.$/i.test(PK.rule) ? 'minimums, no maximum' : /^Most uses/.test(PK.rule) ? 'no minimum for most uses, maximums apply' : 'minimums and maximums')}`,
+      `<p><b>${esc(PK.tier)}.</b> ${esc(PK.rule)} <a href="${esc(PK.url)}" target="_blank" rel="noopener">${esc(PK.ref)} ↗</a></p><div class="dpi-tblwrap"><table class="dpi-tbl dpi-park"><thead><tr><th>Use</th><th>Minimum</th><th>Maximum</th></tr></thead><tbody>${PK.rows.map(r => `<tr><td>${esc(r.use)}</td><td>${esc(r.min)}</td><td>${esc(r.max)}</td></tr>`).join('')}</tbody></table></div><p class="dpi-znote">${esc(PK.note)}</p><p class="dpi-src1"><b>Unverified</b> · Low confidence for the ratios · ${esc(day(look.at))}</p>`, 'official'));
+    else { const g = gapsFor(['parking_requirement'])[0]; out.push(sec('parking', 'Parking', '<span class="dpi-na2">Not available here</span>', g ? gapHTML(g, true) : `<div class="dpi-zgap"><b>Not available.</b> DrawUp has no free parking source for this place yet. <a href="#" data-opensec="find">Look it up yourself</a></div>`)); }
+    // map
+    if (site.lat && site.lng) out.push(sec('map', 'Vicinity map', site.vicinity ? 'Zoning, parcel lines and buildings' : B.length ? 'Buildings around the site' : 'Street map', siteMaps(site)));
+    // links
+    const links = (Core.findLinks ? Core.findLinks(site.lat || 0, site.lng || 0, fv('project_address') || '') : []);
+    if (links.length && site.lat) out.push(sec('find', 'Look it up yourself', 'Free and paid sites DrawUp links to', `<ul class="dpi-links">${links.map(l => `<li><a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)} ↗</a> <span>${esc(l.what)}</span></li>`).join('')}</ul><p class="dpi-note">DrawUp only uses free public sources. These sites are here so you can check or fill in what DrawUp could not; some of them charge. Values you copy from them are labelled with where they came from.</p>`));
+    return `<div class="dpi-secs-wrap">${out.join('')}</div>`;
   }
   const FAM = [[/^N1-/, '#e3efd9'], [/^N2-/, '#f6e7c8'], [/^(CG|CR)\b/, '#f4d6d2'], [/^(NC|CAC|RAC|UE|UC)\b/, '#f1d2e4'], [/^TOD-/, '#dcd8f3'], [/^(IMU|ML|IC|OFC|OG|RC)\b/, '#d6e4f2'], [/^R\/W/, '#ffffff']];
   const famColor = code => { const c = String(code || '').toUpperCase(); const f = FAM.find(([re]) => re.test(c)); return f ? f[1] : '#e9ebef'; };
   function vicinitySVG(site) {
-    const V = site.vicinity; if (!V || !V.bbox) return '';
-    const [x0, y0, x1, y1] = V.bbox, W = 600, H = Math.round(600 * (y1 - y0) / ((x1 - x0) * Math.cos(((y0 + y1) / 2) * Math.PI / 180)) || 600);
+    const V = site.vicinity || {}, B = site.buildings || [];
+    if (!V.bbox && !B.length) return '';
+    let bbox = V.bbox; if (!bbox) { const dy = 450 / 364000, dx = 450 / (364000 * Math.cos(site.lat * Math.PI / 180)); bbox = [site.lng - dx, site.lat - dy, site.lng + dx, site.lat + dy]; }
+    const [x0, y0, x1, y1] = bbox, W = 600, H = Math.round(600 * (y1 - y0) / ((x1 - x0) * Math.cos(((y0 + y1) / 2) * Math.PI / 180)) || 600);
     const X = x => ((x - x0) / (x1 - x0) * W).toFixed(1), Y = y => ((y1 - y) / (y1 - y0) * H).toFixed(1);
     const path = rings => rings.map(r => 'M' + r.map(p => X(p[0]) + ',' + Y(p[1])).join('L') + 'Z').join('');
     const area = r => { let a = 0; for (let i = 0, j = r.length - 1; i < r.length; j = i++) a += (r[j][0] - r[i][0]) * (r[j][1] + r[i][1]); return Math.abs(a); };
@@ -252,22 +297,41 @@
     const zones = (V.zones || []).map(z => `<path d="${path(z.rings)}" fill="${famColor(z.code)}" stroke="#9aa8bb" stroke-width="1"><title>${esc(z.code)}</title></path>`).join('');
     const lines = (V.parcels || []).map(rs => `<path d="${path(rs)}"/>`).join('');
     const rez = (V.rezonings || []).map(r => `<path d="${path(r.rings)}" class="rz"><title>Pending rezoning ${esc(r.petition)}: ${esc(r.existing)} to ${esc(r.requested)}</title></path>`).join('');
+    const blds = B.map(b => `<path d="${path(b.rings)}" class="bd${b.id === site.building ? ' sel' : ''}" data-bsel="${esc(b.id)}" tabindex="0" role="button" aria-label="Pick ${esc(b.name || 'this building')}"><title>${esc(b.name || 'Building')}: ${b.footprintSf.toLocaleString()} sf footprint${b.heightFt ? ', ' + b.heightFt + ' ft' : ''}</title></path>`).join('');
     const sx = +X(site.lng), sy = +Y(site.lat);
     const labels = (V.zones || []).map(z => { const l = labelAt(z.rings); if (!l || l[2] <= 0.01) return ''; let lx = Math.min(W - 34, Math.max(34, +X(l[0]))), ly = Math.min(H - 30, Math.max(20, +Y(l[1]))); if (Math.hypot(lx - sx, ly - sy) < 50) ly = ly + (ly + 60 < H - 30 ? 60 : -60); return `<text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}">${esc(z.code)}</text>`; }).join('');
     const subj = site.boundary ? `<path d="${path(site.boundary)}" class="subj"/>` : `<circle cx="${X(site.lng)}" cy="${Y(site.lat)}" r="7" class="subjpt"/>`;
     const ftPerPx = ((x1 - x0) * 364000 * Math.cos(((y0 + y1) / 2) * Math.PI / 180)) / W, bar = 200 / ftPerPx;
     const codes = [...new Set((V.zones || []).map(z => z.code))].slice(0, 8);
-    return `<figure class="dpi-vic"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Vicinity map: zoning districts and parcel lines around the site"><rect width="${W}" height="${H}" fill="#f7f8fa"/>${zones}<g class="pl">${lines}</g>${rez}${subj}<g class="lb">${labels}</g>
+    return `<figure class="dpi-vic"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Vicinity map around the site"><rect width="${W}" height="${H}" fill="#f7f8fa"/>${zones}<g class="pl">${lines}</g>${rez}${subj}<g class="bds">${blds}</g><g class="lb">${labels}</g>
       <g class="sc" transform="translate(16 ${H - 18})"><rect width="${bar.toFixed(1)}" height="5" fill="#13233d"/><text y="-6">200 ft</text></g><g class="na" transform="translate(${W - 26} 30)"><path d="M0,-16 L7,6 L0,1 L-7,6Z" fill="#13233d"/><text y="20" text-anchor="middle">N</text></g></svg>
-      <figcaption><span class="lg"><i class="subj"></i>This parcel</span>${(V.rezonings || []).length ? '<span class="lg"><i class="rz"></i>Pending rezoning</span>' : ''}${codes.map(c => `<span class="lg"><i style="background:${famColor(c)}"></i>${esc(c)}</span>`).join('')}
-        <small>Zoning districts and parcel lines about 1,300 ft across. ${esc(V.src)}. GIS lines are approximate, not a survey.</small></figcaption></figure>`;
+      <figcaption><span class="lg"><i class="subj"></i>${site.boundary ? 'This parcel' : 'The site'}</span>${B.length ? '<span class="lg"><i class="bd"></i>Building (click to pick)</span>' : ''}${(V.rezonings || []).length ? '<span class="lg"><i class="rz"></i>Pending rezoning</span>' : ''}${codes.map(c => `<span class="lg"><i style="background:${famColor(c)}"></i>${esc(c)}</span>`).join('')}
+        <small>About ${Math.round((x1 - x0) * 364000 * Math.cos(((y0 + y1) / 2) * Math.PI / 180) / 100) * 100} ft across. ${esc([V.src, B.length ? 'buildings © OpenStreetMap contributors' : ''].filter(Boolean).join('; '))}. Map lines are approximate, not a survey.</small></figcaption></figure>`;
   }
   function siteMaps(site) {
     const vic = vicinitySVG(site); if (!vic) return mapEmbed(site.lat, site.lng);
-    return `<div class="dpi-maps"><div class="du-subtabs dpi-tabs dpi-maptabs" role="tablist"><button type="button" role="tab" class="active" data-mv="vic">Vicinity and zoning</button><button type="button" role="tab" data-mv="street">Street map</button></div>
+    return `<div class="dpi-maps"><div class="du-subtabs dpi-tabs dpi-maptabs" role="tablist"><button type="button" role="tab" class="active" data-mv="vic">Vicinity</button><button type="button" role="tab" data-mv="street">Street map</button></div>
       <div data-mvp="vic">${vic}</div><div data-mvp="street" hidden>${mapEmbed(site.lat, site.lng)}</div></div>`;
   }
-  function bindMaps() { S.w.querySelectorAll('[data-mv]').forEach(b => b.onclick = () => { S.w.querySelectorAll('[data-mv]').forEach(x => x.classList.toggle('active', x === b)); S.w.querySelectorAll('[data-mvp]').forEach(p => { p.hidden = p.dataset.mvp !== b.dataset.mv; }); }); }
+  function bindMaps() {
+    S.w.querySelectorAll('[data-mv]').forEach(b => b.onclick = () => { S.w.querySelectorAll('[data-mv]').forEach(x => x.classList.toggle('active', x === b)); S.w.querySelectorAll('[data-mvp]').forEach(p => { p.hidden = p.dataset.mvp !== b.dataset.mv; }); });
+    S.w.querySelectorAll('[data-bsel]').forEach(el => { const go = () => pickBuilding(el.dataset.bsel); if (el.tagName === 'INPUT') el.onchange = go; else { el.onclick = go; el.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } }; } });
+    S.w.querySelectorAll('[data-opensec]').forEach(a => a.onclick = e => { e.preventDefault(); const d = S.w.querySelector(`details[data-sec="${a.dataset.opensec}"]`); if (d) { d.open = true; d.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } });
+    bindSecs();
+  }
+  /** A member picks a building: its values fill Existing building, never over what the member typed or verified. */
+  async function pickBuilding(id) {
+    const site = S.row.site || {}; const b = (site.buildings || []).find(x => x.id === id); if (!b) return;
+    const n = (site.buildings || []).filter(x => x.onParcel).length;
+    // drop the last building's looked-up values (not ones a member typed or checked) so nothing stale carries over
+    const base = Object.assign({}, S.row.fields);
+    (Core.FIELD_GROUPS.find(g => g.id === 'existing') || { fields: [] }).fields.forEach(([k]) => { const c = base[k]; if (c && c.by !== 'user' && !c.verified) delete base[k]; });
+    const m = Core.mergeLookup(base, Core.fieldsForBuilding(b, site.parcel, nowIso(), n));
+    S.row.fields = m.fields; S.row.site = Object.assign({}, site, { building: id });
+    const o = openSet(); o.add('building'); try { localStorage.setItem(OPEN_KEY, JSON.stringify([...o])); } catch (_e) { /* private mode */ }
+    S.dirty = true; await save(true); await renderInfo();
+    if (m.kept.length) S.c.toast(`Kept what you entered for ${m.kept.map(k => Core.FIELD_LABEL[k] || k).join(', ')}.`);
+  }
 
   async function lookup(address) {
     address = String(address || '').trim(); const res = S.w.querySelector('#dpi-lookres'), btn = S.w.querySelector('#dpi-look');
@@ -280,8 +344,8 @@
       const m = Core.mergeLookup(S.row.fields, j.fields);
       S.row.fields = m.fields;
       if (j.site && j.site.lat) {
-        const keep = Object.assign({}, S.row.site); ['parcel', 'zoning', 'vicinity', 'boundary', 'jurisdiction'].forEach(k => delete keep[k]); // a new lookup replaces the old site layers
-        S.row.site = Object.assign(keep, { lat: j.site.lat, lng: j.site.lng, from: j.site.from || 'census', at: j.at }, ...['parcel', 'zoning', 'vicinity', 'boundary', 'jurisdiction'].filter(k => j.site[k]).map(k => ({ [k]: j.site[k] })));
+        const keep = Object.assign({}, S.row.site); ['parcel', 'zoning', 'vicinity', 'boundary', 'jurisdiction', 'buildings', 'building'].forEach(k => delete keep[k]); // a new lookup replaces the old site layers
+        S.row.site = Object.assign(keep, { lat: j.site.lat, lng: j.site.lng, from: j.site.from || 'census', at: j.at }, ...['parcel', 'zoning', 'vicinity', 'boundary', 'jurisdiction', 'buildings', 'building'].filter(k => j.site[k]).map(k => ({ [k]: j.site[k] })));
       }
       S.row.lookups = [{ at: j.at, address, sources: j.sources, unavailable: j.unavailable, applied: m.applied, kept: m.kept }].concat(S.row.lookups || []).slice(0, 10);
       // fill the project's own location only when it is empty (never replace what the member typed)

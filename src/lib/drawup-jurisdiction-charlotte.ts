@@ -17,7 +17,7 @@
 //     copy (petition 2024-067) and in the web edition checked 2026-11-11.
 //   - Article 5 (N2), Article 6 (CG, CR), Article 12 (RAC, UE, UC): web edition, which says it reflects the text
 //     amendment adopted by City Council on February 17, 2025; checked 2026-11-11.
-import type { AdapterCtx, DistrictInfo, FrontageTable, Geo, Jurisdiction, ParcelInfo, Ring, Standard, VicinityInfo, ZoningInfo } from './drawup-jurisdiction-util';
+import type { AdapterCtx, DistrictInfo, FrontageTable, Geo, Jurisdiction, ParcelInfo, ParkingInfo, Ring, Standard, VicinityInfo, ZoningInfo } from './drawup-jurisdiction-util';
 import { arcFeatures, boxAround, clean, clipRings, fmtInt, money, ringAreaSf, ringCentroid, sqlSafe } from './drawup-jurisdiction-util';
 
 const GIS = 'https://gis.charlottenc.gov/arcgis/rest/services';
@@ -154,6 +154,34 @@ function standardsFor(base: string, lotSf?: number): { standards: Standard[]; fr
       note: 'Measured from the future back of curb (Parkway and Limited Access from the right-of-way). The frontage type of each street comes from the Charlotte Streets Map; a lot with several frontages has a setback on each. A blank build-to cell means it is not required there or not transcribed.' };
   }
   return { standards: S, frontage, notes, gaps };
+}
+
+/* ------------------------------------------------------------------ parking (UDO Article 19, Table 19-1) */
+// Tiers: the three district groups in the Table 19-1 heading (web edition, checked 2026-11-11). The tier rules are
+// quoted from the table. The ratios below were read from the web edition, whose table layout is hard to read: the
+// four values per use were taken as Tier 1 minimum, Tier 2 minimum, Tier 2 maximum, Tier 3 maximum (Tier 3 minimum
+// cells are blank and shaded for most uses). Only rows that read cleanly are included; they are low confidence.
+const TIER_OF: Record<string, 1 | 2 | 3> = {};
+['N1-A', 'N1-B', 'N1-C', 'N1-D', 'N1-E', 'N1-F', 'N2-A', 'MHP', 'ML-1', 'ML-2', 'IC-1', 'OFC', 'OG'].forEach(d => { TIER_OF[d] = 1; });
+['N2-B', 'N2-C', 'IMU', 'IC-2', 'RC', 'NC', 'CAC-1', 'CG', 'CR'].forEach(d => { TIER_OF[d] = 2; });
+['CAC-2', 'TOD-UC', 'TOD-NC', 'TOD-CC', 'TOD-TR', 'RAC', 'UC', 'UE'].forEach(d => { TIER_OF[d] = 3; });
+const TIER_RULE: Record<number, string> = {
+  1: 'A minimum number of off-street parking spaces are required. There are no off-street parking space maximums.',
+  2: 'A minimum number of off-street parking spaces are required. There are also off-street parking space maximums.',
+  3: 'Most uses do not have a minimum parking requirement. There are also off-street parking space maximums.',
+};
+// [use, tier1 min, tier2 min, tier2 max, tier3 max]
+const PARK_ROWS: [string, string, string, string, string][] = [
+  ['Single-family dwelling', '2 per dwelling unit', '1 per dwelling unit', 'No limit on enclosed/garage spaces; 2 unenclosed per dwelling unit', 'No limit on enclosed/garage spaces; 2 unenclosed per dwelling unit'],
+  ['Duplex, triplex, quadraplex', '1.5 per dwelling unit', '1 per dwelling unit', 'No limit on enclosed/garage spaces; 2 unenclosed per dwelling unit', 'No limit on enclosed/garage spaces; 2 unenclosed per dwelling unit'],
+  ['Commercial uses (default row)', '1 per 750 sf GFA', '1 per 1,000 sf GFA', '1 per 250 sf GFA', '1 per 250 sf GFA'],
+  ['Restaurant or bar', '1 per 750 sf GFA + 50% of outdoor seating area', '1 per 1,000 sf GFA + 50% of outdoor seating area', '1 per 250 sf GFA + 50% of outdoor seating area', 'Not read cleanly; see Table 19-1'],
+];
+export function parkingFor(base: string): ParkingInfo | null {
+  const t = TIER_OF[base]; if (!t) return null;
+  const rows = PARK_ROWS.map(([use, t1min, t2min, t2max, t3max]) => t === 1 ? { use, min: t1min, max: 'No maximum' } : t === 2 ? { use, min: t2min, max: t2max } : { use, min: 'None for most uses', max: t3max });
+  return { tier: `Tier ${t}`, rule: TIER_RULE[t], ref: 'UDO Article 19, Table 19-1', url: ART[19][1], conf: 'low',
+    note: 'The tier and its rule are from the Table 19-1 heading. The ratios were read from the web edition, whose table layout is hard to read; confirm them in the PDF before relying on them. CG and CR have higher maximums for retail goods and restaurants. Tier 3 minimums can be reduced with a Parking Demand Management Assessment.', rows };
 }
 
 /* ------------------------------------------------------------------ district codes from the zoning map */
@@ -302,7 +330,7 @@ export const CHARLOTTE: Jurisdiction = {
     }
     if (d.kind === 'legacy') {
       const why = `${d.raw} is not a UDO base district. Districts like this were kept from the zoning ordinance in effect until May 31, 2023, usually through a conditional rezoning, so their limits come from the approved rezoning plan and that ordinance, not the UDO tables.`;
-      for (const k of ['setbacks', 'height_limit', 'min_lot_area']) ctx.gap(k, why, d.petitionUrl ? 'Open the rezoning petition for the approved site plan.' : 'Look up the rezoning petition for this parcel and the archived Charlotte Zoning Ordinance.');
+      for (const k of ['setbacks', 'height_limit', 'min_lot_area', 'parking_requirement']) ctx.gap(k, why, d.petitionUrl ? 'Open the rezoning petition for the approved site plan.' : 'Look up the rezoning petition for this parcel and the archived Charlotte Zoning Ordinance.');
       zi.notes.push(why); return { zoning: zi, vicinity };
     }
     const lotSf = parcel?.lotSf;
@@ -310,6 +338,9 @@ export const CHARLOTTE: Jurisdiction = {
     zi.standards = standards; zi.frontage = frontage; zi.notes.push(...notes);
     if (d.conditional || d.exception) zi.notes.unshift('These are the base district limits. The approved rezoning plan can change them; check it before relying on any number here.');
     const ref = d.articleUrl || CLT.udo; const by = (k: string) => standards.find(s => s.key === k);
+    const park = parkingFor(d.base);
+    if (park) { zi.parking = park; ctx.put('parking_requirement', `${park.tier}: ${park.rule}`, SRC.udo + ', ' + ART[19][0], park.url, 'medium', `${park.ref} heading. Ratios for each use are on the Parking section and are low confidence. ${d.conditional || d.exception ? 'The approved rezoning plan may set its own parking. ' : ''}`); }
+    else ctx.gap('parking_requirement', `${d.raw} is not in the Table 19-1 tier list DrawUp has.`, `See ${ART[19][0]} (${ART[19][1]}).`);
     const confS = d.conditional || d.exception ? 'low' : 'medium';
     const baseNote = (d.conditional || d.exception ? 'Base district limit; the approved rezoning plan may differ. ' : '') + UDO_AT;
     const sb = ['front', 'corner_side', 'side', 'rear'].map(by).filter(Boolean) as Standard[];

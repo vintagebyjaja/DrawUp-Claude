@@ -61,3 +61,18 @@ exports.gisAnswer = (u, opts = {}) => {
   return feats();
 };
 exports.censusByAddress = a => /queens/i.test(a) ? exports.censusHouse : /huntersville/i.test(a) ? exports.censusTown : /raleigh/i.test(a) ? exports.censusRaleigh : /legacy/i.test(a) ? exports.censusLegacy : /nowhere/i.test(a) ? exports.censusNoMatch : exports.census;
+
+// ---------------------------------------------------------------- OpenStreetMap buildings (Overpass API answer shape)
+const way = (id, lng, lat, w, h, tags) => ({ type: 'way', id, tags: Object.assign({ building: 'yes' }, tags), geometry: [[lng, lat], [lng + w, lat], [lng + w, lat + h], [lng, lat + h], [lng, lat]].map(([x, y]) => ({ lat: y, lon: x })) });
+/** Buildings around a point: one inside each test parcel, plus neighbours. */
+exports.overpassNear = (lat, lng) => {
+  if (lat > 35.215 && lat < 35.23) return { elements: [ // uptown: the government center has a mapped height
+    way(101, -80.8396, 35.2210, 0.0007, 0.0006, { name: 'Charlotte-Mecklenburg Government Center', building: 'government', height: '61', 'building:levels': '15' }),
+    way(102, -80.8410, 35.2222, 0.0004, 0.0003, { 'building:levels': '4' })] };
+  if (lat > 35.4 && lat < 35.7) return { elements: [] }; // Huntersville stand-in: nothing mapped
+  if (lat > 35.7) return { elements: [way(301, lng - 0.0002, lat - 0.0001, 0.0003, 0.0002, { name: 'Sample Office', 'building:levels': '3' })] }; // Raleigh
+  return { elements: [ // the house: 2 floors, no height tag -> estimate; a neighbour with no data
+    way(201, -80.83025, 35.19515, 0.0002, 0.00015, { building: 'house', 'building:levels': '2' }),
+    way(202, -80.8296, 35.1952, 0.00015, 0.0001, { building: 'garage' })] };
+};
+exports.overpassAnswer = u => { if (u.host !== 'overpass-api.de') return null; const m = decodeURIComponent(u.searchParams.get('data') || '').match(/around:\d+,(-?[\d.]+),(-?[\d.]+)/); return m ? exports.overpassNear(+m[1], +m[2]) : { elements: [] }; };

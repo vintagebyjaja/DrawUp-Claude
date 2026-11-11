@@ -25,12 +25,15 @@ var DrawUpIntelCore = (() => {
     COVERAGE_TEXT: () => COVERAGE_TEXT,
     FIELD_GROUPS: () => FIELD_GROUPS,
     FIELD_LABEL: () => FIELD_LABEL,
+    KIND_LABEL: () => KIND_LABEL,
     REGISTRY: () => REGISTRY,
     SOURCES: () => SOURCES,
     censusUrl: () => censusUrl,
     femaPanelUrl: () => femaPanelUrl,
     femaViewer: () => femaViewer,
     femaZoneUrl: () => femaZoneUrl,
+    fieldsForBuilding: () => fieldsForBuilding,
+    findLinks: () => findLinks,
     lookupSite: () => lookupSite,
     mergeLookup: () => mergeLookup,
     parseCensus: () => parseCensus,
@@ -45,6 +48,15 @@ var DrawUpIntelCore = (() => {
   });
 
   // src/lib/drawup-jurisdiction-util.ts
+  var KIND_LABEL = { official: "Official record", website: "Website", estimate: "Estimate", "3d": "3D file", aerial: "Aerial imagery", member: "Entered by you" };
+  function inRing(p, ring) {
+    let ins = false;
+    for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+      const [xi, yi] = ring[i], [xj, yj] = ring[j];
+      if (yi > p[1] !== yj > p[1] && p[0] < (xj - xi) * (p[1] - yi) / (yj - yi) + xi) ins = !ins;
+    }
+    return ins;
+  }
   var clean = (s, max = 300) => String(s != null ? s : "").replace(/\s+/g, " ").trim().slice(0, max);
   var r6 = (n) => Math.round(n * 1e6) / 1e6;
   var fmtInt = (n) => Math.round(n).toLocaleString("en-US");
@@ -270,6 +282,41 @@ var DrawUpIntelCore = (() => {
     }
     return { standards: S, frontage, notes, gaps };
   }
+  var TIER_OF = {};
+  ["N1-A", "N1-B", "N1-C", "N1-D", "N1-E", "N1-F", "N2-A", "MHP", "ML-1", "ML-2", "IC-1", "OFC", "OG"].forEach((d) => {
+    TIER_OF[d] = 1;
+  });
+  ["N2-B", "N2-C", "IMU", "IC-2", "RC", "NC", "CAC-1", "CG", "CR"].forEach((d) => {
+    TIER_OF[d] = 2;
+  });
+  ["CAC-2", "TOD-UC", "TOD-NC", "TOD-CC", "TOD-TR", "RAC", "UC", "UE"].forEach((d) => {
+    TIER_OF[d] = 3;
+  });
+  var TIER_RULE = {
+    1: "A minimum number of off-street parking spaces are required. There are no off-street parking space maximums.",
+    2: "A minimum number of off-street parking spaces are required. There are also off-street parking space maximums.",
+    3: "Most uses do not have a minimum parking requirement. There are also off-street parking space maximums."
+  };
+  var PARK_ROWS = [
+    ["Single-family dwelling", "2 per dwelling unit", "1 per dwelling unit", "No limit on enclosed/garage spaces; 2 unenclosed per dwelling unit", "No limit on enclosed/garage spaces; 2 unenclosed per dwelling unit"],
+    ["Duplex, triplex, quadraplex", "1.5 per dwelling unit", "1 per dwelling unit", "No limit on enclosed/garage spaces; 2 unenclosed per dwelling unit", "No limit on enclosed/garage spaces; 2 unenclosed per dwelling unit"],
+    ["Commercial uses (default row)", "1 per 750 sf GFA", "1 per 1,000 sf GFA", "1 per 250 sf GFA", "1 per 250 sf GFA"],
+    ["Restaurant or bar", "1 per 750 sf GFA + 50% of outdoor seating area", "1 per 1,000 sf GFA + 50% of outdoor seating area", "1 per 250 sf GFA + 50% of outdoor seating area", "Not read cleanly; see Table 19-1"]
+  ];
+  function parkingFor(base) {
+    const t = TIER_OF[base];
+    if (!t) return null;
+    const rows = PARK_ROWS.map(([use, t1min, t2min, t2max, t3max]) => t === 1 ? { use, min: t1min, max: "No maximum" } : t === 2 ? { use, min: t2min, max: t2max } : { use, min: "None for most uses", max: t3max });
+    return {
+      tier: `Tier ${t}`,
+      rule: TIER_RULE[t],
+      ref: "UDO Article 19, Table 19-1",
+      url: ART[19][1],
+      conf: "low",
+      note: "The tier and its rule are from the Table 19-1 heading. The ratios were read from the web edition, whose table layout is hard to read; confirm them in the PDF before relying on them. CG and CR have higher maximums for retail goods and restaurants. Tier 3 minimums can be reduced with a Parking Demand Management Assessment.",
+      rows
+    };
+  }
   function parseDistrict(attrs) {
     const raw = clean(attrs == null ? void 0 : attrs.ZoneDes, 60);
     const up = raw.toUpperCase();
@@ -471,7 +518,7 @@ var DrawUpIntelCore = (() => {
       }
       if (d.kind === "legacy") {
         const why = `${d.raw} is not a UDO base district. Districts like this were kept from the zoning ordinance in effect until May 31, 2023, usually through a conditional rezoning, so their limits come from the approved rezoning plan and that ordinance, not the UDO tables.`;
-        for (const k of ["setbacks", "height_limit", "min_lot_area"]) ctx.gap(k, why, d.petitionUrl ? "Open the rezoning petition for the approved site plan." : "Look up the rezoning petition for this parcel and the archived Charlotte Zoning Ordinance.");
+        for (const k of ["setbacks", "height_limit", "min_lot_area", "parking_requirement"]) ctx.gap(k, why, d.petitionUrl ? "Open the rezoning petition for the approved site plan." : "Look up the rezoning petition for this parcel and the archived Charlotte Zoning Ordinance.");
         zi.notes.push(why);
         return { zoning: zi, vicinity };
       }
@@ -483,6 +530,11 @@ var DrawUpIntelCore = (() => {
       if (d.conditional || d.exception) zi.notes.unshift("These are the base district limits. The approved rezoning plan can change them; check it before relying on any number here.");
       const ref = d.articleUrl || CLT.udo;
       const by = (k) => standards.find((s) => s.key === k);
+      const park = parkingFor(d.base);
+      if (park) {
+        zi.parking = park;
+        ctx.put("parking_requirement", `${park.tier}: ${park.rule}`, SRC.udo + ", " + ART[19][0], park.url, "medium", `${park.ref} heading. Ratios for each use are on the Parking section and are low confidence. ${d.conditional || d.exception ? "The approved rezoning plan may set its own parking. " : ""}`);
+      } else ctx.gap("parking_requirement", `${d.raw} is not in the Table 19-1 tier list DrawUp has.`, `See ${ART[19][0]} (${ART[19][1]}).`);
       const confS = d.conditional || d.exception ? "low" : "medium";
       const baseNote = (d.conditional || d.exception ? "Base district limit; the approved rezoning plan may differ. " : "") + UDO_AT;
       const sb = ["front", "corner_side", "side", "rear"].map(by).filter(Boolean);
@@ -502,14 +554,87 @@ var DrawUpIntelCore = (() => {
 
   // src/lib/drawup-jurisdictions.ts
   var REGISTRY = [CHARLOTTE];
-  var COVERAGE_TEXT = REGISTRY.map((j) => j.label).join("; ");
-  var findJurisdiction = (geo) => REGISTRY.find((j) => {
+  var COVERAGE_TEXT = "Charlotte, NC (zoning, limits, setbacks, parking) and Mecklenburg County, NC (parcels) from official sources; flood zone, elevation and nearby buildings anywhere in the U.S.";
+  var findJurisdiction = (geo, _env = {}) => REGISTRY.find((j) => {
     try {
       return j.covers(geo);
     } catch {
       return false;
     }
   }) || null;
+  function findLinks(lat, lng, address) {
+    const ll = `${lat},${lng}`;
+    return [
+      { label: "Google Maps (satellite and Street View)", url: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ll)}`, what: "Look at the building and street; measure by eye. Free." },
+      { label: "Google Earth", url: `https://earth.google.com/web/search/${encodeURIComponent(address)}`, what: "3D view and a measuring tool for rough heights and footprints. Free." },
+      { label: "Regrid parcel map", url: "https://app.regrid.com/us", what: "Parcel lines and some zoning codes nationwide. Limited free viewing; full data is paid." },
+      { label: "Zoneomics", url: "https://www.zoneomics.com/", what: "Zoning maps and limits for many U.S. cities. Paid for full details." },
+      { label: "Municode Library", url: "https://library.municode.com/", what: "Free text of many city and county zoning ordinances." }
+    ];
+  }
+
+  // src/lib/drawup-site-buildings.ts
+  var OVERPASS = "https://overpass-api.de/api/interpreter";
+  var OSM_SRC = "OpenStreetMap buildings (Overpass API)";
+  var FT_PER_FLOOR = 12;
+  function overpassUrl(lat, lng, radiusM = 120) {
+    const q2 = `[out:json][timeout:12];way["building"](around:${Math.round(radiusM)},${r6(lat)},${r6(lng)});out tags geom 80;`;
+    return `${OVERPASS}?data=${encodeURIComponent(q2)}`;
+  }
+  function heightToFt(raw) {
+    const s = clean(raw, 20).toLowerCase();
+    if (!s) return void 0;
+    const m = s.match(/^(\d+(?:\.\d+)?)\s*(m|meters?|metres?|ft|feet|')?$/);
+    if (!m) return void 0;
+    const n = parseFloat(m[1]);
+    if (!isFinite(n) || n <= 0 || n > 700) return void 0;
+    return Math.round((m[2] && /^(ft|feet|')$/.test(m[2]) ? n : n * 3.28084) * 10) / 10;
+  }
+  function parseOverpass(j, parcelRings = []) {
+    if (!j || !Array.isArray(j.elements)) throw new Error("unexpected answer");
+    const out = [];
+    for (const el of j.elements) {
+      if (el.type !== "way" || !Array.isArray(el.geometry) || el.geometry.length < 4) continue;
+      const ring = el.geometry.map((p) => [r6(Number(p.lon)), r6(Number(p.lat))]).filter((p) => isFinite(p[0]) && isFinite(p[1]));
+      if (ring.length < 4) continue;
+      const t = el.tags || {};
+      const footprintSf = Math.round(ringAreaSf(ring));
+      if (footprintSf < 60) continue;
+      const c = ringCentroid(ring);
+      const onParcel = parcelRings.some((r) => inRing(c, r));
+      const levels = Number(t["building:levels"]);
+      const lv = isFinite(levels) && levels > 0 && levels < 200 ? Math.round(levels) : void 0;
+      const tagH = heightToFt(t.height);
+      const b = {
+        id: `osm-way-${el.id}`,
+        src: OSM_SRC,
+        srcUrl: `https://www.openstreetmap.org/way/${el.id}`,
+        kind: "website",
+        onParcel,
+        rings: [ring],
+        footprintSf,
+        ...clean(t.name) ? { name: clean(t.name, 80) } : {},
+        ...t.building && t.building !== "yes" ? { use: clean(t.building, 40) } : {},
+        ...lv ? { levels: lv } : {}
+      };
+      if (tagH) {
+        b.heightFt = tagH;
+        b.heightKind = "website";
+        b.heightNote = "Height mapped on OpenStreetMap.";
+      } else if (lv) {
+        b.heightFt = lv * FT_PER_FLOOR;
+        b.heightKind = "estimate";
+        b.heightNote = `Estimate: ${lv} floor${lv === 1 ? "" : "s"} on OpenStreetMap \xD7 about ${FT_PER_FLOOR} ft per floor.`;
+      }
+      if (lv) {
+        b.floorAreaSf = footprintSf * lv;
+        b.floorAreaKind = "estimate";
+        b.floorAreaNote = `Estimate: mapped footprint \xD7 ${lv} floor${lv === 1 ? "" : "s"}. Not a measured floor area.`;
+      }
+      out.push(b);
+    }
+    return out.sort((a, b) => Number(b.onParcel) - Number(a.onParcel) || b.footprintSf - a.footprintSf).slice(0, 80);
+  }
 
   // src/lib/drawup-project-intel.ts
   var SOURCES = {
@@ -523,6 +648,7 @@ var DrawUpIntelCore = (() => {
     { id: "site", label: "Site and jurisdiction", fields: [["project_address", "Project address"], ["project_location", "City and state"], ["latitude", "Latitude"], ["longitude", "Longitude"], ["county", "County"], ["municipality", "Municipality"], ["jurisdiction", "Likely permitting jurisdiction"], ["census_tract", "Census tract"], ["parcel_id", "Parcel ID"], ["site_area", "Site area"], ["property_boundary", "Property boundary"], ["parcel_owner", "Owner of record"], ["assessor_land_use", "Assessor land use"], ["assessed_value", "Assessed value"], ["legal_description", "Legal description and deed"]] },
     { id: "zoning", label: "Zoning and land use", fields: [["zoning_district", "Zoning designation"], ["zoning_conditions", "Conditions and overlays"], ["zoning_requirements", "Zoning requirements"], ["setbacks", "Setbacks (front / side / rear)"], ["height_limit", "Height limit"], ["min_lot_area", "Minimum lot area"], ["min_lot_width", "Minimum lot width"], ["lot_coverage", "Maximum building coverage"], ["far", "Floor area ratio (FAR)"], ["density", "Density"], ["land_use", "Land-use restrictions"], ["parking_requirement", "Parking requirement"], ["nearby_rezonings", "Pending rezonings nearby"]] },
     { id: "environment", label: "Flood, terrain and environment", fields: [["flood_zone", "Flood zone"], ["firm_panel", "FIRM panel"], ["base_flood_elevation", "Base flood elevation"], ["ground_elevation", "Ground elevation"], ["solar_summer", "Sun at noon, June 21"], ["solar_winter", "Sun at noon, December 21"], ["environmental_notes", "Environmental notes"], ["existing_structures", "Existing structures"]] },
+    { id: "existing", label: "Existing building on the site", fields: [["existing_building", "Selected building"], ["existing_footprint", "Footprint"], ["existing_height", "Height"], ["existing_stories", "Floors"], ["existing_floor_area", "Floor area"]] },
     { id: "building", label: "Building", fields: [["occupancy", "Preliminary occupancy classification"], ["construction_type", "Construction type"], ["stories", "Stories"], ["gross_area", "Gross area"], ["sprinklered", "Sprinklered"], ["code_edition", "Building code (adopted edition)"], ["code_references", "Preliminary code references"]] },
     { id: "team", label: "Owner and team", fields: [["owner_name", "Owner"], ["owner_address", "Owner address"], ["architect_name", "Architect"], ["architect_address", "Architect address"], ["pm_name", "Project manager"], ["contractor_name", "Contractor"], ["structural_engineer", "Structural engineer"], ["mep_engineer", "MEP engineer"], ["civil_engineer", "Civil engineer"]] }
   ];
@@ -618,23 +744,39 @@ var DrawUpIntelCore = (() => {
     return { summer: fmt(s), winter: fmt(w), facing: lat >= 0 ? "South-facing glazing gets the most winter sun; west glazing gets the hardest summer afternoon sun." : "North-facing glazing gets the most winter sun." };
   }
   var nowIso = () => (/* @__PURE__ */ new Date()).toISOString();
-  async function lookupSite(address, fetchJson) {
+  var hide = (url) => String(url || "").replace(/([?&](?:token|api_key|key)=)[^&]+/gi, "$1hidden");
+  function fieldsForBuilding(b, parcel, at, onlyOnParcel = 1) {
+    const F = {};
+    const f = (k, v, src, url, conf, kind, note) => {
+      F[k] = { v, src, url, at, conf, by: "auto", verified: false, kind, ...note ? { note } : {} };
+    };
+    const nm = [b.name, b.use].filter(Boolean).join(", ");
+    f("existing_building", `${nm || "Building"}${b.onParcel ? " on this parcel" : " next to the site"}`, b.src, b.srcUrl, "medium", b.kind);
+    f("existing_footprint", `${b.footprintSf.toLocaleString("en-US")} sf`, b.src, b.srcUrl, "medium", b.kind === "official" ? "official" : "estimate", "Area worked out from the mapped outline.");
+    if (b.heightFt) f("existing_height", `${b.heightFt} ft`, b.src, b.srcUrl, b.heightKind === "website" || b.heightKind === "official" ? "medium" : "low", b.heightKind || "estimate", b.heightNote);
+    if (b.levels) f("existing_stories", String(b.levels), b.src, b.srcUrl, "medium", b.kind, "Floor count mapped on the source.");
+    if (b.onParcel && onlyOnParcel === 1 && parcel && parcel.heatedSf) f("existing_floor_area", `${Math.round(parcel.heatedSf).toLocaleString("en-US")} sf heated (assessor)`, parcel.src, parcel.url, "high", "official", "Heated area from the county tax record for the whole parcel.");
+    else if (b.floorAreaSf) f("existing_floor_area", `${b.floorAreaSf.toLocaleString("en-US")} sf`, b.src, b.srcUrl, "low", b.floorAreaKind || "estimate", b.floorAreaNote);
+    return F;
+  }
+  async function lookupSite(address, fetchJson, opts = {}) {
     var _a;
+    const env2 = opts.env || {};
     const at = nowIso();
     const fields = {};
     const sources = [];
     const unavailable = [];
-    const put = (k, v, src, url, conf, note) => {
-      if (v) fields[k] = { v, src, url, at, conf, by: "auto", verified: false, ...note ? { note } : {} };
+    const put = (k, v, src, url, conf, note, kind = "official") => {
+      if (v) fields[k] = { v, src, url: hide(url), at, conf, by: "auto", verified: false, kind, ...note ? { note } : {} };
     };
     const run = async (id, name, url, parse) => {
       const t0 = Date.now();
       try {
         const out = parse(await fetchJson(url));
-        sources.push({ id, name, url, ok: out != null, ms: Date.now() - t0, ...out == null ? { error: "no match" } : {} });
+        sources.push({ id, name, url: hide(url), ok: out != null, ms: Date.now() - t0, ...out == null ? { error: "no match" } : {} });
         return out;
       } catch (e) {
-        sources.push({ id, name, url, ok: false, error: clean2((e == null ? void 0 : e.message) || e, 160), ms: Date.now() - t0 });
+        sources.push({ id, name, url: hide(url), ok: false, error: clean2((e == null ? void 0 : e.message) || e, 160), ms: Date.now() - t0 });
         return null;
       }
     };
@@ -660,10 +802,10 @@ var DrawUpIntelCore = (() => {
       "Inferred from Census boundaries. Confirm the permitting authority (AHJ) and any extraterritorial jurisdiction with the city or county."
     );
     put("census_tract", geo.tract, C, cu, "high");
-    const J = findJurisdiction(geo);
+    const J = findJurisdiction(geo, env2);
     let parcel = null;
     let lat = geo.lat, lng = geo.lng, from = "census";
-    const ctx = { address, geo, at, fetchJson, run: (id, name, url, parse) => run(id, name, url, parse), put, gap: (key, reason, next) => {
+    const ctx = { address, geo, at, fetchJson, env: env2, run: (id, name, url, parse) => run(id, name, url, parse), put, gap: (key, reason, next) => {
       if (!unavailable.some((u) => u.key === key)) unavailable.push({ key, reason, next });
     } };
     if (J) {
@@ -684,11 +826,13 @@ var DrawUpIntelCore = (() => {
       ctx.gap("zoning_district", "The zoning lookup failed: " + clean2((e == null ? void 0 : e.message) || e, 120), "Try again later.");
       return {};
     }) : Promise.resolve({});
-    const [zone, panel, elev, zres] = await Promise.all([
+    const bldP = run("osm_buildings", OSM_SRC, overpassUrl(lat, lng), (j) => parseOverpass(j, (parcel == null ? void 0 : parcel.rings) || []));
+    const [zone, panel, elev, zres, blds] = await Promise.all([
       run("fema_zone", SOURCES.fema.name + " (flood zones)", femaZoneUrl(lat, lng), parseFemaZone),
       run("fema_panel", SOURCES.fema.name + " (FIRM panels)", femaPanelUrl(lat, lng), parseFemaPanel),
       run("usgs", SOURCES.usgs.name, usgsUrl(lat, lng), parseUsgs),
-      zoningP
+      zoningP,
+      bldP
     ]);
     const fv = femaViewer(lat, lng), F = SOURCES.fema.name;
     if (zone && !zone.none) {
@@ -701,10 +845,16 @@ var DrawUpIntelCore = (() => {
     else unavailable.push({ key: "ground_elevation", reason: "The USGS elevation service did not answer.", next: "Use a survey or try again later." });
     const sun = solarSummary(lat);
     const su = SOURCES.sun.home;
-    put("solar_summer", sun.summer, SOURCES.sun.name, su, "high");
-    put("solar_winter", sun.winter, SOURCES.sun.name, su, "high");
+    put("solar_summer", sun.summer, SOURCES.sun.name, su, "high", "Calculated by DrawUp from the latitude.", "estimate");
+    put("solar_winter", sun.winter, SOURCES.sun.name, su, "high", "Calculated by DrawUp from the latitude.", "estimate");
+    const onParcel = (blds || []).filter((b) => b.onParcel);
+    const pick = onParcel[0] || (!parcel && blds && blds[0] && Math.hypot(blds[0].rings[0][0][0] - lng, blds[0].rings[0][0][1] - lat) < 6e-4 ? blds[0] : null);
+    if (pick) Object.assign(fields, fieldsForBuilding(pick, parcel, at, onParcel.length));
+    else if (blds) unavailable.push({ key: "existing_building", reason: blds.length ? "OpenStreetMap shows no building on this parcel." : "OpenStreetMap shows no buildings mapped here.", next: "Pick a building on the vicinity map, or enter the existing building from a survey or site visit." });
+    else unavailable.push({ key: "existing_building", reason: "The OpenStreetMap building service did not answer.", next: "Try again later." });
+    if (pick && !pick.heightFt) unavailable.push({ key: "existing_height", reason: "OpenStreetMap has no height or floor count for this building.", next: "Measure it, take it from a 3D file or survey, or enter it here." });
     const where = geo.county ? `${geo.county}${geo.stateName ? ", " + geo.stateName : ""}` : "this jurisdiction";
-    const covered = J ? "" : ` DrawUp covers: ${COVERAGE_TEXT}.`;
+    const covered = J ? "" : ` DrawUp covers: ${COVERAGE_TEXT}`;
     for (const [key, what] of [["parcel_id", "parcel records"], ["property_boundary", "parcel boundaries"], ["site_area", "parcel area"], ["zoning_district", "zoning"], ["setbacks", "setbacks"], ["height_limit", "height limits"], ["land_use", "land-use restrictions"]])
       if (!fields[key] && !unavailable.some((u) => u.key === key)) unavailable.push({ key, reason: J ? `The ${what} lookup for ${where} returned nothing.` : `DrawUp has no connected ${what} source for ${where} yet.${covered}`, next: key === "property_boundary" || key === "site_area" ? "Upload a survey or the county GIS parcel report, then enter it." : "Check the zoning ordinance or the city/county GIS, then enter it here." });
     unavailable.push({ key: "code_edition", reason: "The adopted building code edition is not looked up automatically.", next: "Confirm the adopted edition and local amendments with the AHJ (the ICC adoption map is a starting point)." });
@@ -715,6 +865,10 @@ var DrawUpIntelCore = (() => {
     }
     if (zres && zres.zoning) site.zoning = zres.zoning;
     if (zres && zres.vicinity) site.vicinity = zres.vicinity;
+    if (blds && blds.length) {
+      site.buildings = blds.slice(0, 60);
+      if (pick) site.building = pick.id;
+    }
     return { fields, site, sources, unavailable, at };
   }
   function mergeLookup(saved, found) {

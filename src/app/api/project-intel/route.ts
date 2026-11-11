@@ -6,6 +6,7 @@ export const dynamic = 'force-dynamic';
 
 // Season 1 Project Intelligence: public site lookups for Projects › Project Information.
 //   POST { action: 'lookup', address } -> { fields, site, sources, unavailable, at }
+//   site has the parcel, zoning (with parking), vicinity map data and nearby buildings where DrawUp covers the place.
 // Free (no credits, no AI). Signed-in members only. The route only reads public services and returns what it
 // found with the source, date and confidence; the page saves it to project_profiles under the member's own RLS,
 // and never over a value the member entered or verified (mergeLookup).

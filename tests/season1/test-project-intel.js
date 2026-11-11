@@ -17,7 +17,7 @@ global.fetch = async (input, init = {}) => {
   const J = (o, s = 200) => new Response(JSON.stringify(o), { status: s, headers: { 'Content-Type': 'application/json' } });
   if (u.host === 'sb.test' && u.pathname === '/auth/v1/user') return (init.headers && String(init.headers.Authorization || init.headers.authorization || '').includes('mock-token')) ? J({ id: UID, is_anonymous: false }) : J({ msg: 'bad jwt' }, 401);
   if (u.host === 'geocoding.geo.census.gov') return J(/nowhere/i.test(u.searchParams.get('address')) ? FX.censusNoMatch : FX.census);
-  const gis = FX.gisAnswer(u); if (gis) return J(gis);
+  const gis = FX.gisAnswer(u) || FX.overpassAnswer(u); if (gis) return J(gis);
   if (u.host === 'hazards.fema.gov') { if (failServices) return J({ error: 'down' }, 503); return J(u.pathname.includes('/28/') ? FX.femaZone : FX.femaPanel); }
   if (u.host === 'epqs.nationalmap.gov') { if (failServices) throw new Error('connect ETIMEDOUT'); return J(FX.usgs); }
   return realFetch(input, init);
@@ -39,7 +39,7 @@ const post = async (body, tok = 'mock-token-123456789') => { const r = await rou
   C.ok(/^719\.4 ft/.test(F.ground_elevation.v), 'Lookup: USGS ground elevation');
   C.ok(Object.values(F).every(f => f.src && f.at && f.by === 'auto' && f.verified === false), 'Lookup: every value has a source, a date, by=auto and unverified');
   C.ok(F.parcel_id.v === '12502601' && /^UC\b/.test(F.zoning_district.v) && !F.code_edition && res.unavailable.some(u => u.key === 'code_edition'), 'Lookup: Charlotte parcel and zoning are filled; the code edition is still flagged as not available, not guessed');
-  C.ok(res.sources.length === 10 && res.sources.every(x => x.ok), 'Lookup: 10 sources answered (Census, 2 parcel searches, 4 Charlotte GIS layers, FEMA x2, USGS)', res.sources.map(x => x.id + ':' + x.ok).join(' '));
+  C.ok(res.sources.length === 11 && res.sources.every(x => x.ok), 'Lookup: 11 sources answered (Census, 2 parcel searches, 4 Charlotte GIS layers, FEMA x2, USGS, OpenStreetMap)', res.sources.map(x => x.id + ':' + x.ok).join(' '));
   failServices = true; const res2 = await L.lookupSite('600 E 4th St, Charlotte, NC 28202', async url => { const r = await global.fetch(url); if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }); failServices = false;
   C.ok(res2.fields.county && !res2.fields.flood_zone && res2.sources.filter(x => !x.ok).length === 3 && res2.unavailable.some(u => u.key === 'flood_zone' && /did not answer/.test(u.reason)), 'Lookup: when FEMA and USGS are down, the Census values still come back and the gaps are named');
   const res3 = await L.lookupSite('1 Nowhere Rd, Nowhere, ZZ', async url => (await global.fetch(url)).json());
@@ -74,6 +74,7 @@ const post = async (body, tok = 'mock-token-123456789') => { const r = await rou
   C.ok(await p.evaluate(pid => (window.__duMockDB.project_threads.find(x => x.id === pid) || {}).location === 'Charlotte, NC', pid), 'New project: empty project location filled as "Charlotte, NC"');
   await t.shot('intel-01-filled');
   // member edits + verify
+  await p.evaluate(() => document.querySelectorAll('details[data-sec]').forEach(d => { d.open = true; }));
   await p.fill('#dpi-f-zoning_district', 'UR-2 (Urban Residential)'); await p.fill('#dpi-f-county', 'Mecklenburg County, NC');
   await p.check('[data-ver="flood_zone"]'); await p.waitForTimeout(1500);
   row = await prof();

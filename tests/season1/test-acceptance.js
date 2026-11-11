@@ -75,6 +75,7 @@ const rec = (n, name, state, note) => { T.push({ n, name, state, note: note || '
   let letterId = '';
   try {
     // the member types the firm's job number on the project record, the way they would
+    await p.click('details[data-sec="g-project"] > summary').catch(() => p.evaluate(() => document.querySelectorAll('details[data-sec]').forEach(d => { d.open = true; })));
     await p.fill('#dpi-f-project_number', '2026-014'); await p.waitForTimeout(1600);
     await go('#portal/documents', 'documents', 4500);
     await p.click('[data-sp-new]'); await p.waitForSelector('#spn-title', { timeout: 8000 });

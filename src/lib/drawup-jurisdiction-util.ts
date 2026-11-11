@@ -14,7 +14,11 @@
 // fixture to tests/season1/fixtures-intel.js and a test to tests/season1/test-site-lookup.js.
 
 export type Conf = 'high' | 'medium' | 'low';
-export type FieldValue = { v: string; src: string; url?: string; at: string; conf?: Conf; by: 'auto' | 'user'; verified?: boolean; note?: string };
+/** Where a value came from, in the words members see: an official record, a website, a DrawUp estimate, a 3D file,
+ *  aerial imagery, or the member. Shown as a label next to every value. */
+export type SourceKind = 'official' | 'website' | 'estimate' | '3d' | 'aerial' | 'member';
+export const KIND_LABEL: Record<SourceKind, string> = { official: 'Official record', website: 'Website', estimate: 'Estimate', '3d': '3D file', aerial: 'Aerial imagery', member: 'Entered by you' };
+export type FieldValue = { v: string; src: string; url?: string; at: string; conf?: Conf; by: 'auto' | 'user'; verified?: boolean; note?: string; kind?: SourceKind };
 export type SourceResult = { id: string; name: string; url: string; ok: boolean; error?: string; ms?: number };
 export type Unavailable = { key: string; reason: string; next: string };
 export type Ring = [number, number][]; // [lng, lat] pairs
@@ -37,9 +41,17 @@ export type DistrictInfo = {
   conditional: boolean; exception: boolean; petition?: string; petitionUrl?: string; rezoned?: string;
   overlays: { code: string; name: string; ref?: string }[]; article?: string; articleUrl?: string;
 };
+/** A building near the site (footprint and height), from whichever source found it. */
+export type BuildingInfo = {
+  id: string; src: string; srcUrl: string; kind: SourceKind; name?: string; use?: string; onParcel: boolean;
+  rings: Ring[]; footprintSf: number; heightFt?: number; heightKind?: SourceKind; heightNote?: string; levels?: number;
+  floorAreaSf?: number; floorAreaKind?: SourceKind; floorAreaNote?: string;
+};
+/** Parking rules for the district (Charlotte: UDO Table 19-1 tiers). */
+export type ParkingInfo = { tier: string; rule: string; ref: string; url: string; conf: Conf; note: string; rows: { use: string; min: string; max: string }[] };
 export type ZoningInfo = {
   jurisdiction: { id: string; name: string; ordinance: string; ordinanceUrl: string; mapName: string; mapUrl: string };
-  district?: DistrictInfo; standards: Standard[]; frontage?: FrontageTable; notes: string[]; transcribed?: string;
+  district?: DistrictInfo; standards: Standard[]; frontage?: FrontageTable; notes: string[]; transcribed?: string; parking?: ParkingInfo; kind?: SourceKind;
 };
 export type VicinityInfo = {
   bbox: [number, number, number, number]; // xmin, ymin, xmax, ymax in degrees
@@ -48,13 +60,13 @@ export type VicinityInfo = {
   rezonings: { petition: string; existing: string; requested: string; acres?: number; received?: string; url?: string; rings: Ring[] }[];
   src: string;
 };
-export type SiteExtras = { parcel?: ParcelInfo; zoning?: ZoningInfo; vicinity?: VicinityInfo; coverage: string };
+
 
 export type Fetcher = (url: string, init?: { body?: string }) => Promise<any>;
 export type AdapterCtx = {
-  address: string; geo: Geo; at: string; fetchJson: Fetcher;
+  address: string; geo: Geo; at: string; fetchJson: Fetcher; env: Record<string, string>;
   run: <T>(id: string, name: string, url: string, parse: (j: any) => T, body?: string) => Promise<T | null>;
-  put: (k: string, v: string, src: string, url: string, conf: Conf, note?: string) => void;
+  put: (k: string, v: string, src: string, url: string, conf: Conf, note?: string, kind?: SourceKind) => void;
   gap: (key: string, reason: string, next: string) => void;
 };
 /** An adapter finds the parcel first (so later lookups use a point inside the lot), then zoning and the vicinity. */
@@ -67,6 +79,11 @@ export type Jurisdiction = {
 };
 
 /* ------------------------------------------------------------------ helpers shared by adapters */
+/** Point in polygon (ray casting), [lng, lat]. */
+export function inRing(p: [number, number], ring: Ring): boolean {
+  let ins = false; for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) { const [xi, yi] = ring[i], [xj, yj] = ring[j]; if ((yi > p[1]) !== (yj > p[1]) && p[0] < (xj - xi) * (p[1] - yi) / (yj - yi) + xi) ins = !ins; }
+  return ins;
+}
 export const clean = (s: unknown, max = 300) => String(s ?? '').replace(/\s+/g, ' ').trim().slice(0, max);
 export const r6 = (n: number) => Math.round(n * 1e6) / 1e6;
 export const fmtInt = (n: number) => Math.round(n).toLocaleString('en-US');
