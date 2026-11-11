@@ -25,6 +25,7 @@ textarea.dpi-in { resize: vertical; }
 .dpi-look { font-size: 14px; background: #f5f8fc; border: 1px solid #e1e8f2; border-radius: 12px; padding: 10px 14px; margin: 10px 0; }
 .dpi-look p { margin: 0 0 6px; }
 .dpi-src { list-style: none; margin: 0 0 6px; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; }
+.dpi-srcs { margin: 0 0 6px; font-size: 13px; } .dpi-srcs summary { cursor: pointer; color: #1d6b3a; font-weight: 600; } .dpi-srcs .dpi-src { margin-top: 6px; }
 .dpi-src .ok { color: #1d6b3a; } .dpi-src .bad { color: #a12a2a; }
 .dpi-na { margin: 8px 0 0; padding-left: 18px; font-size: 13px; color: #33445f; }
 .dpi-na i { color: #5b6b83; }
@@ -61,6 +62,40 @@ textarea.dpi-in { resize: vertical; }
 .dpi-fl li b { flex: 1; font-weight: 600; font-size: 14px; overflow-wrap: anywhere; }
 .dpi-fk { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #2f6fb3; background: #eaf2fb; border-radius: 99px; padding: 4px 8px; }
 .dpi-empty { text-align: center; padding: 40px !important; }
+/* parcel, zoning and vicinity (jurisdiction layer) */
+.dpi-zone { display: grid; gap: 12px; margin: 12px 0; }
+.dpi-parcel, .dpi-zcard { border: 1px solid #e1e8f2; border-radius: 12px; padding: 12px 14px; background: #fff; }
+.dpi-zhead { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+.dpi-zhead a, .dpi-zcard a, .dpi-parcel a { color: #2f6fb3; font-size: 13px; }
+.dpi-pdl { display: grid; grid-template-columns: auto 1fr; gap: 4px 14px; margin: 8px 0; font-size: 14px; }
+.dpi-pdl dt { color: #5b6b83; font-weight: 600; } .dpi-pdl dd { margin: 0; overflow-wrap: anywhere; } .dpi-pdl small { color: #8a97ab; }
+.dpi-zcode { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin: 8px 0 4px; }
+.dpi-zcode b { font: 700 30px/1 Inter, sans-serif; color: #13233d; letter-spacing: -.01em; }
+.dpi-zcode span { font-size: 14px; color: #33445f; }
+.dpi-tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; }
+.dpi-tag { font-size: 12px; font-weight: 600; border-radius: 99px; padding: 4px 9px; background: #eef2f8; color: #33445f; }
+.dpi-tag.warn { background: #fff3dc; color: #7a4d00; } .dpi-tag.ov { background: #eaf2fb; color: #1f5a96; } .dpi-tag.rz { background: #fde8ec; color: #8e1f3a; }
+.dpi-znote { margin: 6px 0; padding: 8px 10px; border-left: 3px solid #e7b766; background: #fffaf0; font-size: 13px; color: #5a4300; }
+.dpi-ztbl { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 6px; }
+.dpi-ztbl th { text-align: left; width: 30%; padding: 8px 8px 8px 0; color: #33445f; font-weight: 600; vertical-align: top; border-bottom: 1px solid #edf1f6; }
+.dpi-ztbl td { padding: 8px 6px; vertical-align: top; border-bottom: 1px solid #edf1f6; color: #13233d; }
+.dpi-ztbl td small { display: block; margin-top: 3px; font-size: 12px; color: #5b6b83; line-height: 1.4; }
+.dpi-ztbl td.dpi-ref { width: 26%; font-size: 12px; } .dpi-ztbl tr.na td { color: #8a5a00; font-size: 13px; }
+.dpi-front { margin-top: 10px; font-size: 14px; } .dpi-front summary { cursor: pointer; font-weight: 600; color: #13233d; } .dpi-front summary small { font-weight: 400; color: #5b6b83; margin-left: 6px; }
+.dpi-rzl { margin: 6px 0 0; padding-left: 18px; font-size: 13px; }
+.dpi-src1 { font-size: 12px; line-height: 1.45; color: #5b6b83; margin: 10px 0 0; } .dpi-src1 b { color: #8a5a00; }
+.dpi-zgap { font-size: 13px; color: #8a5a00; background: #fffaf0; border-radius: 10px; padding: 10px 12px; } .dpi-zgap i { color: #5b6b83; }
+.dpi-maps { margin-top: 12px; } .dpi-maptabs { margin-bottom: 8px; }
+.dpi-vic { margin: 0; } .dpi-vic svg { width: 100%; height: auto; display: block; border: 1px solid #dfe6f0; border-radius: 12px; background: #f7f8fa; }
+.dpi-vic .pl path { fill: none; stroke: #8796ab; stroke-width: .6; opacity: .75; }
+.dpi-vic path.rz { fill: rgba(196, 47, 82, .08); stroke: #c42f52; stroke-width: 2; stroke-dasharray: 6 4; }
+.dpi-vic path.subj { fill: rgba(231, 183, 102, .45); stroke: #13233d; stroke-width: 3; } .dpi-vic .subjpt { fill: #13233d; stroke: #fff; stroke-width: 2.5; }
+.dpi-vic .lb text { font: 700 13px Inter, sans-serif; fill: #13233d; text-anchor: middle; paint-order: stroke; stroke: #fff; stroke-width: 3px; }
+.dpi-vic .sc text, .dpi-vic .na text { font: 600 11px Inter, sans-serif; fill: #13233d; }
+.dpi-vic figcaption { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; font-size: 12px; color: #33445f; margin-top: 8px; }
+.dpi-vic figcaption small { flex-basis: 100%; color: #5b6b83; }
+.dpi-vic .lg { display: inline-flex; align-items: center; gap: 5px; } .dpi-vic .lg i { width: 14px; height: 10px; border-radius: 2px; border: 1px solid #9aa8bb; display: inline-block; }
+.dpi-vic .lg i.subj { background: rgba(231, 183, 102, .7); border: 2px solid #13233d; } .dpi-vic .lg i.rz { background: transparent; border: 2px dashed #c42f52; }
 /* map */
 .dpi-mapgrid { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); gap: 16px; }
 .dpi-mapsvg svg { width: 100%; height: auto; display: block; }
@@ -82,4 +117,6 @@ textarea.dpi-in { resize: vertical; }
   .dpi-row { grid-template-columns: 1fr; gap: 2px; } .dpi-row > label { padding-top: 0; }
   .dpi-addr { flex-direction: column; } .dpi-bar select { min-width: 0; width: 100%; } .dpi-bar label { width: 100%; }
   .dpi-saved { margin-left: 0; }
+  .dpi-ztbl th, .dpi-ztbl td, .dpi-ztbl td.dpi-ref { display: block; width: auto; padding: 4px 0; border: 0; } .dpi-ztbl tr { display: block; padding: 6px 0; border-bottom: 1px solid #edf1f6; }
+  .dpi-zcode b { font-size: 26px; }
 }

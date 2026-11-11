@@ -17,6 +17,7 @@ global.fetch = async (input, init = {}) => {
   const J = (o, s = 200) => new Response(JSON.stringify(o), { status: s, headers: { 'Content-Type': 'application/json' } });
   if (u.host === 'sb.test' && u.pathname === '/auth/v1/user') return (init.headers && String(init.headers.Authorization || init.headers.authorization || '').includes('mock-token')) ? J({ id: UID, is_anonymous: false }) : J({ msg: 'bad jwt' }, 401);
   if (u.host === 'geocoding.geo.census.gov') return J(/nowhere/i.test(u.searchParams.get('address')) ? FX.censusNoMatch : FX.census);
+  const gis = FX.gisAnswer(u); if (gis) return J(gis);
   if (u.host === 'hazards.fema.gov') { if (failServices) return J({ error: 'down' }, 503); return J(u.pathname.includes('/28/') ? FX.femaZone : FX.femaPanel); }
   if (u.host === 'epqs.nationalmap.gov') { if (failServices) throw new Error('connect ETIMEDOUT'); return J(FX.usgs); }
   return realFetch(input, init);
@@ -31,14 +32,14 @@ const post = async (body, tok = 'mock-token-123456789') => { const r = await rou
   C.ok(Math.abs(s.dayHours - 14.5) < 0.3 && Math.abs(wv.dayHours - 9.8) < 0.3, `Sun: day length ${s.dayHours} h / ${wv.dayHours} h (expected ≈14.5 / 9.8)`);
   const res = await L.lookupSite('600 E 4th St, Charlotte, NC 28202', async url => (await global.fetch(url)).json());
   const F = res.fields;
-  C.ok(F.latitude && F.latitude.v === '35.220873' && F.longitude.v === '-80.838195', 'Lookup: coordinates from the Census geocoder');
+  C.ok(F.latitude && F.latitude.v === '35.22127654' && F.longitude.v === '-80.83926799' && /parcel/.test(F.latitude.note), 'Lookup: coordinates from a point inside the county parcel (more exact than the Census street range)');
   C.ok(F.county.v === 'Mecklenburg County, North Carolina' && F.municipality.v === 'Charlotte', 'Lookup: county and municipality');
   C.ok(/Charlotte city \(incorporated place\)/.test(F.jurisdiction.v) && F.jurisdiction.conf === 'low' && /AHJ/.test(F.jurisdiction.note), 'Lookup: jurisdiction is inferred, low confidence, and says to confirm with the AHJ');
   C.ok(/^Zone X/.test(F.flood_zone.v) && !/Special Flood/.test(F.flood_zone.v) && F.firm_panel.v.startsWith('3710454500K'), 'Lookup: FEMA flood zone and FIRM panel', F.flood_zone && F.flood_zone.v);
   C.ok(/^719\.4 ft/.test(F.ground_elevation.v), 'Lookup: USGS ground elevation');
   C.ok(Object.values(F).every(f => f.src && f.at && f.by === 'auto' && f.verified === false), 'Lookup: every value has a source, a date, by=auto and unverified');
-  C.ok(['parcel_id', 'property_boundary', 'zoning_district', 'setbacks', 'height_limit', 'land_use', 'code_edition'].every(k => !F[k] && res.unavailable.some(u => u.key === k)), 'Lookup: parcel, zoning, setbacks, height, land use and code edition are flagged as not available, not guessed');
-  C.ok(res.sources.length === 4 && res.sources.every(x => x.ok), 'Lookup: 4 sources answered');
+  C.ok(F.parcel_id.v === '12502601' && /^UC\b/.test(F.zoning_district.v) && !F.code_edition && res.unavailable.some(u => u.key === 'code_edition'), 'Lookup: Charlotte parcel and zoning are filled; the code edition is still flagged as not available, not guessed');
+  C.ok(res.sources.length === 10 && res.sources.every(x => x.ok), 'Lookup: 10 sources answered (Census, 2 parcel searches, 4 Charlotte GIS layers, FEMA x2, USGS)', res.sources.map(x => x.id + ':' + x.ok).join(' '));
   failServices = true; const res2 = await L.lookupSite('600 E 4th St, Charlotte, NC 28202', async url => { const r = await global.fetch(url); if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }); failServices = false;
   C.ok(res2.fields.county && !res2.fields.flood_zone && res2.sources.filter(x => !x.ok).length === 3 && res2.unavailable.some(u => u.key === 'flood_zone' && /did not answer/.test(u.reason)), 'Lookup: when FEMA and USGS are down, the Census values still come back and the gaps are named');
   const res3 = await L.lookupSite('1 Nowhere Rd, Nowhere, ZZ', async url => (await global.fetch(url)).json());
@@ -65,9 +66,10 @@ const post = async (body, tok = 'mock-token-123456789') => { const r = await rou
   C.ok(!!pid && /#portal\/project-info\?id=/.test(await p.evaluate(() => location.hash)), 'New project: opens Project Information for it');
   const prof = () => p.evaluate(pid => JSON.parse(JSON.stringify((window.__duMockDB.project_profiles || []).find(x => x.project_thread_id === pid) || null)), pid);
   let row = await prof();
-  C.ok(row && row.fields.county && row.fields.county.v === 'Mecklenburg County, North Carolina' && row.site.lat === 35.220873, 'New project: site data saved to project_profiles with coordinates');
+  C.ok(row && row.fields.county && row.fields.county.v === 'Mecklenburg County, North Carolina' && row.site.lat === 35.22127654 && row.site.parcel && row.site.parcel.id === '12502601' && row.site.zoning && row.site.vicinity, 'New project: site data saved to project_profiles with the parcel point, parcel, zoning and vicinity');
   C.ok(await p.evaluate(() => /U\.S\. Census Bureau Geocoder/.test(document.querySelector('[data-k="county"] .dpi-prov').textContent) && /Unverified/.test(document.querySelector('[data-k="county"] .dpi-prov').textContent)), 'Page: each value shows its source and "Unverified"');
-  C.ok(await p.evaluate(() => /Not available/.test(document.querySelector('[data-k="zoning_district"] .dpi-prov').textContent)), 'Page: zoning says "Not available" with the reason');
+  C.ok(await p.evaluate(() => /City of Charlotte zoning map/.test(document.querySelector('[data-k="zoning_district"] .dpi-prov').textContent) && /Unverified/.test(document.querySelector('[data-k="zoning_district"] .dpi-prov').textContent)), 'Page: zoning names its source and says "Unverified"');
+  C.ok(await p.evaluate(() => /Not available/.test(document.querySelector('[data-k="code_edition"] .dpi-prov').textContent)), 'Page: the code edition says "Not available" with the reason');
   C.ok(await p.evaluate(() => !!document.querySelector('.dpi-map iframe[src*="openstreetmap.org/export/embed.html"]')), 'Page: site map at the geocoded point');
   C.ok(await p.evaluate(pid => (window.__duMockDB.project_threads.find(x => x.id === pid) || {}).location === 'Charlotte, NC', pid), 'New project: empty project location filled as "Charlotte, NC"');
   await t.shot('intel-01-filled');

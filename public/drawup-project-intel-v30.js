@@ -5,8 +5,9 @@
  * One record per project (project_profiles, SQL 0076) that Draw, CheckUp, DrawUp Specs and Document Studio read.
  * Every value shows where it came from (source, date, confidence) and whether a member verified it. A public
  * lookup (/api/project-intel: Census geocoder, FEMA flood map, USGS elevation, sun position) fills empty fields
- * and never replaces a value a member typed or verified. When a jurisdiction has no connected source (parcel lines,
- * zoning, setbacks, height limits) the page says so instead of guessing.
+ * and never replaces a value a member typed or verified. Where DrawUp covers the jurisdiction (Charlotte / Mecklenburg
+ * County, NC so far) it also shows the parcel, the zoning district with its UDO limits and references, and a vicinity
+ * map (zoning, parcel lines, pending rezonings). Elsewhere the page says what is not covered instead of guessing.
  * Shared field list and merge rules: drawup-project-intel-core-v30.js (bundled from src/lib/drawup-project-intel.ts).
  */
 (function () {
@@ -129,9 +130,10 @@
     <div class="dpi-grid">
       <article class="du-glass dpi-site"><span class="du-kicker">SITE</span><h2>Where is the site?</h2>
         <div class="dpi-addr"><input id="dpi-addr" class="dpi-in" placeholder="Street address, city, state ZIP" value="${esc((f.project_address && f.project_address.v) || '')}" aria-label="Site address"><button class="du-btn primary" type="button" id="dpi-look">Look up site data</button></div>
-        <p class="dpi-note">Free. DrawUp asks the U.S. Census geocoder, the FEMA flood map and the USGS elevation service, and fills only empty fields. Values you typed or verified are never replaced. Public data is preliminary; nothing here is a survey, a zoning determination or legal verification.</p>
+        <p class="dpi-note">Free. DrawUp asks the U.S. Census geocoder, the FEMA flood map and the USGS elevation service, plus the county parcel records and the city zoning map where DrawUp covers the place. Covered now: ${esc(Core.COVERAGE_TEXT || 'none')}. It fills only empty fields; values you typed or verified are never replaced. Public data is preliminary; nothing here is a survey, a zoning determination or legal verification.</p>
         <div id="dpi-lookres">${look ? lookupHTML(look) : ''}</div>
-        ${site.lat && site.lng ? mapEmbed(site.lat, site.lng) : '<div class="dpi-nomap">Add a site address to place the project on the map.</div>'}
+        ${site.zoning || site.parcel ? zoningHTML(site) : ''}
+        ${site.lat && site.lng ? siteMaps(site) : '<div class="dpi-nomap">Add a site address to place the project on the map.</div>'}
       </article>
       <article class="du-glass dpi-used"><span class="du-kicker">USED BY</span><h2>Where this information goes</h2><div id="dpi-usedby"><p class="du-muted">Checking…</p></div></article>
     </div>
@@ -141,13 +143,13 @@
       <article class="du-glass dpi-list" data-l="milestones"><span class="du-kicker">MILESTONES</span>${listTable('milestones')}</article></div>
     <article class="du-glass dpi-list" data-l="decisions"><span class="du-kicker">DESIGN DECISIONS</span><p class="dpi-note">Open decisions show up in DD Readiness.</p>${listTable('decisions')}</article>
     <article class="du-glass dpi-files"><span class="du-kicker">SURVEYS AND SITE DOCUMENTS</span><div class="dpi-up"><select id="dpi-fkind" class="dpi-in" aria-label="Kind of file">${FILE_KINDS.map(([k, l]) => `<option value="${k}">${l}</option>`).join('')}</select><label class="du-btn ghost">Upload a file<input type="file" id="dpi-file" hidden multiple accept="image/*,application/pdf,.dwg,.dxf,.docx,.xlsx,.csv"></label></div><div id="dpi-flist">${filesHTML()}</div></article>`;
-    bindHead(); bindInfo(); usedBy(); total_();
+    bindHead(); bindInfo(); bindMaps(); usedBy(); total_();
     if (opts && opts.autoLookup) lookup(opts.autoLookup);
   }
 
   function fieldRow(k, label) {
     const f = S.row.fields[k]; const fb = !f ? projectFallback(k) : '';
-    const v = f ? f.v : fb; const long = ['project_description', 'zoning_requirements', 'environmental_notes', 'existing_structures', 'code_references', 'land_use', 'property_boundary'].includes(k);
+    const v = f ? f.v : fb; const long = ['project_description', 'zoning_requirements', 'zoning_conditions', 'setbacks', 'nearby_rezonings', 'parcel_owner', 'legal_description', 'environmental_notes', 'existing_structures', 'code_references', 'land_use', 'property_boundary'].includes(k);
     const prov = f ? badge(f, k) : fb ? '<span class="dpi-prov proj">From the DrawUp project</span>' : badge(null, k);
     const canVerify = f && String(f.v || '').trim();
     return `<div class="dpi-row" data-k="${k}"><label for="dpi-f-${k}">${esc(label)}</label><div class="dpi-val">${long ? `<textarea id="dpi-f-${k}" class="dpi-in" rows="2" data-f="${k}">${esc(v)}</textarea>` : `<input id="dpi-f-${k}" class="dpi-in" data-f="${k}" value="${esc(v)}">`}
@@ -198,14 +200,74 @@
   function lookupHTML(L) {
     const ok = (L.sources || []).filter(s => s.ok), bad = (L.sources || []).filter(s => !s.ok);
     return `<div class="dpi-look"><p><b>Last lookup:</b> ${esc(day(L.at))}${L.applied ? ` · ${L.applied.length} field${L.applied.length === 1 ? '' : 's'} filled` : ''}${L.kept && L.kept.length ? ` · ${L.kept.length} kept as you entered them (${L.kept.map(k => esc(Core.FIELD_LABEL[k] || k)).join(', ')})` : ''}</p>
-      <ul class="dpi-src">${ok.map(s => `<li class="ok">✓ <a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.name)}</a></li>`).join('')}${bad.map(s => `<li class="bad">✕ ${esc(s.name)}: ${esc(s.error || 'no answer')}</li>`).join('')}</ul>
+      ${(() => { const list = `<ul class="dpi-src">${ok.map(s => `<li class="ok">✓ <a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.name)}</a></li>`).join('')}${bad.map(s => `<li class="bad">✕ ${esc(s.name)}: ${esc(s.error || 'no answer')}</li>`).join('')}</ul>`;
+        return ok.length + bad.length > 4 ? `<details class="dpi-srcs"${bad.length ? ' open' : ''}><summary>${ok.length} source${ok.length === 1 ? '' : 's'} answered${bad.length ? `, ${bad.length} did not` : ''}</summary>${list}</details>` : list; })()}
       ${(L.unavailable || []).length ? `<details><summary>${L.unavailable.length} item${L.unavailable.length === 1 ? '' : 's'} DrawUp could not look up</summary><ul class="dpi-na">${L.unavailable.map(u => `<li><b>${esc(Core.FIELD_LABEL[u.key] || u.key)}</b>: ${esc(u.reason)} <i>${esc(u.next)}</i></li>`).join('')}</ul></details>` : ''}</div>`;
   }
   function mapEmbed(lat, lng) {
     const d = 0.004, bbox = [lng - d * 1.4, lat - d, lng + d * 1.4, lat + d].map(x => x.toFixed(5)).join(',');
     return `<div class="dpi-map"><iframe title="Site map" loading="lazy" referrerpolicy="no-referrer" src="https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&amp;layer=mapnik&amp;marker=${lat},${lng}"></iframe>
-      <p class="dpi-note">Pin at the geocoded point (${(+lat).toFixed(5)}, ${(+lng).toFixed(5)}). Property lines are not shown: no parcel source is connected for this site. Map © OpenStreetMap contributors. <a href="https://www.openstreetmap.org/?mlat=${lat}&amp;mlon=${lng}#map=18/${lat}/${lng}" target="_blank" rel="noopener">Open larger map</a></p></div>`;
+      <p class="dpi-note">Pin at the ${S && S.row.site && S.row.site.from === 'parcel' ? 'parcel point' : 'geocoded point'} (${(+lat).toFixed(5)}, ${(+lng).toFixed(5)}). ${S && S.row.site && S.row.site.boundary ? 'Parcel lines are on the Vicinity tab.' : 'Property lines are not shown: no parcel source is connected for this site.'} Map © OpenStreetMap contributors. <a href="https://www.openstreetmap.org/?mlat=${lat}&amp;mlon=${lng}#map=18/${lat}/${lng}" target="_blank" rel="noopener">Open larger map</a></p></div>`;
   }
+
+  /* ------------------------------------------------------------------ parcel, zoning and vicinity (jurisdiction layer) */
+  const money = n => n ? '$' + Math.round(n).toLocaleString() : '';
+  function zoningHTML(site) {
+    const P = site.parcel, Z = site.zoning, D = Z && Z.district, look = S.row.lookups[0] || {};
+    const gaps = (look.unavailable || []).filter(u => ['zoning_district', 'setbacks', 'height_limit', 'min_lot_area', 'min_lot_width', 'lot_coverage', 'far', 'density'].includes(u.key));
+    const parcel = P ? `<div class="dpi-parcel"><div class="dpi-zhead"><span class="du-kicker">PARCEL</span><a href="${esc(P.url)}" target="_blank" rel="noopener">Open in Polaris ↗</a></div>
+      <dl class="dpi-pdl"><dt>Parcel ID</dt><dd><b>${esc(P.id)}</b>${P.how === 'point' ? ' <span class="dpi-tag warn" title="Found at the map point, not by the address">check lot</span>' : ''}</dd>
+        ${P.lotSf ? `<dt>Lot size</dt><dd>${Math.round(P.lotSf).toLocaleString()} sf · ${esc(P.lotAcres)} ac <small>(${esc(P.lotFrom)})</small></dd>` : ''}
+        ${P.owner ? `<dt>Owner of record</dt><dd>${esc(P.owner)}</dd>` : ''}
+        ${P.landUse ? `<dt>Assessor land use</dt><dd>${esc(P.landUse)}</dd>` : ''}
+        ${P.totalValue ? `<dt>Assessed value</dt><dd>${money(P.totalValue)}${P.assessedYear ? ` <small>(tax year ${esc(P.assessedYear)})</small>` : ''}</dd>` : ''}
+        ${P.heatedSf ? `<dt>Heated area</dt><dd>${Math.round(P.heatedSf).toLocaleString()} sf</dd>` : ''}
+        ${P.lastSale ? `<dt>Last sale</dt><dd>${esc(P.lastSale)}</dd>` : ''}</dl>
+      <p class="dpi-src1"><b>Unverified</b> · <a href="${esc(P.srcUrl)}" target="_blank" rel="noopener">${esc(P.src)}</a> · ${esc(day(look.at))}</p></div>` : '';
+    if (!Z || !D) return `<div class="dpi-zone">${parcel}${gaps.length ? `<div class="dpi-zgap"><b>Zoning not available.</b> ${esc(gaps[0].reason)} <i>${esc(gaps[0].next)}</i></div>` : ''}</div>`;
+    const tags = [D.conditional ? '<span class="dpi-tag warn">Conditional (CD)</span>' : '', D.exception ? '<span class="dpi-tag warn">Exception (EX)</span>' : '', D.kind === 'legacy' ? '<span class="dpi-tag warn">Pre-UDO district</span>' : '', ...(D.overlays || []).map(o => `<span class="dpi-tag ov" title="${esc(o.ref || '')}">${esc(o.name)}</span>`), (site.vicinity && site.vicinity.rezonings && site.vicinity.rezonings.length) ? `<span class="dpi-tag rz">${site.vicinity.rezonings.length} pending rezoning${site.vicinity.rezonings.length === 1 ? '' : 's'} nearby</span>` : ''].join('');
+    const rows = (Z.standards || []).map(x => `<tr><th scope="row">${esc(x.label)}</th><td>${esc(x.value)}${x.note ? `<small>${esc(x.note)}</small>` : ''}</td><td class="dpi-ref"><a href="${esc(D.articleUrl || Z.jurisdiction.ordinanceUrl)}" target="_blank" rel="noopener">${esc(x.ref)}</a></td></tr>`).join('');
+    const gapRows = gaps.filter(g => g.key !== 'zoning_district').map(g => `<tr class="na"><th scope="row">${esc(Core.FIELD_LABEL[g.key] || g.key)}</th><td colspan="2">${esc(g.reason)}</td></tr>`).join('');
+    const fr = Z.frontage ? `<details class="dpi-front"><summary>${esc(Z.frontage.title)} <small>${esc(Z.frontage.ref)}</small></summary><div class="dpi-tblwrap"><table class="dpi-tbl"><thead><tr>${Z.frontage.cols.map(c => `<th>${esc(c)}</th>`).join('')}</tr></thead><tbody>${Z.frontage.rows.map(r => `<tr>${r.map(c => `<td>${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></div><p class="dpi-note">${esc(Z.frontage.note)}</p></details>` : '';
+    const rz = site.vicinity && site.vicinity.rezonings && site.vicinity.rezonings.length ? `<details class="dpi-front"><summary>Pending rezonings within about 650 ft</summary><ul class="dpi-rzl">${site.vicinity.rezonings.map(r => `<li><b>${r.url ? `<a href="${esc(r.url)}" target="_blank" rel="noopener">${esc(r.petition)}</a>` : esc(r.petition)}</b> ${esc(r.existing || '?')} → ${esc(r.requested || '?')}${r.acres ? ` · ${esc(r.acres)} ac` : ''}${r.received ? ` · filed ${esc(r.received)}` : ''}</li>`).join('')}</ul></details>` : '';
+    return `<div class="dpi-zone">${parcel}<div class="dpi-zcard">
+      <div class="dpi-zhead"><span class="du-kicker">ZONING · ${esc(Z.jurisdiction.name.toUpperCase())}</span>${D.petitionUrl ? `<a href="${esc(D.petitionUrl)}" target="_blank" rel="noopener">Rezoning petition ${esc(D.petition || '')} ↗</a>` : ''}</div>
+      <div class="dpi-zcode"><b>${esc(D.raw)}</b><span>${esc(D.name || '')}${D.article ? ` · <a href="${esc(D.articleUrl)}" target="_blank" rel="noopener">${esc(D.article)}</a>` : ''}</span></div>
+      ${tags ? `<div class="dpi-tags">${tags}</div>` : ''}
+      ${(Z.notes || []).map(n => `<p class="dpi-znote">${esc(n)}</p>`).join('')}
+      ${rows || gapRows ? `<div class="dpi-tblwrap"><table class="dpi-ztbl"><tbody>${rows}${gapRows}</tbody></table></div>` : ''}
+      ${fr}${rz}
+      <p class="dpi-src1"><b>Unverified</b> · district from the <a href="${esc(Z.jurisdiction.mapUrl)}" target="_blank" rel="noopener">${esc(Z.jurisdiction.mapName)}</a>${rows ? `; limits from the <a href="${esc(Z.jurisdiction.ordinanceUrl)}" target="_blank" rel="noopener">${esc(Z.jurisdiction.ordinance)}</a>` : ''} · ${esc(day(look.at))}${Z.transcribed && rows ? ` · ${esc(Z.transcribed)}` : ''} Not a zoning determination: for a binding answer ask the city for a zoning verification letter.</p>
+    </div></div>`;
+  }
+  const FAM = [[/^N1-/, '#e3efd9'], [/^N2-/, '#f6e7c8'], [/^(CG|CR)\b/, '#f4d6d2'], [/^(NC|CAC|RAC|UE|UC)\b/, '#f1d2e4'], [/^TOD-/, '#dcd8f3'], [/^(IMU|ML|IC|OFC|OG|RC)\b/, '#d6e4f2'], [/^R\/W/, '#ffffff']];
+  const famColor = code => { const c = String(code || '').toUpperCase(); const f = FAM.find(([re]) => re.test(c)); return f ? f[1] : '#e9ebef'; };
+  function vicinitySVG(site) {
+    const V = site.vicinity; if (!V || !V.bbox) return '';
+    const [x0, y0, x1, y1] = V.bbox, W = 600, H = Math.round(600 * (y1 - y0) / ((x1 - x0) * Math.cos(((y0 + y1) / 2) * Math.PI / 180)) || 600);
+    const X = x => ((x - x0) / (x1 - x0) * W).toFixed(1), Y = y => ((y1 - y) / (y1 - y0) * H).toFixed(1);
+    const path = rings => rings.map(r => 'M' + r.map(p => X(p[0]) + ',' + Y(p[1])).join('L') + 'Z').join('');
+    const area = r => { let a = 0; for (let i = 0, j = r.length - 1; i < r.length; j = i++) a += (r[j][0] - r[i][0]) * (r[j][1] + r[i][1]); return Math.abs(a); };
+    const labelAt = rings => { const r = rings.slice().sort((a, b) => area(b) - area(a))[0]; if (!r) return null; let cx = 0, cy = 0; r.forEach(p => { cx += p[0]; cy += p[1]; }); return [cx / r.length, cy / r.length, area(r) / ((x1 - x0) * (y1 - y0))]; };
+    const zones = (V.zones || []).map(z => `<path d="${path(z.rings)}" fill="${famColor(z.code)}" stroke="#9aa8bb" stroke-width="1"><title>${esc(z.code)}</title></path>`).join('');
+    const lines = (V.parcels || []).map(rs => `<path d="${path(rs)}"/>`).join('');
+    const rez = (V.rezonings || []).map(r => `<path d="${path(r.rings)}" class="rz"><title>Pending rezoning ${esc(r.petition)}: ${esc(r.existing)} to ${esc(r.requested)}</title></path>`).join('');
+    const sx = +X(site.lng), sy = +Y(site.lat);
+    const labels = (V.zones || []).map(z => { const l = labelAt(z.rings); if (!l || l[2] <= 0.01) return ''; let lx = Math.min(W - 34, Math.max(34, +X(l[0]))), ly = Math.min(H - 30, Math.max(20, +Y(l[1]))); if (Math.hypot(lx - sx, ly - sy) < 50) ly = ly + (ly + 60 < H - 30 ? 60 : -60); return `<text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}">${esc(z.code)}</text>`; }).join('');
+    const subj = site.boundary ? `<path d="${path(site.boundary)}" class="subj"/>` : `<circle cx="${X(site.lng)}" cy="${Y(site.lat)}" r="7" class="subjpt"/>`;
+    const ftPerPx = ((x1 - x0) * 364000 * Math.cos(((y0 + y1) / 2) * Math.PI / 180)) / W, bar = 200 / ftPerPx;
+    const codes = [...new Set((V.zones || []).map(z => z.code))].slice(0, 8);
+    return `<figure class="dpi-vic"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Vicinity map: zoning districts and parcel lines around the site"><rect width="${W}" height="${H}" fill="#f7f8fa"/>${zones}<g class="pl">${lines}</g>${rez}${subj}<g class="lb">${labels}</g>
+      <g class="sc" transform="translate(16 ${H - 18})"><rect width="${bar.toFixed(1)}" height="5" fill="#13233d"/><text y="-6">200 ft</text></g><g class="na" transform="translate(${W - 26} 30)"><path d="M0,-16 L7,6 L0,1 L-7,6Z" fill="#13233d"/><text y="20" text-anchor="middle">N</text></g></svg>
+      <figcaption><span class="lg"><i class="subj"></i>This parcel</span>${(V.rezonings || []).length ? '<span class="lg"><i class="rz"></i>Pending rezoning</span>' : ''}${codes.map(c => `<span class="lg"><i style="background:${famColor(c)}"></i>${esc(c)}</span>`).join('')}
+        <small>Zoning districts and parcel lines about 1,300 ft across. ${esc(V.src)}. GIS lines are approximate, not a survey.</small></figcaption></figure>`;
+  }
+  function siteMaps(site) {
+    const vic = vicinitySVG(site); if (!vic) return mapEmbed(site.lat, site.lng);
+    return `<div class="dpi-maps"><div class="du-subtabs dpi-tabs dpi-maptabs" role="tablist"><button type="button" role="tab" class="active" data-mv="vic">Vicinity and zoning</button><button type="button" role="tab" data-mv="street">Street map</button></div>
+      <div data-mvp="vic">${vic}</div><div data-mvp="street" hidden>${mapEmbed(site.lat, site.lng)}</div></div>`;
+  }
+  function bindMaps() { S.w.querySelectorAll('[data-mv]').forEach(b => b.onclick = () => { S.w.querySelectorAll('[data-mv]').forEach(x => x.classList.toggle('active', x === b)); S.w.querySelectorAll('[data-mvp]').forEach(p => { p.hidden = p.dataset.mvp !== b.dataset.mv; }); }); }
 
   async function lookup(address) {
     address = String(address || '').trim(); const res = S.w.querySelector('#dpi-lookres'), btn = S.w.querySelector('#dpi-look');
@@ -217,7 +279,10 @@
       const j = await r.json().catch(() => ({})); if (!r.ok || !j.fields) throw new Error(j.error || 'The lookup did not answer. Try again.');
       const m = Core.mergeLookup(S.row.fields, j.fields);
       S.row.fields = m.fields;
-      if (j.site && j.site.lat) S.row.site = Object.assign({}, S.row.site, { lat: j.site.lat, lng: j.site.lng, from: 'census', at: j.at });
+      if (j.site && j.site.lat) {
+        const keep = Object.assign({}, S.row.site); ['parcel', 'zoning', 'vicinity', 'boundary', 'jurisdiction'].forEach(k => delete keep[k]); // a new lookup replaces the old site layers
+        S.row.site = Object.assign(keep, { lat: j.site.lat, lng: j.site.lng, from: j.site.from || 'census', at: j.at }, ...['parcel', 'zoning', 'vicinity', 'boundary', 'jurisdiction'].filter(k => j.site[k]).map(k => ({ [k]: j.site[k] })));
+      }
       S.row.lookups = [{ at: j.at, address, sources: j.sources, unavailable: j.unavailable, applied: m.applied, kept: m.kept }].concat(S.row.lookups || []).slice(0, 10);
       // fill the project's own location only when it is empty (never replace what the member typed)
       const loc = j.fields.project_location && j.fields.project_location.v;
@@ -304,7 +369,7 @@
     card.querySelector('[data-dpi-docs]').onclick = () => { history.replaceState(null, '', '#portal/documents?project=' + pid); c.openPortalTab('documents'); };
     loadProfile(c, pid).then(({ row, missing }) => {
       const f = row.fields || {}; const v = k => f[k] && String(f[k].v || '').trim() ? esc(f[k].v) : '<span class="du-muted">Not set</span>';
-      card.querySelector('.dpi-card-b').innerHTML = missing ? '<p class="du-muted">Run the Project Information SQL (0076) to keep site and jurisdiction data here.</p>' : `<dl class="dpi-dl"><dt>Address</dt><dd>${v('project_address')}</dd><dt>Jurisdiction</dt><dd>${v('jurisdiction')}</dd><dt>Zoning</dt><dd>${v('zoning_district')}</dd><dt>Flood zone</dt><dd>${v('flood_zone')}</dd><dt>Occupancy</dt><dd>${v('occupancy')}</dd><dt>Gross area</dt><dd>${v('gross_area')}</dd></dl>`;
+      card.querySelector('.dpi-card-b').innerHTML = missing ? '<p class="du-muted">Run the Project Information SQL (0076) to keep site and jurisdiction data here.</p>' : `<dl class="dpi-dl"><dt>Address</dt><dd>${v('project_address')}</dd><dt>Jurisdiction</dt><dd>${v('jurisdiction')}</dd><dt>Zoning</dt><dd>${v('zoning_district')}</dd><dt>Flood zone</dt><dd>${v('flood_zone')}</dd><dt>Parcel</dt><dd>${v('parcel_id')}</dd><dt>Setbacks</dt><dd>${v('setbacks')}</dd><dt>Height limit</dt><dd>${v('height_limit')}</dd><dt>Occupancy</dt><dd>${v('occupancy')}</dd><dt>Gross area</dt><dd>${v('gross_area')}</dd></dl>`;
     }).catch(() => { card.querySelector('.dpi-card-b').innerHTML = '<p class="du-muted">Project information could not load.</p>'; });
   }
   function watch() { const host = document.getElementById('du-workspace-content'); if (!host) { setTimeout(watch, 300); return; } new MutationObserver(decorateProjectPage).observe(host, { childList: true, subtree: false }); decorateProjectPage(); }

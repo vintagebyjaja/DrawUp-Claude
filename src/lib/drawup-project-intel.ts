@@ -13,12 +13,19 @@
 //     https://hazards.fema.gov/arcgis/rest/services/public/NFHL/MapServer
 //   - USGS Elevation Point Query Service (3DEP): ground elevation at the point.  https://epqs.nationalmap.gov/v1/
 //   - Sun position: computed here (NOAA solar equations), no network.
+//   - Parcels, zoning, UDO limits and the vicinity map: one adapter per covered jurisdiction
+//     (drawup-jurisdictions.ts; Charlotte and Mecklenburg County, NC in drawup-jurisdiction-charlotte.ts).
+import { COVERAGE_TEXT, findJurisdiction } from './drawup-jurisdictions';
+import type { AdapterCtx, ParcelInfo, Ring, VicinityInfo, ZoningInfo } from './drawup-jurisdictions';
+export { REGISTRY, COVERAGE_TEXT } from './drawup-jurisdictions';
+export { parseDistrict } from './drawup-jurisdiction-charlotte';
 
 export type Conf = 'high' | 'medium' | 'low';
 export type FieldValue = { v: string; src: string; url?: string; at: string; conf?: Conf; by: 'auto' | 'user'; verified?: boolean; note?: string };
 export type SourceResult = { id: string; name: string; url: string; ok: boolean; error?: string; ms?: number };
 export type Unavailable = { key: string; reason: string; next: string };
-export type LookupResult = { fields: Record<string, FieldValue>; site: { lat?: number; lng?: number; boundary?: null }; sources: SourceResult[]; unavailable: Unavailable[]; at: string };
+export type SiteInfo = { lat?: number; lng?: number; from?: 'census' | 'parcel'; boundary?: Ring[] | null; jurisdiction?: string; parcel?: ParcelInfo; zoning?: ZoningInfo; vicinity?: VicinityInfo };
+export type LookupResult = { fields: Record<string, FieldValue>; site: SiteInfo; sources: SourceResult[]; unavailable: Unavailable[]; at: string };
 
 export const SOURCES = {
   census: { name: 'U.S. Census Bureau Geocoder', home: 'https://geocoding.geo.census.gov/geocoder/' },
@@ -30,8 +37,8 @@ export const SOURCES = {
 /** Project Information fields, grouped. Keys shared with DrawUp Specs project data (<<project_name>> tokens). */
 export const FIELD_GROUPS: { id: string; label: string; fields: [string, string, string?][] }[] = [
   { id: 'project', label: 'Project', fields: [['project_name', 'Project name'], ['project_number', 'Project number'], ['project_status', 'Project status'], ['phase', 'Phase'], ['building_type', 'Building type'], ['project_description', 'Description']] },
-  { id: 'site', label: 'Site and jurisdiction', fields: [['project_address', 'Project address'], ['project_location', 'City and state'], ['latitude', 'Latitude'], ['longitude', 'Longitude'], ['county', 'County'], ['municipality', 'Municipality'], ['jurisdiction', 'Likely permitting jurisdiction'], ['census_tract', 'Census tract'], ['parcel_id', 'Parcel ID'], ['site_area', 'Site area'], ['property_boundary', 'Property boundary']] },
-  { id: 'zoning', label: 'Zoning and land use', fields: [['zoning_district', 'Zoning designation'], ['zoning_requirements', 'Zoning requirements'], ['setbacks', 'Setbacks (front / side / rear)'], ['height_limit', 'Height limit'], ['land_use', 'Land-use restrictions'], ['parking_requirement', 'Parking requirement']] },
+  { id: 'site', label: 'Site and jurisdiction', fields: [['project_address', 'Project address'], ['project_location', 'City and state'], ['latitude', 'Latitude'], ['longitude', 'Longitude'], ['county', 'County'], ['municipality', 'Municipality'], ['jurisdiction', 'Likely permitting jurisdiction'], ['census_tract', 'Census tract'], ['parcel_id', 'Parcel ID'], ['site_area', 'Site area'], ['property_boundary', 'Property boundary'], ['parcel_owner', 'Owner of record'], ['assessor_land_use', 'Assessor land use'], ['assessed_value', 'Assessed value'], ['legal_description', 'Legal description and deed']] },
+  { id: 'zoning', label: 'Zoning and land use', fields: [['zoning_district', 'Zoning designation'], ['zoning_conditions', 'Conditions and overlays'], ['zoning_requirements', 'Zoning requirements'], ['setbacks', 'Setbacks (front / side / rear)'], ['height_limit', 'Height limit'], ['min_lot_area', 'Minimum lot area'], ['min_lot_width', 'Minimum lot width'], ['lot_coverage', 'Maximum building coverage'], ['far', 'Floor area ratio (FAR)'], ['density', 'Density'], ['land_use', 'Land-use restrictions'], ['parking_requirement', 'Parking requirement'], ['nearby_rezonings', 'Pending rezonings nearby']] },
   { id: 'environment', label: 'Flood, terrain and environment', fields: [['flood_zone', 'Flood zone'], ['firm_panel', 'FIRM panel'], ['base_flood_elevation', 'Base flood elevation'], ['ground_elevation', 'Ground elevation'], ['solar_summer', 'Sun at noon, June 21'], ['solar_winter', 'Sun at noon, December 21'], ['environmental_notes', 'Environmental notes'], ['existing_structures', 'Existing structures']] },
   { id: 'building', label: 'Building', fields: [['occupancy', 'Preliminary occupancy classification'], ['construction_type', 'Construction type'], ['stories', 'Stories'], ['gross_area', 'Gross area'], ['sprinklered', 'Sprinklered'], ['code_edition', 'Building code (adopted edition)'], ['code_references', 'Preliminary code references']] },
   { id: 'team', label: 'Owner and team', fields: [['owner_name', 'Owner'], ['owner_address', 'Owner address'], ['architect_name', 'Architect'], ['architect_address', 'Architect address'], ['pm_name', 'Project manager'], ['contractor_name', 'Contractor'], ['structural_engineer', 'Structural engineer'], ['mep_engineer', 'MEP engineer'], ['civil_engineer', 'Civil engineer']] },
@@ -111,7 +118,7 @@ export function solarSummary(lat: number) {
 }
 
 /* ------------------------------------------------------------------ lookup */
-type Fetcher = (url: string) => Promise<any>;
+type Fetcher = (url: string, init?: { body?: string }) => Promise<any>;
 const nowIso = () => new Date().toISOString();
 
 /** Runs every public lookup for an address. Each source is independent; a failed source never blocks the rest. */
@@ -141,32 +148,49 @@ export async function lookupSite(address: string, fetchJson: Fetcher): Promise<L
     'Inferred from Census boundaries. Confirm the permitting authority (AHJ) and any extraterritorial jurisdiction with the city or county.');
   put('census_tract', geo.tract, C, cu, 'high');
 
-  const { lat, lng } = geo;
-  const [zone, panel, elev] = await Promise.all([
+  // Parcels, zoning and the vicinity, from the jurisdiction's own sources when DrawUp covers it.
+  const J = findJurisdiction(geo as any); let parcel: ParcelInfo | null = null; let lat = geo.lat, lng = geo.lng, from: 'census' | 'parcel' = 'census';
+  const ctx: AdapterCtx = { address, geo: geo as any, at, fetchJson, run: (id, name, url, parse) => run(id, name, url, parse), put, gap: (key, reason, next) => { if (!unavailable.some(u => u.key === key)) unavailable.push({ key, reason, next }); } };
+  if (J) {
+    try { parcel = await J.parcel(ctx); } catch (e: any) { ctx.gap('parcel_id', 'The parcel lookup failed: ' + clean(e?.message || e, 120), 'Try again later.'); }
+    if (parcel && parcel.point) {
+      [lng, lat] = [parcel.point[0], parcel.point[1]]; from = 'parcel';
+      const pn = 'A point inside the county GIS parcel, more exact than the street-range geocode.';
+      put('latitude', String(lat), parcel.src, parcel.url, 'high', pn); put('longitude', String(lng), parcel.src, parcel.url, 'high', pn);
+    }
+  }
+  const zoningP = J ? J.zoning(ctx, lat, lng, parcel).catch((e: any) => { ctx.gap('zoning_district', 'The zoning lookup failed: ' + clean(e?.message || e, 120), 'Try again later.'); return {} as { zoning?: ZoningInfo; vicinity?: VicinityInfo }; }) : Promise.resolve({} as { zoning?: ZoningInfo; vicinity?: VicinityInfo });
+  const [zone, panel, elev, zres] = await Promise.all([
     run('fema_zone', SOURCES.fema.name + ' (flood zones)', femaZoneUrl(lat, lng), parseFemaZone),
     run('fema_panel', SOURCES.fema.name + ' (FIRM panels)', femaPanelUrl(lat, lng), parseFemaPanel),
     run('usgs', SOURCES.usgs.name, usgsUrl(lat, lng), parseUsgs),
+    zoningP,
   ]);
   const fv = femaViewer(lat, lng), F = SOURCES.fema.name;
   if (zone && !zone.none) {
-    put('flood_zone', `Zone ${zone.zone}${zone.subtype ? ' (' + zone.subtype.toLowerCase() + ')' : ''}${zone.sfha ? ' - Special Flood Hazard Area' : ''}`, F, fv, 'medium', 'At the geocoded point only; check the whole parcel on the FIRM.');
+    put('flood_zone', `Zone ${zone.zone}${zone.subtype ? ' (' + zone.subtype.toLowerCase() + ')' : ''}${zone.sfha ? ' - Special Flood Hazard Area' : ''}`, F, fv, 'medium', from === 'parcel' ? 'At one point inside the parcel; check the whole parcel on the FIRM.' : 'At the geocoded point only; check the whole parcel on the FIRM.');
     if (zone.bfe) put('base_flood_elevation', zone.bfe, F, fv, 'medium');
   } else if (zone && zone.none) unavailable.push({ key: 'flood_zone', reason: 'FEMA returned no mapped flood zone at this point (the area may be unmapped).', next: 'Check the FEMA Flood Map Service Center for the parcel.' });
   else unavailable.push({ key: 'flood_zone', reason: 'The FEMA flood service did not answer.', next: 'Try again later or check the FEMA Flood Map Service Center.' });
   if (panel) put('firm_panel', `${panel.panel}${panel.effective ? ', effective ' + panel.effective : ''}`, F, fv, 'medium');
-  if (elev != null) put('ground_elevation', `${elev} ft (NAVD 88), at the geocoded point`, SOURCES.usgs.name, usgsUrl(lat, lng), 'medium', 'From 3DEP terrain data; not a survey.');
+  if (elev != null) put('ground_elevation', `${elev} ft (NAVD 88), at ${from === 'parcel' ? 'a point inside the parcel' : 'the geocoded point'}`, SOURCES.usgs.name, usgsUrl(lat, lng), 'medium', 'From 3DEP terrain data; not a survey.');
   else unavailable.push({ key: 'ground_elevation', reason: 'The USGS elevation service did not answer.', next: 'Use a survey or try again later.' });
 
   const sun = solarSummary(lat); const su = SOURCES.sun.home;
   put('solar_summer', sun.summer, SOURCES.sun.name, su, 'high'); put('solar_winter', sun.winter, SOURCES.sun.name, su, 'high');
 
-  // No national public source for these: say so instead of guessing.
+  // Anything the jurisdiction layer did not answer (or no jurisdiction covers this place): say so instead of guessing.
   const where = geo.county ? `${geo.county}${geo.stateName ? ', ' + geo.stateName : ''}` : 'this jurisdiction';
+  const covered = J ? '' : ` DrawUp covers: ${COVERAGE_TEXT}.`;
   for (const [key, what] of [['parcel_id', 'parcel records'], ['property_boundary', 'parcel boundaries'], ['site_area', 'parcel area'], ['zoning_district', 'zoning'], ['setbacks', 'setbacks'], ['height_limit', 'height limits'], ['land_use', 'land-use restrictions']] as const)
-    unavailable.push({ key, reason: `DrawUp has no connected ${what} source for ${where} yet.`, next: key === 'property_boundary' || key === 'site_area' ? 'Upload a survey or the county GIS parcel report, then enter it.' : 'Check the zoning ordinance or the city/county GIS, then enter it here.' });
+    if (!fields[key] && !unavailable.some(u => u.key === key)) unavailable.push({ key, reason: J ? `The ${what} lookup for ${where} returned nothing.` : `DrawUp has no connected ${what} source for ${where} yet.${covered}`, next: key === 'property_boundary' || key === 'site_area' ? 'Upload a survey or the county GIS parcel report, then enter it.' : 'Check the zoning ordinance or the city/county GIS, then enter it here.' });
   unavailable.push({ key: 'code_edition', reason: 'The adopted building code edition is not looked up automatically.', next: 'Confirm the adopted edition and local amendments with the AHJ (the ICC adoption map is a starting point).' });
 
-  return { fields, site: { lat, lng, boundary: null }, sources, unavailable, at };
+  const site: SiteInfo = { lat, lng, from, boundary: parcel?.rings?.length ? parcel.rings : null, ...(J ? { jurisdiction: J.id } : {}) };
+  if (parcel) { const { rings: _r, ...rest } = parcel; site.parcel = rest; }
+  if (zres && zres.zoning) site.zoning = zres.zoning;
+  if (zres && zres.vicinity) site.vicinity = zres.vicinity;
+  return { fields, site, sources, unavailable, at };
 }
 
 /** Merge a lookup into saved fields without overwriting anything a member entered or verified. */
