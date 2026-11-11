@@ -1,6 +1,6 @@
 # DrawUp Season 1 — files, run order and what still needs doing (v30)
 
-Branch: **`migration`**. Nothing has been merged into `main` and nothing has been deployed.
+Branch: **`migration`**, merged into `main` on 2026-11-11 at the member's request. Run the SQL below in Supabase right after the deploy.
 Preview page: `public/drawup-preview.html` on `migration` (the whole product UI, hash-routed).
 
 Season 1 is pre-design → schematic design → DD preparation. Season 2 work (Details) is hidden, never
@@ -167,4 +167,4 @@ Supabase stand-in and, where a route is involved, the real route code.
 8. **DD Readiness is advisory.** It measures how much of a checklist of your own records is in place. It is
    not a prediction, a grade, or any kind of approval, and it says that on screen and in the exported PDF.
 9. **Seals and signatures are images, not digital certificates.** A placed seal is a picture with the name and date the person applied it; it is not a cryptographic (PKI) digital signature, and jurisdictions that require one need it applied in a signing tool after export. Seals on drawing sheets are not covered yet; the title block still has an empty Seal box.
-10. **Nothing is deployed.** Merging to `main` and deploying is waiting on your explicit go-ahead.
+10. **Merged to `main` on 2026-11-11.** Run SQL 0076–0078 in Supabase (section 1) so Project Information, Document Studio and CheckUp reviews can save. Check one live site lookup, one AI spec draft and the public GIS lookups once it is live.
