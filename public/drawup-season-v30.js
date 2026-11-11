@@ -36,7 +36,7 @@
   const previewOn = () => get(sessionStorage, SS_PREVIEW) === '1';
   const flags = () => ({ season2Details: !!(serverFlags.season2Details || devOn() || previewOn()) });
 
-  const listeners = [];
+  const listeners = [f => publicGate(f)];
   function apply() {
     const f = flags();
     root.classList.toggle('du-s1', !f.season2Details);
@@ -189,6 +189,34 @@
     const kept = w.querySelector('#dus2-kept'), n = await savedCounts(c);
     if (kept && n) { kept.hidden = false; kept.textContent = `Your ${n} saved detail${n === 1 ? ' is' : 's are'} kept and will be here in Season 2.`; }
     const pv = w.querySelector('#dus2-preview'); if (pv) pv.onclick = () => { preview(true); c.openPortalTab('details'); };
+  }
+
+  /* The public Details page (marketing side) shows the same Season 2 screen in Season 1: its own content stays in
+   * the page, blurred and inert underneath, and comes back as it was when Season 2 Details is turned on. */
+  function publicGate(f) {
+    const pg = document.getElementById('page-details'); if (!pg) return;
+    const on = !f.season2Details, has = pg.classList.contains('dus2-pub');
+    if (on && !has) {
+      const under = document.createElement('div'); under.className = 'dus2-pubreal'; under.setAttribute('inert', ''); under.setAttribute('aria-hidden', 'true');
+      while (pg.firstChild) under.appendChild(pg.firstChild);
+      pg.classList.add('dus2-pub');
+      pg.innerHTML = `<section class="dus2" aria-labelledby="dus2-pub-title"><div class="dus2-under"></div><div class="dus2-glass"></div>
+        <div class="dus2-msg">
+          <div class="dus2-tile">${svg('layers')}</div>
+          <h1 id="dus2-pub-title">Details</h1>
+          <p class="dus2-kicker"><span></span>COMING IN SEASON 2<span></span></p>
+          <p class="dus2-lead">Advanced construction detailing, 3D assemblies, and technical documentation are coming in Season 2.</p>
+          <ul class="dus2-tools" aria-label="Included in Season 2"><li>${svg('draw')}Draw a Detail</li><li>${svg('cube')}3D Details</li><li>${svg('table')}Details Table</li><li>${svg('layers')}Detail Library</li></ul>
+          <p class="dus2-pill">SEASON 2</p>
+          <p class="dus2-sub">DESIGN DEVELOPMENT + CONSTRUCTION DOCUMENTATION</p>
+          <p class="dus2-s1">Season 1 is here now: project information, drawings, specifications, documents and CheckUp, from pre-design through DD preparation.</p>
+          <div class="dus2-acts"><a class="dus2-btn" href="#products" data-page="products">See Season 1</a><a class="dus2-btn ghost" href="#check" data-page="check">Explore CheckUp</a></div>
+        </div></section>`;
+      pg.querySelector('.dus2-under').appendChild(under);
+    } else if (!on && has) {
+      const under = pg.querySelector('.dus2-pubreal'); const kids = under ? [...under.childNodes] : [];
+      pg.innerHTML = ''; kids.forEach(k => pg.appendChild(k)); pg.classList.remove('dus2-pub');
+    }
   }
 
   function registerGate(n) {

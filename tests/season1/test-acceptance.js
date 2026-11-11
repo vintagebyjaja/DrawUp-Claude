@@ -203,7 +203,7 @@ const rec = (n, name, state, note) => { T.push({ n, name, state, note: note || '
     const reg = await p.evaluate(async () => { const r = await fetch('/api/features'); return r.ok ? await r.json() : null; });
     await go('#portal/details', 'details', 4000);
     const rows2 = JSON.stringify((await db('details')).concat(await db('draw_details')));
-    const under = await p.evaluate(() => { const real = document.querySelector('#dus2-real'); const box = document.querySelector('.dus2-under'); return { present: !!real, children: real ? real.children.length : 0, inert: !!(box && box.hasAttribute('inert')), blurred: real ? /blur/.test(getComputedStyle(real).filter || '') : false }; });
+    const under = await p.evaluate(() => { const real = document.querySelector('#du-portal #dus2-real'); const box = document.querySelector('#du-portal .dus2-under'); return { present: !!real, children: real ? real.children.length : 0, inert: !!(box && box.hasAttribute('inert')), blurred: real ? /blur/.test(getComputedStyle(real).filter || '') : false }; });
     rec(11, 'Confirm Details functionality and its data are preserved',
       rows === rows2 && files.length >= 2 && under.present && under.inert ? 'pass' : 'fail',
       `${files.join(', ')} still loaded; the real workspace renders under the screen${under.inert ? ', marked inert' : ', NOT inert'}${under.blurred ? ' and blurred' : ''}; detail rows ${rows === rows2 ? 'unchanged' : 'CHANGED: ' + rows2.slice(0, 160)}`);
@@ -212,13 +212,13 @@ const rec = (n, name, state, note) => { T.push({ n, name, state, note: note || '
   // 12 ---------------------------------------------------------------- Season 1 members see the Season 2 screen
   try {
     const seen = await p.evaluate(() => {
-      const w = document.querySelector('.dus2'); if (!w) return null;
-      const glass = document.querySelector('.dus2-glass');
-      return { title: (w.querySelector('#dus2-title') || {}).textContent, pill: /SEASON 2/.test(w.textContent), line: /Advanced construction detailing/.test(w.textContent), glass: !!glass && /blur/.test(getComputedStyle(glass).backdropFilter || getComputedStyle(glass).webkitBackdropFilter || ''), tab: !!document.querySelector('[data-portal-tab="details"]'), kept: /saved detail/.test(w.textContent) };
+      const w = document.querySelector('#du-portal .dus2'); if (!w) return null;
+      const glass = w.querySelector('.dus2-glass');
+      return { title: (w.querySelector('#dus2-title') || {}).textContent, pill: /SEASON 2/.test(w.textContent), line: /Advanced construction detailing/.test(w.textContent), glass: !!glass && /blur/.test(getComputedStyle(glass).backdropFilter || getComputedStyle(glass).webkitBackdropFilter || ''), tab: (() => { const b = document.querySelector('#dus-pnav .dus-link[data-cat="details"]'); return !!b && getComputedStyle(b).display === 'none'; })(), kept: /saved detail/.test(w.textContent) };
     });
-    rec(12, 'A Season 1 member sees the blurred Details screen, with the tab still there',
+    rec(12, 'A Season 1 member sees the blurred Details screen; Details is off the main menu but kept',
       seen && /DETAILS/i.test(seen.title || '') && seen.pill && seen.line && seen.tab && seen.kept ? 'pass' : 'fail',
-      seen ? `"${(seen.title || '').trim()}", the Season 2 line, the frosted overlay${seen.glass ? ' (blurred)' : ''}, the tab still in the menu, and a note that saved details are kept` : 'screen not shown');
+      seen ? `"${(seen.title || '').trim()}", the Season 2 line, the frosted overlay${seen.glass ? ' (blurred)' : ''}, Details hidden from the main menu (kept in the code, reached by any Details link), and a note that saved details are kept` : 'screen not shown');
     await t.shot('acc-12-details-season2');
   } catch (e) { rec(12, 'A Season 1 member sees the blurred Details screen', 'fail', e.message); }
 

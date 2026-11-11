@@ -10,6 +10,12 @@ html.du-s1 .du-dit24 [data-work],      /* Draw it up › work on a needed detail
 html.du-s1 .du-dit24 [data-lib],       /* Draw it up › open the Details library */
 html.du-s1 .dus-pop__item[data-dus-go*='"tab":"details"'],
 html.du-s1 .vdi27-card { display: none !important; }  /* Visual Detail Intelligence: a Season 2 Details tool */
+/* Details is not in the Season 1 main menu (desktop bar, mobile sheet, legacy portal tabs). Links elsewhere that
+   point to Details still open the Season 2 screen. */
+html.du-s1 #dus-pnav .dus-link[data-cat="details"],
+html.du-s1 .dus-sheet__direct[data-dus-go*='"tab":"details"'],
+html.du-s1 #du-portal-tabs [data-portal-tab="details"],
+html.du-s1 .du-side [data-portal-tab="details"] { display: none !important; }
 
 /* ---------------------------------------------------------------- the Season 2 Details screen */
 .dus2 {
@@ -74,3 +80,13 @@ html.dus #du-portal #du-workspace-content:has(> .dus2) { max-width: none; paddin
   .dus2-sub { font-size: 11px; letter-spacing: .16em; line-height: 1.6; }
 }
 @media (prefers-reduced-motion: reduce) { .dus2-real { transform: none; } }
+
+/* ---------------------------------------------------------------- the public Details page in Season 1 */
+#page-details.dus2-pub { position: relative; padding: 0 !important; }
+.dus2-pub > .dus2 { min-height: 100vh; }
+.dus2-pub .dus2-under { display: block; }
+.dus2-pub .dus2-pubreal { position: absolute; inset: 0; overflow: hidden; filter: blur(9px) saturate(.7) brightness(.5); transform: scale(1.02); pointer-events: none; user-select: none; }
+.dus2-pub .dus2-msg h1 { margin: 22px 0 6px; font: 600 clamp(44px, 6vw, 64px)/1 'Inter Tight', Inter, sans-serif; color: #fff; }
+.dus2-pub .dus2-kicker { color: var(--gold); }
+.dus2-pub .dus2-pill { color: var(--gold2); }
+.dus2-pub .dus2-s1 { margin: 26px 0 0; max-width: 620px; font-size: 15px; line-height: 1.55; color: #cfe0ff; }
