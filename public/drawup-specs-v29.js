@@ -181,6 +181,7 @@ async function mountSpecs(body, c, firm, opts) {
   S.admin = S.admin || S.roles[S.me] === 'admin' || isPersonal(S);
   if (opts && opts.hooks) S.hooks = opts.hooks;
   if (opts && opts.onState) opts.onState(S);
+  window.DrawUpSpecs._current = S; // v30: the open workspace, for AI drafting
   const params = new URLSearchParams((location.hash.split('?')[1]) || ''); let openId = params.get('doc');
   try { const k = sessionStorage.getItem('du-specs-open'); if (k) { openId = k; sessionStorage.removeItem('du-specs-open'); } } catch (_e) { /* private mode */ }
   const want = openId && S.docs.find(d => d.id === openId);
@@ -291,7 +292,7 @@ function openEditor(S, doc) {
       <label class="sp-mini"><span>Project</span><select data-top="project"><option value="">No project</option>${S.projects.map(x => `<option value="${x.id}" ${x.id === doc.project_thread_id ? 'selected' : ''}>${esc(x.project_name)}</option>`).join('')}</select></label>
       <label class="sp-mini"><span>Format</span><select data-top="format"><option value="">DrawUp format</option>${S.formats.map(f => `<option value="${f.id}" ${f.id === doc.format_id ? 'selected' : ''}>${f.kind === 'firm' ? 'Firm standard: ' + esc(f.name) : 'Client: ' + esc(f.client_name || f.name)}</option>`).join('')}</select></label>
       <label class="sp-mini"><span>Status</span><select data-top="status">${DOC_STATUS.map(([k, l]) => `<option value="${k}" ${k === doc.status ? 'selected' : ''}>${l}</option>`).join('')}</select></label>
-      ${(S.hooks && S.hooks.topHTML) ? S.hooks.topHTML(doc, S) : ''}<button class="du-btn ghost" type="button" data-side="data">Project data</button><button class="du-btn primary" type="button" data-side="preview">Preview &amp; export</button>
+      ${(S.hooks && S.hooks.topHTML) ? S.hooks.topHTML(doc, S) : ''}${doc.kind === 'spec' && window.DrawUpSpecsAI ? '<button class="du-btn ghost" type="button" data-sp-ai>Draft with AI</button>' : ''}<button class="du-btn ghost" type="button" data-side="data">Project data</button><button class="du-btn primary" type="button" data-side="preview">Preview &amp; export</button>
       <button class="du-btn ghost sp-more" type="button" aria-label="More" data-more>⋯</button>
     </div></div>
   <div class="sp-conflict" hidden></div>
@@ -305,6 +306,7 @@ function openEditor(S, doc) {
   b.querySelectorAll('[data-side]').forEach(x => x.onclick = () => S.side === x.dataset.side ? closeSide(S) : openSide(S, x.dataset.side));
   b.querySelector('[data-more]').onclick = e => moreMenu(S, e.currentTarget);
   if (S.hooks && S.hooks.bindTop) S.hooks.bindTop(b, doc, S);
+  { const ai = b.querySelector('[data-sp-ai]'); if (ai) ai.onclick = () => window.DrawUpSpecsAI.open(S); } // v30 AI drafting
   if (doc.project_thread_id) Promise.all([brief(S, doc.project_thread_id), intelFor(S, doc.project_thread_id)]).then(() => { if (S.doc === doc) { redraw(S); if (S.side) openSide(S, S.side); } }).catch(() => null);
   redraw(S); if (S.side) openSide(S, S.side);
 }
@@ -414,7 +416,7 @@ function renderSection(S) {
   <div class="sp-sheet">
     <div class="sp-tools-bar" role="toolbar" aria-label="Insert"><button type="button" data-ins="blank" title="Insert a blank to fill in">＋ Blank</button><button type="button" data-ins="opt" title="Insert a choice">＋ Choice</button><button type="button" data-ins="data" title="Insert project data">＋ Project data</button><span class="sp-sep"></span><button type="button" data-tb="changes" class="${S.showChanges ? 'on' : ''}">${S.showChanges ? 'Hide changes' : 'Show changes'}</button><button type="button" data-tb="expand">Expand all</button></div>
     <h2 class="sp-sec-title">${esc(s.number)} - ${esc(String(s.title).toUpperCase())}</h2>
-    <div class="sp-secmeta"><label><b>State:</b><select data-sm="state">${SEC_STATES.map(([k, l]) => `<option value="${k}" ${s.state === k ? 'selected' : ''}>${l}</option>`).join('')}</select></label><span class="sp-bar">|</span><label><b>Assigned to:</b><select data-sm="assigned"><option value="">Nobody</option>${S.members.map(mb => `<option value="${mb.id}" ${s.assigned === mb.id ? 'selected' : ''}>${esc(mb.name)}</option>`).join('')}</select></label><span class="sp-bar">|</span><span class="sp-openn ${n ? 'has' : ''}"><b>Open items:</b> ${n}</span>${s.imported ? `<span class="sp-bar">|</span><span class="sp-note">Imported from ${esc(s.imported)}</span>` : ''}</div>
+    <div class="sp-secmeta"><label><b>State:</b><select data-sm="state">${SEC_STATES.map(([k, l]) => `<option value="${k}" ${s.state === k ? 'selected' : ''}>${l}</option>`).join('')}</select></label><span class="sp-bar">|</span><label><b>Assigned to:</b><select data-sm="assigned"><option value="">Nobody</option>${S.members.map(mb => `<option value="${mb.id}" ${s.assigned === mb.id ? 'selected' : ''}>${esc(mb.name)}</option>`).join('')}</select></label><span class="sp-bar">|</span><span class="sp-openn ${n ? 'has' : ''}"><b>Open items:</b> ${n}</span>${s.imported ? `<span class="sp-bar">|</span><span class="sp-note">Imported from ${esc(s.imported)}</span>` : ''}${s.ai ? `<span class="sp-bar">|</span><span class="sp-note sp-ai-note">AI draft, ${esc(day(s.ai.at))}: review every line before it is issued</span>` : ''}</div>
     ${doc.outline && part !== 2 ? '<p class="sp-note">Outline specifications usually carry Part 2 only. Add articles here if this project needs them.</p>' : ''}
     <div class="sp-arts">${arts.map((a, ai) => artHTML(S, a, part + '.' + (ai + 1), ctx, fmt)).join('')}</div>
     <button type="button" class="du-btn ghost sp-add-art" data-addart>＋ Add article</button>
@@ -737,5 +739,5 @@ function register() {
   return true;
 }
 if (!register()) document.addEventListener('DOMContentLoaded', register);
-window.DrawUpSpecs = { mount: mountSpecs, _intelFor: intelFor, _projectData: projectData, _openEditor: openEditor, _createDoc: createDoc, _modal: modal, _TYPE: () => TYPE, makeSection, newDocument: newDocumentFromCheck, _stateOf: stateOf, _richHTML: richHTML, _serialize: serialize, _dirty: dirty, _flush: flush, _renderHub: renderHub, _newDocModal: newDocModal };
+window.DrawUpSpecs = { mount: mountSpecs, _intelFor: intelFor, _projectData: projectData, _openEditor: openEditor, _createDoc: createDoc, _modal: modal, _TYPE: () => TYPE, makeSection, newDocument: newDocumentFromCheck, _stateOf: stateOf, _richHTML: richHTML, _serialize: serialize, _dirty: dirty, _flush: flush, _renderHub: renderHub, _newDocModal: newDocModal, _redraw: redraw, _ctxFor: ctxFor };
 })();
