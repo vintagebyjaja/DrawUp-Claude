@@ -108,7 +108,7 @@
       createSignedUrl: async p => ({ data: { signedUrl: /^(https?:|\/)/.test(p) ? p : '/__mock/' + p }, error: null }),
       createSignedUrls: async ps => ({ data: ps.map(p => ({ path: p, signedUrl: /^(https?:|\/)/.test(p) ? p : '/__mock/' + p })), error: null }),
       getPublicUrl: p => ({ data: { publicUrl: '/__mock/' + p } }),
-      upload: async p => ({ data: { path: p }, error: null }), download: async () => ({ data: new Blob([]), error: null }), remove: async () => ({ data: [], error: null }), list: async () => ({ data: [], error: null })
+      upload: async p => ({ data: { path: p }, error: null }), download: async p => { const f = MOCK.files && MOCK.files[b + '/' + p]; if (f) return { data: new Blob([Uint8Array.from(atob(f), ch => ch.charCodeAt(0))], { type: 'application/pdf' }), error: null }; return { data: new Blob([]), error: null }; }, remove: async () => ({ data: [], error: null }), list: async () => ({ data: [], error: null })
     }) },
     channel: () => { const ch = { on: () => ch, subscribe: () => ch, unsubscribe: () => {}, send: () => {} }; return ch; },
     removeChannel: () => {}, functions: { invoke: async () => ({ data: null, error: null }) }

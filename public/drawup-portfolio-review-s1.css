@@ -157,3 +157,13 @@ html.dus .dpr-dash .dus-kicker{color:var(--dus-cyan,#55D8FF)!important}
 .dpr-dash__go{display:inline-flex;align-items:center;gap:8px;background:#fff;color:var(--dus-navy,#081729);border-radius:999px;padding:11px 18px;font:600 14px var(--dus-font,sans-serif);white-space:nowrap}
 .dpr-dash__go svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
 @media (max-width:900px){.dpr-dash{grid-template-columns:1fr;gap:12px;padding:18px}.dpr-dash__art{height:84px}.dpr-dash__go{justify-self:start}}
+/* v30: review a PDF already in DrawUp */
+.dpr-have{margin:14px 0 4px;border:1px solid var(--du-line,#dfe3ea);border-radius:14px;padding:10px 14px;background:var(--du-card,#fff)}
+.dpr-have summary{cursor:pointer;font-weight:650}
+.dpr-have summary small{margin-left:6px;padding:1px 8px;border-radius:99px;background:#eef2f8;font-weight:600}
+.dpr-have-g h3{font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:#5b6577;margin:12px 0 6px}
+.dpr-have-i{color:var(--dpr-ink,#1b2430);display:flex;flex-direction:column;align-items:flex-start;width:100%;text-align:left;padding:8px 10px;border:1px solid transparent;border-radius:10px;background:none;cursor:pointer;font:inherit}
+.dpr-have-i:hover,.dpr-have-i:focus-visible{border-color:#c9d3e3;background:#f6f8fc}
+.dpr-have-i b{color:inherit;font-size:14.5px}
+.dpr-have-i small{color:#667085}
+.dpr-have-st{margin:6px 0 0;color:#5b6577}

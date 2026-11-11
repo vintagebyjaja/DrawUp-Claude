@@ -493,7 +493,7 @@ function makeDeck(c,firm,spec0,tplName){
   <label class="fk-wide"><span>Date</span><input id="fkm-date" value="${esc(today)}"></label>
   <label class="fk-wide"><span>Slides: first line is the slide title, the next lines are bullet points. Leave a blank line between slides.</span><textarea id="fkm-slides" rows="8">Agenda\nIntroductions\nProject goals\nSchedule\n\nSchedule and next steps\nDesign development review\nConsultant coordination\nOwner sign-off</textarea></label>
   <div class="fk-thumbstrip"></div><p class="fk-warn" hidden></p>
-  <div class="fk-savebar"><button type="button" class="du-btn primary" data-fkm="pptx">Download PowerPoint (.pptx)</button><button type="button" class="du-btn ghost" data-fkm="pdf">Download PDF</button><span class="fk-st" role="status"></span></div></div></div>`);
+  <div class="fk-savebar"><button type="button" class="du-btn primary" data-fkm="pptx">Download PowerPoint (.pptx)</button><button type="button" class="du-btn ghost" data-fkm="pdf">Download PDF</button>${window.DrawUpPortfolio?'<button type="button" class="du-btn ghost" data-fkm="review">Review in Portfolio Review</button>':''}<span class="fk-st" role="status"></span></div></div></div>`);
   const m=document.getElementById('fk-modal');const v=id=>m.querySelector('#'+id).value;let ctx=null;
   m.querySelector('.fk-x').onclick=()=>m.remove();m.onclick=e=>{if(e.target===m)m.remove();};
   const deck=()=>deckFromText(v('fkm-title'),v('fkm-slides'));
@@ -503,6 +503,7 @@ function makeDeck(c,firm,spec0,tplName){
   buildCtx(c,firm,spec,base()).then(x=>{ctx=x;thumbs();});
   m.querySelectorAll('[data-fkm]').forEach(b=>b.onclick=async()=>{const st=m.querySelector('.fk-st');const kind=b.dataset.fkm;st.textContent='Building '+(kind==='pdf'?'PDF':'PowerPoint')+'…';
     try{if(!ctx)ctx=await buildCtx(c,firm,spec,base());Object.assign(ctx,base());const d=deck().map(s=>s.kind==='title'?{...s,subtitle:ctx.project}:s);
+      if(kind==='review'){const pdf=await exportPdf(spec,ctx,d);const f=new File([pdf],slug(ctx.title)+'.pdf',{type:'application/pdf'});m.remove();window.DrawUpPortfolio.open({file:f});return;}
       const bytes=kind==='pdf'?await exportPdf(spec,ctx,d):await exportPptx(spec,ctx,d);
       download(bytes,slug(ctx.title)+(kind==='pdf'?'.pdf':'.pptx'),kind==='pdf'?'application/pdf':PPTX_MIME);st.textContent=(kind==='pdf'?'PDF':'PowerPoint')+' ready: '+d.length+' slides.';}
     catch(e){st.textContent='Could not build it: '+(e.message||e);}});

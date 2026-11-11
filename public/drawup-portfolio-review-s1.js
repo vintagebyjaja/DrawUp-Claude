@@ -94,6 +94,7 @@
       <section class="dpr-card" id="dpr-new" aria-label="New portfolio review">
         <div class="dpr-step"><span>1</span><div><h2>Upload your portfolio</h2><p>PDF only, up to 50 MB. Your original file is kept exactly as you uploaded it.</p></div></div>
         <label class="dpr-drop" id="dpr-drop"><input type="file" accept="application/pdf,.pdf" id="dpr-file"><strong>Choose a PDF or drop it here</strong><span id="dpr-file-name">No file chosen</span></label>
+        <div id="dpr-have"></div>
         <div id="dpr-draft"></div>
       </section>
       <section class="dpr-card" aria-label="Your portfolio reviews"><div class="dpr-row"><h2>Your reviews</h2></div><div id="dpr-list" class="dpr-list"><p class="dpr-muted">Loading…</p></div></section>
@@ -105,6 +106,7 @@
     drop.ondragleave = () => drop.classList.remove('is-over');
     drop.ondrop = e => { e.preventDefault(); drop.classList.remove('is-over'); const f = e.dataTransfer.files[0]; if (f) choose(w, f, cfg); };
     listReviews(w);
+    if (window.DrawUpPortfolioSources) window.DrawUpPortfolioSources.mount($q(w, '#dpr-have'), ctx, f => choose(w, f, cfg));
     if (file) choose(w, file, cfg);
   }
 
