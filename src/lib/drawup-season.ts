@@ -74,7 +74,7 @@ export const FEATURES: SeasonFeature[] = [
 
   // ---------------------------------------------------------------- Season 1: Phase A, pre-design
   { id: 'project-brief', name: 'Project intake and brief', season: 1, phase: 'pre-design', status: 'live', where: 'Projects › Start a new project', code: ['public/drawup-portal-v17.js', 'public/drawup-project-studio-v22.js'], tables: ['project_threads'] },
-  { id: 'project-info', name: 'Project Information and site data (with sources)', season: 1, phase: 'pre-design', status: 'building', where: 'Projects › Project Information', code: [], note: 'Season 1 restructure, stage 2.' },
+  { id: 'project-info', name: 'Project Information and site data (with sources)', season: 1, phase: 'pre-design', status: 'live', where: 'Projects › Project Information', code: ['public/drawup-project-intel-v30.js', 'src/lib/drawup-project-intel.ts'], api: ['/api/project-intel'], tables: ['project_profiles', 'project_profile_changes'] },
   { id: 'project-map', name: 'Project map', season: 1, phase: 'pre-design', status: 'live', where: 'Firm › DrawUp Specs › Map', code: ['public/drawup-specs-v29.js'], tables: ['project_threads', 'firm_project_info'] },
   { id: 'site-photos', name: 'Existing conditions and site photos', season: 1, phase: 'pre-design', status: 'live', where: 'Projects › project › files; AI Team attachments', code: ['public/drawup-project-studio-v22.js'] },
 
@@ -92,12 +92,15 @@ export const FEATURES: SeasonFeature[] = [
   // ---------------------------------------------------------------- Phase D, DD preparation
   { id: 'specs', name: 'DrawUp Specs (outline and preliminary specifications, project documents)', season: 1, phase: 'dd-prep', status: 'live', where: 'Firm › DrawUp Specs', code: ['public/drawup-specs-v29.js', 'public/drawup-specs-data-v29.js', 'public/drawup-specs-export-v29.js'], tables: ['firm_documents', 'firm_spec_formats', 'firm_project_info'] },
   { id: 'presentations', name: 'Presentation builder', season: 1, phase: 'dd-prep', status: 'live', where: 'Firm › GM Presentation', code: ['public/drawup-playbook-v21.js', 'public/drawup-firmkit-v22.js'] },
-  { id: 'dd-readiness', name: 'DD Readiness review and handoff', season: 1, phase: 'dd-prep', status: 'building', where: 'CheckUp › DD Readiness', code: [], note: 'Season 1 restructure, stage 4.' },
+  { id: 'dd-readiness', name: 'DD Readiness review and handoff', season: 1, phase: 'dd-prep', status: 'live', where: 'CheckUp › DD Readiness', code: ['public/drawup-checkup-v30.js'], tables: ['spec_reviews'] },
+  { id: 'documents', name: 'Document Studio (letters, reports, CA/CM/QA-QC/PM documents, versions, imports)', season: 1, phase: 'dd-prep', status: 'live', where: 'Projects › Documents', code: ['public/drawup-docstudio-v30.js'], tables: ['project_documents', 'document_versions', 'document_imports'] },
+  { id: 'spec-ai', name: 'AI specification drafting (preliminary sections, reviewed before they are added)', season: 1, phase: 'dd-prep', status: 'live', where: 'Specifications › Draft with AI', code: ['public/drawup-specs-ai-v30.js', 'src/lib/drawup-spec-draft.ts'], api: ['/api/specs/draft'] },
+  { id: 'pm-tracker', name: 'Project tracker (RFIs, submittals, change orders, punch lists, QA/QC)', season: 1, phase: 'dd-prep', status: 'live', where: 'Projects › Project Management', code: ['public/drawup-pm-tracker-v30.js'], tables: ['project_documents'] },
 
   // ---------------------------------------------------------------- CheckUp
   { id: 'checkup', name: 'CheckUp: code, ADA, life safety, drawing review, narratives', season: 1, phase: 'checkup', status: 'live', where: 'CheckUp', code: ['public/drawup-check-v22.js', 'public/drawup-check-quick-v23.js', 'src/lib/drawup-check-core.ts'], api: ['/api/check', '/api/check/quick'], tables: ['check_reviews'] },
-  { id: 'portfolio-review', name: 'Portfolio Review', season: 1, phase: 'checkup', status: 'live', where: 'CheckUp › Portfolio Review; Discover › Portfolio Review', code: ['public/drawup-portfolio-review-s1.js', 'src/lib/drawup-portfolio.ts'], api: ['/api/portfolio'], tables: ['portfolio_reviews'] },
-  { id: 'specs-review', name: 'Specifications Review', season: 1, phase: 'checkup', status: 'building', where: 'CheckUp › Specifications Review', code: [], note: 'Season 1 restructure, stage 4.' },
+  { id: 'portfolio-review', name: 'Portfolio Review', season: 1, phase: 'checkup', status: 'live', where: 'CheckUp › Portfolio Review; Discover › Portfolio Review', code: ['public/drawup-portfolio-review-s1.js', 'public/drawup-portfolio-sources-v30.js', 'src/lib/drawup-portfolio.ts'], api: ['/api/portfolio'], tables: ['portfolio_reviews'] },
+  { id: 'specs-review', name: 'Specifications Review', season: 1, phase: 'checkup', status: 'live', where: 'CheckUp › Specifications Review', code: ['public/drawup-checkup-v30.js'], tables: ['spec_reviews'] },
 ];
 
 export const season2Features = () => FEATURES.filter(f => f.season === 2);

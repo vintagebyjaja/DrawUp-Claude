@@ -188,7 +188,7 @@
   /* ------------------------------------------------------------------ the tab */
   async function render(w, c) {
     const q = new URLSearchParams((location.hash.split('?')[1]) || '');
-    ST = { w, c, project: q.get('project') || '', openId: q.get('doc') || '', group: q.get('group') || '', start: q.get('new') === '1' };
+    ST = { w, c, project: q.get('project') || '', openId: q.get('doc') || '', group: q.get('group') || '', start: q.get('new') === '1', type: q.get('type') || '' };
     w.innerHTML = '<div class="du-loading">LOADING DOCUMENTS…</div>';
     if (!window.DrawUpSpecs || !window.DrawUpSpecsData) { w.innerHTML = '<article class="du-glass"><h2>Document Studio could not load.</h2><p class="du-muted">The DrawUp Specs files are missing from this build.</p></article>'; return; }
     const host = document.createElement('div'); host.className = 'dds-host';
@@ -204,7 +204,7 @@
       },
     }).catch(e => { host.innerHTML = `<article class="du-glass"><h2>Documents could not open.</h2><p class="du-muted">${esc(e.message || e)}</p></article>`; });
     decorate(host);
-    if (ST.start && ST.S) { ST.start = false; Specs()._newDocModal(ST.S, { project: ST.project || '' }); }
+    if (ST.start && ST.S) { ST.start = false; Specs()._newDocModal(ST.S, { project: ST.project || '', type: ST.type || undefined }); }
   }
   /** Document Studio's own wording and buttons on the hub the Specs app rendered. */
   function decorate(host) {

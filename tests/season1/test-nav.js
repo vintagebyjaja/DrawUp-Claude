@@ -22,7 +22,7 @@ const COLS = p => p.evaluate(() => {
   C.ok(pr.some(c => c.h === 'More' && c.items.some(i => /Drawing Sets/.test(i[0])) && c.items.some(i => /DrawUp Ready/.test(i[0]))),
     'Projects: what the menu had before is kept under More', JSON.stringify(pr.map(c => c.h)));
   C.ok(pr.some(c => c.recent), 'Projects: the Recent projects column is still there');
-  C.ok(/project-info\?view=map/.test(pr[0].items[1][1]) && /"tab":"documents"/.test(pr[0].items[3][1]) && /pane=specs/.test(pr[0].items[4][1]) && /group=PM/.test(pr[0].items[5][1]),
+  C.ok(/project-info\?view=map/.test(pr[0].items[1][1]) && /"tab":"documents"/.test(pr[0].items[3][1]) && /pane=specs/.test(pr[0].items[4][1]) && /"tab":"tracker"/.test(pr[0].items[5][1]),
     'Projects: each item points at its own screen');
 
   // ---------------------------------------------------------------- CheckUp and Results
@@ -52,10 +52,11 @@ const COLS = p => p.evaluate(() => {
   C.ok(!lost.length, 'No menu item was dropped except the Season 2 Details ones', lost.join(', '));
 
   // ---------------------------------------------------------------- the destinations open
-  await p.evaluate(() => window.DrawUpStudio.go({ tab: 'documents', hash: '#portal/documents?group=PM' }));
+  await p.evaluate(() => { const c = window.DrawUpStudio._nav.PORTAL_NAV.find(x => x.id === 'projects'); const it = c.cols[0].items.find(i => i[0] === 'Project Management'); window.DrawUpStudio.go(it[1]); });
   await p.waitForTimeout(4000);
-  C.ok(await p.evaluate(() => /#portal\/documents/.test(location.hash) && !!document.querySelector('.sp-head')), 'Projects › Project Management opens Documents', await p.evaluate(() => location.hash));
-  C.ok(await p.evaluate(() => (window.__ddsS || {}).filter && window.__ddsS.filter.group === 'PM'), 'It opens on the project management documents');
+  C.ok(await p.evaluate(() => /#portal\/tracker/.test(location.hash) && !!document.querySelector('.pmt')), 'Projects › Project Management opens the project tracker', await p.evaluate(() => location.hash));
+  await p.evaluate(() => window.DrawUpStudio.go({ tab: 'documents', hash: '#portal/documents?group=PM' })); await p.waitForTimeout(3000);
+  C.ok(await p.evaluate(() => (window.__ddsS || {}).filter && window.__ddsS.filter.group === 'PM'), 'Documents still opens on the project management group with ?group=PM');
   await p.evaluate(() => window.DrawUpStudio.go({ tab: 'documents', hash: '#portal/documents?new=1' }));
   await p.waitForTimeout(4000);
   C.ok(!!await p.$('#spn-title'), 'Firm › Document Templates opens the template picker');

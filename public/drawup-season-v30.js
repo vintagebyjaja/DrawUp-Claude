@@ -93,7 +93,7 @@
         ['Project Information', T('project-info'), 'Site, zoning, program, team, decisions and files'],
         ['Documents', T('documents'), 'Letters, reports, minutes, RFIs and narratives'],
         ['Specifications', T('firm', { hash: '#portal/firm?pane=specs' }), 'Project manuals and outline specs'],
-        ['Project Management', T('documents', { hash: '#portal/documents?group=PM' }), 'Kickoff agendas, transmittals and meeting minutes'],
+        ['Project Management', T('tracker'), 'RFIs, submittals, change orders, punch lists and QA/QC, with who has the ball'],
       ] },
       { h: 'More', small: true, keepRest: true },
       { h: 'Recent', recent: true },

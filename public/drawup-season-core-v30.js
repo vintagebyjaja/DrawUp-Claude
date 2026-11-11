@@ -34,7 +34,7 @@ var DrawUpSeasonCore = (() => {
   var SEASON_ENV = { season2Details: "DRAWUP_SEASON_2_DETAILS_ENABLED" };
   var DEFAULT_FLAGS = { season2Details: false };
   var REGISTRY_VERSION = "30.0";
-  var truthy = (v) => /^(1|true|yes|on)$/i.test(String(v != null ? v : "").trim().replace(/^(["'])(.*)\1$/, "$2"));
+  var truthy = (v) => /^(1|true|yes|on)$/i.test(String(v ?? "").trim().replace(/^(["'])(.*)\1$/, "$2"));
   function flagsFromEnv(env) {
     return { season2Details: truthy(env[SEASON_ENV.season2Details]) };
   }
@@ -111,7 +111,7 @@ var DrawUpSeasonCore = (() => {
     },
     // ---------------------------------------------------------------- Season 1: Phase A, pre-design
     { id: "project-brief", name: "Project intake and brief", season: 1, phase: "pre-design", status: "live", where: "Projects \u203A Start a new project", code: ["public/drawup-portal-v17.js", "public/drawup-project-studio-v22.js"], tables: ["project_threads"] },
-    { id: "project-info", name: "Project Information and site data (with sources)", season: 1, phase: "pre-design", status: "building", where: "Projects \u203A Project Information", code: [], note: "Season 1 restructure, stage 2." },
+    { id: "project-info", name: "Project Information and site data (with sources)", season: 1, phase: "pre-design", status: "live", where: "Projects \u203A Project Information", code: ["public/drawup-project-intel-v30.js", "src/lib/drawup-project-intel.ts"], api: ["/api/project-intel"], tables: ["project_profiles", "project_profile_changes"] },
     { id: "project-map", name: "Project map", season: 1, phase: "pre-design", status: "live", where: "Firm \u203A DrawUp Specs \u203A Map", code: ["public/drawup-specs-v29.js"], tables: ["project_threads", "firm_project_info"] },
     { id: "site-photos", name: "Existing conditions and site photos", season: 1, phase: "pre-design", status: "live", where: "Projects \u203A project \u203A files; AI Team attachments", code: ["public/drawup-project-studio-v22.js"] },
     // ---------------------------------------------------------------- Phase B, concept
@@ -126,11 +126,14 @@ var DrawUpSeasonCore = (() => {
     // ---------------------------------------------------------------- Phase D, DD preparation
     { id: "specs", name: "DrawUp Specs (outline and preliminary specifications, project documents)", season: 1, phase: "dd-prep", status: "live", where: "Firm \u203A DrawUp Specs", code: ["public/drawup-specs-v29.js", "public/drawup-specs-data-v29.js", "public/drawup-specs-export-v29.js"], tables: ["firm_documents", "firm_spec_formats", "firm_project_info"] },
     { id: "presentations", name: "Presentation builder", season: 1, phase: "dd-prep", status: "live", where: "Firm \u203A GM Presentation", code: ["public/drawup-playbook-v21.js", "public/drawup-firmkit-v22.js"] },
-    { id: "dd-readiness", name: "DD Readiness review and handoff", season: 1, phase: "dd-prep", status: "building", where: "CheckUp \u203A DD Readiness", code: [], note: "Season 1 restructure, stage 4." },
+    { id: "dd-readiness", name: "DD Readiness review and handoff", season: 1, phase: "dd-prep", status: "live", where: "CheckUp \u203A DD Readiness", code: ["public/drawup-checkup-v30.js"], tables: ["spec_reviews"] },
+    { id: "documents", name: "Document Studio (letters, reports, CA/CM/QA-QC/PM documents, versions, imports)", season: 1, phase: "dd-prep", status: "live", where: "Projects \u203A Documents", code: ["public/drawup-docstudio-v30.js"], tables: ["project_documents", "document_versions", "document_imports"] },
+    { id: "spec-ai", name: "AI specification drafting (preliminary sections, reviewed before they are added)", season: 1, phase: "dd-prep", status: "live", where: "Specifications \u203A Draft with AI", code: ["public/drawup-specs-ai-v30.js", "src/lib/drawup-spec-draft.ts"], api: ["/api/specs/draft"] },
+    { id: "pm-tracker", name: "Project tracker (RFIs, submittals, change orders, punch lists, QA/QC)", season: 1, phase: "dd-prep", status: "live", where: "Projects \u203A Project Management", code: ["public/drawup-pm-tracker-v30.js"], tables: ["project_documents"] },
     // ---------------------------------------------------------------- CheckUp
     { id: "checkup", name: "CheckUp: code, ADA, life safety, drawing review, narratives", season: 1, phase: "checkup", status: "live", where: "CheckUp", code: ["public/drawup-check-v22.js", "public/drawup-check-quick-v23.js", "src/lib/drawup-check-core.ts"], api: ["/api/check", "/api/check/quick"], tables: ["check_reviews"] },
-    { id: "portfolio-review", name: "Portfolio Review", season: 1, phase: "checkup", status: "live", where: "CheckUp \u203A Portfolio Review; Discover \u203A Portfolio Review", code: ["public/drawup-portfolio-review-s1.js", "src/lib/drawup-portfolio.ts"], api: ["/api/portfolio"], tables: ["portfolio_reviews"] },
-    { id: "specs-review", name: "Specifications Review", season: 1, phase: "checkup", status: "building", where: "CheckUp \u203A Specifications Review", code: [], note: "Season 1 restructure, stage 4." }
+    { id: "portfolio-review", name: "Portfolio Review", season: 1, phase: "checkup", status: "live", where: "CheckUp \u203A Portfolio Review; Discover \u203A Portfolio Review", code: ["public/drawup-portfolio-review-s1.js", "public/drawup-portfolio-sources-v30.js", "src/lib/drawup-portfolio.ts"], api: ["/api/portfolio"], tables: ["portfolio_reviews"] },
+    { id: "specs-review", name: "Specifications Review", season: 1, phase: "checkup", status: "live", where: "CheckUp \u203A Specifications Review", code: ["public/drawup-checkup-v30.js"], tables: ["spec_reviews"] }
   ];
   var season2Features = () => FEATURES.filter((f) => f.season === 2);
   var season1Features = () => FEATURES.filter((f) => f.season === 1);
