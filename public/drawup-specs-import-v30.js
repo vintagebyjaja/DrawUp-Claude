@@ -283,6 +283,8 @@ const LOOSE_SECTION_RE = /^SECTION\s+([\d][\d\s.]{3,14})$/;    // a mistyped num
 .spx .spx-card:focus-visible{outline:2px solid #2b6cb0;outline-offset:2px}
 .spx .spx-opt{display:flex;gap:8px;align-items:center;margin:0 0 12px;font-size:13px}
 .spx .spx-out{margin-top:14px}
+.spx .sp-file{display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;border:1.5px solid #1d1d1f;border-radius:999px;color:#1d1d1f;background:#fff;font-weight:600;cursor:pointer}
+.spx .sp-file:hover{background:#f2f2ef}.spx .sp-file:focus-within{outline:2px solid #2b6cb0;outline-offset:2px}
 .spx .spx-box{border:1px solid rgba(0,0,0,.14);border-left-width:4px;border-radius:8px;padding:10px 14px;margin:0 0 12px;background:#fff;color:#1d1d1f}
 .spx .spx-box.ok{border-left-color:#2f855a}.spx .spx-box.warn{border-left-color:#b7791f}
 .spx .spx-box h4{margin:0 0 6px;font-size:14px}.spx .spx-box ul{margin:6px 0;padding-left:18px;font-size:13px}
