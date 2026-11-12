@@ -50,6 +50,14 @@ const sections = [
   // back to print: the edit is in the PDF
   await p.click('[data-bk-mode="print"]'); await p.waitForSelector('.sp-pgslot canvas', { timeout: 20000 }).catch(() => null); await p.waitForTimeout(800);
   await p.evaluate(() => { const b = document.querySelector('.sp-fprev'); b.scrollTop = b.querySelector('.sp-pgslot[data-n="3"]').offsetTop - 10; }); await p.waitForTimeout(1500); await t.shot('book-print-drawup');
+  // footers count through the whole book: Page 3 of 4, Page 4 of 4 (not 1 of 1 in every section)
+  const feet = await p.evaluate(async () => { const X = window.DrawUpSpecsExport, S = window.__ddsS; const d = S.docs.find(x => x.kind === 'spec'); const r = await X.pdf(d, { data: { project_name: 'P' } }, X.fixFormat(null), {}, {}); const L = await X.pdfjs(); const pdf = await L.getDocument({ data: r.bytes.slice() }).promise; const o = []; for (let i = 1; i <= pdf.numPages; i++) { const tc = await (await pdf.getPage(i)).getTextContent(); o.push((tc.items.map(t => t.str).join(' ').match(/Page \d+ of \d+/) || [''])[0]); } return o; });
+  C.ok(feet.join() === ',Page 2 of 4,Page 3 of 4,Page 4 of 4', 'Footers number every page through the whole book', feet.join());
+  const old = await p.evaluate(() => window.DrawUpSpecsExport.fixFormat({ standard: 'drawup-v30', footer: { right: '{section_number} - Page {page} of {section_pages}' } }).footer.right);
+  C.ok(old === '{section_number} - Page {page_total} of {pages}', 'Formats saved with the old per-section footer count the whole book too', old);
+  const sheetFoot = await p.evaluate(async () => { document.querySelector('[data-bk-mode="edit"]').click(); await new Promise(r => setTimeout(r, 2500)); return [...document.querySelectorAll('.sp-sh-foot')].map(f => f.textContent.trim()); });
+  C.ok(sheetFoot.length && sheetFoot.every(t => /Page \d+(–\d+)? of \d+$/.test(t)), 'Edit sheet footers show the real page numbers', sheetFoot.join(' | '));
+  await p.click('[data-bk-mode="print"]'); await p.waitForTimeout(1500);
   // the starter book
   await p.selectOption('[data-bk="src"]', 'starter'); await p.waitForSelector('.sp-pgslot', { timeout: 20000 }); await p.waitForTimeout(1500);
   const st = await p.evaluate(() => ({ n: document.querySelectorAll('.sp-pgslot').length, save: !!document.querySelector('[data-bk-act="savedoc"]') }));

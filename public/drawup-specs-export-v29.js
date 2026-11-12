@@ -27,7 +27,7 @@ const DRAWUP_FORMAT = {
   name: 'DrawUp standard', standard: 'drawup-v30', page: 'letter', margins: { t: 0.5, r: 0.7, b: 0.5, l: 1 }, font: 'Helvetica', size: 9, line: 1.25, accent: '#000000',
   numbering: 'csi', indent: 0.55, caps_articles: true, article_style: '01', number_style: 'compact', part_style: 'PART {n} - {title}', section_title: 'SECTION {number}\n{title}', end_text: 'END OF SECTION {number}',
   header: { block: '<<owner_name>>\n<<project_name>>\n<<architect_name>> Project Number:\t<<project_number>>\nOwner Project Number:\t<<owner_project_number>>', left: '', right: '', rule: true, bold: true },
-  footer: { left: '{section_title}', center: '', right: '{section_number} - Page {page} of {section_pages}', rule: true, bold: true },
+  footer: { left: '{section_title}', center: '', right: '{section_number} - Page {page_total} of {pages}', rule: true, bold: true },
   letter_footer: { left: '<<firm_name>>', center: '', right: 'Page {page} of {pages}' },
   letterhead: { show: true, logo: 'firm', align: 'left', lines: '<<firm_name>>\n<<architect_address>>' },
   cover: true, toc: true, background: null, word_template: null, label: 'DrawUp'
@@ -54,6 +54,7 @@ function fixFormat(s) {
   const d = !Object.keys(s).length || s.standard === 'drawup-v30' ? DRAWUP_FORMAT : LEGACY_FORMAT;
   const o = { ...d, ...s };
   ['margins', 'header', 'footer', 'letter_footer', 'letterhead'].forEach(k => { o[k] = { ...d[k], ...(isObj(s[k]) ? s[k] : {}) }; });
+  if (o.footer.right === '{section_number} - Page {page} of {section_pages}') o.footer.right = DRAWUP_FORMAT.footer.right; // v31: pages count through the whole book
   if (!PAGES[o.page]) o.page = 'letter'; if (!FONTS[o.font]) o.font = 'Helvetica';
   if (!['portrait', 'landscape'].includes(o.orientation)) o.orientation = 'portrait';
   o.size = Math.min(14, Math.max(7, +o.size || 10)); o.line = Math.min(2, Math.max(1, +o.line || 1.3)); o.indent = Math.min(1, Math.max(0.2, +o.indent || 0.5));
@@ -285,7 +286,8 @@ async function pdf(doc, ctx, fmt, files, opts) {
       else if (it.k === 'rect') page.drawRectangle({ x: it.x, y: it.y, width: it.w, height: it.h, color: it.fill ? hex(P, it.fill) : undefined, borderColor: hex(P, it.stroke), borderWidth: 0.6 });
     });
   });
-  return { bytes: await out.save(), pages: L.pages.length };
+  const ranges = {}; L.pages.forEach((p, i) => { if (p.cover || p.letter) return; const k = p.section.number + '|' + p.section.title; if (!ranges[k]) ranges[k] = [i + 1, i + 1]; else ranges[k][1] = i + 1; }); // v31: where each section falls in the book
+  return { bytes: await out.save(), pages: L.pages.length, ranges };
 }
 
 /* ------------------------------------------------------------------ Word (.docx) */
@@ -351,7 +353,7 @@ function fieldRun(instr, rpr) { rpr = rpr || ''; return `<w:r>${rpr}<w:fldChar w
 function hfXml(tag, cells, fmt, R, o) { // three tab-separated parts: left, center, right. {page} becomes a PAGE field, {pages} NUMPAGES, {section_pages} SECTIONPAGES.
   o = o || {}; const W = TW(pageSize(fmt)[0] - fmt.margins.l - fmt.margins.r), font = FONTS[fmt.font][2];
   const rpr = `<w:rPr><w:rFonts w:ascii="${font}" w:hAnsi="${font}" w:cs="${font}"/>${o.bold ? '<w:b/>' : ''}<w:color w:val="${o.bold ? '000000' : '334155'}"/><w:sz w:val="${Math.round((o.bold ? fmt.size : fmt.size - 2) * 2)}"/></w:rPr>`;
-  const runs = s => R(s).replace(/\[[^\]]*\]/g, '').split(/(\{page\}|\{pages\}|\{section_pages\}|\t)/).map(part => part === '{page}' ? fieldRun('PAGE', rpr) : part === '{pages}' ? fieldRun('NUMPAGES', rpr) : part === '{section_pages}' ? fieldRun('SECTIONPAGES', rpr) : part === '\t' ? `<w:r>${rpr}<w:tab/></w:r>` : part ? `<w:r>${rpr}<w:t xml:space="preserve">${xe(part)}</w:t></w:r>` : '').join('');
+  const runs = s => R(s).replace(/\[[^\]]*\]/g, '').split(/(\{page\}|\{page_total\}|\{pages\}|\{section_pages\}|\t)/).map(part => part === '{page}' || part === '{page_total}' ? fieldRun('PAGE', rpr) : part === '{pages}' ? fieldRun('NUMPAGES', rpr) : part === '{section_pages}' ? fieldRun('SECTIONPAGES', rpr) : part === '\t' ? `<w:r>${rpr}<w:tab/></w:r>` : part ? `<w:r>${rpr}<w:t xml:space="preserve">${xe(part)}</w:t></w:r>` : '').join('');
   const bdr = side => `<w:pBdr><w:${side} w:val="single" w:sz="6" w:space="${side === 'top' ? 4 : 1}" w:color="000000"/></w:pBdr>`;
   const NS = 'xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"';
   if (o.block) { // the project block: one paragraph per line, a rule under the last one
@@ -412,7 +414,7 @@ async function docx(doc, ctx, fmt, files, opts) {
   chunks.forEach((ch, i) => { body += docxBody(ch, fmt, styles, ''); if (i < chunks.length - 1) body += `<w:p><w:pPr>${sectFor(i, i > 0)}</w:pPr></w:p>`; });
   const lastSect = sectFor(Math.max(0, chunks.length - 1), chunks.length > 1);
   const NS = 'xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"';
-  zip.file('word/document.xml', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document ${NS}><w:body>${body}${lastSect}</w:body></w:document>`);
+  zip.file('word/document.xml', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document ${NS}><w:body>${body}${lastSect}</w:body></w:document>`.replace(/<w:pgNumType w:start="1"\/>/g, /\{page_total\}/.test([fmt.footer.left, fmt.footer.center, fmt.footer.right, fmt.header.left, fmt.header.right].join(' ')) ? '' : '$&'));
   const sz = Math.round(fmt.size * 2), acc = fmt.accent.slice(1);
   zip.file('word/styles.xml', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:docDefaults><w:rPrDefault><w:rPr><w:rFonts w:ascii="${font}" w:hAnsi="${font}" w:cs="${font}" w:eastAsia="${font}"/><w:sz w:val="${sz}"/><w:szCs w:val="${sz}"/><w:lang w:val="en-US"/></w:rPr></w:rPrDefault><w:pPrDefault><w:pPr><w:spacing w:after="80" w:line="${Math.round(240 * fmt.line)}" w:lineRule="auto"/></w:pPr></w:pPrDefault></w:docDefaults><w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/><w:qFormat/></w:style><w:style w:type="paragraph" w:styleId="Title"><w:name w:val="Title"/><w:basedOn w:val="Normal"/><w:qFormat/><w:rPr><w:b/><w:color w:val="${acc}"/></w:rPr></w:style><w:style w:type="paragraph" w:styleId="Heading1"><w:name w:val="heading 1"/><w:basedOn w:val="Normal"/><w:qFormat/><w:pPr><w:keepNext/><w:outlineLvl w:val="0"/></w:pPr><w:rPr><w:b/></w:rPr></w:style><w:style w:type="paragraph" w:styleId="Heading2"><w:name w:val="heading 2"/><w:basedOn w:val="Normal"/><w:qFormat/><w:pPr><w:keepNext/><w:outlineLvl w:val="1"/></w:pPr><w:rPr><w:b/></w:rPr></w:style></w:styles>`);
   zip.file('word/settings.xml', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:settings xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:updateFields w:val="true"/><w:defaultTabStop w:val="720"/></w:settings>');
