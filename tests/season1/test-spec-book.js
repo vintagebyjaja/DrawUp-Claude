@@ -24,12 +24,23 @@ const sections = [
   C.ok(info.brands.join() === 'KEi Architects*,DrawUp', 'Branding tabs: the firm (picked) and DrawUp', info.brands.join());
   C.ok(info.top === 0 && info.first === '1', 'It opens at the first page');
   await p.evaluate(() => document.querySelector('.sp-bk-top').scrollIntoView()); await p.waitForTimeout(900); await t.shot('book-print-firm');
+  const goOpts = await p.evaluate(() => [...document.querySelectorAll('[data-bk="go"] option')].map(o => o.textContent));
+  C.ok(goOpts.join('|') === 'Start of the book (cover)|Table of contents|01 3200 · Construction Progress Documentation|01 3300 · Submittal Procedures', 'Go to lists the cover, contents and every section', goOpts.join('|'));
+  await p.selectOption('[data-bk="go"]', 's2'); await p.waitForTimeout(1200);
+  const at = await p.evaluate(() => { const b = document.querySelector('.sp-fprev'), sl = document.querySelector('.sp-pgslot[data-n="4"]'); return Math.round(sl.getBoundingClientRect().top - b.getBoundingClientRect().top); });
+  C.ok(Math.abs(at) < 20, 'Picking a section jumps to its first page in Print preview', String(at));
+  await p.selectOption('[data-bk="go"]', 'top'); await p.waitForTimeout(900);
   // edit sheet
   await p.click('[data-bk-mode="edit"]'); await p.waitForSelector('.sp-sheet [data-e]', { timeout: 10000 });
   const sheet = await p.evaluate(() => ({ n: document.querySelectorAll('.sp-sheet').length, firstSec: document.querySelector('.sp-sheet[data-sec]')?.dataset.sec, head: document.querySelector('.sp-sh-head')?.textContent, tok: document.querySelectorAll('.sp-tok').length }));
   C.ok(sheet.n === 4 && sheet.firstSec === 's1', 'Edit sheet: cover, contents, then sections in number order (01 32 00 first)', JSON.stringify(sheet));
   C.ok(/KEi Architects Project Number/.test(sheet.head || ''), 'Header carries the firm name in firm branding', sheet.head);
-  await p.evaluate(() => document.querySelector('.sp-bk-top').scrollIntoView()); await p.waitForTimeout(300); await t.shot('book-edit-firm'); await p.evaluate(() => { const b = document.querySelector('.sp-fprev'); b.scrollTop = b.querySelector('.sp-sheet[data-sec]').offsetTop * parseFloat(b.querySelector('.sp-sheets').style.zoom || 1) - 10; }); await p.waitForTimeout(300); await t.shot('book-edit-firm-sec');
+  await p.evaluate(() => document.querySelector('.sp-bk-top').scrollIntoView()); await p.waitForTimeout(300); await t.shot('book-edit-firm');
+  await p.selectOption('[data-bk="go"]', 's2'); await p.waitForTimeout(1200);
+  const at2 = await p.evaluate(() => { const b = document.querySelector('.sp-fprev'), sh = document.querySelector('.sp-sheet[data-sec="s2"]'); const off = Math.round(sh.getBoundingClientRect().top - b.getBoundingClientRect().top); return Math.abs(off) < 20 || b.scrollTop + b.clientHeight >= b.scrollHeight - 2 ? 0 : off; });
+  C.ok(Math.abs(at2) < 20, 'Picking a section jumps to its sheet in Edit sheet', String(at2));
+  await p.evaluate(() => document.querySelector('.sp-bk-top').scrollIntoView()); await t.shot('book-goto');
+  await p.selectOption('[data-bk="go"]', 'top'); await p.waitForTimeout(900); await p.evaluate(() => { const b = document.querySelector('.sp-fprev'); b.scrollTop = b.querySelector('.sp-sheet[data-sec]').offsetTop * parseFloat(b.querySelector('.sp-sheets').style.zoom || 1) - 10; }); await p.waitForTimeout(300); await t.shot('book-edit-firm-sec');
   // type into a paragraph that holds project data: the data code survives
   const el = await p.$('[data-e="p:1:1:0:0"]'); await el.click(); await p.keyboard.press('End'); await p.keyboard.type(' Typed here.');
   await p.click('[data-e="a:1:1:0"]', { clickCount: 3 }); await p.keyboard.type('SCOPE OF SECTION');

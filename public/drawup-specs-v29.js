@@ -764,17 +764,29 @@ function bookPanel(S, box, bar, get) {
   const paintBar = () => {
     const firmName = B.firm ? B.firm.name : '';
     bar.innerHTML = `<div class="sp-bk-row"><label class="sp-mini"><span>Spec book</span><select class="sp-in" data-bk="src">${docs.map(d => `<option value="${d.id}" ${B.doc.id === d.id ? 'selected' : ''}>${esc(d.title)} · ${d.sections.length} section${d.sections.length === 1 ? '' : 's'}</option>`).join('')}<option value="starter" ${B.doc.starter ? 'selected' : ''}>DrawUp starter book · ${B.doc.starter ? B.doc.sections.length : starterNumbers().length} sections</option></select></label>
+      <label class="sp-mini sp-bk-go"><span>Go to</span><select class="sp-in" data-bk="go" aria-label="Go to a section"></select></label>
       <div class="sp-seg" role="tablist" aria-label="Branding"><span>Branding</span>${firmName ? `<button type="button" role="tab" data-bk-brand="firm" class="${B.brand === 'firm' ? 'active' : ''}" aria-selected="${B.brand === 'firm'}">${esc(firmName)}</button>` : ''}<button type="button" role="tab" data-bk-brand="drawup" class="${B.brand === 'drawup' || !firmName ? 'active' : ''}" aria-selected="${B.brand === 'drawup' || !firmName}">DrawUp</button></div></div>
      <div class="sp-bk-row"><div class="sp-seg" role="tablist" aria-label="View"><button type="button" role="tab" data-bk-mode="print" class="${B.mode === 'print' ? 'active' : ''}" aria-selected="${B.mode === 'print'}">Print preview</button><button type="button" role="tab" data-bk-mode="edit" class="${B.mode === 'edit' ? 'active' : ''}" aria-selected="${B.mode === 'edit'}">Edit sheet</button></div>
       <span class="sp-bk-st" role="status"></span><span class="sp-bk-act">${B.doc.starter ? '<button type="button" class="du-btn ghost" data-bk-act="savedoc">Save as a document</button><button type="button" class="sp-link" data-bk-act="reset">Reset starter text</button>' : ''}<button type="button" class="du-btn ghost" data-bk-act="pdf">Download PDF</button><button type="button" class="du-btn ghost" data-bk-act="print">Print</button></span></div>
      <p class="sp-note sp-bk-note">${B.mode === 'edit' ? 'Click any word or title and type. The layout, numbering and indents stay in this format. Shaded words are project data, blanks and choices; type around them.' : B.doc.starter ? 'DrawUp-written starter text, ready to edit. Pick your own project manual above to see it in this format.' : 'Your project manual, compiled in this format from the first page.'}</p>`;
     bar.querySelector('[data-bk="src"]').onchange = async e => { await flushBook(); const id = e.target.value; setBookPref('src', id); B.doc = id === 'starter' ? starterBook() : docs.find(d => d.id === id) || starterBook(); B.stale = true; paintBar(); show(); };
+    fillGo(); bar.querySelector('[data-bk="go"]').onchange = e => goTo(e.target.value);
     bar.querySelectorAll('[data-bk-brand]').forEach(x => x.onclick = () => { B.brand = x.dataset.bkBrand; setBookPref('brand', B.brand); B.stale = true; paintBar(); show(); });
     bar.querySelectorAll('[data-bk-mode]').forEach(x => x.onclick = async () => { B.mode = x.dataset.bkMode; setBookPref('mode', B.mode); await flushBook(); paintBar(); show(); });
     bar.querySelectorAll('[data-bk-act]').forEach(x => x.onclick = () => act(x.dataset.bkAct));
   };
   const brand = () => (B.brand === 'firm' && B.firm ? 'firm' : 'drawup');
-  const build = async () => { const { settings, files } = await get(); const f2 = await brandFiles(S, settings, files, brand(), B.firm); const ctx = bookCtx(S, B.doc, brand(), B.firm); return { settings, files: f2, ctx }; };
+  const goList = () => (B.doc.sections || []).filter(s => s.state !== 'excluded').slice().sort((a, b) => String(a.number).localeCompare(String(b.number)));
+  const fillGo = () => { const sel = bar.querySelector('[data-bk="go"]'); if (!sel) return; const f = B.fmt || {};
+    sel.innerHTML = `<option value="top">Start of the book${f.cover === false ? '' : ' (cover)'}</option>${f.toc === false ? '' : '<option value="toc">Table of contents</option>'}` + goList().map(s => `<option value="${esc(s.id)}">${esc(shownNum(s.number, f))} · ${esc(X.resolve(s.title, B.ctx || { data: {} }))}</option>`).join(''); };
+  /** Scroll the book to a section: its first page in Print preview, its sheet in Edit sheet. */
+  const goTo = id => { let el = null;
+    if (id === 'top') { box.scrollTo({ top: 0, behavior: 'smooth' }); return; }
+    if (B.mode === 'edit') el = id === 'toc' ? box.querySelectorAll('.sp-sheet:not([data-sec])')[B.fmt && B.fmt.cover === false ? 0 : 1] : box.querySelector(`.sp-sheet[data-sec="${CSS.escape(id)}"]`);
+    else if (B.pm) { let n = null; if (id === 'toc') { const k = Object.keys(B.pm.ranges).find(x => x.endsWith('|TABLE OF CONTENTS')); n = k && B.pm.ranges[k][0]; } else { const s = B.doc.sections.find(x => x.id === id); const k = s && (shownNum(s.number, B.fmt || {}) + '|' + X.resolve(s.title, B.ctx || { data: {} }).toUpperCase()); n = k && B.pm.ranges[k] && B.pm.ranges[k][0]; } if (n) el = box.querySelector(`.sp-pgslot[data-n="${n}"]`); }
+    if (!el) { st('That section is still laying out. Try again in a moment.'); return; }
+    box.scrollTo({ top: el.getBoundingClientRect().top - box.getBoundingClientRect().top + box.scrollTop - 8, behavior: 'smooth' }); };
+  const build = async () => { const { settings, files } = await get(); const f2 = await brandFiles(S, settings, files, brand(), B.firm); const ctx = bookCtx(S, B.doc, brand(), B.firm); const re = !B.fmt || B.fmt.number_style !== settings.number_style || B.fmt.cover !== settings.cover || B.fmt.toc !== settings.toc; B.fmt = settings; B.ctx = ctx; if (re) fillGo(); return { settings, files: f2, ctx }; };
   const show = async () => {
     const my = ++B.seq; box.classList.add('sp-bookbox'); box.classList.toggle('editing', B.mode === 'edit');
     if (B.mode === 'edit') { const { settings, files, ctx } = await build(); if (my !== B.seq) return; box.innerHTML = sheetHTML(B.doc, ctx, settings, B.pm); fit(); box.scrollTop = 0; paginate(settings, files, ctx, my); return; }
@@ -786,6 +798,7 @@ function bookPanel(S, box, bar, get) {
   const fit = () => { const sh = box.querySelector('.sp-sheets'); if (!sh) return; const first = sh.querySelector('.sp-sheet'); const w = first ? first.offsetWidth : 816; sh.style.zoom = String(Math.min(1, Math.max(0.35, ((box.clientWidth || 600) - 28) / w))); };
   const saveBook = async () => {
     clearTimeout(B.timer); B.timer = null; const doc = B.doc;
+    fillGo();
     if (B.mode === 'edit') build().then(({ settings, files, ctx }) => paginate(settings, files, ctx, B.seq)).catch(() => null);
     if (doc.starter) { try { localStorage.setItem(BOOK_KEY + ':starter', JSON.stringify({ title: doc.title, sections: doc.sections })); st('Saved on this device.'); } catch (_e) { st('Not saved: this browser blocked storage.'); } return; }
     st('Saving…'); const row = toRow(doc, S.me);

@@ -404,3 +404,6 @@ html #du-workspace-content .sp-wrap input.sp-title:not([type="checkbox"]):not([t
 @media (max-width:700px){.sp-bk-act{margin-left:0}.sp-fprev.sp-bookbox{max-height:75vh}}
 .sp-seg button{flex:none!important;width:auto!important;min-width:max-content;max-width:none!important;text-overflow:clip!important}
 .sp-bk-row .sp-mini select{max-width:none}
+
+.sp-bk-row .sp-mini.sp-bk-go{flex:1 1 300px}
+.sp-bk-row .sp-mini [data-bk="src"]{min-width:190px}
