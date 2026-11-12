@@ -346,3 +346,61 @@ html #du-workspace-content .sp-wrap input.sp-title:not([type="checkbox"]):not([t
 .sai-field { background: #e8f5ec; color: #1d6b3a; border-radius: 4px; padding: 0 3px; }
 .sai-limits { margin-top: 12px; }
 .sp-ai-note { color: #8a5a00 !important; font-weight: 600; }
+
+/* v31: the full spec book on a format's page (Print preview and Edit sheet, firm or DrawUp branding) */
+.sp-fgrid.sp-wide{grid-template-columns:minmax(0,1fr)}
+.sp-fgrid.sp-wide>.fk-form{display:none}
+.sp-bookcol{position:relative!important;top:0!important;display:grid;gap:10px}
+.sp-bk-top{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.sp-bkbar{display:grid;gap:8px}
+.sp-bk-row{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center}
+.sp-bk-row .sp-mini{display:flex;align-items:center;gap:8px;min-width:0;flex:1 1 260px}
+.sp-bk-row .sp-mini span{font-size:12px;font-weight:700;color:#475569;white-space:nowrap}
+.sp-bk-row .sp-mini select{min-width:0;flex:1}
+.sp-seg{display:inline-flex;align-items:center;gap:4px;background:#eef2f7;border:1px solid #dbe3ee;border-radius:999px;padding:3px}
+.sp-seg>span{font-size:12px;font-weight:700;color:#475569;padding:0 6px 0 8px}
+.sp-seg button{border:0;background:transparent;border-radius:999px;padding:6px 12px;font:inherit;font-size:13px;font-weight:600;color:#334155;cursor:pointer;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sp-seg button.active{background:#13233d;color:#fff}
+.sp-seg button:focus-visible{outline:2px solid #2f6fb3;outline-offset:1px}
+.sp-bk-st{font-size:12px;color:#475569;min-height:1em}
+.sp-bk-act{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-left:auto}
+.sp-bk-note{margin:0}
+.sp-fprev.sp-bookbox{display:block;max-height:calc(100vh - 150px);min-height:420px;overflow:auto;overscroll-behavior:contain}
+.sp-fprev.sp-bookbox .sp-pgslot{margin:0 auto 14px;background:#fff;box-shadow:0 4px 16px rgba(16,28,51,.18);border-radius:2px;max-width:100%}
+.sp-fprev.sp-bookbox .sp-pgslot .sp-pg{display:block;width:100%;height:100%;box-shadow:none}
+.sp-sheets{color:#000;width:max-content;margin:0 auto}
+.sp-sheet{position:relative;box-sizing:border-box;background:#fff;box-shadow:0 4px 16px rgba(16,28,51,.18);margin:0 auto 18px;min-height:5in;display:flex;flex-direction:column}
+.sp-sheet>.sp-sh-foot{margin-top:auto}
+.sp-sheet{border-radius:0!important}
+.sp-sh-head{margin-bottom:22px;padding-bottom:4px}
+.sp-sh-head.rule{border-bottom:1.2px solid #000}
+.sp-sh-head.b,.sp-sh-foot.b{font-weight:700}
+.sp-sh-hl{display:grid;grid-template-columns:max-content 1fr;gap:0 1em}
+.sp-sh-hl.lr{grid-template-columns:1fr auto}
+.sp-sh-foot{display:grid;grid-template-columns:1fr auto 1fr;gap:1em;padding-top:4px;margin-top:24px}
+.sp-sh-foot.rule{border-top:1.2px solid #000}
+.sp-sh-foot span:last-child{text-align:right}
+.sp-sh-t{margin:0 0 2px;text-align:center;font-size:1.1em;font-weight:700}
+.sp-sh-t+.sp-sh-part,.sp-sh-t+.sp-sh-p{margin-top:14px}
+.sp-sh-part{font-weight:700;margin:14px 0 8px}
+.sp-sh-a{position:relative;margin:8px 0 4px}
+.sp-sh-p{position:relative;margin:0 0 4px;white-space:pre-wrap}
+.sp-sh-l{position:absolute;top:0}
+.sp-sh-end{text-align:center;font-weight:700;margin:18px 0 0}
+.sp-sh-div{font-weight:700;margin:8px 0 4px}
+.sp-sh-toc{position:relative;margin:0;padding-left:var(--ti)}
+.sp-sh-toc span:first-child{position:absolute;left:.1in}
+.sp-sh-cover{margin-top:1.6in}
+.sp-sh-cover h2{font-size:2.2em;margin:0 0 14px;line-height:1.15}
+.sp-sh-cover p{margin:0}
+.sp-ed{outline:none;border-radius:2px;white-space:pre-wrap;cursor:text}
+.sp-ed.up{text-transform:uppercase}
+.sp-ed.b{font-weight:700}
+.sp-fprev.editing .sp-ed:hover{background:rgba(47,111,179,.07)}
+.sp-fprev.editing .sp-ed:focus{background:rgba(47,111,179,.1);box-shadow:0 0 0 1px rgba(47,111,179,.45)}
+.sp-tok{background:#e8f5ec;border-radius:3px;padding:0 1px}
+.sp-tok.open{background:#fff1c9}
+@media print{.sp-tok,.sp-tok.open{background:none}}
+@media (max-width:700px){.sp-bk-act{margin-left:0}.sp-fprev.sp-bookbox{max-height:75vh}}
+.sp-seg button{flex:none!important;width:auto!important;min-width:max-content;max-width:none!important;text-overflow:clip!important}
+.sp-bk-row .sp-mini select{max-width:none}

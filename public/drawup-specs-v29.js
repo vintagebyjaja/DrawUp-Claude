@@ -641,10 +641,180 @@ function renderFormats(S, v) {
   v.querySelectorAll('[data-fopen]').forEach(x => x.onclick = () => formatEditor(S, v, x.dataset.fopen === 'drawup' ? 'drawup' : S.formats.find(f => f.id === x.dataset.fopen)));
   v.querySelectorAll('[data-fnew]').forEach(x => x.onclick = () => formatEditor(S, v, { kind: x.dataset.fnew, name: x.dataset.fnew === 'firm' ? S.firm.name + ' standard' : 'Client format', settings: {}, is_default: x.dataset.fnew === 'firm' && !firmF.length, reference_file_ids: [] }));
 }
+/* ------------------------------------------------------------------ v31: the full spec book on a format's page
+   Opening a format shows the whole compiled spec book from its first page (cover, contents, then every section in
+   number order), in that format. Two views: Print preview (the real PDF pages) and Edit sheet (the same book as a
+   typed-on sheet: words and titles change, the layout stays the format's). Branding: the member's firm or DrawUp.
+   The book is the firm's own project manual when there is one, or the DrawUp starter book (DrawUp-written text). */
+const BOOK_KEY = 'du-specs-book-v31';
+const bookPrefs = () => { try { return JSON.parse(localStorage.getItem(BOOK_KEY) || '{}') || {}; } catch (_e) { return {}; } };
+const setBookPref = (k, val) => { try { const o = bookPrefs(); o[k] = val; localStorage.setItem(BOOK_KEY, JSON.stringify(o)); } catch (_e) { /* private mode */ } };
+function starterNumbers() { const n = new Set(Object.keys(D.MASTER)); D.CATALOG.forEach(([x]) => { if (/^01 /.test(x)) n.add(x); }); return [...n].sort(); }
+function starterBook(fresh) {
+  let saved = null; if (!fresh) { try { saved = JSON.parse(localStorage.getItem(BOOK_KEY + ':starter') || 'null'); } catch (_e) { saved = null; } }
+  if (saved && Array.isArray(saved.sections) && saved.sections.length) return { id: null, starter: true, kind: 'spec', title: saved.title || 'Project Manual', sections: saved.sections, data: {} };
+  return { id: null, starter: true, kind: 'spec', title: 'Project Manual', sections: starterNumbers().map(n => makeSection(n)), data: {} };
+}
+const bookDocs = S => S.docs.filter(d => d.kind === 'spec' && (d.sections || []).length);
+/** The firm whose name and logo go on the book: the firm workspace, else the member's own firm, else the architect saved on the project. */
+async function brandFirm(S) {
+  if (S.brandFirm !== undefined) return S.brandFirm;
+  let f = null;
+  if (!isPersonal(S) && S.firm && S.firm.name) f = { name: S.firm.name, logo_url: S.firm.logo_url || null };
+  else {
+    try { const r = await S.c.client.rpc('drawup_my_firms'); const row = Array.isArray(r.data) ? r.data[0] : null;
+      if (row && row.name) { f = { id: row.id, name: row.name, logo_url: row.logo_url || null };
+        if (!f.logo_url && row.id) { const l = await S.c.client.from('firms').select('logo_url').eq('id', row.id).maybeSingle(); f.logo_url = (l.data && l.data.logo_url) || null; } } } catch (_e) { /* no firm */ }
+  }
+  if (!f) { const pid = S.projects[0]?.id; const an = pid ? String(projectData(S, pid).saved.architect_name || '').trim() : ''; if (an) f = { name: an, logo_url: null }; }
+  S.brandFirm = f; return f;
+}
+function bookCtx(S, doc, brand, firm) {
+  const ctx = ctxFor(S, { ...doc, project_thread_id: doc.project_thread_id || S.projects[0]?.id || null, data: doc.data || {} });
+  const useFirm = brand === 'firm' && firm; const name = useFirm ? firm.name : 'DrawUp';
+  ctx.data = { ...ctx.data, firm_name: name, architect_name: name };
+  if (!useFirm) ctx.data.architect_address = 'Prepared with DrawUp';
+  return ctx;
+}
+async function brandLogo(S, brand, firm) {
+  const url = brand === 'firm' ? (firm && firm.logo_url) : '/icons/drawup-icon-512.png'; if (!url) return null;
+  S.logoCache = S.logoCache || {}; if (S.logoCache[url] !== undefined) return S.logoCache[url];
+  let out = null;
+  try { const r = await fetch(url); if (r.ok) { const b = await r.blob(); if (/png|jpe?g/.test(b.type)) { out = { logo: new Uint8Array(await b.arrayBuffer()), logoType: b.type.includes('png') ? 'image/png' : 'image/jpeg' }; try { const im = await createImageBitmap(b); out.logoW = im.width; out.logoH = im.height; } catch (_e) { /* size unknown */ } } } } catch (_e) { /* logo is optional */ }
+  S.logoCache[url] = out; return out;
+}
+/** Settings + files for the book in this branding: the format's own uploaded logo stays; "firm logo" follows the branding. */
+async function brandFiles(S, settings, files, brand, firm) {
+  if (settings.letterhead.logo !== 'firm') return files;
+  const out = { ...files }; delete out.logo; delete out.logoType; delete out.logoW; delete out.logoH;
+  const l = await brandLogo(S, brand, firm); return l ? { ...out, ...l } : out;
+}
+// All pages of a PDF, drawn when they scroll into view, from the first page.
+async function renderBookPdf(box, bytes) {
+  const L = await X.pdfjs(); const d = await L.getDocument({ data: bytes.slice() }).promise;
+  const p1 = await d.getPage(1); const v1 = p1.getViewport({ scale: 1 }); const w = Math.max(240, Math.min(820, (box.clientWidth || 560) - 24));
+  box.innerHTML = ''; box.scrollTop = 0;
+  const io = new IntersectionObserver(es => es.forEach(async e => {
+    if (!e.isIntersecting) return; const el = e.target; io.unobserve(el);
+    try { const pg = await d.getPage(+el.dataset.n); const v0 = pg.getViewport({ scale: 1 }); const vp = pg.getViewport({ scale: w / v0.width * Math.min(2, window.devicePixelRatio || 1) });
+      const cv = document.createElement('canvas'); cv.width = Math.round(vp.width); cv.height = Math.round(vp.height); cv.className = 'sp-pg'; el.replaceChildren(cv); await pg.render({ canvasContext: cv.getContext('2d'), viewport: vp }).promise; } catch (_e) { /* page skipped */ }
+  }), { root: box, rootMargin: '900px 0px' });
+  for (let i = 1; i <= d.numPages; i++) { const s = document.createElement('div'); s.className = 'sp-pgslot'; s.dataset.n = i; s.style.width = w + 'px'; s.style.aspectRatio = v1.width + ' / ' + v1.height; s.setAttribute('aria-label', 'Page ' + i + ' of ' + d.numPages); box.appendChild(s); io.observe(s); }
+  return d.numPages;
+}
+// ---- the edit sheet: the same book as HTML in the format's type, indents and numbering; text is typed on directly
+const CSS_FONT = { Helvetica: 'Arial, Helvetica, sans-serif', Times: '"Times New Roman", Times, serif', Courier: '"Courier New", Courier, monospace' };
+const PART_T = { 1: 'GENERAL', 2: 'PRODUCTS', 3: 'EXECUTION' };
+const shownNum = (n, fmt) => { const s = String(n || ''); return fmt.number_style === 'compact' ? s.replace(/^(\d{2}) (\d{2}) (\d{2})/, '$1 $2$3') : s; };
+/** Text with project data, blanks and choices as chips that keep their codes, so typing around them never loses them. */
+function richText(raw, ctx) {
+  const D0 = (ctx && ctx.data) || {};
+  return X.tokens(raw).map(k => { if (k.t === 'txt') return esc(k.v); const code = X.untokens([k]);
+    const open = (k.t === 'blank' && !(k.value != null && k.value !== '')) || (k.t === 'opt' && k.sel < 0) || (k.t === 'data' && !(D0[k.key] != null && String(D0[k.key]).trim()));
+    return `<span class="sp-tok${open ? ' open' : ''}" contenteditable="false" data-tok="${esc(encodeURIComponent(code))}" title="${esc(k.t === 'data' ? 'Project data: ' + k.key.replace(/_/g, ' ') : k.t === 'blank' ? 'Blank: ' + k.label : 'Choice: ' + k.opts.join(' / '))}">${esc(X.resolve(code, ctx))}</span>`; }).join('');
+}
+function readRich(el) { let s = ''; el.childNodes.forEach(n => { if (n.nodeType === 3) s += n.nodeValue; else if (n.dataset && n.dataset.tok) s += decodeURIComponent(n.dataset.tok); else if (n.nodeName === 'BR') s += '\n'; else if (n.nodeType === 1) s += (n.nodeName === 'DIV' && s ? '\n' : '') + readRich(n); }); return s.replace(/ /g, ' '); }
+function sheetHTML(doc, ctx, fmt) {
+  const R = t => X.resolve(t, ctx), IND = fmt.indent, [pw] = X.pageSize(fmt), M = fmt.margins, ed = (key, raw, cls) => `<span class="sp-ed ${cls || ''}" contenteditable="true" spellcheck="true" data-e="${key}">${richText(raw, ctx)}</span>`;
+  const pad = `padding:${M.t}in ${M.r}in ${M.b}in ${M.l}in;width:${pw}in`;
+  const head = () => { const lines = String(fmt.header.block || '').split('\n').filter(x => x.trim()); const body = lines.length ? lines.map(l => { const [a, b] = l.split('\t'); return `<div class="sp-sh-hl"><span>${esc(R(a))}</span><span>${esc(R(b || ''))}</span></div>`; }).join('') : `<div class="sp-sh-hl lr"><span>${esc(R(fmt.header.left))}</span><span>${esc(R(fmt.header.right))}</span></div>`; return `<div class="sp-sh-head${fmt.header.rule ? ' rule' : ''}${fmt.header.bold ? ' b' : ''}">${body}</div>`; };
+  const foot = sec => { const f = c => esc(R(X.fill(c, { section_number: sec.number, section_title: sec.title, page: '#', pages: '#', section_pages: '#' }))); return `<div class="sp-sh-foot${fmt.footer.rule ? ' rule' : ''}${fmt.footer.bold ? ' b' : ''}"><span>${f(fmt.footer.left)}</span><span>${f(fmt.footer.center)}</span><span>${f(fmt.footer.right)}</span></div>`; };
+  const secs = (doc.sections || []).map((s, si) => ({ s, si })).filter(x => x.s.state !== 'excluded').sort((a, b) => String(a.s.number).localeCompare(String(b.s.number)));
+  const out = [];
+  if (fmt.cover) out.push(`<div class="sp-sheet cover" style="${pad}"><div class="sp-sh-cover"><h2 style="color:${esc(fmt.accent)}">${ed('d', doc.title || 'Project Manual')}</h2>${[R('<<project_name>>'), R('<<project_address>>'), '', 'Project no. ' + R('<<project_number>>'), R('<<issue_purpose>>'), R('<<issue_date>>'), '', R('<<architect_name>>'), R('<<architect_address>>')].map(l => l ? `<p>${esc(l)}</p>` : '<br>').join('')}</div></div>`);
+  if (fmt.toc) { let div = ''; out.push(`<div class="sp-sheet" style="${pad}">${head()}<h4 class="sp-sh-t">TABLE OF CONTENTS</h4>${secs.map(({ s }) => { const d = String(s.number).slice(0, 2); const dh = d !== div ? (div = d, `<p class="sp-sh-div">DIVISION ${esc(d)} - ${esc((D.DIVISIONS[d] || '').toUpperCase())}</p>`) : ''; return dh + `<p class="sp-sh-toc" style="--ti:${IND * 2.4}in"><span>${esc(shownNum(s.number, fmt))}</span><span>${esc(R(s.title).toUpperCase())}</span></p>`; }).join('')}${foot({ number: '00 01 10', title: 'TABLE OF CONTENTS' })}</div>`); }
+  secs.forEach(({ s, si }) => {
+    const sec = { number: shownNum(s.number, fmt), title: R(s.title).toUpperCase() }; const h = [];
+    const lead = (((s.parts || {})[1] || [])[0] || {}).lead ? s.parts[1][0] : null;
+    if (lead && !lead.off) lead.paras.forEach((p, pi) => { if (!p.off) h.push(`<p class="sp-sh-p" style="padding-left:0">${ed(`p:${si}:1:0:${pi}`, p.t)}</p>`); });
+    String(fmt.section_title || '').split('\n').forEach(line => { h.push(`<h4 class="sp-sh-t">${esc(line).replace('{number}', esc(sec.number)).replace('{title}', ed(`s:${si}`, s.title, 'up'))}</h4>`); });
+    [1, 2, 3].forEach(n => {
+      const part = (s.parts || {})[n] || [];
+      if (doc.outline && n !== 2 && !part.length) return; if (s.front && !part.filter(a => !a.lead).length) return;
+      if (!s.front) h.push(`<p class="sp-sh-part">${esc(X.fill(fmt.part_style, { n, title: (s.part_titles && s.part_titles[n]) || PART_T[n] }))}</p>`);
+      let ai = 0;
+      part.forEach((a, aIdx) => { if (a.off || a.lead) return;
+        const titled = !a.untitled || String(a.title || '').trim(); if (titled) ai++;
+        const num = n + '.' + (String(fmt.article_style) === '01' ? String(Math.max(ai, 1)).padStart(2, '0') : Math.max(ai, 1));
+        if (titled) h.push(`<p class="sp-sh-a" style="padding-left:${IND}in"><b class="sp-sh-l" style="left:0">${esc(num)}</b>${ed(`a:${si}:${n}:${aIdx}`, a.title, fmt.caps_articles ? 'up b' : 'b')}</p>`);
+        const live = (a.paras || []).map((p, pi) => ({ p, pi })).filter(x => !x.p.off); const labs = X.paraLabels(live.map(x => x.p), fmt.numbering, num);
+        live.forEach(({ p, pi }, k) => { const lv = Math.min(3, p.lvl | 0); h.push(`<p class="sp-sh-p" style="padding-left:${IND * (lv + 2)}in"><span class="sp-sh-l" style="left:${IND * (lv + 1)}in">${esc(labs[k] || '')}</span>${ed(`p:${si}:${n}:${aIdx}:${pi}`, p.t)}</p>`); });
+      });
+    });
+    if (!s.front) h.push(`<p class="sp-sh-end">${esc(X.fill(fmt.end_text, { number: sec.number, title: sec.title }))}</p>`);
+    out.push(`<div class="sp-sheet" data-sec="${esc(s.id)}" style="${pad}">${head()}${h.join('')}${foot(sec)}</div>`);
+  });
+  return `<div class="sp-sheets" style="font-family:${CSS_FONT[fmt.font] || CSS_FONT.Helvetica};font-size:${fmt.size}pt;line-height:${fmt.line}">${out.join('')}</div>`;
+}
+function applyEdit(doc, key, text) {
+  const [k, ...ix] = key.split(':'); const n = ix.map(Number);
+  if (k === 'd') { doc.title = text; return; }
+  const s = doc.sections[n[0]]; if (!s) return;
+  if (k === 's') { s.title = text; return; }
+  const a = ((s.parts || {})[n[1]] || [])[n[2]]; if (!a) return;
+  if (k === 'a') { a.title = text; return; }
+  const p = (a.paras || [])[n[3]]; if (p) p.t = text;
+}
+/** The book panel inside a format's page. get() returns { settings, files } for the format as it is on screen. */
+function bookPanel(S, box, bar, get) {
+  const P = bookPrefs(); const B = { mode: P.mode === 'edit' ? 'edit' : 'print', brand: P.brand === 'drawup' ? 'drawup' : 'firm', doc: null, firm: null, stale: true, timer: null, seq: 0 };
+  const docs = bookDocs(S); const pick = P.src && docs.find(d => d.id === P.src);
+  B.doc = P.src === 'starter' ? starterBook() : pick || (docs.slice().sort((a, b) => String(b.updated_at || '').localeCompare(String(a.updated_at || '')))[0]) || starterBook();
+  const st = t => { const el = bar.querySelector('.sp-bk-st'); if (el) el.textContent = t; };
+  const paintBar = () => {
+    const firmName = B.firm ? B.firm.name : '';
+    bar.innerHTML = `<div class="sp-bk-row"><label class="sp-mini"><span>Spec book</span><select class="sp-in" data-bk="src">${docs.map(d => `<option value="${d.id}" ${B.doc.id === d.id ? 'selected' : ''}>${esc(d.title)} · ${d.sections.length} section${d.sections.length === 1 ? '' : 's'}</option>`).join('')}<option value="starter" ${B.doc.starter ? 'selected' : ''}>DrawUp starter book · ${B.doc.starter ? B.doc.sections.length : starterNumbers().length} sections</option></select></label>
+      <div class="sp-seg" role="tablist" aria-label="Branding"><span>Branding</span>${firmName ? `<button type="button" role="tab" data-bk-brand="firm" class="${B.brand === 'firm' ? 'active' : ''}" aria-selected="${B.brand === 'firm'}">${esc(firmName)}</button>` : ''}<button type="button" role="tab" data-bk-brand="drawup" class="${B.brand === 'drawup' || !firmName ? 'active' : ''}" aria-selected="${B.brand === 'drawup' || !firmName}">DrawUp</button></div></div>
+     <div class="sp-bk-row"><div class="sp-seg" role="tablist" aria-label="View"><button type="button" role="tab" data-bk-mode="print" class="${B.mode === 'print' ? 'active' : ''}" aria-selected="${B.mode === 'print'}">Print preview</button><button type="button" role="tab" data-bk-mode="edit" class="${B.mode === 'edit' ? 'active' : ''}" aria-selected="${B.mode === 'edit'}">Edit sheet</button></div>
+      <span class="sp-bk-st" role="status"></span><span class="sp-bk-act">${B.doc.starter ? '<button type="button" class="du-btn ghost" data-bk-act="savedoc">Save as a document</button><button type="button" class="sp-link" data-bk-act="reset">Reset starter text</button>' : ''}<button type="button" class="du-btn ghost" data-bk-act="pdf">Download PDF</button><button type="button" class="du-btn ghost" data-bk-act="print">Print</button></span></div>
+     <p class="sp-note sp-bk-note">${B.mode === 'edit' ? 'Click any word or title and type. The layout, numbering and indents stay in this format. Shaded words are project data, blanks and choices; type around them.' : B.doc.starter ? 'DrawUp-written starter text, ready to edit. Pick your own project manual above to see it in this format.' : 'Your project manual, compiled in this format from the first page.'}</p>`;
+    bar.querySelector('[data-bk="src"]').onchange = async e => { await flushBook(); const id = e.target.value; setBookPref('src', id); B.doc = id === 'starter' ? starterBook() : docs.find(d => d.id === id) || starterBook(); B.stale = true; paintBar(); show(); };
+    bar.querySelectorAll('[data-bk-brand]').forEach(x => x.onclick = () => { B.brand = x.dataset.bkBrand; setBookPref('brand', B.brand); B.stale = true; paintBar(); show(); });
+    bar.querySelectorAll('[data-bk-mode]').forEach(x => x.onclick = async () => { B.mode = x.dataset.bkMode; setBookPref('mode', B.mode); await flushBook(); paintBar(); show(); });
+    bar.querySelectorAll('[data-bk-act]').forEach(x => x.onclick = () => act(x.dataset.bkAct));
+  };
+  const brand = () => (B.brand === 'firm' && B.firm ? 'firm' : 'drawup');
+  const build = async () => { const { settings, files } = await get(); const f2 = await brandFiles(S, settings, files, brand(), B.firm); const ctx = bookCtx(S, B.doc, brand(), B.firm); return { settings, files: f2, ctx }; };
+  const show = async () => {
+    const my = ++B.seq; box.classList.add('sp-bookbox'); box.classList.toggle('editing', B.mode === 'edit');
+    if (B.mode === 'edit') { const { settings, ctx } = await build(); if (my !== B.seq) return; box.innerHTML = sheetHTML(B.doc, ctx, settings); fit(); box.scrollTop = 0; return; }
+    box.innerHTML = '<p class="sp-note">Laying out the whole book…</p>';
+    try { const { settings, files, ctx } = await build(); const r = await X.pdf(B.doc, ctx, settings, files, {}); if (my !== B.seq) return; B.bytes = r.bytes; B.stale = false; const n = await renderBookPdf(box, r.bytes); if (my === B.seq) st(n + ' pages'); }
+    catch (e) { if (my === B.seq) box.innerHTML = `<p class="sp-bad">${esc(e.message || e)}</p>`; }
+  };
+  const fit = () => { const sh = box.querySelector('.sp-sheets'); if (!sh) return; const first = sh.querySelector('.sp-sheet'); const w = first ? first.offsetWidth : 816; sh.style.zoom = String(Math.min(1, Math.max(0.35, ((box.clientWidth || 600) - 28) / w))); };
+  const saveBook = async () => {
+    clearTimeout(B.timer); B.timer = null; const doc = B.doc;
+    if (doc.starter) { try { localStorage.setItem(BOOK_KEY + ':starter', JSON.stringify({ title: doc.title, sections: doc.sections })); st('Saved on this device.'); } catch (_e) { st('Not saved: this browser blocked storage.'); } return; }
+    st('Saving…'); const row = toRow(doc, S.me);
+    const r = await S.c.client.from(DOCS(S)).update(row).eq('id', doc.id).select('updated_at');
+    if (r.error || !r.data?.length) { st('Not saved: ' + (r.error ? r.error.message : 'you can only edit documents you can open')); return; }
+    doc.updated_at = r.data[0].updated_at || row.updated_at; doc.updated_by = S.me; st('Saved to “' + doc.title + '”.');
+  };
+  const flushBook = async () => { if (B.timer) await saveBook(); };
+  box.addEventListener('input', e => { const el = e.target.closest && e.target.closest('[data-e]'); if (!el || B.mode !== 'edit') return; applyEdit(B.doc, el.dataset.e, readRich(el)); B.stale = true; st('Editing…'); clearTimeout(B.timer); B.timer = setTimeout(saveBook, 900); });
+  box.addEventListener('keydown', e => { const el = e.target.closest && e.target.closest('[data-e]'); if (!el) return; if (e.key === 'Enter') { e.preventDefault(); if (e.shiftKey && el.dataset.e.startsWith('p:')) document.execCommand('insertLineBreak'); } });
+  box.addEventListener('paste', e => { const el = e.target.closest && e.target.closest('[data-e]'); if (!el) return; e.preventDefault(); const t = (e.clipboardData && e.clipboardData.getData('text/plain')) || ''; document.execCommand('insertText', false, t.replace(/\s*\n\s*/g, ' ')); });
+  const act = async k => {
+    if (k === 'reset') { if (!confirm('Put the DrawUp starter text back? Your edits to the starter book on this device are removed.')) return; try { localStorage.removeItem(BOOK_KEY + ':starter'); } catch (_e) { /* private mode */ } B.doc = starterBook(true); paintBar(); show(); return; }
+    if (k === 'savedoc') { await flushBook(); try { const d = await createDoc(S, { type: 'spec', title: B.doc.title, sections: [] }); d.sections = JSON.parse(JSON.stringify(B.doc.sections)); const r = await S.c.client.from(DOCS(S)).update(toRow(d, S.me)).eq('id', d.id).select('updated_at'); if (r.error) throw r.error; docs.unshift(d); B.doc = d; setBookPref('src', d.id); paintBar(); st('Saved as a document in Documents.'); toast(S, 'Spec book saved as a document.'); } catch (e) { st('Not saved: ' + (sqlMissing(e) ? 'run the DrawUp Specs SQL.' : (e.message || e))); } return; }
+    await flushBook(); st('Preparing the PDF…');
+    try { let bytes = B.bytes; if (B.stale || !bytes) { const { settings, files, ctx } = await build(); bytes = (await X.pdf(B.doc, ctx, settings, files, {})).bytes; B.bytes = bytes; B.stale = false; }
+      const url = URL.createObjectURL(new Blob([bytes], { type: 'application/pdf' }));
+      if (k === 'print') { const w = window.open(url, '_blank'); if (!w) { st('Allow pop-ups to print, or use Download PDF.'); return; } setTimeout(() => { try { w.print(); } catch (_e) { /* the viewer prints */ } }, 900); st('Opened for printing.'); }
+      else { const a = document.createElement('a'); a.href = url; a.download = slug(B.doc.title || 'spec-book') + (brand() === 'drawup' ? '-drawup' : '') + '.pdf'; document.body.appendChild(a); a.click(); a.remove(); st('PDF downloaded.'); }
+      setTimeout(() => URL.revokeObjectURL(url), 60000);
+    } catch (e) { st('No PDF: ' + (e.message || e)); }
+  };
+  window.addEventListener('resize', fit);
+  (async () => { B.firm = await brandFirm(S); paintBar(); show(); })();
+  paintBar();
+  return { redraw: () => { B.stale = true; show(); }, flush: flushBook, state: B };
+}
 function formatEditor(S, v, row) {
   const builtIn = row === 'drawup'; if (builtIn) row = { kind: 'drawup', name: 'DrawUp standard', settings: {} };
   const canEdit = !builtIn && (row.kind === 'client' || S.admin);
-  const st = X.fixFormat(row.settings); let tplId = row.template_file_id || null, refs = (row.reference_file_ids || []).slice(); let sample = 'spec';
+  const st = X.fixFormat(row.settings); let tplId = row.template_file_id || null, refs = (row.reference_file_ids || []).slice(); let sample = 'book', book = null;
   const fileName = id => (S.kitFiles.find(k => k.id === id) || {}).file_name || 'File';
   const ro = canEdit ? '' : 'disabled';
   v.innerHTML = `<div class="sp-fed fk-wrap"><div class="sp-fed-h"><button type="button" class="du-btn ghost" data-fback>← Formats</button><h3>${esc(builtIn ? 'DrawUp standard' : row.kind === 'firm' ? 'Firm standard format' : 'Client format')}</h3>${builtIn ? '<span class="sp-note">Built in. Copy it into a firm or client format to change it.</span>' : ''}</div>
@@ -672,17 +842,22 @@ function formatEditor(S, v, row) {
      <div class="fk-two"><label><span>Logo</span><select id="sf-logo" ${ro}><option value="firm" ${st.letterhead.logo === 'firm' ? 'selected' : ''}>Firm logo</option><option value="upload" ${st.letterhead.logo === 'upload' ? 'selected' : ''}>Uploaded logo</option><option value="none" ${st.letterhead.logo === 'none' ? 'selected' : ''}>No logo</option></select></label><label><span>Align</span><select id="sf-align" ${ro}><option value="left">Left</option><option value="right" ${st.letterhead.align === 'right' ? 'selected' : ''}>Right</option></select></label></div>
      ${canEdit ? `<label class="du-btn ghost sp-file">Upload a logo (PNG or JPG)<input type="file" accept="image/png,image/jpeg" data-up="logo" hidden></label>` : ''}</details>
    ${canEdit ? `<div class="fk-savebar"><button type="button" class="du-btn primary" data-fsave>Save format</button>${row.id ? '<button type="button" class="du-btn ghost" data-fdel>Delete</button>' : ''}<span class="sp-st" role="status"></span></div>` : builtIn ? `<div class="fk-savebar">${S.admin ? '<button type="button" class="du-btn ghost" data-fcopy="firm">Copy into a firm standard</button>' : ''}<button type="button" class="du-btn ghost" data-fcopy="client">Copy into a client format</button></div>` : ''}
-  </div><div class="fk-prev-col"><div class="fk-prev-tabs sp-ptabs" role="tablist"><button type="button" class="active" data-smp="spec">Spec page</button><button type="button" data-smp="letter">Letter page</button></div><div class="sp-fprev"><p class="sp-note">Laying out…</p></div><p class="sp-note">Sample content with this firm's project data where it is set.</p></div></div></div>`;
+  </div><div class="fk-prev-col sp-bookcol"><div class="sp-bk-top"><div class="fk-prev-tabs sp-ptabs" role="tablist"><button type="button" class="active" data-smp="book">Full spec book</button><button type="button" data-smp="letter">Letter page</button></div><button type="button" class="sp-link" data-fwide aria-pressed="false">Wide view</button></div><div class="sp-bkbar"></div><div class="sp-fprev"><p class="sp-note">Laying out…</p></div><p class="sp-note sp-smpnote" hidden>Sample letter with this firm's project data where it is set.</p></div></div></div>`;
   const q = id => v.querySelector('#' + id);
   const read = () => { if (!canEdit) return st; const o = { ...st, margins: { ...st.margins }, header: { ...st.header }, footer: { ...st.footer }, letter_footer: { ...st.letter_footer }, letterhead: { ...st.letterhead } };
     o.page = q('sf-page').value; o.font = q('sf-font').value; o.size = +q('sf-size').value; o.line = +q('sf-line').value; o.accent = q('sf-accent').value; o.indent = +q('sf-indent').value;
     v.querySelectorAll('[data-mg]').forEach(i => { o.margins[i.dataset.mg] = +i.value; }); o.numbering = q('sf-num').value; o.section_title = q('sf-sectitle').value; o.part_style = q('sf-part').value; o.end_text = q('sf-end').value; o.caps_articles = q('sf-caps').checked; o.cover = q('sf-cover').checked; o.toc = q('sf-toc').checked; o.article_style = q('sf-art').value; o.number_style = q('sf-numst').value;
     v.querySelectorAll('[data-hf]').forEach(i => { const [a, b] = i.dataset.hf.split('.'); o[a][b] = i.value; }); o.header.block = q('sf-hblock').value.replace(/\\t/g, '\t'); o.header.rule = q('sf-hrule').checked; o.footer.rule = q('sf-frule').checked; o.header.bold = o.footer.bold = q('sf-frule').checked; o.letterhead.show = q('sf-lh').checked; o.letterhead.lines = q('sf-lhl').value; o.letterhead.logo = q('sf-logo').value; o.letterhead.align = q('sf-align').value;
     if (o.background && q('sf-bgmode')) o.background = { ...o.background, mode: q('sf-bgmode').value }; Object.assign(st, X.fixFormat(o)); return st; };
-  let tm = null; const draw = async () => { const box = v.querySelector('.sp-fprev'); try { const s2 = read(); const fake = { id: row.id, kind: row.kind, settings: s2, template_file_id: tplId }; const { settings, files } = await formatFiles(S, builtIn ? null : fake); const doc = sample === 'spec' ? SAMPLE_SPEC() : SAMPLE_LETTER(); const ctx = ctxFor(S, { ...doc, project_thread_id: S.projects[0]?.id || null, data: {} }); const r = await X.pdf(doc, ctx, settings, files, sample === 'spec' ? { sectionId: doc.sections[0].id } : {}); await renderPdf(box, r.bytes, 2); } catch (e) { box.innerHTML = `<p class="sp-bad">${esc(e.message || e)}</p>`; } };
+  let tm = null; const fmtNow = async () => { const s2 = read(); const fake = { id: row.id, kind: row.kind, settings: s2, template_file_id: tplId }; return formatFiles(S, builtIn ? null : fake); };
+  const draw = async () => { const box = v.querySelector('.sp-fprev'), bar = v.querySelector('.sp-bkbar'); v.querySelector('.sp-smpnote').hidden = sample === 'book'; bar.hidden = sample !== 'book';
+    if (sample === 'book') { if (book) book.redraw(); else book = bookPanel(S, box, bar, fmtNow); return; }
+    box.classList.remove('sp-bookbox', 'editing');
+    try { const { settings, files } = await fmtNow(); const doc = SAMPLE_LETTER(); const f = await brandFirm(S); const brand = bookPrefs().brand === 'drawup' || !f ? 'drawup' : 'firm'; const ctx = bookCtx(S, { ...doc, data: {} }, brand, f); const r = await X.pdf(doc, ctx, settings, await brandFiles(S, settings, files, brand, f), {}); await renderPdf(box, r.bytes, 2); } catch (e) { box.innerHTML = `<p class="sp-bad">${esc(e.message || e)}</p>`; } };
   v.querySelector('.fk-form').addEventListener('input', () => { clearTimeout(tm); tm = setTimeout(draw, 500); }); v.querySelector('.fk-form').addEventListener('change', () => { clearTimeout(tm); tm = setTimeout(draw, 200); });
-  v.querySelectorAll('[data-smp]').forEach(x => x.onclick = () => { sample = x.dataset.smp; v.querySelectorAll('[data-smp]').forEach(y => y.classList.toggle('active', y === x)); draw(); });
-  v.querySelector('[data-fback]').onclick = () => renderFormats(S, v);
+  v.querySelectorAll('[data-smp]').forEach(x => x.onclick = async () => { if (book && sample === 'book') await book.flush(); sample = x.dataset.smp; v.querySelectorAll('[data-smp]').forEach(y => y.classList.toggle('active', y === x)); draw(); });
+  v.querySelector('[data-fwide]').onclick = e => { const g = v.querySelector('.sp-fgrid'); const on = g.classList.toggle('sp-wide'); e.target.setAttribute('aria-pressed', String(on)); e.target.textContent = on ? 'Show format settings' : 'Wide view'; if (book) book.redraw(); };
+  v.querySelector('[data-fback]').onclick = async () => { if (book) await book.flush(); renderFormats(S, v); };
   v.querySelectorAll('[data-fcopy]').forEach(x => x.onclick = () => formatEditor(S, v, { kind: x.dataset.fcopy, name: x.dataset.fcopy === 'firm' ? S.firm.name + ' standard' : 'Client format', settings: JSON.parse(JSON.stringify(X.DRAWUP_FORMAT)), reference_file_ids: [] }));
   v.querySelectorAll('[data-ref]').forEach(x => x.onclick = async () => { const kf = S.kitFiles.find(k => k.id === x.dataset.ref); if (!kf) return; const r = await S.c.client.storage.from(BUCKET).createSignedUrl(kf.storage_path, 600, { download: kf.file_name }); if (r.data) window.open(r.data.signedUrl, '_blank', 'noopener'); });
   v.querySelectorAll('[data-rx]').forEach(x => x.onclick = () => { refs = refs.filter(id => id !== x.dataset.rx); row.reference_file_ids = refs; row.settings = read(); row.template_file_id = tplId; formatEditor(S, v, row); });
