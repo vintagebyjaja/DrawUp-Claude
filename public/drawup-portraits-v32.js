@@ -12,7 +12,7 @@
   // every face shot planned; READY lists the ones whose image is in /drawup-portraits-v32/ (only those are shown)
   const PLANNED = ['arch-coach', 'paul-r-williams', 'julia-morgan', 'frank-lloyd-wright', 'zaha-hadid', 'norma-merrick-sklarek',
     'ove-arup', 'i-m-pei', 'fazlur-rahman-khan', 'emily-warren-roebling', 'tadao-ando'];
-  const READY = [];
+  const READY = PLANNED;
   const KEYS = PLANNED.filter(k => READY.includes(k));
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const has = k => KEYS.includes(k);
