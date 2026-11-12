@@ -34,3 +34,4 @@ next-env.d.ts
 tests/season1/out/
 tests/dashboard-v31/out/
 tests/draw-studio/out-*.png
+tests/portraits-v32/out/
