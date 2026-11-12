@@ -162,6 +162,7 @@ async function render(w,c){
     root.addEventListener('drop',e=>{root.classList.remove('drop');const f=[...(e.dataTransfer?.files||[])].find(x=>/^image\//.test(x.type));if(f){e.preventDefault();addImage(f);}});
     drawMessages();
     try{window.DrawUpSwap21?.mount?.(V.api);}catch(e){console.warn('Swap V21 modes',e);} // V21: mode picker
+    try{window.DrawUpMaterials?.mountSwap?.(V.api);}catch(e){console.warn('Swap materials',e);} // v33: Materials library picks
   };
   const remember=id=>{try{id?localStorage.setItem('drawup_swap20_thread',id):localStorage.removeItem('drawup_swap20_thread');}catch(_e){}};
   V.drawMessages=()=>drawMessages();
@@ -228,6 +229,8 @@ async function render(w,c){
   /* extra (V21 modes, optional): {swapType, sourcePath, maskBlob, options, noMask} */
   const generate=async(text,area,extra)=>{if(V.busy)return;V.busy=true;const sendBtn=w.querySelector('#sw20-send');if(sendBtn)sendBtn.disabled=true;
     let k=null;extra=extra||{};
+    // v33 Materials library: materials picked for this swap ride along (text + their ids for reference pictures).
+    const mh=window.DrawUpMaterials?.forSwap?.()||null;if(mh&&mh.text){text=(text+' '+mh.text).trim();extra={...extra,options:{...(extra.options||{}),...(mh.ids.length?{materials:mh.ids}:{})}};}
     try{
       const src=extra.sourcePath||base(),id=uuid();let maskPath=null;const mask=extra.maskBlob?{blob:extra.maskBlob}:(!extra.noMask&&V.mask&&V.mask.path===src?V.mask:null);
       if(mask){maskPath=`${uid}/swap/${id}-mask.png`;const up=await c.client.storage.from(BUCKET).upload(maskPath,mask.blob,{contentType:'image/png'});if(up.error)throw up.error;}
@@ -239,6 +242,7 @@ async function render(w,c){
       let d;try{d=await api(c,'/api/swap',{method:'POST',body:JSON.stringify(extra.options?{generation_id:id,options:extra.options}:{generation_id:id})});}
       catch(e){if(e.data?.generation)onGen(e.data.generation);k.done(`<p>${esc(e.message)}</p>`,false,e.data?.code==='INSUFFICIENT_CREDITS'?'Not enough credits for this one.':'No good — it did not start.');k=null;
         const r=await c.client.from('swap_generations').select('*').eq('id',id).single();if(r.data?.status==='queued')await stopGen(c,id,'not-started');else if(r.data)onGen(r.data);return;}
+      if(mh)window.DrawUpMaterials?.clearSwap?.();
       const g=d.generation||ins.data;onGen(g);document.dispatchEvent(new Event('du-credits'));
       if(g.status==='generating'||g.status==='queued')watch(c,g,k,t0);else if(k){k.done(`<p>${esc(g.error||'')}</p>`,g.status==='complete');}
     }catch(e){k?.close();c.toast('Swap did not start: '+(e.message||e),true);}

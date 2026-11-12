@@ -123,8 +123,8 @@
     ['home', 'Home', 'Back to the top of your dashboard', { fn: 'home' }],
     ['cube', 'My Projects', 'All your projects', T('projects')],
     ['template', 'Templates', 'Starting points', { fn: 'templates' }],
-    ['library', 'Library', 'The Locker Room: everything you saved', T('ai-team', { view: 'locker' })],
-    ['material', 'Materials', 'Change materials on a picture with Swap', T('swap', { click: 'Materials' })],
+    ['library', 'Library', 'Everything you uploaded and every Swap picture you made', { fn: 'library' }],
+    ['material', 'Materials', 'DrawUp, imported and vendor materials to use in Swap', { fn: 'materials' }],
     ['gear', 'Settings', 'Account, subscription and credits', T('account')],
     ['help', 'Support', 'Ask how to do anything in DrawUp, free', { fn: 'support' }]
   ];
@@ -143,7 +143,7 @@
     if (k === '3d') return openRecentDrawing('3d');
     if (k === 'export') return openRecentDrawing('export');
     if (k === 'templates') return openTemplates();
-    if (k === 'materials') return go(T('swap', { click: 'Materials' }));
+    if (k === 'materials') return openView('materials');
   }
 
   /* ------------------------------------------------------------------ Arch Coach (the existing implementation) */
@@ -286,6 +286,7 @@
         ${SIGNATURE}
       </div></div>`;
     bind(w);
+    { const q = new URLSearchParams((/\?(.*)$/.exec(location.hash || '') || [])[1] || ''); const v = q.get('view'); if (v === 'library' || v === 'materials') openView(v, { tab: q.get('tab') || undefined, vendor: q.get('vendor') || undefined }); }
     const paintAva = () => coachAvatar().then(svg => { const a = w.querySelector('#db-coach-ava'); if (a && svg) a.innerHTML = svg; else if (a) a.innerHTML = `<span class="db-coach__fallback">${ico('spark')}</span>`; });
     paintAva();
     w.querySelector('[data-av-edit]')?.addEventListener('click', () => window.DrawUpAvatars ? window.DrawUpAvatars.open('coach') : window.DrawUpCoach?.open?.('appearance'));
@@ -367,9 +368,10 @@
       const sd = t.closest('[data-db-side]');
       if (sd) {
         const s = SIDE[+sd.dataset.dbSide];
-        if (s[3].fn === 'home') { (w.closest('.du-workspace') || window).scrollTo?.({ top: 0, behavior: 'smooth' }); window.scrollTo({ top: 0, behavior: 'smooth' }); return; }
+        if (s[3].fn === 'home') { closeView(); (w.closest('.du-workspace') || window).scrollTo?.({ top: 0, behavior: 'smooth' }); window.scrollTo({ top: 0, behavior: 'smooth' }); return; }
+        if (s[3].fn === 'library' || s[3].fn === 'materials') return openView(s[3].fn);
         if (s[3].fn === 'templates') return openTemplates();
-        if (s[3].fn === 'support') { input.value = ''; input.placeholder = 'Ask how to do anything in DrawUp…'; input.focus(); input.closest('.db-coach').scrollIntoView({ block: 'center', behavior: 'smooth' }); status.textContent = 'Questions about using DrawUp are answered free.'; return; }
+        if (s[3].fn === 'support') { closeView(); input.value = ''; input.placeholder = 'Ask how to do anything in DrawUp…'; input.focus(); input.closest('.db-coach').scrollIntoView({ block: 'center', behavior: 'smooth' }); status.textContent = 'Questions about using DrawUp are answered free.'; return; }
         return go(s[3]);
       }
       if (t.closest('[data-db-collapse]')) {
@@ -429,6 +431,33 @@
     show();
   }
 
+  /* ------------------------------------------------------------------ Library and Materials views (drawup-materials-v33.js)
+   * They open inside the dashboard, next to the sidebar. The dashboard itself is only hidden, so Home brings it back as it was. */
+  const VIEW_SIDE = { library: 3, materials: 4 };
+  const viewHash = (view, opts) => '#portal/dashboard?view=' + view + (opts.tab ? '&tab=' + opts.tab : '') + (opts.vendor ? '&vendor=' + encodeURIComponent(opts.vendor) : '');
+  function markSide(i) { $$('#db-dash [data-db-side]').forEach(b => { const on = +b.dataset.dbSide === i; b.classList.toggle('is-on', on); if (on) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); }); }
+  async function openView(view, opts = {}) {
+    const main = $('#db-dash .db-main');
+    if (!main) { await go(T('dashboard', { hash: viewHash(view, opts) })); return; }
+    const M = await waitFor(() => window.DrawUpMaterials, 4000);
+    if (!M) { toast('Library and Materials did not load. Refresh the page.'); return; }
+    [...main.children].forEach(ch => { if (!ch.classList.contains('db-view')) ch.classList.add('db-hide'); });
+    let host = main.querySelector(':scope > .db-view');
+    if (!host) { main.insertAdjacentHTML('afterbegin', '<div class="db-view"></div>'); host = main.querySelector(':scope > .db-view'); }
+    host.dataset.view = view;
+    markSide(VIEW_SIDE[view]);
+    history.replaceState(null, '', viewHash(view, opts));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    return view === 'library' ? M.renderLibrary(host, opts) : M.renderMaterials(host, opts);
+  }
+  function closeView() {
+    const main = $('#db-dash .db-main'); if (!main) return;
+    const host = main.querySelector(':scope > .db-view'); if (host) host.outerHTML = '';
+    main.querySelectorAll(':scope > .db-hide').forEach(ch => ch.classList.toggle('db-hide', false));
+    markSide(0);
+    if (/[?&]view=/.test(location.hash || '')) history.replaceState(null, '', '#portal/dashboard');
+  }
+
   /* ------------------------------------------------------------------ light header: icons, brand mark, signature in the account menu */
   const NAV_ICON = { dashboard: 'dash', projects: 'cube', 'ai-team': 'team', draw: 'pen', check: 'check', swap: 'swap', details: 'library', discover: 'discover', connect: 'connect', firm: 'firm' };
   function decorateNav() {
@@ -458,5 +487,5 @@
     watchAcct();
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
-  window.DrawUpDreamBeyond = { render, go, runTool, version: V };
+  window.DrawUpDreamBeyond = { render, go, runTool, openView, closeView, version: V };
 })();

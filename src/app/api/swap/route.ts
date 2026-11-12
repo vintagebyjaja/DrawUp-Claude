@@ -67,6 +67,37 @@ function readOptions(gen: any, raw: any, userId: string): Opts {
   return { lines, refs };
 }
 
+// v33 Materials library: the member's own imported materials and published vendor products, by id.
+// Read with the service role, then checked here the same way RLS would: imported = owner only,
+// vendor = published product on a published vendor page (or the member's own).
+const MATERIALS_BUCKET = 'drawup-materials';
+const MAX_MATERIALS = 3;
+type Mat = { line: string; bucket: string; path: string };
+const fmtNum = (n: unknown) => { const v = Number(n); return Number.isFinite(v) && v > 0 ? String(Math.round(v * 1000) / 1000) : ''; };
+async function readMaterials(raw: any, userId: string): Promise<Mat[]> {
+  const ids = (Array.isArray(raw?.materials) ? raw.materials : []).map((x: unknown) => String(x || '')).filter((x: string) => /^[0-9a-f-]{36}$/i.test(x)).slice(0, MAX_MATERIALS);
+  if (!ids.length) return [];
+  const r = await adminRest(`user_materials?id=in.(${ids.join(',')})&select=*,vendor:material_vendors(name,is_published,owner_id)`);
+  if (!r.ok) return [];
+  const rows = (await r.json()) as any[];
+  const out: Mat[] = [];
+  for (const id of ids) {
+    const m = rows.find(x => x.id === id); if (!m) continue;
+    const own = m.owner_id === userId;
+    if (m.source === 'imported' && !own) continue;
+    if (m.source === 'vendor' && !own && !(m.is_published && m.vendor?.is_published) && m.vendor?.owner_id !== userId) continue;
+    const size = [fmtNum(m.width), fmtNum(m.length), fmtNum(m.thickness)].filter(Boolean);
+    const bits = [
+      clean(m.name, 120), m.category && m.category !== 'other' ? clean(m.category, 30) : '',
+      m.color ? 'colour ' + clean(m.color, 120) : '', m.finish ? clean(m.finish, 120) + ' finish' : '',
+      m.source === 'vendor' && m.vendor?.name ? 'a real product by ' + clean(m.vendor.name, 120) + (m.sku ? ' (' + clean(m.sku, 80) + ')' : '') : '',
+    ].filter(Boolean).join(', ');
+    const sizeLine = size.length ? ` Each piece is actually ${size.join(' x ')} ${m.unit || 'in'}${size.length === 3 ? ' (width x length x thickness)' : ' (width x length)'}: scale the pattern, joints and units to that real size for the camera.` : '';
+    out.push({ line: `${bits}.${sizeLine}${m.description ? ' Notes: ' + clean(m.description, 300) + '.' : ''}`, bucket: m.source === 'vendor' ? MATERIALS_BUCKET : PRIVATE_BUCKET, path: String(m.image_path || '') });
+  }
+  return out;
+}
+
 async function loadOwned(id: string, userId: string) {
   if (!/^[0-9a-f-]{36}$/i.test(id)) return null;
   const row = await adminSelectOne<any>('swap_generations', `id=eq.${id}&select=*`);
@@ -190,10 +221,23 @@ export async function POST(request: Request) {
       if (f.bytes.byteLength <= MAX_REF_BYTES) refImages.push({ type: 'input_image', image_url: `data:${/png|webp/.test(f.type) ? f.type : 'image/jpeg'};base64,${bytesToBase64(f.bytes)}` });
     } catch { /* a missing reference only weakens the match */ }
   }
+  // v33 Materials library picks: one reference picture each, with the real size when it is known.
+  const matLines: string[] = [];
+  for (const m of await readMaterials(body?.options, user.id).catch(() => [] as Mat[])) {
+    let shown = false;
+    if (m.path && !m.path.includes('..')) {
+      try {
+        const f = await storageDownload(m.bucket, m.path);
+        if (f.bytes.byteLength <= MAX_REF_BYTES) { refImages.push({ type: 'input_image', image_url: `data:${/png|webp/.test(f.type) ? f.type : 'image/jpeg'};base64,${bytesToBase64(f.bytes)}` }); shown = true; }
+      } catch { /* the text description still goes through */ }
+    }
+    matLines.push(`Use this material: ${m.line}${shown ? ` Reference image ${refImages.length + 1} is a picture of it: match its texture, pattern, colour and sheen.` : ''}`);
+  }
   const text = [
     `Edit this architectural image. ${rule}`,
     gen.swap_type === 'photoreal' ? `Description to follow: ${gen.prompt}` : `Requested change: ${gen.prompt}`,
     ...opts.lines,
+    ...matLines,
     area ? `Where: apply the change only to ${area === 'Marked area' ? 'the marked area' : 'the ' + area.toLowerCase()}. Leave every other surface as it is.` : '',
     maskData ? 'A mask is attached: its transparent pixels mark the exact region to change. Keep everything outside that region identical.' : '',
     refImages.length ? 'The first image is the one to edit. The images after it are references only, do not return them.' : '',
