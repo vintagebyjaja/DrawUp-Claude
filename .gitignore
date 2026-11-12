@@ -32,3 +32,4 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 tests/season1/out/
+tests/draw-studio/out-*.png
