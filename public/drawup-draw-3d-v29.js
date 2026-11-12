@@ -30,7 +30,7 @@
   const MATS = { fabric: '#7d8b99', wood: '#b48a5f', metal: '#9aa1a8', white: '#f4f4f2', glass: '#bfe3f2', stone: '#d8d3ca', steel: '#c4c9ce', plant: '#4f8a4a', dark: '#3a3d41', person: '#c9b8a4', brand: '#c8102e', accent: '#c2a15a', custom: '#a3b6c9' };
   const STYLES = {
     cd: { bg: '#ffffff', clay: '#f6f6f6', edge: '#111111', edges: true, light: 1, shadows: false, label: 'CD (black and white)' },
-    sketch: { bg: '#fbf8f1', clay: '#fffdf8', edge: '#3b3b3b', edges: true, light: 0.95, shadows: false, label: 'Sketch' },
+    sketch: { bg: '#fbfaf6', clay: '#fffdf8', edge: '#161616', edges: true, light: 0.95, shadows: false, pencil: true, label: 'Sketch' },
     presentation: { bg: '#eef2f5', edge: '#55606b', edges: true, edgeOpacity: 0.25, light: 1, shadows: true, label: 'Presentation' },
     realistic: { bg: '#dfe7ee', edges: false, light: 1.1, shadows: true, label: 'Realistic' },
   };
@@ -43,6 +43,64 @@
     const s = new T.Shape(pts.map(p => new T.Vector2(p.x, -p.y)));
     const g = new T.ExtrudeGeometry(s, { depth: z1 - z0, bevelEnabled: false });
     g.rotateX(-Math.PI / 2); g.translate(0, z0, 0); return g;
+  }
+  /* ---------- Sketch style: pencil hatching on faces, overshooting doubled strokes on edges, a few smudges.
+   * Deterministic (seeded), so the same model always draws the same way and exports match the screen. */
+  function rng(seed) { let a = seed >>> 0 || 1; return () => { a ^= a << 13; a ^= a >>> 17; a ^= a << 5; return ((a >>> 0) % 100000) / 100000; }; }
+  const pencilCache = new WeakMap();
+  function pencilMats(T) {
+    if (pencilCache.has(T)) return pencilCache.get(T);
+    const tex = (density, dark, seed, smudge) => {
+      const N = 512, cv = (root.document ? root.document.createElement('canvas') : null); if (!cv) return null; cv.width = cv.height = N;
+      const g = cv.getContext('2d'), r = rng(seed); g.fillStyle = '#fdfcf8'; g.fillRect(0, 0, N, N);
+      // paper grain
+      for (let i = 0; i < 2600; i++) { g.fillStyle = `rgba(60,55,45,${0.025 + r() * 0.04})`; g.fillRect(r() * N, r() * N, 1 + r(), 1 + r()); }
+      // smudges: soft graphite blotches
+      for (let i = 0; i < smudge; i++) { const x = r() * N, y = r() * N, rad = 60 + r() * 120, gr = g.createRadialGradient(x, y, 0, x, y, rad); gr.addColorStop(0, `rgba(70,70,70,${0.03 + r() * 0.04})`); gr.addColorStop(1, 'rgba(70,70,70,0)'); g.fillStyle = gr; g.fillRect(x - rad, y - rad, rad * 2, rad * 2); }
+      // hatching: short parallel pencil strokes in loose bands
+      g.lineCap = 'round';
+      for (let i = 0; i < density; i++) {
+        const x = r() * N * 1.2 - N * 0.1, y = r() * N * 1.2 - N * 0.1, len = 30 + r() * 70, ang = -0.9 + (r() - 0.5) * 0.12;
+        g.strokeStyle = `rgba(40,40,40,${dark * (0.35 + r() * 0.65)})`; g.lineWidth = 0.6 + r() * 0.9;
+        g.beginPath(); g.moveTo(x, y); g.lineTo(x + Math.cos(ang) * len, y + Math.sin(ang) * len); g.stroke();
+      }
+      const t = new T.CanvasTexture(cv); t.wrapS = t.wrapT = T.RepeatWrapping; if (T.sRGBEncoding) t.encoding = T.sRGBEncoding; return t;
+    };
+    const M = map => new T.MeshBasicMaterial({ color: 0xffffff, map, polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1 });
+    const out = [M(tex(90, 0.16, 7, 0)), M(tex(1500, 0.42, 11, 2)), M(tex(2600, 0.58, 23, 2))]; // tops, lit sides, shaded sides
+    out.forEach((x, i) => { x.name = ['pencil-top', 'pencil-side', 'pencil-shade'][i]; });
+    pencilCache.set(T, out); return out;
+  }
+  /** Box-projected UVs (8 ft per tile) and a material group per face direction: 0 up/down, 1 faces east/west, 2 faces north/south. */
+  function pencilGeom(T, geom) {
+    const g = geom.index ? geom.toNonIndexed() : geom, P = g.attributes.position, n = P.count, uv = new Float32Array(n * 2), TILE = 96;
+    g.clearGroups(); let cur = -1, start = 0;
+    const a = new T.Vector3(), b = new T.Vector3(), c = new T.Vector3(), nn = new T.Vector3();
+    for (let i = 0; i < n; i += 3) {
+      a.fromBufferAttribute(P, i); b.fromBufferAttribute(P, i + 1); c.fromBufferAttribute(P, i + 2);
+      nn.subVectors(c, b).cross(b.clone().sub(a)).normalize();
+      const ax = Math.abs(nn.x), ay = Math.abs(nn.y), az = Math.abs(nn.z), grp = ay >= ax && ay >= az ? 0 : ax >= az ? 1 : 2;
+      [a, b, c].forEach((v, k) => { const u = grp === 0 ? [v.x, v.z] : grp === 1 ? [v.z, v.y] : [v.x, v.y]; const t = grp === 0 ? TILE * 3 : TILE; uv[(i + k) * 2] = u[0] / t; uv[(i + k) * 2 + 1] = u[1] / t; });
+      if (grp !== cur) { if (cur >= 0) g.addGroup(start, i - start, cur); cur = grp; start = i; }
+    }
+    if (cur >= 0) g.addGroup(start, n - start, cur);
+    g.setAttribute('uv', new T.BufferAttribute(uv, 2)); return g;
+  }
+  /** Edge lines drawn twice, slightly off each other, running past the corners like construction lines. */
+  function pencilEdges(T, geom, mats, seed) {
+    const E = new T.EdgesGeometry(geom, 25), P = E.attributes.position, r = rng(seed), main = [], ghost = [], third = [];
+    for (let i = 0; i < P.count; i += 2) {
+      const A = new T.Vector3().fromBufferAttribute(P, i), B = new T.Vector3().fromBufferAttribute(P, i + 1), d = B.clone().sub(A), L = d.length(); if (L < 0.5) continue; d.divideScalar(L);
+      const over = () => Math.min(14, 3 + L * 0.06) * (0.4 + r());
+      const a1 = A.clone().addScaledVector(d, -over()), b1 = B.clone().addScaledVector(d, over());
+      main.push(a1.x, a1.y, a1.z, b1.x, b1.y, b1.z);
+      const j = () => (r() - 0.5) * 1.4, a2 = A.clone().addScaledVector(d, -over() * 0.6), b2 = B.clone().addScaledVector(d, over() * 0.6);
+      ghost.push(a2.x + j(), a2.y + j(), a2.z + j(), b2.x + j(), b2.y + j(), b2.z + j());
+      // a third, slightly offset pass makes the main stroke read heavier, like pressing on a pencil
+      const k = 0.35; third.push(A.x + k, A.y + k, A.z, B.x + k, B.y + k, B.z);
+    }
+    const mk = (arr, m) => { const g = new T.BufferGeometry(); g.setAttribute('position', new T.Float32BufferAttribute(arr, 3)); const l = new T.LineSegments(g, m); l.userData.edge = true; return l; };
+    E.dispose(); return [mk(main, mats[0]), mk(third, mats[0]), mk(ghost, mats[1])];
   }
   function ringShape(T, rx, ry, band) {
     const s = new T.Shape(); s.absellipse(0, 0, rx, ry, 0, Math.PI * 2, false, 0);
@@ -110,7 +168,7 @@
     const wallCol = finishColor('wall', fin.wall, '#f1efe9'), floorCol = finishColor('floor', fin.floor, '#d9d4ca'), accent = finishColor('accent', fin.accent, MATS.accent);
     const brandCol = isHex(brand.primary) ? brand.primary : MATS.brand;
     const compMat = k => {
-      if (k === 'glass') return mat('glass', MATS.glass, { transparent: true, opacity: clay ? 0.18 : 0.35, roughness: 0.1, metalness: 0.1, depthWrite: false });
+      if (k === 'glass') return clay ? mat('glass', '#c3cad1', { transparent: true, opacity: 0.6, roughness: 0.2, metalness: 0, depthWrite: false }) : mat('glass', MATS.glass, { transparent: true, opacity: 0.5, roughness: 0.1, metalness: 0.1, depthWrite: false });
       if (k === 'brand') return mat('brand', brandCol);
       if (k === 'accent') return mat('accent', accent, { metalness: 0.3, roughness: 0.4 });
       if (k === 'metal' || k === 'steel') return mat(k, MATS[k], { metalness: 0.45, roughness: 0.45 });
@@ -118,8 +176,16 @@
     };
     const root3 = new T.Group(); root3.name = 'DrawUp model'; root3.scale.setScalar(IN);
     const edgeMat = st.edges ? new T.LineBasicMaterial({ color: st.edge, transparent: (st.edgeOpacity || 1) < 1, opacity: st.edgeOpacity || 1 }) : null;
+    let pencilSeed = 1;
+    const pencilLines = st.pencil ? [new T.LineBasicMaterial({ color: st.edge }), new T.LineBasicMaterial({ color: st.edge, transparent: true, opacity: 0.45 })] : null;
     const put = (geom, M, sel, parent, name) => {
-      if (!geom) return null; const mesh = new T.Mesh(geom, M); mesh.castShadow = st.shadows; mesh.receiveShadow = st.shadows; mesh.userData.sel = sel || null; if (name) mesh.name = name;
+      if (!geom) return null;
+      if (st.pencil) {
+        // glass keeps its grey tint; everything else is drawn in pencil
+        const glass = M.transparent, g2 = glass ? geom : pencilGeom(T, geom), mesh = new T.Mesh(g2, glass ? M : pencilMats(T)); mesh.userData.sel = sel || null; if (name) mesh.name = name;
+        (parent || root3).add(mesh); pencilEdges(T, geom, pencilLines, ++pencilSeed * 7919).forEach(l => mesh.add(l)); if (g2 !== geom) geom.dispose(); return mesh;
+      }
+      const mesh = new T.Mesh(geom, M); mesh.castShadow = st.shadows; mesh.receiveShadow = st.shadows; mesh.userData.sel = sel || null; if (name) mesh.name = name;
       (parent || root3).add(mesh);
       if (edgeMat && !(M.transparent && M.opacity < 0.3)) { const e = new T.LineSegments(new T.EdgesGeometry(geom, 25), edgeMat); e.userData.edge = true; mesh.add(e); }
       return mesh;
@@ -276,7 +342,7 @@
     V.highlight = sel => {
       hi.forEach(([o, e]) => { o.material = o.userData._m; void e; }); hi = [];
       if (!sel || !cur) { dirty = true; return; }
-      cur.group.traverse(o => { if (o.isMesh && o.userData.sel && o.userData.sel.type === sel.type && o.userData.sel.id === sel.id) { o.userData._m = o.material; const M = o.material.clone(); M.emissive = new T.Color('#1b8cff'); M.emissiveIntensity = 0.35; o.material = M; hi.push([o]); } });
+      cur.group.traverse(o => { if (o.isMesh && o.userData.sel && o.userData.sel.type === sel.type && o.userData.sel.id === sel.id) { o.userData._m = o.material; const tint = x => { const M = x.clone(); if (M.emissive) { M.emissive = new T.Color('#1b8cff'); M.emissiveIntensity = 0.35; } else M.color = new T.Color('#a9d0ff'); return M; }; o.material = Array.isArray(o.material) ? o.material.map(tint) : tint(o.material); hi.push([o]); } });
       dirty = true;
     };
     /* png(w, h, {background: '#hex' | 'transparent', type: 'image/png' | 'image/jpeg', quality}) renders a clean frame:
