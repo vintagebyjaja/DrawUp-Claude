@@ -74,8 +74,31 @@
   }
 
   /* ------------------------------------------------------------ scene */
+  /* v31: a drawing with floors (DrawUpFloors) is built one floor at a time and stacked at each
+   * floor's elevation. opts.isolate = a floor id to show alone; opts.explode = extra gap in inches
+   * between floors; opts.upTo = hide floors above this one (to see inside a building). */
+  function buildStack(T, m, opts) {
+    const Fl = root.DrawUpFloors, all = Fl.all(m), topId = all[all.length - 1].level.id;
+    let shown = all;
+    if (opts.isolate) shown = all.filter(f => f.level.id === opts.isolate);
+    else if (opts.upTo) { const k = all.findIndex(f => f.level.id === opts.upTo); if (k >= 0) shown = all.slice(0, k + 1); }
+    if (!shown.length) shown = all;
+    const root3 = new T.Group(); root3.name = 'DrawUp model'; root3.scale.setScalar(IN);
+    const lastShown = shown[shown.length - 1].level.id;
+    let style = null;
+    shown.forEach((f, k) => {
+      const o = Object.assign({}, opts, { _floor: true, center: false, roof: opts.roof && f.level.id === topId && !opts.isolate && !opts.upTo, cut: f.level.id === lastShown ? opts.cut : 0, slab: true });
+      const r = build(T, f.model, o); style = r.style;
+      const g = r.group; g.scale.setScalar(1); g.position.set(0, f.level.elev + (opts.explode > 0 ? k * opts.explode : 0), 0);
+      g.name = f.level.name; g.userData.level = f.level.id; root3.add(g);
+    });
+    const box = new T.Box3().setFromObject(root3); const c = box.getCenter(new T.Vector3());
+    root3.position.set(-c.x, 0, -c.z);
+    return { group: root3, box, style };
+  }
   function build(T, m, opts) {
     opts = Object.assign({ style: 'presentation', roof: true, cutaway: false }, opts || {});
+    if (!opts._floor && root.DrawUpFloors && root.DrawUpFloors.count(m) > 1) return buildStack(T, m, opts);
     const C = core(), G = geo(), Lb = lib(), ws = (m.ws || {}), st = STYLES[opts.style] || STYLES.presentation, finAll = ws.finishes || {}, fin = Object.assign({}, finAll, finAll.all || {}), brand = ws.brand || {};
     const clay = st.clay;
     const mats = new Map();
@@ -170,11 +193,14 @@
       if (pts && z1 > 0) put(prism(T, pts, 0, z1), M, sel, items, it.kind);
     });
     // centre the model on the origin, floor at y = 0
+    if (opts.center === false) return { group: root3, box: null, style: st };
     const box = new T.Box3().setFromObject(root3); const c = box.getCenter(new T.Vector3());
     root3.position.set(-c.x, 0, -c.z);
     return { group: root3, box, style: st };
   }
 
+  /* v31: light presets [hemisphere, sun, sun direction] */
+  const LIGHTS = { daylight: [0.75, 0.8, [-8.4, 16.8, 9.8]], morning: [0.7, 0.85, [-16, 7, 5]], evening: [0.55, 0.7, [16, 6, -5]], overcast: [1.05, 0.22, [-4, 24, 4]], studio: [0.95, 0.55, [-6, 20, 14]] };
   /* ------------------------------------------------------------ viewer */
   /** mount(el, model, {style, onPick(sel)}) → viewer. Viewer: update(model, opts), setStyle, view('iso'|'top'|'front'|'side'), png(), glb(), dispose(). */
   async function mount(el, model, opts) {
@@ -183,29 +209,56 @@
     renderer.setPixelRatio(Math.min(2, root.devicePixelRatio || 1)); renderer.shadowMap.enabled = true; renderer.shadowMap.type = T.PCFSoftShadowMap;
     if ('outputEncoding' in renderer) renderer.outputEncoding = T.sRGBEncoding;
     el.appendChild(renderer.domElement); renderer.domElement.className = 'dw29-3dcanvas'; renderer.domElement.tabIndex = 0; renderer.domElement.setAttribute('aria-label', '3D model. Drag to orbit, scroll to zoom, right-drag to pan.');
-    const scene = new T.Scene(), camera = new T.PerspectiveCamera(40, 1, 0.05, 2000);
+    const scene = new T.Scene(), persp = new T.PerspectiveCamera(40, 1, 0.05, 2000), ortho = new T.OrthographicCamera(-1, 1, 1, -1, 0.05, 2000);
+    let camera = persp, aspect = 1, orthoR = 10; // v31: perspective or orthographic
     const controls = new T.OrbitControls(camera, renderer.domElement); controls.enableDamping = true; controls.dampingFactor = 0.12; controls.maxPolarAngle = Math.PI * 0.495;
     const hemi = new T.HemisphereLight(0xffffff, 0xb8b2a6, 0.75), sun = new T.DirectionalLight(0xffffff, 0.8);
     sun.position.set(-12, 20, 14); sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048); scene.add(hemi, sun, sun.target);
     const ground = new T.Mesh(new T.PlaneGeometry(400, 400), new T.ShadowMaterial({ opacity: 0.18 })); ground.rotation.x = -Math.PI / 2; ground.position.y = -0.11; ground.receiveShadow = true; scene.add(ground);
     let cur = null, state = Object.assign({}, opts), raf = 0, dirty = true;
+    function applyLight() { const L = LIGHTS[state.light || 'daylight'], k = cur ? cur.style.light : 1; hemi.intensity = L[0] * k; sun.intensity = L[1] * k; dirty = true; }
     const V = { el, state, three: T };
+    function setOrthoFrustum() { ortho.left = -orthoR * aspect; ortho.right = orthoR * aspect; ortho.top = orthoR; ortho.bottom = -orthoR; ortho.updateProjectionMatrix(); }
+    function useCamera(kind) {
+      const next = kind === 'ortho' ? ortho : persp; if (next === camera) return;
+      next.position.copy(camera.position); next.quaternion.copy(camera.quaternion); camera = next; controls.object = camera;
+      if (camera === ortho) setOrthoFrustum(); else { persp.aspect = aspect; persp.updateProjectionMatrix(); }
+      dirty = true;
+    }
+    /* v31 camera presets. Plan y runs down the sheet (north up), so north is -z in 3D.
+     * Orthographic: axo (planometric-style, 45 deg), iso (true isometric), plan (top-down 3D),
+     * north/south/east/west (elevations, looking at that face). Perspective: iso/corner, exterior, interior, top, front, side, back. */
+    const PRESETS = {
+      iso: { dir: [-0.75, 0.62, 0.95] }, corner: { dir: [-0.75, 0.62, 0.95] }, exterior: { dir: [-0.9, 0.28, 1.05] },
+      top: { dir: [0, 1, 0.0001] }, front: { dir: [0, 0.18, 1] }, side: { dir: [1, 0.18, 0] }, back: { dir: [0, 0.18, -1] },
+      axo: { dir: [-1, Math.SQRT2, 1], ortho: true }, isometric: { dir: [-1, 1, 1], ortho: true }, plan: { dir: [0, 1, 0.0001], ortho: true },
+      north: { dir: [0, 0.0001, -1], ortho: true }, south: { dir: [0, 0.0001, 1], ortho: true }, east: { dir: [1, 0.0001, 0], ortho: true }, west: { dir: [-1, 0.0001, 0], ortho: true },
+    };
     function fit(kind) {
       if (!cur) return; const b = new T.Box3().setFromObject(cur.group), s = b.getSize(new T.Vector3()), c = b.getCenter(new T.Vector3()), R = Math.max(s.x, s.y, s.z) * 0.62 + 0.5;
-      const d = R / Math.sin(camera.fov * Math.PI / 360) * 0.9; const dir = { iso: [-0.75, 0.62, 0.95], top: [0, 1, 0.0001], front: [0, 0.18, 1], side: [1, 0.18, 0], back: [0, 0.18, -1] }[kind || 'iso'];
-      const v = new T.Vector3(...dir).normalize().multiplyScalar(d); camera.position.copy(c).add(v); controls.target.copy(c); camera.near = d / 100; camera.far = d * 20; camera.updateProjectionMatrix(); controls.update(); dirty = true;
-      const S = Math.max(s.x, s.z); Object.assign(sun.shadow.camera, { left: -S, right: S, top: S, bottom: -S, near: 0.5, far: 80 }); sun.shadow.camera.updateProjectionMatrix(); sun.position.set(c.x - S * 0.6, S * 1.2 + 6, c.z + S * 0.7); sun.target.position.copy(c);
+      kind = kind || 'iso';
+      if (kind === 'interior') { // eye height 5'-3" inside, looking across the longer side
+        useCamera('persp'); const eye = 63 * IN, lookX = s.x >= s.z; camera.position.set(c.x - (lookX ? s.x * 0.3 : 0), b.min.y + eye, c.z - (lookX ? 0 : s.z * 0.3)); controls.target.set(c.x + (lookX ? s.x * 0.2 : 0), b.min.y + eye, c.z + (lookX ? 0 : s.z * 0.2));
+        camera.near = 0.05; camera.far = R * 40; camera.updateProjectionMatrix(); controls.maxPolarAngle = Math.PI; controls.update(); state.preset = kind; dirty = true; return;
+      }
+      controls.maxPolarAngle = Math.PI * 0.495;
+      const P = PRESETS[kind] || PRESETS.iso; useCamera(P.ortho ? 'ortho' : 'persp'); state.preset = kind;
+      const d = P.ortho ? R * 4 : R / Math.sin(persp.fov * Math.PI / 360) * 0.9; const dir = P.dir;
+      if (P.ortho) { orthoR = R * 1.02; ortho.zoom = 1; setOrthoFrustum(); }
+      const v = new T.Vector3(...dir).normalize().multiplyScalar(d); camera.position.copy(c).add(v); controls.target.copy(c); camera.near = P.ortho ? 0.01 : d / 100; camera.far = d * 20; camera.updateProjectionMatrix(); controls.update(); dirty = true;
+      const S = Math.max(s.x, s.z); Object.assign(sun.shadow.camera, { left: -S, right: S, top: S, bottom: -S, near: 0.5, far: S * 8 + 80 }); sun.shadow.camera.updateProjectionMatrix(); (() => { const sd = LIGHTS[state.light || 'daylight'][2], k = S / 14; sun.position.set(c.x + sd[0] * k, sd[1] * k + 6, c.z + sd[2] * k); })(); sun.target.position.copy(c);
     }
     function dispose3(g) { g.traverse(o => { if (o.geometry) o.geometry.dispose(); }); }
     V.update = (m, o) => {
       Object.assign(state, o || {}); const first = !cur;
       if (cur) { scene.remove(cur.group); dispose3(cur.group); }
       cur = build(T, m, state); scene.add(cur.group); scene.background = new T.Color(cur.style.bg);
-      hemi.intensity = 0.75 * cur.style.light; sun.intensity = 0.8 * cur.style.light; sun.castShadow = !!cur.style.shadows; ground.visible = !!cur.style.shadows;
+      applyLight(); sun.castShadow = !!cur.style.shadows; ground.visible = !!cur.style.shadows;
       if (first) fit('iso'); dirty = true; return V;
     };
     V.view = k => fit(k);
-    function size() { const w = el.clientWidth || 640, h = el.clientHeight || 420; renderer.setSize(w, h, false); renderer.domElement.style.width = '100%'; renderer.domElement.style.height = '100%'; camera.aspect = w / h; camera.updateProjectionMatrix(); dirty = true; }
+    function setAspect(a) { aspect = a; persp.aspect = a; persp.updateProjectionMatrix(); setOrthoFrustum(); }
+    function size() { const w = el.clientWidth || 640, h = el.clientHeight || 420; renderer.setSize(w, h, false); renderer.domElement.style.width = '100%'; renderer.domElement.style.height = '100%'; setAspect(w / h); dirty = true; }
     const ro = root.ResizeObserver ? new ResizeObserver(size) : null; ro && ro.observe(el); size();
     controls.addEventListener('change', () => { dirty = true; });
     const loop = () => { raf = requestAnimationFrame(loop); if (controls.update() || dirty) { renderer.render(scene, camera); dirty = false; } };
@@ -226,7 +279,23 @@
       cur.group.traverse(o => { if (o.isMesh && o.userData.sel && o.userData.sel.type === sel.type && o.userData.sel.id === sel.id) { o.userData._m = o.material; const M = o.material.clone(); M.emissive = new T.Color('#1b8cff'); M.emissiveIntensity = 0.35; o.material = M; hi.push([o]); } });
       dirty = true;
     };
-    V.png = (w, h) => { const ow = el.clientWidth, oh = el.clientHeight; if (w && h) { renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); } renderer.render(scene, camera); const url = renderer.domElement.toDataURL('image/png'); if (w && h) { renderer.setSize(ow, oh, false); camera.aspect = ow / oh; camera.updateProjectionMatrix(); dirty = true; } return url; };
+    /* png(w, h, {background: '#hex' | 'transparent', type: 'image/png' | 'image/jpeg', quality}) renders a clean frame:
+     * no selection highlight, pixel ratio 1 at the asked size (so 4000 px wide is 4000 px). */
+    V.png = (w, h, o) => {
+      o = o || {}; const ow = el.clientWidth || 640, oh = el.clientHeight || 420, pr = renderer.getPixelRatio(), bg = scene.background, hiSave = hi.slice();
+      hi.forEach(([m]) => { m.userData._hi = m.material; m.material = m.userData._m; });
+      if (o.background === 'transparent') { scene.background = null; renderer.setClearColor(0x000000, 0); } else if (o.background) scene.background = new T.Color(o.background);
+      if (w && h) { renderer.setPixelRatio(1); renderer.setSize(w, h, false); setAspect(w / h); }
+      renderer.render(scene, camera); const url = renderer.domElement.toDataURL(o.type || 'image/png', o.quality || 0.92);
+      if (w && h) { renderer.setPixelRatio(pr); renderer.setSize(ow, oh, false); setAspect(ow / oh); }
+      scene.background = bg; renderer.setClearColor(0xffffff, 1); hiSave.forEach(([m]) => { m.material = m.userData._hi; }); dirty = true; return url;
+    };
+    V.preset = () => state.preset || 'iso';
+    V.presets = () => Object.keys(PRESETS).concat('interior');
+    V.isOrtho = () => camera === ortho;
+    V.maxSize = () => { const gl = renderer.getContext(); return Math.min(gl.getParameter(gl.MAX_RENDERBUFFER_SIZE), gl.getParameter(gl.MAX_TEXTURE_SIZE)); };
+    V.setLight = k => { if (!LIGHTS[k]) return; state.light = k; applyLight(); const p = state.preset || 'iso'; const t = controls.target.clone(), pos = camera.position.clone(), z = camera.zoom; fit(p); camera.position.copy(pos); controls.target.copy(t); camera.zoom = z; camera.updateProjectionMatrix(); controls.update(); dirty = true; };
+    V.lights = () => Object.keys(LIGHTS);
     V.glb = () => new Promise((ok, bad) => { const ex = new T.GLTFExporter(); const g = cur.group.clone(true); g.traverse(o => { if (o.userData && o.userData.edge) o.visible = false; }); const onDone = r => ok(new Blob([r], { type: 'model/gltf-binary' })); try { ex.parse(g, onDone, bad, { binary: true, onlyVisible: true }); } catch (e) { bad(e); } });
     V.stats = () => { const s = { meshes: 0, walls: 0, openings: 0, items: 0, roof: 0 }; if (cur) cur.group.traverse(o => { if (!o.isMesh) return; s.meshes++; const t = o.userData.sel && o.userData.sel.type; if (t === 'wall') s.walls++; else if (t === 'opening') s.openings++; else if (t === 'item') s.items++; if (/Roof|Gable|Parapet/.test(o.name)) s.roof++; }); return s; };
     V.dispose = () => { cancelAnimationFrame(raf); ro && ro.disconnect(); controls.dispose(); if (cur) dispose3(cur.group); renderer.dispose(); renderer.domElement.remove(); };

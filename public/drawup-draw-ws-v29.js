@@ -214,7 +214,10 @@
         } catch (x) { const e = $q(M.body, '#dw29-err'); e.hidden = false; e.textContent = 'Not created — ' + (x.message || x); b.disabled = false; b.textContent = 'Create editable plan'; }
       };
     };
+    if (opts.kind) st.kind = opts.kind; if (opts.method) st.method = opts.method;
     stepOne();
+    // v31: the Draw Studio start screen hands the chosen file straight in
+    if (opts.file) { try { const inp = $q(M.body, '#dw29-file'), dt = new DataTransfer(); dt.items.add(opts.file); inp.files = dt.files; inp.dispatchEvent(new Event('change')); } catch (_e) { /* the member picks it again */ } }
     return { state: st, el: M.el, close: M.close, _review: () => review() };
   }
 

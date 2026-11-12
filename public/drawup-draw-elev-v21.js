@@ -103,8 +103,50 @@
    * cuts: what the section line cuts ({type:'wall'|'column'|'stair', u0, u1, h, holes, id})
    * beyond: what is seen ({type, u0, u1, w, h, openings, id}), far to near.
    */
+  /* v31: a drawing with floors is drawn one floor at a time, each lifted to its elevation.
+   * Each floor's own FLOOR line is relabelled with the floor's name, and its heights are
+   * written as elevations above the lowest floor. */
+  const floors31 = () => opt('./drawup-draw-floors-v31.js', 'DrawUpFloors');
+  function buildStack(model, cam, scale, opts) {
+    const Fl = floors31(), C = core(), parts = Fl.all(model);
+    const lift = (pt, dz) => ({ x: pt.x, y: pt.y - dz });
+    let P = [], first = null; const levels = [];
+    parts.forEach((f, i) => {
+      const V = build(f.model, cam, scale, Object.assign({}, opts, { _floor: true }));
+      if (!first) first = V;
+      const dz = f.level.elev - parts[0].level.elev;
+      V.prims.forEach(p => {
+        const q = Object.assign({}, p);
+        if (p.t === 'line') { q.a = lift(p.a, dz); q.b = lift(p.b, dz); }
+        else if (p.t === 'poly') q.pts = p.pts.map(x => lift(x, dz));
+        else if (p.t === 'circle') q.c = lift(p.c, dz);
+        else if (p.t === 'text') {
+          q.at = lift(p.at, dz);
+          if (p.data && p.data.level != null) {
+            const z = +p.data.level;
+            if (p.text === 'FLOOR') q.text = f.level.name;
+            else if (p.text === C.formatFtIn(z)) q.text = C.formatFtIn(z + dz);
+            // the upper floor's FLOOR line replaces the floor below's T.O. WALL label at the same height
+          }
+        }
+        if (p.data) q.data = Object.assign({}, p.data, { floor: f.level.id });
+        P.push(q);
+      });
+      (V.prims.levels || []).forEach(l => levels.push({ z: l.z + dz, label: l.label === 'FLOOR' ? f.level.name : l.label, floor: f.level.id }));
+      void i;
+    });
+    // where an upper floor's FLOOR line meets the floor below's T.O. WALL, keep only the floor's name
+    const floorZ = levels.filter(l => l.label !== 'CLG' && l.label !== 'T.O. WALL').map(l => l.z);
+    const twAbs = levels.filter(l => l.label === 'T.O. WALL' && floorZ.some(z => Math.abs(z - l.z) < 0.5));
+    P = P.filter(p => !(p.data && p.data.level != null && twAbs.some(l => l.floor === p.data.floor && Math.abs(+p.data.level + (parts.find(x => x.level.id === l.floor).level.elev - parts[0].level.elev) - l.z) < 0.5)));
+    P.levels = levels;
+    const out = Object.assign({}, first, { prims: P, floors: parts.map(f => f.level) });
+    out.bounds = boundsOf(P, scale);
+    return out;
+  }
   function build(model, cam, scale, opts) {
     const C = core(); opts = opts || {}; scale = scale || 48;
+    const Fl = floors31(); if (!opts._floor && Fl && Fl.count(model) > 1) return buildStack(model, cam, scale, opts);
     const m = C.normalizeModel(model), F = frame(cam), L = F.L, isCut = cam.kind === 'section';
     const depth = cam.depth > 0 ? cam.depth : Infinity;
     const toUW = p => ({ u: F.U(p), w: F.W(p) });

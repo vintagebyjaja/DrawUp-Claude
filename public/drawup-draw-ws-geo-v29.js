@@ -58,6 +58,14 @@
     (m.items || []).forEach(i => parts.push('I' + pick(i, ['id', 'kind', 'comp', 'at', 'a', 'b', 'rot', 'w', 'd', 'h', 'z', 'size', 'length', 'width', 'rise', 'pts', 'r'])));
     (m.curves || []).forEach(c => parts.push('C' + pick(c, ['id', 'a', 'b', 'm', 'thickness', 'height'])));
     if (m.roof) parts.push('F' + pick(m.roof, ['type', 'pitch', 'overhang', 'ridge', 'parapet', 'base']));
+    // v31: with floors, every floor (in stack order, whichever one is open), its height and name count
+    if (Array.isArray(m.floors) && m.floors.length && !m.__floor) {
+      parts.length = 0;
+      const byId = {}; byId[(m.level || {}).id] = Object.assign({ __floor: true }, m, { floors: null }); m.floors.forEach(f => { byId[f.id] = Object.assign({ __floor: true }, f); });
+      parts.push('B' + n(m.levelBase || 0));
+      (m.levelOrder || Object.keys(byId)).forEach(id => { const f = byId[id]; if (!f) return; const L = id === (m.level || {}).id ? m.level : f; parts.push('L' + pick(L, ['id', 'name', 'height']) + '#' + geomHash(f)); });
+      if (m.roof) parts.push('F' + pick(m.roof, ['type', 'pitch', 'overhang', 'ridge', 'parapet', 'base']));
+    }
     let h = 2166136261; const s = parts.join('|');
     for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; }
     return h.toString(16).padStart(8, '0') + ':' + parts.length;
