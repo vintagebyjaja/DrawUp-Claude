@@ -1,0 +1,41 @@
+/* v32 avatar maker (Dream Beyond light look) */
+.du-av{position:fixed;inset:0;z-index:2147483000;background:rgba(20,35,55,.45);backdrop-filter:blur(6px);display:grid;place-items:center;padding:16px;font-family:Inter,system-ui,sans-serif;color:#142337}
+.du-av-card{width:min(1180px,100%);max-height:calc(100vh - 32px);display:flex;flex-direction:column;background:#FFF5EF;border-radius:24px;box-shadow:0 40px 90px rgba(20,35,55,.3);overflow:hidden}
+.du-av-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;padding:22px 26px 10px}
+.du-av-k{font:700 11px/1 Inter,sans-serif;letter-spacing:.2em;color:#1A73D1}
+.du-av-head h2{margin:6px 0 4px;font:700 26px/1.15 Inter,sans-serif;letter-spacing:-.02em}
+.du-av-blurb{margin:0;color:#4B5A70;font-size:14px}
+.du-av-x{width:40px;height:40px;border-radius:50%;border:1px solid #E4EAF3;background:#fff;font-size:22px;line-height:1;cursor:pointer;color:#142337;flex:none}
+.du-av-tabs{display:flex;gap:8px;padding:6px 26px 14px;flex-wrap:wrap}
+.du-av-tabs button{display:inline-flex;align-items:center;gap:8px;padding:6px 16px 6px 6px;border-radius:999px;border:1px solid #E4EAF3;background:#fff;color:#142337;font:600 14px Inter,sans-serif;cursor:pointer}
+.du-av-tabs button i{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#DCEBFF,#FFE3D4);overflow:hidden;display:block}
+.du-av-tabs button i img{width:100%;height:100%;object-fit:cover;display:block}
+.du-av-tabs button[aria-selected="true"]{background:linear-gradient(135deg,#FFD9C6,#FFC2A6);border-color:rgba(255,141,114,.4);box-shadow:0 6px 16px rgba(255,141,114,.25)}
+.du-av-tabs button:focus-visible,.du-av button:focus-visible{outline:2px solid #258FF5;outline-offset:2px}
+.du-av-body{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:18px;padding:0 26px;min-height:0;flex:1}
+.du-av-stagewrap{display:flex;flex-direction:column;align-items:center;background:#E4DECF;border-radius:20px;padding:10px 10px 12px;min-height:0}
+.du-av-stage{position:relative;width:100%;flex:1;min-height:340px;height:min(56vh,560px)}
+.du-av-loading{position:absolute;inset:0;display:grid;place-items:center;margin:0;color:#4B5A70;font-size:14px}
+.du-av-views{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:8px}
+.du-av-views button{padding:8px 16px;border-radius:12px;border:1px solid #b9ab88;background:#FFFCF4;color:#142337;font:500 14px Inter,sans-serif;cursor:pointer}
+.du-av-hint{margin:8px 0 0;font-size:12px;color:#4B5A70}
+.du-av-opts{overflow:auto;padding:0 4px 12px;min-height:0;max-height:calc(56vh + 70px)}
+.du-av-opts section{padding:12px 0;border-bottom:1px solid #F0E3D9}
+.du-av-opts h3{margin:6px 0 8px;font:700 11px/1 Inter,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#4B5A70}
+.du-av-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.du-av-chips button{padding:7px 12px;border-radius:999px;border:1px solid #E4EAF3;background:#fff;color:#142337;font:500 13px Inter,sans-serif;cursor:pointer}
+.du-av-chips button[aria-checked="true"],.du-av-chips button[aria-pressed="true"]{background:#142337;color:#fff;border-color:#142337}
+.du-av-sw{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.du-av-sw button{width:28px;height:28px;border-radius:50%;border:2px solid #fff;background:var(--c);box-shadow:0 0 0 1px #E4EAF3;cursor:pointer;padding:0}
+.du-av-sw button[aria-checked="true"]{box-shadow:0 0 0 2px #FF8D72}
+.du-av-chk{display:inline-flex;gap:8px;align-items:center;font-size:14px}
+.du-av-foot{display:flex;align-items:center;gap:10px;padding:14px 26px 20px;border-top:1px solid #F0E3D9;background:#fff}
+.du-av-status{flex:1;margin:0;font-size:13px;color:#4B5A70}.du-av-status.bad{color:#b4362a}
+.du-av .du-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.du-av-teambtn{width:max-content;justify-self:start;align-self:flex-start;margin:6px 0 0;padding:6px 12px;border-radius:999px;border:1px solid rgba(255,141,114,.45);background:linear-gradient(135deg,#FFD9C6,#FFC2A6);color:#142337;font:600 13px Inter,sans-serif;cursor:pointer}
+.du-tm25-av img.du-face,.du-tm25-pill img.du-face{border-radius:50%}
+.du-tm25-pill img.du-face{display:inline-block;width:18px;height:18px;vertical-align:-4px}
+.db-coach__edit{position:absolute;left:56px;top:58px;width:32px;height:32px;border-radius:50%;border:2px solid #fff;background:#142337;color:#fff;display:grid;place-items:center;cursor:pointer;box-shadow:0 4px 10px rgba(20,35,55,.25);font-size:13px;padding:0}
+@media (max-width:860px){.du-av{padding:8px}.du-av-card{max-height:calc(100vh - 16px)}.du-av-head{padding:16px 18px 6px}.du-av-head h2{font-size:21px}.du-av-tabs{padding:4px 18px 10px;gap:6px;flex-wrap:nowrap;overflow-x:auto}.du-av-tabs button{flex:none;font-size:13px;padding:4px 12px 4px 4px}.du-av-tabs button i{width:26px;height:26px}.du-av-body{display:block;overflow:auto;padding:0 18px}.du-av-stagewrap{min-height:0}.du-av-stage{flex:none;height:42vh;min-height:240px}.du-av-opts{max-height:none;overflow:visible;padding-top:6px}.du-av-views button{padding:7px 12px;font-size:13px}.du-av-foot{padding:12px 18px 16px}}
+.db-coach__hello{position:relative}
+.du-av-head,.du-av-tabs,.du-av-foot{flex:none}

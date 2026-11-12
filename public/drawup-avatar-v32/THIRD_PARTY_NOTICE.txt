@@ -1,0 +1,13 @@
+# Third-party assets: AUREVIA characters v4 prototype
+
+`aurevia-v4-female.glb` / `aurevia-v4-male.glb` are built by `../convert-v4.ts` from:
+
+- **Quaternius — Universal Base Characters [Standard]** (bodies, eyes, brows, hair and beard pieces).
+  Licence: CC0 1.0 Universal (public domain dedication), https://creativecommons.org/publicdomain/zero/1.0/ .
+  Supplied by the founder as `Universal_Base_Characters_Standard_.zip` (licence file inside the archive), 2026-11-06.
+- **Microsoft Rocketbox** animation clips (idle, walk, run, sit, talk, wave, laugh), retargeted onto the base skeleton.
+  Licence: MIT, Copyright (c) 2020 Microsoft (full text in `../../v3/assets/THIRD_PARTY_NOTICE.md`).
+
+Clothing, soles, collars, hoods, fabric detail and prints are generated in code (`../garments.ts`, `../avatar-v4.ts`,
+`../school-prints.ts`). School crest patches use the approved crest images in
+`assets/approved-appearance-2026-11-04/derived/` unchanged.

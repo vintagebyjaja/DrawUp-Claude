@@ -293,12 +293,13 @@ async function checkPrompt(){
 }
 
 /* =================================================================== Portal hooks */
-function coachHead(cls){return avatarSVG(look(),{crop:'head',cls});}
+function memberHead(o){const f=window.DrawUpAvatars?.faceImg?.('coach',o&&o.cls);return f||avatarSVG(look(),o);}
+function coachHead(cls){return memberHead({crop:'head',cls});}
 function profileCard(){
   const x=xp(),lv=level(x),lo=levelXp(lv),hi=levelXp(lv+1),r=S.row,custom=r&&(r.mode==='custom'||r.mode==='generic');
   const leg=S.legends.find(l=>l.key===r?.legend),next=S.legends.find(l=>l.xp_required>x);const sk=r?.skills||PROF,u=total(sk);
   const card=document.createElement('section');card.className='ac-pcard';
-  card.innerHTML=`<div class="ac-pfig ${look().generic?'is-generic':''}">${avatarSVG(look(),{crop:'head',holo:look().generic})}</div>
+  card.innerHTML=`<div class="ac-pfig ${look().generic?'is-generic':''}">${memberHead({crop:'head',holo:look().generic})}</div>
   <div class="ac-pinfo"><span class="du-kicker">ARCH COACH · LEVEL ${lv} · ${x} XP</span><h2>${custom?esc(r.archetype)+(r.mode==='generic'?' · Hologram coach':''):'Create your Arch Coach'}</h2>
   <p>${custom?`${esc(r.discipline)} · ${esc(r.focus)} · OVR ${Math.round(u/14)} · Potential ${Math.round(budget(x)/14)}${leg?' · Legend: '+esc(leg.name):''}`:'Build a coach that fits how you work. It starts as a College Professor and grows with XP.'}</p>
   <div class="ac-pxp"><i><u style="width:${Math.min(100,Math.round(100*(x-lo)/Math.max(1,hi-lo)))}%"></u></i><small>${hi-x} XP to level ${lv+1}${next?` · ${esc(next.name)} unlocks at ${next.xp_required} XP`:''}</small></div>
@@ -317,7 +318,7 @@ function inject(){
   const head=w.querySelector('.du-coach-main .du-work-head');
   if(head&&!head.querySelector('.ac-edit-btn')){const b=document.createElement('button');b.type='button';b.className='du-btn ghost ac-edit-btn';b.innerHTML=`<span class="ac-mini">${coachHead()}</span>Edit coach`;b.onclick=()=>openCreator('appearance');head.appendChild(b);}
   const box=w.querySelector('#dc-messages');
-  if(box)box.querySelectorAll('article.assistant:not(.ac-has-ava),article.coach:not(.ac-has-ava)').forEach(a=>{a.classList.add('ac-has-ava');const i=document.createElement('i');i.className='ac-chat-ava'+(look().generic?' is-generic':'');i.setAttribute('aria-hidden','true');i.innerHTML=avatarSVG(look(),{crop:'head',holo:look().generic});a.prepend(i);});
+  if(box)box.querySelectorAll('article.assistant:not(.ac-has-ava),article.coach:not(.ac-has-ava)').forEach(a=>{a.classList.add('ac-has-ava');const i=document.createElement('i');i.className='ac-chat-ava'+(look().generic?' is-generic':'');i.setAttribute('aria-hidden','true');i.innerHTML=memberHead({crop:'head',holo:look().generic});a.prepend(i);});
 }
 function queueInject(){if(injectQueued)return;injectQueued=true;requestAnimationFrame(inject);}
 
