@@ -83,6 +83,7 @@
   // page frames its legend the same way; the studio's narrower click bands would cut some faces in half
   const FACE_X = { 'paul-r-williams': 0, 'julia-morgan': 175, 'frank-lloyd-wright': 378, 'zaha-hadid': 612, 'norma-merrick-sklarek': 850, 'ove-arup': 1040, 'i-m-pei': 1225, 'fazlur-rahman-khan': 1410 };
   function portrait(key, name) {
+    if (window.DrawUpPortraits?.has(key)) return `<div class="du-lg28-pic du-lg28-face">${window.DrawUpPortraits.img(key, '', name)}</div>`;
     const b = key in FACE_X ? [FACE_X[key], 85, FACE_X[key] + 230, 470] : BIOS[key]?.band;
     if (!b) return `<div class="du-lg28-mono" aria-hidden="true">${esc(mono(name))}</div>`;
     // the member-approved legends artwork, cropped to this legend's panel (scaled so the panel fills the frame)

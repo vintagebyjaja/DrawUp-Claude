@@ -95,6 +95,7 @@ function outfitSVG(o,sw){
 }
 /* opt: {crop:'head'|'torso', holo:true, cls} */
 function avatarSVG(a,opt={}){
+  if(a&&a.generic&&opt.crop==='head'&&window.DrawUpPortraits?.has('arch-coach'))return window.DrawUpPortraits.img('arch-coach',opt.cls);
   a={...DEFAULT_LOOK,...(a||{})};
   const holo=opt.holo||a.generic;
   const skin=(SKIN[a.skin]||SKIN[3])[0],hc=(HAIRC[a.hairColor]||HAIRC[0])[0],dark=shade(skin,-.22);
@@ -110,7 +111,7 @@ function avatarSVG(a,opt={}){
   const cls=['ac-ava',holo?'ac-holo ac-holo-'+(a.holo||'classic'):'',opt.cls||''].join(' ').trim();
   return `<svg class="${cls}" viewBox="${vb}" style="--ac-skin:${skin}" role="img" aria-label="${esc(holo?'Hologram Arch Coach':'Arch Coach avatar')}">${back}<rect x="${100-nw}" y="118" width="${nw*2}" height="36" rx="${nw*.6}" fill="${dark}"/><g transform="translate(0 -8)">${outfitSVG(a.outfit,sw)}</g>${head}${face}${front}</svg>`;
 }
-function monogram(l){const ini=l.name.replace(/[^A-Za-z ]/g,'').split(' ').filter(Boolean).map(w=>w[0]).join('').slice(0,3);const c=l.kind==='engineer'?'#3ee08f':'#7fe7ff';
+function monogram(l){if(window.DrawUpPortraits?.has(l.key))return window.DrawUpPortraits.img(l.key,'ac-mono');const ini=l.name.replace(/[^A-Za-z ]/g,'').split(' ').filter(Boolean).map(w=>w[0]).join('').slice(0,3);const c=l.kind==='engineer'?'#3ee08f':'#7fe7ff';
   return `<svg viewBox="0 0 120 120" class="ac-mono" aria-hidden="true"><polygon points="60,6 107,33 107,87 60,114 13,87 13,33" fill="none" stroke="${c}" stroke-width="2"/><polygon points="60,18 96,39 96,81 60,102 24,81 24,39" fill="${c}" opacity=".08"/>${l.kind==='engineer'?'<path d="M30 92H90M38 92V78L60 64L82 78V92M60 64V92" stroke="'+c+'" stroke-width="1.4" fill="none" opacity=".55"/>':'<path d="M36 90L60 30L84 90M46 66H74" stroke="'+c+'" stroke-width="1.4" fill="none" opacity=".55"/>'}<text x="60" y="68" text-anchor="middle" font-size="26" font-weight="900" font-family="Archivo,Arial,sans-serif" fill="#fff">${esc(ini)}</text></svg>`;}
 
 /* =================================================================== data */

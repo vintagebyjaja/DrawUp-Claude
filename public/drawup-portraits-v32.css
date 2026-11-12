@@ -1,0 +1,8 @@
+/* v32 portrait face shots: fill whatever round or square frame they are placed in */
+img.du-face{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 40%;border-radius:inherit}
+.ac-pfig.is-generic img.du-face,.ac-chat-ava.is-generic img.du-face,.ac-mini img.du-face{border-radius:50%}
+.ac-legend img.du-face.ac-mono{width:74px;height:74px;border-radius:50%;box-shadow:0 0 0 2px rgba(127,231,255,.45)}
+.ac-legend.locked img.du-face.ac-mono{filter:grayscale(.7) brightness(.8)}
+.ac-prompt-fig img.du-face{border-radius:50%}
+.du-lg28-pic.du-lg28-face{aspect-ratio:1/1}
+.du-lg28-pic.du-lg28-face img.du-face{position:static;width:100%;height:100%;max-width:100%}
