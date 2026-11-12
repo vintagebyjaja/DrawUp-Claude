@@ -189,7 +189,7 @@ export async function POST(request: Request) {
   images.forEach((img: string, i: number) => content.push({ type: 'input_text', text: `<user_files>PICTURE ${i + 1}</user_files>` }, { type: 'input_image', image_url: img }));
   // v29: verified DrawUp feature facts, so the team answers as part of DrawUp and never sends members elsewhere for a DrawUp feature.
   const instructions = legend ? prompt.instructions : prompt.instructions + '\n\n' + platformBrief(message, features);
-  const payload = { instructions, input: content.length > 1 ? [{ role: 'user', content }] : prompt.input, max_output_tokens: prefs.concise ? 900 : 1800 };
+  const payload = { instructions, input: content.length > 1 ? [{ role: 'user', content }] : prompt.input, max_output_tokens: prompt.budget };
 
   let assistant: any;
   try { assistant = await insert('coach_messages', { thread_id: th.id, role: 'assistant', speaker: dbSpeaker, status: 'streaming', content: '', reply_to: userMsg.id, meta: { continued_from: continueOf || undefined, command: command || undefined, legend: legend ? { key: legend.key, name: legend.name, kind: legend.kind } : undefined } }); }

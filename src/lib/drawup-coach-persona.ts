@@ -3,6 +3,7 @@
 // Server-only: uses the Supabase service role through drawup-server. Never import from the browser.
 
 import { adminRpc, adminSelectOne } from '@/lib/drawup-server';
+import { SHARED_STANDARDS, classifyRequest, legendLength, legendReasoning } from '@/lib/drawup-reasoning';
 
 export type XpKind = 'ask' | 'upload' | 'check' | 'peer_like' | 'peer_comment' | 'board_help';
 
@@ -111,14 +112,17 @@ export async function legendFor(userId: string, key: string, hq: boolean): Promi
 
 /** The Hall of Fame second opinion: a legend's documented principles applied to Arch Coach's answer. */
 export function legendPrompt(l: LegendInfo, question: string, answer: string, language: string) {
+  // v32: the legend reasons from its own documented work (drawup-reasoning.ts), not from Arch Coach's frame.
+  const c = classifyRequest(question);
   return [
     `You write DrawUp's HALL OF FAME SECOND OPINION in the voice of ${l.name} (${l.kind}). Arch Coach has already answered; this is a separate message from the legend.`,
     COACH_GUARDRAILS,
-    `Ground the opinion only in what is publicly documented about ${l.name}'s work and design principles (${(l.principles || []).join(', ')}${l.note ? '. Background: ' + l.note : ''}).`,
-    `Speak in ${l.name}'s style: write in the first person as DrawUp's interpretation of how ${l.name} would respond, using the voice, priorities and vocabulary their documented work and writing are known for (for example their attitude to site, light, structure, clients or craft). Make it sound like them, not like Arch Coach.`,
-    `Stay by the book: never invent direct quotes, never put words in quotation marks as theirs, never invent biographical facts, projects or opinions they did not hold, and never claim they endorse a product, firm or person. If the member asked for ${l.name}'s opinion, give a clear opinion grounded in those documented principles.`,
-    'Respond to Arch Coach\'s answer below as your own separate take: agree or disagree with it in your own words, say what you would emphasize, what you would question or push further, and give one or two concrete, buildable suggestions. Keep code, safety and accessibility requirements intact: a design lens never overrides them.',
-    'Length: 120 to 220 words. Plain text, short paragraphs or a few bullets. No headings.',
+    SHARED_STANDARDS,
+    legendReasoning(l, c),
+    `Speak in ${l.name}'s style: write in the first person as DrawUp's interpretation of how ${l.name} would respond, using the priorities their documented work is known for. Make it sound and reason like them, not like Arch Coach.`,
+    `Stay by the book: never invent direct quotes, never put words in quotation marks as theirs, never invent biographical facts, projects or opinions they did not hold, and never claim they endorse a product, firm or person. If the member asked for ${l.name}'s opinion, give a clear opinion grounded in that documented work.`,
+    'Respond to Arch Coach\'s answer below as your own separate take: start from what YOU would notice first, say where you agree or disagree and why, what you would question or push further, and give concrete, buildable suggestions that follow from your own approach. Keep code, safety and accessibility requirements intact: a design lens never overrides them.',
+    `${legendLength(c.kind, true)} Plain text, short paragraphs or a few bullets. No headings.`,
     language ? `Write in ${language} unless the question is clearly in another language.` : 'Write in the language of the question.',
     '',
     `MEMBER QUESTION:\n${question.slice(0, 3000)}`,

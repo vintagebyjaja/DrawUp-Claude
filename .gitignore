@@ -37,3 +37,4 @@ tests/draw-studio/out-*.png
 tests/portraits-v32/out/
 tools/avatar-maker-v32/node_modules/
 tests/avatars-v32/out/
+tests/coach-reasoning/out/

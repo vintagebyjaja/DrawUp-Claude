@@ -31,7 +31,7 @@ export async function POST(request: Request) {
     access = await reserveCredits(user, 3, action);
     if (!access.ok) return NextResponse.json({ error: creditMessage(access, 3), ...access }, { status: 402 });
 
-    const payload = { input: legendPrompt(legend, question, answer, ''), max_output_tokens: 900 };
+    const payload = { input: legendPrompt(legend, question, answer, ''), max_output_tokens: 1200 };
     const models = modelList(process.env.DRAWUP_COACH_MODEL, process.env.DRAWUP_SEARCH_MODEL, 'gpt-5.6-sol');
     let data: any = null;
     try { data = await streamCreate({ ...payload, reasoning: { effort: 'low' } }, models); }
