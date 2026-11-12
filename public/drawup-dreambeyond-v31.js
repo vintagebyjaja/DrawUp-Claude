@@ -68,7 +68,7 @@
     bolt: '<path d="M13 3 5.5 13.5H11L10 21l8-10.5h-5.5z"/>'
   };
   const ico = (k, cls = 'db-ico') => `<svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true">${I[k] || ''}</svg>`;
-  const SIGNATURE = '<div class="db-signature" role="contentinfo"><i aria-hidden="true"></i><span>A Dream Beyond Platform</span><i aria-hidden="true"></i></div>';
+  const SIGNATURE = '<div class="db-signature" role="contentinfo"><i aria-hidden="true"></i><span>GROOVEVILLE LLC <b aria-hidden="true">|</b> DRAWUP HEADQUARTERS</span><i aria-hidden="true"></i></div>';
 
   /* ------------------------------------------------------------------ navigation helpers */
   const go = (a, opts) => S()?.go ? S().go(a, opts) : (P()?.openPortalTab?.(a.tab));
@@ -238,7 +238,7 @@
       <div class="db-main">
         <div class="db-top">
           <section class="db-hero" aria-labelledby="db-hero-h">
-            <picture class="db-hero__art"><source media="(max-width:700px)" srcset="${ART}hero-villa-m.webp"><img src="${ART}hero-villa.webp" alt="A modern two-storey villa with glass walls at sunset, lit from inside, behind an infinity pool" decoding="async" fetchpriority="high"></picture>
+            <picture class="db-hero__art"><source media="(max-width:700px)" srcset="${ART}hero-villa-m.webp"><img src="${ART}hero-villa.webp" alt="A modern two-storey villa with glass walls at sunset, lit from inside, behind a pool" decoding="async" fetchpriority="high"></picture>
             <div class="db-hero__copy">
               <p class="db-eyebrow">Design <i>•</i> Plan <i>•</i> Visualize</p>
               <h1 id="db-hero-h">Build What’s Next<span>.</span></h1>
@@ -429,7 +429,7 @@
   function decorateNav() {
     const nav = $('#dus-pnav'); if (!nav) return false;
     $$('.dus-link[data-cat]', nav).forEach(b => { if (!b.querySelector('.db-ico') && NAV_ICON[b.dataset.cat]) b.insertAdjacentHTML('afterbegin', ico(NAV_ICON[b.dataset.cat])); });
-    const brand = nav.querySelector('.dus-brand'); if (brand && !brand.querySelector('.db-mark')) brand.insertAdjacentHTML('afterbegin', '<svg class="db-mark" viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="dbmk" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFB28F"/><stop offset=".55" stop-color="#FF8D72"/><stop offset="1" stop-color="#258FF5"/></linearGradient></defs><path d="M16 3 29 27H21.5L16 16.5 10.5 27H3z" fill="url(#dbmk)"/><path d="M16 16.5 21.5 27h-11z" fill="#142337" opacity=".9"/></svg>');
+    const brand = nav.querySelector('.dus-brand'); if (brand && !brand.querySelector('.db-mark')) brand.insertAdjacentHTML('afterbegin', '<img class="db-mark" src="'+ART+'drawup-logo.png" width="40" height="40" alt="">');
     return true;
   }
   function watchAcct() {

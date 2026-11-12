@@ -24,7 +24,7 @@ html.db #dus-pnav{background:rgba(255,255,255,.86);color:var(--db-navy);border-b
 html.db #dus-pnav .dus-brand{color:var(--db-navy);align-items:center;gap:12px}
 html.db #dus-pnav .dus-brand b{font-size:28px;color:var(--db-navy)}
 html.db #dus-pnav .dus-brand small{color:var(--db-ink-2);transform:none;padding-left:14px;border-left:1px solid rgba(20,35,55,.18);line-height:22px}
-html.db #dus-pnav .db-mark{width:30px;height:30px;flex:none}
+html.db #dus-pnav .db-mark{width:40px;height:40px;flex:none;border-radius:50%;box-shadow:0 2px 8px rgba(20,35,55,.18)}
 html.db #dus-pnav .dus-link{color:var(--db-navy);display:inline-flex;align-items:center;gap:8px;font-weight:500;padding:0 14px}
 html.db #dus-pnav .dus-link .db-ico{width:18px;height:18px;opacity:.85}
 html.db #dus-pnav .dus-link:hover,html.db #dus-pnav .dus-link[aria-expanded="true"]{color:var(--db-navy);background:rgba(220,235,255,.6)}
@@ -87,9 +87,11 @@ html.db body:has(#du-portal.open) .dus-sheet summary::after{border-color:var(--d
 /* the signature */
 .db-signature{display:flex;align-items:center;justify-content:center;gap:22px;padding:26px 0 8px;color:var(--db-ink-2);font:600 11px/1 var(--db-font);letter-spacing:.42em;text-transform:uppercase}
 .db-signature i{display:block;width:clamp(40px,10vw,120px);height:1px;background:linear-gradient(90deg,transparent,var(--db-blue))}
+.db-signature span{text-align:center}
+.db-signature span b{font-weight:400;color:var(--db-blue);margin:0 .2em}
 .db-signature i:last-child{background:linear-gradient(90deg,var(--db-blue),transparent)}
-.dus-pop .db-signature{padding:12px 0 6px;gap:10px;font-size:9.5px;letter-spacing:.32em}
-.dus-pop .db-signature i{width:28px}
+.dus-pop .db-signature{padding:12px 0 6px;gap:8px;font-size:9px;letter-spacing:.14em}
+.dus-pop .db-signature i{width:18px}
 .db-about{margin:28px 0 0;text-align:center}
 .db-about p{margin:6px 0 0;color:var(--db-ink-3);font:500 13px/1.4 var(--db-font)}
 
@@ -124,8 +126,8 @@ html.db #du-portal #du-workspace-content.dus-full:has(.db-dash){padding:0 0 40px
 /* hero */
 .db-hero{position:relative;min-height:440px;border-radius:30px;overflow:hidden;isolation:isolate;background:linear-gradient(135deg,#FFE9DD,#DCEBFF);box-shadow:var(--db-shadow);display:flex;align-items:center}
 .db-hero__art{position:absolute;inset:0;z-index:-2;display:block}
-.db-hero__art img{width:100%;height:100%;object-fit:cover;object-position:62% 62%;display:block;filter:contrast(1.06) saturate(1.05)}
-.db-hero::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,rgba(255,250,246,.95) 0%,rgba(255,247,242,.82) 24%,rgba(255,245,239,.25) 40%,rgba(255,245,239,0) 50%)}
+.db-hero__art img{width:100%;height:100%;object-fit:cover;object-position:70% 55%;display:block}
+.db-hero::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,rgba(255,250,246,.97) 0%,rgba(255,247,242,.92) 30%,rgba(255,245,239,.6) 44%,rgba(255,245,239,0) 58%)}
 .db-hero__copy{padding:clamp(28px,3.4vw,52px);max-width:600px}
 .db-eyebrow{margin:0 0 18px;font:600 12px/1 var(--db-font);letter-spacing:.32em;text-transform:uppercase;color:var(--db-navy)}
 .db-eyebrow i{font-style:normal;color:var(--db-coral);margin:0 .35em}
@@ -303,7 +305,8 @@ html.dus #du-workspace-content .db-ask input#db-ask-in:not([type=checkbox]):not(
   .db-tool{min-height:84px}
   .db-coach__chips{flex-direction:column}
   .db-empty{flex-direction:column;align-items:flex-start}
-  .db-signature{letter-spacing:.28em;gap:12px;font-size:10px}
+  .db-signature{letter-spacing:.18em;gap:10px;font-size:9.5px}
+  .db-signature i{width:24px}
 }
 @media (prefers-reduced-motion:reduce){
   .db-dash *,.db-dash{transition:none!important;animation:none!important}

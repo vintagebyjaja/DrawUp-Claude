@@ -61,7 +61,7 @@ const api = async p => p === '/api/features' ? { json: { season2_details: false 
   C.ok(/AI credits 500 left/.test(d.stats) && /Projects 3 active/.test(d.stats) && /Drawings 1 saved/.test(d.stats), 'Platform Status reads credits, active projects and drawings from the database', d.stats);
   C.ok(!/Storage/.test(d.stats) && !/%/.test(d.stats), 'No storage figure and no made-up percentages (the test account has no monthly allowance)', d.stats);
   C.ok(d.svc === 'Services responding', 'Service badge comes from a live check', d.svc);
-  C.ok(/A Dream Beyond Platform/i.test(d.sig || ''), 'Footer signature: A Dream Beyond Platform', d.sig);
+  C.ok(/GROOVEVILLE LLC \| DRAWUP HEADQUARTERS/.test((d.sig || '').replace(/\s+/g, ' ')), 'Footer signature: GROOVEVILLE LLC | DRAWUP HEADQUARTERS', d.sig);
 
   // suggestions + panel behaviour
   await p.click('[data-db-suggest="2"]'); await p.waitForTimeout(600);
@@ -100,7 +100,7 @@ const api = async p => p === '/api/features' ? { json: { season2_details: false 
   // account menu signature
   await p.evaluate(() => window.DrawUpStudio.go({ tab: 'dashboard' })); await p.waitForTimeout(2000);
   await p.click('#dus-pnav .dus-avatar'); await p.waitForTimeout(300);
-  C.ok(await p.evaluate(() => /Dream Beyond/i.test(document.querySelector('#dus-pnav .dus-pop[data-pop="acct"]')?.textContent || '')), 'Account menu carries the Dream Beyond signature');
+  C.ok(await p.evaluate(() => /GROOVEVILLE LLC/.test(document.querySelector('#dus-pnav .dus-pop[data-pop="acct"]')?.textContent || '')), 'Account menu carries the Dream Beyond signature');
   await p.screenshot({ path: path.join(OUT, 'desk-account-menu.png') });
   await p.keyboard.press('Escape');
   // other tabs still open
