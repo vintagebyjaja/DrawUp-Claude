@@ -53,8 +53,13 @@ html.db body:has(#du-portal.open) .dus-sheet details{border-color:var(--db-line)
 html.db body:has(#du-portal.open) .dus-sheet .dus-sheet__links button,html.db body:has(#du-portal.open) .dus-sheet .dus-sheet__links a{color:var(--db-ink-2)}
 html.db body:has(#du-portal.open) .dus-sheet__direct{color:var(--db-navy)!important;border-color:var(--db-line)!important}
 html.db body:has(#du-portal.open) .dus-sheet summary::after{border-color:var(--db-ink-3)}
-@media (max-width:1320px){html.db #dus-pnav .dus-link{padding:0 10px;gap:6px;font-size:13.5px}html.db #dus-pnav .dus-link .db-ico{width:16px;height:16px}}
-@media (max-width:1180px){html.db #dus-pnav .dus-link .db-ico{display:none}}
+/* header fit: the links column may shrink, and the brand, icons and padding step down before anything can touch */
+html.db #dus-pnav .dus-nav__inner{grid-template-columns:auto minmax(0,1fr) auto;gap:20px}
+@media (max-width:1600px){html.db #dus-pnav .dus-brand small{display:none}html.db #dus-pnav .dus-link{padding:0 11px;gap:7px;font-size:14px}}
+@media (max-width:1440px){html.db #dus-pnav .dus-link{padding:0 9px;gap:6px;font-size:13.5px}html.db #dus-pnav .dus-link .db-ico{width:16px;height:16px}html.db #dus-pnav .dus-brand b{font-size:26px}}
+@media (max-width:1320px){html.db #dus-pnav .dus-link .db-ico{display:none}html.db #dus-pnav .dus-nav__inner{gap:14px}}
+@media (max-width:1180px){html.db #dus-pnav .dus-link{padding:0 8px;font-size:13px}html.db #dus-pnav .dus-brand b{font-size:24px}html.db #dus-pnav .db-mark{width:34px;height:34px}html.db #dus-pnav .dus-right{padding-left:8px;gap:6px}}
+@media (max-width:1100px){html.db #dus-pnav .dus-link{padding:0 6px;font-size:12.5px}}
 
 /* ================================================================ shared pieces */
 .db-ico{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;flex:none}
