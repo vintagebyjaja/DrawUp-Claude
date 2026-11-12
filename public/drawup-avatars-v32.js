@@ -8,7 +8,7 @@
 (function () {
   'use strict';
   if (window.DrawUpAvatars) return;
-  const V = '32.0', MAKER = '/drawup-avatar-v32/maker.js?v=' + V + '.1';
+  const V = '32.1', MAKER = '/drawup-avatar-v32/maker.js?v=' + V + '.3';
   const ROLES = { coach: 'Arch Coach', teammate: 'Teammate', sixth_man: '6th Man' };
   const BLURB = { coach: 'Your head coach: codes, details and reviews.', teammate: 'Your design partner who brainstorms and builds with you.', sixth_man: 'The game changer who comes off the bench with another play.' };
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -85,8 +85,6 @@
         ${l.who === 'male' ? `<label class="du-av-chk"><input type="checkbox" data-k="beard" ${l.beard ? 'checked' : ''}> Beard</label>` : ''}</section>
       <section><h3>Top</h3>${chips('top', TOPS, l.top, 'Top')}${sw('topColor', CLOTH, l.topColor, 'Top colour')}
         <h3>Jacket</h3>${chips('jacket', JACKETS, l.jacket || 'none', 'Jacket')}${l.jacket && l.jacket !== 'none' ? sw('jacketColor', CLOTH, l.jacketColor, 'Jacket colour') : ''}</section>
-      <section><h3>Bottoms</h3>${chips('bottom', BOTTOMS, l.bottom, 'Bottoms')}${sw('bottomColor', CLOTH, l.bottomColor, 'Bottoms colour')}
-        <h3>Shoes</h3>${chips('shoes', SHOES, l.shoes, 'Shoes')}${l.shoes !== 'none' ? sw('shoeColor', CLOTH, l.shoeColor, 'Shoe colour') : ''}</section>
       <section><h3>Accessories</h3><div class="du-av-chips">${ACCS.map(([v, t]) => `<button type="button" aria-pressed="${acc.includes(v)}" data-acc="${v}">${esc(t)}</button>`).join('')}</div></section>`;
   }
   function paintPanel() { const p = M.el?.querySelector('.du-av-opts'); if (p) { const y = p.scrollTop; p.innerHTML = panel(); p.scrollTop = y; } }
@@ -113,7 +111,7 @@
       <div class="du-av-tabs" role="tablist" aria-label="Who you are creating">${Object.entries(ROLES).map(([k, n]) => `<button type="button" role="tab" data-role="${k}"><i aria-hidden="true"></i>${esc(n)}</button>`).join('')}</div>
       <div class="du-av-body">
         <div class="du-av-stagewrap"><div class="du-av-stage" aria-label="3D preview. Drag to turn, scroll to zoom."><p class="du-av-loading">Loading the 3D avatar…</p></div>
-          <div class="du-av-views"><button type="button" data-view="body">Full body</button><button type="button" data-view="face">Face</button><button type="button" data-turn="-0.5">Rotate left</button><button type="button" data-turn="0.5">Rotate right</button></div>
+          <div class="du-av-views"><button type="button" data-view="portrait">Portrait</button><button type="button" data-view="headshot">Headshot</button><button type="button" data-turn="-0.5">Rotate left</button><button type="button" data-turn="0.5">Rotate right</button></div>
           <p class="du-av-hint">Drag to rotate · scroll or pinch to zoom</p></div>
         <div class="du-av-opts"></div>
       </div>
@@ -139,7 +137,7 @@
     if (b.dataset.turn) return M.view?.turn(+b.dataset.turn);
     if (b.matches('[data-save]')) return doSave(b);
     if (b.dataset.acc) { const a = new Set(M.look.accessories || []); a.has(b.dataset.acc) ? a.delete(b.dataset.acc) : a.add(b.dataset.acc); M.look.accessories = [...a]; return apply(); }
-    if (b.dataset.k) { const k = b.dataset.k, v = b.dataset.v; M.look[k] = v; if (k === 'topColor') M.look.topTrim = M.look.topTrim || v; if (k === 'who' && v === 'female') M.look.beard = false; return apply(k === 'who' || k === 'jacket' || k === 'shoes'); }
+    if (b.dataset.k) { const k = b.dataset.k, v = b.dataset.v; M.look[k] = v; if (k === 'topColor') M.look.topTrim = M.look.topTrim || v; if (k === 'who' && v === 'female') M.look.beard = false; return apply(k === 'who' || k === 'jacket'); }
   }
   function onChange(e) { const i = e.target; if (i.dataset.k === 'beard') { M.look.beard = i.checked; apply(); } }
   function apply(repaint) { M.view?.set(M.look); if (repaint) paintPanel(); else paintPanel(); }

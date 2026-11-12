@@ -29,10 +29,11 @@ function frameFace(cam: T.PerspectiveCamera, a: Avatar, dist = 1.05) {
   const h = a.head.getWorldPosition(new T.Vector3()); const tgt = new T.Vector3(h.x, h.y + .03, h.z);
   cam.position.set(tgt.x + .12, tgt.y + .04, tgt.z + dist); cam.lookAt(tgt);
 }
+// portrait: navel and up (head top to about 0.62 m below the head centre)
 function frameBody(cam: T.PerspectiveCamera, a: Avatar) {
-  const box = new T.Box3().setFromObject(a.root); const c = box.getCenter(new T.Vector3()), hgt = box.max.y - box.min.y;
-  const dist = (hgt * .62) / Math.tan(T.MathUtils.degToRad(cam.fov / 2));
-  cam.position.set(c.x, c.y + hgt * .04, c.z + dist); cam.lookAt(c);
+  const h = a.head.getWorldPosition(new T.Vector3()); const top = h.y + .3, bottom = h.y - .6, c = new T.Vector3(h.x, (top + bottom) / 2, h.z);
+  const half = (top - bottom) / 2 / Math.tan(T.MathUtils.degToRad(cam.fov / 2)), wide = .42 / Math.tan(T.MathUtils.degToRad(cam.fov / 2)) / Math.max(.01, cam.aspect);
+  cam.position.set(c.x + .1, c.y + .03, c.z + Math.max(half, wide)); cam.lookAt(c);
 }
 // the face shot: a 256px square on the DrawUp cream-to-sky background, as a webp data URL (about 10 to 20 KB)
 function toFace(src: HTMLCanvasElement) {
@@ -73,7 +74,7 @@ async function mount(el: HTMLElement, look: Partial<Look>) {
   await set(cur); loop();
   return {
     set,
-    view(m: 'body' | 'face') { mode = m; zoom = 1; place(); },
+    view(m: 'body' | 'face' | 'portrait' | 'headshot') { m = m === 'headshot' ? 'face' : m === 'portrait' ? 'body' : m; mode = m; zoom = 1; place(); },
     turn(d: number) { yaw += d; place(); },
     faceShot: () => faceShot(cur),
     dispose() { alive = false; cancelAnimationFrame(raf); ro.disconnect(); if (a) { scene.remove(a.root); a.dispose(); } r.dispose(); r.domElement.remove(); },

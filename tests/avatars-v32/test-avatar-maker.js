@@ -14,7 +14,7 @@ const C = checker(); const OUT = path.join(__dirname, 'out'); fs.mkdirSync(OUT, 
   C.ok(await p.locator('.du-av-tabs [role=tab]').allTextContents().then(x => x.join('|')) === 'Arch Coach|Teammate|6th Man', 'Maker offers Arch Coach, Teammate and 6th Man');
   await p.screenshot({ path: path.join(OUT, 'maker-coach.png') });
   await p.click('.du-av-chips [data-k="hair"][data-v="afro"]'); await p.click('[data-acc="glasses"]'); await p.waitForTimeout(1500);
-  await p.click('[data-view="face"]'); await p.waitForTimeout(800);
+  await p.click('[data-view="headshot"]'); await p.waitForTimeout(800);
   await p.screenshot({ path: path.join(OUT, 'maker-face.png') });
   await p.click('[data-save]'); await p.waitForFunction(() => /saved/.test(document.querySelector('.du-av-status')?.textContent || ''), null, { timeout: 60000 }).catch(() => {});
   const st = await p.locator('.du-av-status').textContent(); C.ok(/saved/.test(st), 'Saving takes a face shot', st);
