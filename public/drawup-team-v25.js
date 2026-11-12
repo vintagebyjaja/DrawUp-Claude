@@ -20,7 +20,9 @@
   if (window.DrawUpTeam) return;
   const NAMES = { teammate: 'Teammate', sixth_man: '6th Man', coach: 'Arch Coach' };
   const ROLE = { teammate: 'Design partner', sixth_man: 'The game changer', coach: 'Head coach' };
-  const ICON = { teammate: '◆', sixth_man: '6', coach: '✦' };
+  const ICON0 = { teammate: '◆', sixth_man: '6', coach: '✦' };
+  // v32: a member's avatar-maker face shot replaces the symbol when they have made one (drawup-avatars-v32.js)
+  const ICON = new Proxy(ICON0, { get: (o, k) => (typeof k === 'string' && window.DrawUpAvatars?.faceImg?.(k)) || (k === 'coach' && window.DrawUpPortraits?.img?.('arch-coach')) || o[k] });
   const STYLES = [['professional', 'Professional'], ['casual', 'Casual'], ['creative', 'Creative'], ['direct', 'Straight to the point']];
   const KINDS = { idea: 'Idea', bookmark: 'Bookmark', decision: 'Decision', rejected: 'Rejected', play: '6th Man play', finding: 'Coach finding', note: 'Note', unfinished: 'Unfinished', proposal: 'Proposal' };
   const STARTERS = [

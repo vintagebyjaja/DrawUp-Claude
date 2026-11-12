@@ -1,0 +1,1 @@
+{ "name": "drawup-avatar-maker-v32", "private": true, "dependencies": { "three": "0.180.0", "esbuild": "0.24.0" } }

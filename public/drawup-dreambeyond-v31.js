@@ -168,6 +168,8 @@
   async function coachAvatar() {
     const C = window.DrawUpCoach; if (!C?.avatarSVG) return '';
     try { await C.reload?.(); } catch (_e) {}
+    try { await window.DrawUpAvatars?.load?.(); } catch (_e) {}
+    const made = window.DrawUpAvatars?.faceImg?.('coach'); if (made) return made;
     const row = C.state?.()?.row;
     const mine = row && row.mode && row.mode !== 'later';
     const look = mine ? { ...GENERIC_LOOK, generic: false, ...(row.appearance || {}) } : GENERIC_LOOK;
@@ -251,7 +253,7 @@
           </section>
           <section class="db-card db-coach" aria-labelledby="db-coach-h">
             <header class="db-coach__head"><span class="db-coach__spark">${ico('spark')}</span><h2 id="db-coach-h">Arch Coach</h2><span class="db-live" id="db-coach-live">Ready</span><button type="button" class="db-iconbtn" data-db-go='${esc(JSON.stringify(T('arch-coach')))}' aria-label="Open Arch Coach">${ico('chev')}</button></header>
-            <div class="db-coach__hello"><div class="db-coach__ava" id="db-coach-ava" aria-hidden="true"></div><p><b>${first ? `Good to see you, ${esc(first)}.` : 'Good to see you.'}</b><span>Ready to bring your next vision to life?</span></p></div>
+            <div class="db-coach__hello"><div class="db-coach__ava" id="db-coach-ava" aria-hidden="true"></div><button type="button" class="db-coach__edit" data-av-edit aria-label="Create your Arch Coach avatar" title="Create your Arch Coach avatar">✎</button><p><b>${first ? `Good to see you, ${esc(first)}.` : 'Good to see you.'}</b><span>Ready to bring your next vision to life?</span></p></div>
             <div class="db-coach__chips">${SUGGEST.map((s, i) => `<button type="button" class="db-chip" data-db-suggest="${i}">${ico(s[0])}<span>${esc(s[1])}</span></button>`).join('')}</div>
             <div class="db-coach__recent" id="db-coach-recent" hidden></div>
             <form class="db-ask" id="db-ask" autocomplete="off">
@@ -284,7 +286,10 @@
         ${SIGNATURE}
       </div></div>`;
     bind(w);
-    coachAvatar().then(svg => { const a = w.querySelector('#db-coach-ava'); if (a && svg) a.innerHTML = svg; else if (a) a.innerHTML = `<span class="db-coach__fallback">${ico('spark')}</span>`; });
+    const paintAva = () => coachAvatar().then(svg => { const a = w.querySelector('#db-coach-ava'); if (a && svg) a.innerHTML = svg; else if (a) a.innerHTML = `<span class="db-coach__fallback">${ico('spark')}</span>`; });
+    paintAva();
+    w.querySelector('[data-av-edit]')?.addEventListener('click', () => window.DrawUpAvatars ? window.DrawUpAvatars.open('coach') : window.DrawUpCoach?.open?.('appearance'));
+    if (!w.dataset.avListen) { w.dataset.avListen = '1'; document.addEventListener('du-avatars-changed', () => { if (w.querySelector('#db-coach-ava')) paintAva(); }); }
     if (!me) return;
     loadRecent(w);
     loadStatus(me).then(s => {
