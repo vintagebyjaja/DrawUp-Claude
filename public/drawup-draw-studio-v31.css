@@ -1,0 +1,266 @@
+/* DrawUp Draw Studio (v31). Dream Beyond tokens (shared with the dashboard), scoped to Draw.
+ * Mostly white workspace, navy labels, blue selected states, peach accents. */
+.dws-startpage, .dws, .dws-modal, .dws-menu {
+  --s-navy: var(--db-navy, #142337); --s-blue: var(--db-blue, #258FF5); --s-sky: var(--db-sky, #DCEBFF);
+  --s-peach: var(--db-peach, #FFB28F); --s-coral: var(--db-coral, #FF8D72); --s-cream: var(--db-cream, #FFF5EF);
+  --s-cloud: var(--db-cloud, #F8F9FC); --s-white: var(--db-white, #FFFFFF); --s-ink2: var(--db-ink-2, #4B5A70);
+  --s-line: var(--db-line, #E4EAF3); --s-r: var(--db-radius, 16px); --s-shadow: var(--db-shadow, 0 8px 28px rgba(20,35,55,.08));
+  --s-grad: var(--db-grad, linear-gradient(135deg, #FFB28F, #DCEBFF)); --s-bink: var(--db-blue-ink, #1A73D1);
+  color: var(--s-navy);
+}
+.dws-ico { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.dws-ico.big { width: 40px; height: 40px; opacity: .35; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.dws-kicker { display: block; font-size: 11px; letter-spacing: .14em; font-weight: 700; color: var(--s-coral); text-transform: uppercase; }
+.dws-muted, .dws-hint { color: var(--s-ink2); font-size: 13px; line-height: 1.45; }
+.dws-hint.sm { font-size: 12px; }
+.dws-link { background: none; border: 0; padding: 0; color: var(--s-bink); font: inherit; font-weight: 600; cursor: pointer; text-decoration: none; }
+.dws-link:hover { text-decoration: underline; }
+.dws-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 20px; border-radius: 12px; border: 1px solid transparent; font: inherit; font-weight: 700; cursor: pointer; transition: background .15s, box-shadow .15s, transform .1s; }
+.dws-btn.primary { background: var(--s-blue); color: #fff; box-shadow: 0 6px 16px rgba(37,143,245,.25); }
+.dws-btn.primary:hover { background: #1c7fe0; }
+.dws-btn.primary:disabled { background: #a9c9ec; box-shadow: none; cursor: not-allowed; }
+.dws-btn.ghost { background: var(--s-white); color: var(--s-navy); border-color: var(--s-line); }
+.dws-btn.ghost:hover { border-color: var(--s-bink); color: var(--s-bink); }
+.dws-btn.sm { min-height: 36px; padding: 0 14px; font-size: 13px; border-radius: 10px; }
+.dws-btn.xs { min-height: 30px; padding: 0 10px; font-size: 12px; border-radius: 8px; }
+.dws-btn.bad { color: #c2410c; }
+.dws-btn:focus-visible, .dws-link:focus-visible, .dws-rail button:focus-visible { outline: 3px solid rgba(37,143,245,.45); outline-offset: 2px; }
+.dws-chip { display: inline-block; padding: 2px 8px; border-radius: 999px; background: var(--s-sky); color: var(--s-navy); font-size: 11px; font-weight: 700; }
+.dws-chip.ok { background: #dcf5e7; color: #166534; } .dws-chip.warn { background: #ffe9dd; color: #9a3412; }
+.dws-warn { color: #b45309; background: #fff7ed; border: 1px solid #fed7aa; border-radius: 10px; padding: 8px 12px; font-size: 13px; }
+
+/* ---------------------------------------------------------------- start screen */
+.dws-startpage { background: var(--s-cloud); min-height: 100%; }
+.dws-start { max-width: 1120px; margin: 0 auto; padding: 40px 24px 56px; }
+.dws-start-head { text-align: center; margin-bottom: 28px; }
+.dws-start-head h1 { font-size: clamp(30px, 4.4vw, 46px); line-height: 1.08; margin: 10px 0 10px; color: var(--s-navy); letter-spacing: -.02em; }
+.dws-start-head p { font-size: 17px; color: var(--s-ink2); margin: 0 auto; max-width: 620px; }
+.dws-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.dws-card { position: relative; background: var(--s-white); border: 1px solid var(--s-line); border-radius: 20px; padding: 28px; box-shadow: var(--s-shadow); display: flex; flex-direction: column; gap: 12px; transition: border-color .15s, box-shadow .15s; }
+.dws-card h2 { margin: 4px 0 0; font-size: 22px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.dws-card p { margin: 0; color: var(--s-ink2); line-height: 1.5; }
+.dws-card .dws-btn { align-self: flex-start; margin-top: 4px; }
+.dws-card .dws-fine { font-size: 12px; }
+.dws-card-ico { width: 52px; height: 52px; border-radius: 14px; display: grid; place-items: center; background: var(--s-sky); color: var(--s-bink); }
+.dws-card-ico .dws-ico { width: 26px; height: 26px; }
+.dws-card-image .dws-card-ico { background: var(--s-grad); color: var(--s-navy); }
+.dws-card.over, .dws-card.focus { border-color: var(--s-bink); box-shadow: 0 0 0 4px rgba(37,143,245,.15), var(--s-shadow); }
+.dws-badge { font-size: 11px; font-weight: 700; letter-spacing: .04em; padding: 3px 9px; border-radius: 999px; background: var(--s-cream); color: #b4532a; border: 1px solid #ffd9c6; }
+.dws-drop { display: block; border: 1.5px dashed #c7d3e3; border-radius: 12px; padding: 14px; text-align: center; color: var(--s-ink2); font-size: 13px; cursor: pointer; background: var(--s-cloud); }
+.dws-drop input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.dws-drop span::after { content: ' browse'; color: var(--s-bink); font-weight: 600; }
+.dws-recent { margin-top: 36px; }
+.dws-recent-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 12px; }
+.dws-recent-head h2 { font-size: 18px; margin: 0; }
+.dws-recent-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+.dws-rcard { position: relative; background: var(--s-white); border: 1px solid var(--s-line); border-radius: 14px; overflow: hidden; }
+.dws-rcard:hover { border-color: #b8cbe4; box-shadow: var(--s-shadow); }
+.dws-rthumb { display: grid; place-items: center; width: 100%; aspect-ratio: 4 / 3; border: 0; background: linear-gradient(180deg, #fbfcfe, #f1f5fb); cursor: pointer; padding: 14px; color: var(--s-navy); }
+.dws-rthumb svg { width: 100%; height: 100%; }
+.dws-rthumb svg polygon { fill: var(--s-navy); }
+.dws-rmeta { padding: 10px 40px 12px 12px; display: grid; gap: 2px; }
+.dws-rmeta b { font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dws-rmeta span { font-size: 12px; color: var(--s-ink2); }
+.dws-rmore { position: absolute; right: 6px; bottom: 10px; width: 32px; height: 32px; border: 0; border-radius: 8px; background: none; color: var(--s-ink2); cursor: pointer; display: grid; place-items: center; }
+.dws-rmore:hover { background: var(--s-cloud); color: var(--s-navy); }
+.dws-empty { background: var(--s-white); border: 1px dashed var(--s-line); border-radius: 14px; padding: 22px; text-align: center; color: var(--s-ink2); }
+.dws-start-links { margin-top: 24px; text-align: center; color: var(--s-ink2); font-size: 14px; }
+.dws-projpick select { margin-left: 6px; min-height: 32px; border-radius: 8px; border: 1px solid var(--s-line); padding: 0 8px; max-width: 220px; }
+.dws-menu { position: absolute; z-index: 2147483001; background: #fff; border: 1px solid var(--s-line); border-radius: 12px; box-shadow: 0 14px 34px rgba(20,35,55,.16); padding: 6px; min-width: 180px; display: grid; }
+.dws-menu button { text-align: left; background: none; border: 0; padding: 9px 12px; border-radius: 8px; font: inherit; color: var(--s-navy); cursor: pointer; }
+.dws-menu button:hover { background: var(--s-cloud); } .dws-menu .bad { color: #c2410c; }
+
+/* ---------------------------------------------------------------- modals (import review, export, floors) */
+.dws-modal { position: fixed; inset: 0; z-index: 2147483000; background: rgba(20,35,55,.42); display: grid; place-items: center; padding: 16px; }
+.dws-mcard { position: relative; background: #fff; border-radius: 20px; width: min(560px, 100%); max-height: calc(100vh - 32px); overflow: auto; box-shadow: 0 30px 80px rgba(20,35,55,.3); }
+.dws-modal.mid .dws-mcard { width: min(640px, 100%); }
+.dws-modal.wide .dws-mcard { width: min(1180px, 100%); }
+.dws-mbody { padding: 26px 28px 28px; }
+.dws-mbody h2 { margin: 6px 0 6px; font-size: 22px; }
+.dws-mbody h3 { margin: 18px 0 8px; font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--s-ink2); }
+.dws-mbody h4, .dws-props h4, .dws-pbody h4 { margin: 16px 0 8px; font-size: 13px; color: var(--s-navy); display: flex; gap: 8px; align-items: baseline; }
+.dws-mbody h4 small, .dws-props h4 small { color: var(--s-ink2); font-weight: 600; }
+.dws-x { position: absolute; top: 12px; right: 12px; width: 36px; height: 36px; border: 0; border-radius: 10px; background: var(--s-cloud); color: var(--s-navy); font-size: 22px; line-height: 1; cursor: pointer; z-index: 2; }
+.dws-x.sm { position: static; width: 28px; height: 28px; font-size: 18px; background: none; }
+.dws-file { font-weight: 700; word-break: break-all; margin: 4px 0; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.dws-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 12px; }
+.dws-two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.dws-field { display: grid; gap: 4px; margin: 8px 0; min-width: 0; }
+.dws-field label { font-size: 12px; font-weight: 700; color: var(--s-navy); }
+.dws-field small { color: var(--s-ink2); font-size: 12px; }
+.dws-field input, .dws-field select { min-height: 40px; border: 1px solid var(--s-line); border-radius: 10px; padding: 0 10px; font: inherit; color: var(--s-navy); background: #fff; min-width: 0; width: 100%; box-sizing: border-box; }
+.dws-field input:focus, .dws-field select:focus { outline: none; border-color: var(--s-bink); box-shadow: 0 0 0 3px rgba(37,143,245,.18); }
+.dws-field input.bad, .dws-fhin.bad { border-color: #ea580c; }
+.dws-field input:disabled { background: var(--s-cloud); color: var(--s-ink2); }
+.dws-check { display: flex; gap: 8px; align-items: center; font-size: 13px; margin: 8px 0; font-weight: 600; }
+.dws-check input { width: 18px; height: 18px; accent-color: var(--s-bink); }
+.dws-adv { margin: 10px 0; font-size: 13px; } .dws-adv summary { cursor: pointer; font-weight: 700; }
+.dws-rv { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(320px, 1fr); gap: 22px; margin-top: 12px; }
+.dws-rv-stage { min-width: 0; }
+.dws-rv-svg { height: min(62vh, 620px); background: #fff; border: 1px solid var(--s-line); border-radius: 14px; overflow: hidden; display: grid; place-items: center; }
+.dws-rv-side { min-width: 0; }
+.dws-found { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 10px 0; }
+.dws-found span { background: var(--s-cloud); border-radius: 10px; padding: 8px 10px; font-size: 12px; color: var(--s-ink2); }
+.dws-found b { display: block; font-size: 18px; color: var(--s-navy); }
+.dws-class { font-size: 13px; }
+.dws-notes { margin: 0; padding-left: 0; list-style: none; display: grid; gap: 6px; font-size: 13px; color: var(--s-navy); }
+.dws-notes li { line-height: 1.4; }
+.dws-pgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; margin-top: 10px; }
+.dws-pg { border: 1px solid var(--s-line); border-radius: 12px; background: #fff; padding: 8px; cursor: pointer; display: grid; gap: 6px; justify-items: center; font: inherit; font-size: 12px; color: var(--s-navy); }
+.dws-pg:hover { border-color: var(--s-bink); } .dws-pg.busy { opacity: .6; cursor: progress; }
+.dws-pg canvas { max-width: 100%; height: 150px; object-fit: contain; background: #fafafa; }
+
+/* ---------------------------------------------------------------- the studio */
+html.dws-on .du-workspace-content, html.dws-on #du-workspace-content { padding: 0 !important; }
+.dws { background: var(--s-white); }
+.dws > .dws-shell { display: grid; grid-template-rows: auto 1fr auto; height: calc(100vh - var(--dws-top, 64px)); min-height: 560px; background: var(--s-white); }
+.dws-top { display: flex; align-items: center; gap: 10px; padding: 8px 14px; border-bottom: 1px solid var(--s-line); background: #fff; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: thin; }
+.dws-titlebox { min-width: 130px; max-width: 280px; flex: 0 1 auto; }
+.dws-titlebox .dws-kicker { font-size: 10px; }
+.dws-titlerow { display: flex; align-items: center; gap: 6px; }
+.dws-titlerow #dw-title { display: none; }
+.dws-titlerow #dw-list { flex: 1; min-width: 90px; max-width: 220px; min-height: 30px; border: 1px solid transparent !important; border-radius: 8px; padding: 0 22px 0 6px !important; font: inherit; font-size: 15px !important; font-weight: 800; color: var(--s-navy) !important; background: transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23142337' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") right 4px center/14px no-repeat !important; appearance: none; -webkit-appearance: none; cursor: pointer; text-overflow: ellipsis; box-shadow: none !important; }
+.dws-titlerow #dw-list:hover, .dws-titlerow #dw-list:focus { border-color: var(--s-line) !important; outline: none; }
+.dws-titlerow #dw-new { white-space: nowrap; flex: none; min-height: 28px !important; padding: 0 9px !important; font-size: 12px !important; border-radius: 8px !important; }
+.dws-quick { display: flex; gap: 2px; padding: 3px; background: var(--s-cloud); border-radius: 10px; }
+.dws-quick button { width: 36px; height: 34px; border: 0; border-radius: 8px; background: none; color: var(--s-navy); display: grid; place-items: center; cursor: pointer; padding: 0; }
+.dws-quick button:hover { background: #fff; } .dws-quick button.on, .dws-quick button[aria-pressed="true"] { background: #fff; color: var(--s-bink); box-shadow: 0 1px 3px rgba(20,35,55,.12); }
+.dws-quick button:disabled { opacity: .35; }
+.dws-seg, .dws .dw21-seg { display: inline-flex; gap: 2px; padding: 3px; background: var(--s-cloud); border-radius: 10px; border: 0; flex: none; }
+.dws-seg button, .dws .dw21-seg button { min-height: 32px; padding: 0 10px; border: 0; border-radius: 8px; background: none; color: var(--s-ink2); font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+.dws-seg button.on, .dws .dw21-seg button.on { background: #fff; color: var(--s-bink); box-shadow: 0 1px 3px rgba(20,35,55,.12); }
+.dws-dim button { min-width: 44px; }
+/* the 2D/3D seg already covers 3D, so the View seg only needs plan / elevation / section */
+.dws-top #dws-viewslot [data-view29] { display: none; }
+.dws-floorpick label { display: inline-flex; align-items: center; gap: 6px; background: var(--s-cream); border: 1px solid #ffdcca; border-radius: 10px; padding: 0 4px 0 8px; color: #8a3b17; }
+.dws-floorpick select { border: 0; background: transparent; font: inherit; font-size: 13px; font-weight: 700; color: var(--s-navy); min-height: 32px; cursor: pointer; }
+.dws-flex { flex: 1; }
+.dws-save { font-size: 12px; color: var(--s-ink2); white-space: nowrap; }
+.dws-propsbtn { display: none; }
+.dws-body { display: grid; grid-template-columns: 84px auto minmax(0, 1fr) 300px; min-height: 0; background: var(--s-cloud); }
+.dws-rail { display: flex; flex-direction: column; gap: 4px; padding: 10px 6px; background: #fff; border-right: 1px solid var(--s-line); overflow-y: auto; }
+.dws-rail button { display: grid; justify-items: center; gap: 4px; padding: 9px 0; letter-spacing: -.01em; border: 0; border-radius: 12px; background: none; color: var(--s-ink2); font: inherit; font-size: 10.5px; font-weight: 700; cursor: pointer; }
+.dws-rail button:hover { background: var(--s-cloud); color: var(--s-navy); }
+.dws-rail button.on { background: var(--s-sky); color: var(--s-bink); }
+.dws-rail button .dws-ico { width: 22px; height: 22px; }
+.dws-fly { width: 248px; background: #fff; border-right: 1px solid var(--s-line); overflow-y: auto; }
+.dws-fly[hidden] { display: none; }
+.dws-panel header { display: flex; align-items: center; justify-content: space-between; padding: 12px 12px 4px 16px; }
+.dws-panel header b { font-size: 14px; }
+.dws-pbody { padding: 4px 12px 16px; display: grid; gap: 4px; align-content: start; }
+/* the existing tool buttons, restyled as a list */
+.dws-pbody > button[data-tool], .dws-pbody > #dw29-curve, .dws-pbody > #dw29-libbtn, .dws-pbody > #dw29-fin, .dws-pbody > #dw29-as, .dws-pbody > #dw29-hist, .dws-pbody > #dw29-coach, .dws-pbody > #dw21-markup, .dws-pbody > button.dw21-btn {
+  display: flex; align-items: center; gap: 10px; width: 100%; min-height: 40px; padding: 0 12px; border: 1px solid transparent; border-radius: 10px; background: none; color: var(--s-navy); font: inherit; font-size: 13.5px; font-weight: 600; text-align: left; cursor: pointer; box-shadow: none; }
+.dws-pbody > button[data-tool]:hover, .dws-pbody > button.dw21-btn:hover, .dws-pbody > [id^="dw29-"]:hover, .dws-pbody > #dw21-markup:hover { background: var(--s-cloud); }
+.dws-pbody > button[data-tool].on, .dws-pbody > button[data-tool][aria-pressed="true"] { background: var(--s-sky); color: var(--s-bink); border-color: #bcd8fb; }
+.dws-pbody label { font-size: 13px; }
+.dws-pbody .dw21-snaps { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; font-size: 12px; }
+.dws-pbody select { max-width: 100%; }
+.dws-vlist { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.dws-chipbtn { min-height: 32px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--s-line); background: #fff; color: var(--s-navy); font: inherit; font-size: 12.5px; font-weight: 600; cursor: pointer; }
+.dws-chipbtn:hover { border-color: var(--s-bink); color: var(--s-bink); }
+.dws-chipbtn.on { background: var(--s-sky); color: var(--s-bink); border-color: #bcd8fb; }
+.dws-swatches { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+.dws-sw { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; padding: 0; border: 1px solid var(--s-line); border-radius: 10px; overflow: hidden; background: #fff; cursor: pointer; }
+.dws-sw i { height: 34px; } .dws-sw span { grid-column: 1 / -1; font-size: 11.5px; font-weight: 600; padding: 6px; text-align: left; color: var(--s-navy); }
+.dws-sw:hover { border-color: var(--s-bink); }
+.dws-explist { position: static !important; display: grid !important; box-shadow: none !important; border: 0 !important; padding: 0 !important; background: none !important; gap: 2px; }
+.dws-explist button { text-align: left; }
+#dws-cadrow button { min-height: 34px; }
+.dws-stage { position: relative; display: flex; flex-direction: column; min-width: 0; min-height: 0; overflow: hidden; }
+.dws-ctx { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 8px 14px; font-size: 12.5px; color: var(--s-ink2); background: #fff; border-bottom: 1px solid var(--s-line); }
+.dws-ctx:empty { display: none; }
+.dws-ctx #dw-opt { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.dws-ctx #dw-hint { flex: 1; min-width: 200px; }
+.dws-stage .du-draw-split { flex: 1; min-height: 0; display: block; margin: 0; }
+.dws-stage .du-draw-canvas, .dws-stage #dw-canvas { height: 100% !important; min-height: 0; border: 0; border-radius: 0; background: #fff; }
+.dws-stage .dw29-3d { position: absolute; inset: 0; }
+.dws-stage .dw29-3dstage { height: 100%; }
+.dws-stage .dw29-3dbar { display: none; }
+.dws .dws-oldbar, .dws .du-draw-head[hidden] { display: none !important; }
+.dws .dws-note { display: none; }
+.dws-props { background: #fff; border-left: 1px solid var(--s-line); overflow-y: auto; min-width: 0; }
+.dws-ptabs { display: flex; gap: 4px; padding: 10px 12px 0; border-bottom: 1px solid var(--s-line); position: sticky; top: 0; background: #fff; z-index: 1; }
+.dws-ptabs button { flex: 1; min-height: 38px; border: 0; border-bottom: 2px solid transparent; background: none; font: inherit; font-size: 13px; font-weight: 700; color: var(--s-ink2); cursor: pointer; }
+.dws-ptabs button[aria-selected="true"] { color: var(--s-bink); border-bottom-color: var(--s-bink); }
+.dws-ppane { padding: 6px 14px 20px; }
+.dws-ppane #dw-inspect { border: 0; padding: 0; background: none; box-shadow: none; margin: 0; }
+.dws-floors { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.dws-floors li { display: grid; grid-template-columns: 1fr 86px; gap: 6px; align-items: center; }
+.dws-fsw { display: grid; text-align: left; gap: 1px; border: 1px solid var(--s-line); background: #fff; border-radius: 10px; padding: 7px 10px; cursor: pointer; font: inherit; color: var(--s-navy); }
+.dws-fsw b { font-size: 13px; } .dws-fsw span { font-size: 11.5px; color: var(--s-ink2); }
+.dws-floors li.on .dws-fsw { background: var(--s-sky); border-color: #bcd8fb; }
+.dws-floors li.on .dws-fsw b { color: var(--s-bink); }
+.dws-fhin { min-height: 38px; border: 1px solid var(--s-line); border-radius: 10px; padding: 0 8px; font: inherit; font-size: 13px; width: 100%; box-sizing: border-box; color: var(--s-navy); }
+.dws-northrow { display: flex; gap: 8px; align-items: center; }
+.dws-narrow { display: inline-grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: var(--s-cream); color: var(--s-coral); flex: none; }
+.dws-narrow .dws-ico { fill: currentColor; }
+.dws-bottom { position: relative; display: grid; gap: 0; border-top: 1px solid var(--s-line); background: #fff; }
+.dws-toastslot { position: absolute; left: 50%; bottom: calc(100% + 12px); transform: translateX(-50%); display: flex; align-items: center; gap: 10px; background: var(--s-navy); color: #fff; padding: 9px 10px 9px 16px; border-radius: 14px; box-shadow: 0 14px 30px rgba(20,35,55,.28); font-size: 13.5px; max-width: min(720px, calc(100% - 24px)); z-index: 30; }
+.dws-toastslot[hidden] { display: none; }
+.dws-toastslot .dws-link { color: var(--s-peach); }
+.dws-toastslot .dws-x.sm { color: #fff; }
+.dws-toastslot .dws-btn.ghost { background: transparent; color: #fff; border-color: rgba(255,255,255,.35); }
+.dws-tdot { width: 8px; height: 8px; border-radius: 50%; background: #4ade80; flex: none; } .dws-tdot.bad { background: var(--s-coral); }
+.dws-cambar { display: flex; align-items: center; gap: 12px; padding: 8px 14px; flex-wrap: wrap; border-bottom: 1px solid var(--s-line); font-size: 13px; }
+.dws-cambar[hidden] { display: none; }
+.dws-camsel { display: inline-flex; align-items: center; gap: 6px; color: var(--s-navy); }
+.dws-camsel select { min-height: 34px; border: 1px solid var(--s-line); border-radius: 10px; padding: 0 8px; font: inherit; font-size: 13px; font-weight: 600; color: var(--s-navy); background: #fff; }
+.dws-chk { display: inline-flex; gap: 6px; align-items: center; font-weight: 600; }
+.dws-cambar .dws-3dopts { display: flex !important; gap: 10px; align-items: center; flex-wrap: wrap; margin-left: auto; background: none; border: 0; padding: 0; position: static; }
+.dws-cambar .dws-3dopts .dw21-seg[hidden] { display: none; }
+.dws-cambar .dws-3dopts label { color: var(--s-navy) !important; opacity: 1 !important; font-weight: 600; display: inline-flex; gap: 6px; align-items: center; }
+.dws-cambar .dws-3dopts input[type=checkbox] { accent-color: var(--s-bink); }
+.dws-coach { display: flex; align-items: center; gap: 10px; padding: 10px 14px; }
+.dws-coach-tag { display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 999px; background: var(--s-grad); color: var(--s-navy); font-size: 12px; font-weight: 800; white-space: nowrap; flex: none; }
+.dws-coach #dw29-cmd { flex: 1; display: flex; align-items: center; gap: 6px; margin: 0; padding: 0; background: none; border: 0; min-width: 0; }
+.dws-coach #dw29-cmd input { flex: 1; min-width: 0; min-height: 44px; border: 1px solid var(--s-line); border-radius: 14px; padding: 0 14px; font: inherit; font-size: 14px; color: var(--s-navy); background: var(--s-cloud); }
+.dws-coach #dw29-cmd input:focus { outline: none; border-color: var(--s-bink); background: #fff; box-shadow: 0 0 0 3px rgba(37,143,245,.15); }
+.dws-send { width: 44px; height: 44px; border: 0; border-radius: 12px; background: var(--s-blue); color: #fff; display: grid; place-items: center; cursor: pointer; flex: none; }
+.dws-send:hover { background: #1c7fe0; }
+.dws-ghost polygon { vector-effect: non-scaling-stroke; }
+
+/* ---------------------------------------------------------------- tablet and phone */
+@media (max-width: 1180px) {
+  .dws-body { grid-template-columns: 84px auto minmax(0, 1fr); }
+  .dws-props { position: absolute; right: 0; top: 0; bottom: 0; width: min(340px, 92vw); z-index: 25; box-shadow: -12px 0 30px rgba(20,35,55,.14); transform: translateX(105%); transition: transform .2s; }
+  .dws-body { position: relative; }
+  .dws-shell.dws-propsopen .dws-props { transform: none; }
+  .dws-propsbtn { display: inline-flex; }
+  .dws-recent-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 900px) {
+  .dws-cards { grid-template-columns: 1fr; }
+  .dws-recent-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .dws-rv { grid-template-columns: 1fr; } .dws-rv-svg { height: 44vh; }
+  .dws > .dws-shell { height: calc(100dvh - var(--dws-top, 124px)); min-height: 0; }
+  .dws-body { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; }
+  .dws-stage { grid-row: 1; grid-column: 1; }
+  .dws-rail { grid-row: 2; grid-column: 1; flex-direction: row; overflow-x: auto; border-right: 0; border-top: 1px solid var(--s-line); padding: 4px 6px; }
+  .dws-rail button { min-width: 72px; padding: 6px 2px; font-size: 10px; white-space: nowrap; }
+  .dws-fly { position: absolute; left: 0; right: 0; bottom: 62px; width: auto; max-height: 52vh; z-index: 24; border: 0; border-top: 1px solid var(--s-line); border-radius: 18px 18px 0 0; box-shadow: 0 -12px 30px rgba(20,35,55,.16); }
+  .dws-titlebox { min-width: 120px; } .dws-titlebox .dws-kicker { display: none; }
+  .dws-top { gap: 6px; padding: 6px 8px; }
+  .dws-top .dws-btn span, #dws-styleslot { display: none; }
+  .dws-top .dws-btn.sm { padding: 0 10px; }
+  .dws-coach-tag span { display: none; }
+  .dws-coach { padding: 8px; }
+}
+@media (max-width: 560px) {
+  .dws-start { padding: 24px 16px 40px; }
+  .dws-card { padding: 20px; }
+  .dws-two { grid-template-columns: 1fr; }
+  .dws-found { grid-template-columns: repeat(2, 1fr); }
+  .dws-mbody { padding: 22px 16px 20px; }
+  .dws-recent-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+  #dws-viewslot { display: none; }
+}
+
+/* the existing inspector, compacted for the side panel */
+.dws-ppane #dw-inspect .du-field { margin: 6px 0; }
+.dws-ppane #dw-inspect label { font-size: 11.5px; letter-spacing: .04em; }
+.dws-ppane #dw-inspect input, .dws-ppane #dw-inspect select { min-height: 36px !important; padding: 0 10px !important; font-size: 13.5px !important; border-radius: 10px !important; }
+.dws-ppane #dw-inspect .du-btn { min-height: 34px; font-size: 13px; padding: 0 14px; }
+.dws-ppane #dw-inspect, .dws-ppane #dw-inspect p { font-size: 13px; }
+@media (max-width: 1360px) { .dws-save { display: none; } .dws-top .dws-btn.sm span { display: none; } .dws-top .dws-btn.sm { padding: 0 10px; } }

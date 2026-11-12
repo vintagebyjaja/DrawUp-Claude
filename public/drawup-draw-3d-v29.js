@@ -30,7 +30,7 @@
   const MATS = { fabric: '#7d8b99', wood: '#b48a5f', metal: '#9aa1a8', white: '#f4f4f2', glass: '#bfe3f2', stone: '#d8d3ca', steel: '#c4c9ce', plant: '#4f8a4a', dark: '#3a3d41', person: '#c9b8a4', brand: '#c8102e', accent: '#c2a15a', custom: '#a3b6c9' };
   const STYLES = {
     cd: { bg: '#ffffff', clay: '#f6f6f6', edge: '#111111', edges: true, light: 1, shadows: false, label: 'CD (black and white)' },
-    sketch: { bg: '#fbf8f1', clay: '#fffdf8', edge: '#3b3b3b', edges: true, light: 0.95, shadows: false, label: 'Sketch' },
+    sketch: { bg: '#fbfaf6', clay: '#fffdf8', edge: '#161616', edges: true, light: 0.95, shadows: false, pencil: true, label: 'Sketch' },
     presentation: { bg: '#eef2f5', edge: '#55606b', edges: true, edgeOpacity: 0.25, light: 1, shadows: true, label: 'Presentation' },
     realistic: { bg: '#dfe7ee', edges: false, light: 1.1, shadows: true, label: 'Realistic' },
   };
@@ -43,6 +43,64 @@
     const s = new T.Shape(pts.map(p => new T.Vector2(p.x, -p.y)));
     const g = new T.ExtrudeGeometry(s, { depth: z1 - z0, bevelEnabled: false });
     g.rotateX(-Math.PI / 2); g.translate(0, z0, 0); return g;
+  }
+  /* ---------- Sketch style: pencil hatching on faces, overshooting doubled strokes on edges, a few smudges.
+   * Deterministic (seeded), so the same model always draws the same way and exports match the screen. */
+  function rng(seed) { let a = seed >>> 0 || 1; return () => { a ^= a << 13; a ^= a >>> 17; a ^= a << 5; return ((a >>> 0) % 100000) / 100000; }; }
+  const pencilCache = new WeakMap();
+  function pencilMats(T) {
+    if (pencilCache.has(T)) return pencilCache.get(T);
+    const tex = (density, dark, seed, smudge) => {
+      const N = 512, cv = (root.document ? root.document.createElement('canvas') : null); if (!cv) return null; cv.width = cv.height = N;
+      const g = cv.getContext('2d'), r = rng(seed); g.fillStyle = '#fdfcf8'; g.fillRect(0, 0, N, N);
+      // paper grain
+      for (let i = 0; i < 2600; i++) { g.fillStyle = `rgba(60,55,45,${0.025 + r() * 0.04})`; g.fillRect(r() * N, r() * N, 1 + r(), 1 + r()); }
+      // smudges: soft graphite blotches
+      for (let i = 0; i < smudge; i++) { const x = r() * N, y = r() * N, rad = 60 + r() * 120, gr = g.createRadialGradient(x, y, 0, x, y, rad); gr.addColorStop(0, `rgba(70,70,70,${0.03 + r() * 0.04})`); gr.addColorStop(1, 'rgba(70,70,70,0)'); g.fillStyle = gr; g.fillRect(x - rad, y - rad, rad * 2, rad * 2); }
+      // hatching: short parallel pencil strokes in loose bands
+      g.lineCap = 'round';
+      for (let i = 0; i < density; i++) {
+        const x = r() * N * 1.2 - N * 0.1, y = r() * N * 1.2 - N * 0.1, len = 30 + r() * 70, ang = -0.9 + (r() - 0.5) * 0.12;
+        g.strokeStyle = `rgba(40,40,40,${dark * (0.35 + r() * 0.65)})`; g.lineWidth = 0.6 + r() * 0.9;
+        g.beginPath(); g.moveTo(x, y); g.lineTo(x + Math.cos(ang) * len, y + Math.sin(ang) * len); g.stroke();
+      }
+      const t = new T.CanvasTexture(cv); t.wrapS = t.wrapT = T.RepeatWrapping; if (T.sRGBEncoding) t.encoding = T.sRGBEncoding; return t;
+    };
+    const M = map => new T.MeshBasicMaterial({ color: 0xffffff, map, polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1 });
+    const out = [M(tex(90, 0.16, 7, 0)), M(tex(1500, 0.42, 11, 2)), M(tex(2600, 0.58, 23, 2))]; // tops, lit sides, shaded sides
+    out.forEach((x, i) => { x.name = ['pencil-top', 'pencil-side', 'pencil-shade'][i]; });
+    pencilCache.set(T, out); return out;
+  }
+  /** Box-projected UVs (8 ft per tile) and a material group per face direction: 0 up/down, 1 faces east/west, 2 faces north/south. */
+  function pencilGeom(T, geom) {
+    const g = geom.index ? geom.toNonIndexed() : geom, P = g.attributes.position, n = P.count, uv = new Float32Array(n * 2), TILE = 96;
+    g.clearGroups(); let cur = -1, start = 0;
+    const a = new T.Vector3(), b = new T.Vector3(), c = new T.Vector3(), nn = new T.Vector3();
+    for (let i = 0; i < n; i += 3) {
+      a.fromBufferAttribute(P, i); b.fromBufferAttribute(P, i + 1); c.fromBufferAttribute(P, i + 2);
+      nn.subVectors(c, b).cross(b.clone().sub(a)).normalize();
+      const ax = Math.abs(nn.x), ay = Math.abs(nn.y), az = Math.abs(nn.z), grp = ay >= ax && ay >= az ? 0 : ax >= az ? 1 : 2;
+      [a, b, c].forEach((v, k) => { const u = grp === 0 ? [v.x, v.z] : grp === 1 ? [v.z, v.y] : [v.x, v.y]; const t = grp === 0 ? TILE * 3 : TILE; uv[(i + k) * 2] = u[0] / t; uv[(i + k) * 2 + 1] = u[1] / t; });
+      if (grp !== cur) { if (cur >= 0) g.addGroup(start, i - start, cur); cur = grp; start = i; }
+    }
+    if (cur >= 0) g.addGroup(start, n - start, cur);
+    g.setAttribute('uv', new T.BufferAttribute(uv, 2)); return g;
+  }
+  /** Edge lines drawn twice, slightly off each other, running past the corners like construction lines. */
+  function pencilEdges(T, geom, mats, seed) {
+    const E = new T.EdgesGeometry(geom, 25), P = E.attributes.position, r = rng(seed), main = [], ghost = [], third = [];
+    for (let i = 0; i < P.count; i += 2) {
+      const A = new T.Vector3().fromBufferAttribute(P, i), B = new T.Vector3().fromBufferAttribute(P, i + 1), d = B.clone().sub(A), L = d.length(); if (L < 0.5) continue; d.divideScalar(L);
+      const over = () => Math.min(14, 3 + L * 0.06) * (0.4 + r());
+      const a1 = A.clone().addScaledVector(d, -over()), b1 = B.clone().addScaledVector(d, over());
+      main.push(a1.x, a1.y, a1.z, b1.x, b1.y, b1.z);
+      const j = () => (r() - 0.5) * 1.4, a2 = A.clone().addScaledVector(d, -over() * 0.6), b2 = B.clone().addScaledVector(d, over() * 0.6);
+      ghost.push(a2.x + j(), a2.y + j(), a2.z + j(), b2.x + j(), b2.y + j(), b2.z + j());
+      // a third, slightly offset pass makes the main stroke read heavier, like pressing on a pencil
+      const k = 0.35; third.push(A.x + k, A.y + k, A.z, B.x + k, B.y + k, B.z);
+    }
+    const mk = (arr, m) => { const g = new T.BufferGeometry(); g.setAttribute('position', new T.Float32BufferAttribute(arr, 3)); const l = new T.LineSegments(g, m); l.userData.edge = true; return l; };
+    E.dispose(); return [mk(main, mats[0]), mk(third, mats[0]), mk(ghost, mats[1])];
   }
   function ringShape(T, rx, ry, band) {
     const s = new T.Shape(); s.absellipse(0, 0, rx, ry, 0, Math.PI * 2, false, 0);
@@ -74,8 +132,31 @@
   }
 
   /* ------------------------------------------------------------ scene */
+  /* v31: a drawing with floors (DrawUpFloors) is built one floor at a time and stacked at each
+   * floor's elevation. opts.isolate = a floor id to show alone; opts.explode = extra gap in inches
+   * between floors; opts.upTo = hide floors above this one (to see inside a building). */
+  function buildStack(T, m, opts) {
+    const Fl = root.DrawUpFloors, all = Fl.all(m), topId = all[all.length - 1].level.id;
+    let shown = all;
+    if (opts.isolate) shown = all.filter(f => f.level.id === opts.isolate);
+    else if (opts.upTo) { const k = all.findIndex(f => f.level.id === opts.upTo); if (k >= 0) shown = all.slice(0, k + 1); }
+    if (!shown.length) shown = all;
+    const root3 = new T.Group(); root3.name = 'DrawUp model'; root3.scale.setScalar(IN);
+    const lastShown = shown[shown.length - 1].level.id;
+    let style = null;
+    shown.forEach((f, k) => {
+      const o = Object.assign({}, opts, { _floor: true, center: false, roof: opts.roof && f.level.id === topId && !opts.isolate && !opts.upTo, cut: f.level.id === lastShown ? opts.cut : 0, slab: true });
+      const r = build(T, f.model, o); style = r.style;
+      const g = r.group; g.scale.setScalar(1); g.position.set(0, f.level.elev + (opts.explode > 0 ? k * opts.explode : 0), 0);
+      g.name = f.level.name; g.userData.level = f.level.id; root3.add(g);
+    });
+    const box = new T.Box3().setFromObject(root3); const c = box.getCenter(new T.Vector3());
+    root3.position.set(-c.x, 0, -c.z);
+    return { group: root3, box, style };
+  }
   function build(T, m, opts) {
     opts = Object.assign({ style: 'presentation', roof: true, cutaway: false }, opts || {});
+    if (!opts._floor && root.DrawUpFloors && root.DrawUpFloors.count(m) > 1) return buildStack(T, m, opts);
     const C = core(), G = geo(), Lb = lib(), ws = (m.ws || {}), st = STYLES[opts.style] || STYLES.presentation, finAll = ws.finishes || {}, fin = Object.assign({}, finAll, finAll.all || {}), brand = ws.brand || {};
     const clay = st.clay;
     const mats = new Map();
@@ -87,7 +168,7 @@
     const wallCol = finishColor('wall', fin.wall, '#f1efe9'), floorCol = finishColor('floor', fin.floor, '#d9d4ca'), accent = finishColor('accent', fin.accent, MATS.accent);
     const brandCol = isHex(brand.primary) ? brand.primary : MATS.brand;
     const compMat = k => {
-      if (k === 'glass') return mat('glass', MATS.glass, { transparent: true, opacity: clay ? 0.18 : 0.35, roughness: 0.1, metalness: 0.1, depthWrite: false });
+      if (k === 'glass') return clay ? mat('glass', '#c3cad1', { transparent: true, opacity: 0.6, roughness: 0.2, metalness: 0, depthWrite: false }) : mat('glass', MATS.glass, { transparent: true, opacity: 0.5, roughness: 0.1, metalness: 0.1, depthWrite: false });
       if (k === 'brand') return mat('brand', brandCol);
       if (k === 'accent') return mat('accent', accent, { metalness: 0.3, roughness: 0.4 });
       if (k === 'metal' || k === 'steel') return mat(k, MATS[k], { metalness: 0.45, roughness: 0.45 });
@@ -95,8 +176,16 @@
     };
     const root3 = new T.Group(); root3.name = 'DrawUp model'; root3.scale.setScalar(IN);
     const edgeMat = st.edges ? new T.LineBasicMaterial({ color: st.edge, transparent: (st.edgeOpacity || 1) < 1, opacity: st.edgeOpacity || 1 }) : null;
+    let pencilSeed = 1;
+    const pencilLines = st.pencil ? [new T.LineBasicMaterial({ color: st.edge }), new T.LineBasicMaterial({ color: st.edge, transparent: true, opacity: 0.45 })] : null;
     const put = (geom, M, sel, parent, name) => {
-      if (!geom) return null; const mesh = new T.Mesh(geom, M); mesh.castShadow = st.shadows; mesh.receiveShadow = st.shadows; mesh.userData.sel = sel || null; if (name) mesh.name = name;
+      if (!geom) return null;
+      if (st.pencil) {
+        // glass keeps its grey tint; everything else is drawn in pencil
+        const glass = M.transparent, g2 = glass ? geom : pencilGeom(T, geom), mesh = new T.Mesh(g2, glass ? M : pencilMats(T)); mesh.userData.sel = sel || null; if (name) mesh.name = name;
+        (parent || root3).add(mesh); pencilEdges(T, geom, pencilLines, ++pencilSeed * 7919).forEach(l => mesh.add(l)); if (g2 !== geom) geom.dispose(); return mesh;
+      }
+      const mesh = new T.Mesh(geom, M); mesh.castShadow = st.shadows; mesh.receiveShadow = st.shadows; mesh.userData.sel = sel || null; if (name) mesh.name = name;
       (parent || root3).add(mesh);
       if (edgeMat && !(M.transparent && M.opacity < 0.3)) { const e = new T.LineSegments(new T.EdgesGeometry(geom, 25), edgeMat); e.userData.edge = true; mesh.add(e); }
       return mesh;
@@ -170,11 +259,14 @@
       if (pts && z1 > 0) put(prism(T, pts, 0, z1), M, sel, items, it.kind);
     });
     // centre the model on the origin, floor at y = 0
+    if (opts.center === false) return { group: root3, box: null, style: st };
     const box = new T.Box3().setFromObject(root3); const c = box.getCenter(new T.Vector3());
     root3.position.set(-c.x, 0, -c.z);
     return { group: root3, box, style: st };
   }
 
+  /* v31: light presets [hemisphere, sun, sun direction] */
+  const LIGHTS = { daylight: [0.75, 0.8, [-8.4, 16.8, 9.8]], morning: [0.7, 0.85, [-16, 7, 5]], evening: [0.55, 0.7, [16, 6, -5]], overcast: [1.05, 0.22, [-4, 24, 4]], studio: [0.95, 0.55, [-6, 20, 14]] };
   /* ------------------------------------------------------------ viewer */
   /** mount(el, model, {style, onPick(sel)}) → viewer. Viewer: update(model, opts), setStyle, view('iso'|'top'|'front'|'side'), png(), glb(), dispose(). */
   async function mount(el, model, opts) {
@@ -183,29 +275,56 @@
     renderer.setPixelRatio(Math.min(2, root.devicePixelRatio || 1)); renderer.shadowMap.enabled = true; renderer.shadowMap.type = T.PCFSoftShadowMap;
     if ('outputEncoding' in renderer) renderer.outputEncoding = T.sRGBEncoding;
     el.appendChild(renderer.domElement); renderer.domElement.className = 'dw29-3dcanvas'; renderer.domElement.tabIndex = 0; renderer.domElement.setAttribute('aria-label', '3D model. Drag to orbit, scroll to zoom, right-drag to pan.');
-    const scene = new T.Scene(), camera = new T.PerspectiveCamera(40, 1, 0.05, 2000);
+    const scene = new T.Scene(), persp = new T.PerspectiveCamera(40, 1, 0.05, 2000), ortho = new T.OrthographicCamera(-1, 1, 1, -1, 0.05, 2000);
+    let camera = persp, aspect = 1, orthoR = 10; // v31: perspective or orthographic
     const controls = new T.OrbitControls(camera, renderer.domElement); controls.enableDamping = true; controls.dampingFactor = 0.12; controls.maxPolarAngle = Math.PI * 0.495;
     const hemi = new T.HemisphereLight(0xffffff, 0xb8b2a6, 0.75), sun = new T.DirectionalLight(0xffffff, 0.8);
     sun.position.set(-12, 20, 14); sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048); scene.add(hemi, sun, sun.target);
     const ground = new T.Mesh(new T.PlaneGeometry(400, 400), new T.ShadowMaterial({ opacity: 0.18 })); ground.rotation.x = -Math.PI / 2; ground.position.y = -0.11; ground.receiveShadow = true; scene.add(ground);
     let cur = null, state = Object.assign({}, opts), raf = 0, dirty = true;
+    function applyLight() { const L = LIGHTS[state.light || 'daylight'], k = cur ? cur.style.light : 1; hemi.intensity = L[0] * k; sun.intensity = L[1] * k; dirty = true; }
     const V = { el, state, three: T };
+    function setOrthoFrustum() { ortho.left = -orthoR * aspect; ortho.right = orthoR * aspect; ortho.top = orthoR; ortho.bottom = -orthoR; ortho.updateProjectionMatrix(); }
+    function useCamera(kind) {
+      const next = kind === 'ortho' ? ortho : persp; if (next === camera) return;
+      next.position.copy(camera.position); next.quaternion.copy(camera.quaternion); camera = next; controls.object = camera;
+      if (camera === ortho) setOrthoFrustum(); else { persp.aspect = aspect; persp.updateProjectionMatrix(); }
+      dirty = true;
+    }
+    /* v31 camera presets. Plan y runs down the sheet (north up), so north is -z in 3D.
+     * Orthographic: axo (planometric-style, 45 deg), iso (true isometric), plan (top-down 3D),
+     * north/south/east/west (elevations, looking at that face). Perspective: iso/corner, exterior, interior, top, front, side, back. */
+    const PRESETS = {
+      iso: { dir: [-0.75, 0.62, 0.95] }, corner: { dir: [-0.75, 0.62, 0.95] }, exterior: { dir: [-0.9, 0.28, 1.05] },
+      top: { dir: [0, 1, 0.0001] }, front: { dir: [0, 0.18, 1] }, side: { dir: [1, 0.18, 0] }, back: { dir: [0, 0.18, -1] },
+      axo: { dir: [-1, Math.SQRT2, 1], ortho: true }, isometric: { dir: [-1, 1, 1], ortho: true }, plan: { dir: [0, 1, 0.0001], ortho: true },
+      north: { dir: [0, 0.0001, -1], ortho: true }, south: { dir: [0, 0.0001, 1], ortho: true }, east: { dir: [1, 0.0001, 0], ortho: true }, west: { dir: [-1, 0.0001, 0], ortho: true },
+    };
     function fit(kind) {
       if (!cur) return; const b = new T.Box3().setFromObject(cur.group), s = b.getSize(new T.Vector3()), c = b.getCenter(new T.Vector3()), R = Math.max(s.x, s.y, s.z) * 0.62 + 0.5;
-      const d = R / Math.sin(camera.fov * Math.PI / 360) * 0.9; const dir = { iso: [-0.75, 0.62, 0.95], top: [0, 1, 0.0001], front: [0, 0.18, 1], side: [1, 0.18, 0], back: [0, 0.18, -1] }[kind || 'iso'];
-      const v = new T.Vector3(...dir).normalize().multiplyScalar(d); camera.position.copy(c).add(v); controls.target.copy(c); camera.near = d / 100; camera.far = d * 20; camera.updateProjectionMatrix(); controls.update(); dirty = true;
-      const S = Math.max(s.x, s.z); Object.assign(sun.shadow.camera, { left: -S, right: S, top: S, bottom: -S, near: 0.5, far: 80 }); sun.shadow.camera.updateProjectionMatrix(); sun.position.set(c.x - S * 0.6, S * 1.2 + 6, c.z + S * 0.7); sun.target.position.copy(c);
+      kind = kind || 'iso';
+      if (kind === 'interior') { // eye height 5'-3" inside, looking across the longer side
+        useCamera('persp'); const eye = 63 * IN, lookX = s.x >= s.z; camera.position.set(c.x - (lookX ? s.x * 0.3 : 0), b.min.y + eye, c.z - (lookX ? 0 : s.z * 0.3)); controls.target.set(c.x + (lookX ? s.x * 0.2 : 0), b.min.y + eye, c.z + (lookX ? 0 : s.z * 0.2));
+        camera.near = 0.05; camera.far = R * 40; camera.updateProjectionMatrix(); controls.maxPolarAngle = Math.PI; controls.update(); state.preset = kind; dirty = true; return;
+      }
+      controls.maxPolarAngle = Math.PI * 0.495;
+      const P = PRESETS[kind] || PRESETS.iso; useCamera(P.ortho ? 'ortho' : 'persp'); state.preset = kind;
+      const d = P.ortho ? R * 4 : R / Math.sin(persp.fov * Math.PI / 360) * 0.9; const dir = P.dir;
+      if (P.ortho) { orthoR = R * 1.02; ortho.zoom = 1; setOrthoFrustum(); }
+      const v = new T.Vector3(...dir).normalize().multiplyScalar(d); camera.position.copy(c).add(v); controls.target.copy(c); camera.near = P.ortho ? 0.01 : d / 100; camera.far = d * 20; camera.updateProjectionMatrix(); controls.update(); dirty = true;
+      const S = Math.max(s.x, s.z); Object.assign(sun.shadow.camera, { left: -S, right: S, top: S, bottom: -S, near: 0.5, far: S * 8 + 80 }); sun.shadow.camera.updateProjectionMatrix(); (() => { const sd = LIGHTS[state.light || 'daylight'][2], k = S / 14; sun.position.set(c.x + sd[0] * k, sd[1] * k + 6, c.z + sd[2] * k); })(); sun.target.position.copy(c);
     }
     function dispose3(g) { g.traverse(o => { if (o.geometry) o.geometry.dispose(); }); }
     V.update = (m, o) => {
       Object.assign(state, o || {}); const first = !cur;
       if (cur) { scene.remove(cur.group); dispose3(cur.group); }
       cur = build(T, m, state); scene.add(cur.group); scene.background = new T.Color(cur.style.bg);
-      hemi.intensity = 0.75 * cur.style.light; sun.intensity = 0.8 * cur.style.light; sun.castShadow = !!cur.style.shadows; ground.visible = !!cur.style.shadows;
+      applyLight(); sun.castShadow = !!cur.style.shadows; ground.visible = !!cur.style.shadows;
       if (first) fit('iso'); dirty = true; return V;
     };
     V.view = k => fit(k);
-    function size() { const w = el.clientWidth || 640, h = el.clientHeight || 420; renderer.setSize(w, h, false); renderer.domElement.style.width = '100%'; renderer.domElement.style.height = '100%'; camera.aspect = w / h; camera.updateProjectionMatrix(); dirty = true; }
+    function setAspect(a) { aspect = a; persp.aspect = a; persp.updateProjectionMatrix(); setOrthoFrustum(); }
+    function size() { const w = el.clientWidth || 640, h = el.clientHeight || 420; renderer.setSize(w, h, false); renderer.domElement.style.width = '100%'; renderer.domElement.style.height = '100%'; setAspect(w / h); dirty = true; }
     const ro = root.ResizeObserver ? new ResizeObserver(size) : null; ro && ro.observe(el); size();
     controls.addEventListener('change', () => { dirty = true; });
     const loop = () => { raf = requestAnimationFrame(loop); if (controls.update() || dirty) { renderer.render(scene, camera); dirty = false; } };
@@ -223,10 +342,26 @@
     V.highlight = sel => {
       hi.forEach(([o, e]) => { o.material = o.userData._m; void e; }); hi = [];
       if (!sel || !cur) { dirty = true; return; }
-      cur.group.traverse(o => { if (o.isMesh && o.userData.sel && o.userData.sel.type === sel.type && o.userData.sel.id === sel.id) { o.userData._m = o.material; const M = o.material.clone(); M.emissive = new T.Color('#1b8cff'); M.emissiveIntensity = 0.35; o.material = M; hi.push([o]); } });
+      cur.group.traverse(o => { if (o.isMesh && o.userData.sel && o.userData.sel.type === sel.type && o.userData.sel.id === sel.id) { o.userData._m = o.material; const tint = x => { const M = x.clone(); if (M.emissive) { M.emissive = new T.Color('#1b8cff'); M.emissiveIntensity = 0.35; } else M.color = new T.Color('#a9d0ff'); return M; }; o.material = Array.isArray(o.material) ? o.material.map(tint) : tint(o.material); hi.push([o]); } });
       dirty = true;
     };
-    V.png = (w, h) => { const ow = el.clientWidth, oh = el.clientHeight; if (w && h) { renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); } renderer.render(scene, camera); const url = renderer.domElement.toDataURL('image/png'); if (w && h) { renderer.setSize(ow, oh, false); camera.aspect = ow / oh; camera.updateProjectionMatrix(); dirty = true; } return url; };
+    /* png(w, h, {background: '#hex' | 'transparent', type: 'image/png' | 'image/jpeg', quality}) renders a clean frame:
+     * no selection highlight, pixel ratio 1 at the asked size (so 4000 px wide is 4000 px). */
+    V.png = (w, h, o) => {
+      o = o || {}; const ow = el.clientWidth || 640, oh = el.clientHeight || 420, pr = renderer.getPixelRatio(), bg = scene.background, hiSave = hi.slice();
+      hi.forEach(([m]) => { m.userData._hi = m.material; m.material = m.userData._m; });
+      if (o.background === 'transparent') { scene.background = null; renderer.setClearColor(0x000000, 0); } else if (o.background) scene.background = new T.Color(o.background);
+      if (w && h) { renderer.setPixelRatio(1); renderer.setSize(w, h, false); setAspect(w / h); }
+      renderer.render(scene, camera); const url = renderer.domElement.toDataURL(o.type || 'image/png', o.quality || 0.92);
+      if (w && h) { renderer.setPixelRatio(pr); renderer.setSize(ow, oh, false); setAspect(ow / oh); }
+      scene.background = bg; renderer.setClearColor(0xffffff, 1); hiSave.forEach(([m]) => { m.material = m.userData._hi; }); dirty = true; return url;
+    };
+    V.preset = () => state.preset || 'iso';
+    V.presets = () => Object.keys(PRESETS).concat('interior');
+    V.isOrtho = () => camera === ortho;
+    V.maxSize = () => { const gl = renderer.getContext(); return Math.min(gl.getParameter(gl.MAX_RENDERBUFFER_SIZE), gl.getParameter(gl.MAX_TEXTURE_SIZE)); };
+    V.setLight = k => { if (!LIGHTS[k]) return; state.light = k; applyLight(); const p = state.preset || 'iso'; const t = controls.target.clone(), pos = camera.position.clone(), z = camera.zoom; fit(p); camera.position.copy(pos); controls.target.copy(t); camera.zoom = z; camera.updateProjectionMatrix(); controls.update(); dirty = true; };
+    V.lights = () => Object.keys(LIGHTS);
     V.glb = () => new Promise((ok, bad) => { const ex = new T.GLTFExporter(); const g = cur.group.clone(true); g.traverse(o => { if (o.userData && o.userData.edge) o.visible = false; }); const onDone = r => ok(new Blob([r], { type: 'model/gltf-binary' })); try { ex.parse(g, onDone, bad, { binary: true, onlyVisible: true }); } catch (e) { bad(e); } });
     V.stats = () => { const s = { meshes: 0, walls: 0, openings: 0, items: 0, roof: 0 }; if (cur) cur.group.traverse(o => { if (!o.isMesh) return; s.meshes++; const t = o.userData.sel && o.userData.sel.type; if (t === 'wall') s.walls++; else if (t === 'opening') s.openings++; else if (t === 'item') s.items++; if (/Roof|Gable|Parapet/.test(o.name)) s.roof++; }); return s; };
     V.dispose = () => { cancelAnimationFrame(raf); ro && ro.disconnect(); controls.dispose(); if (cur) dispose3(cur.group); renderer.dispose(); renderer.domElement.remove(); };
