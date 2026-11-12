@@ -1,0 +1,27 @@
+{
+  "scenarios": [
+    { "id": "lobby", "kind": "troubleshoot", "message": "I'm designing a university student center, but the main lobby feels too empty. What should I do?" },
+    { "id": "corridor-width", "kind": "quick", "technical": true, "message": "What is the minimum corridor width?" },
+    { "id": "header-sizing", "kind": "learning", "technical": true, "message": "Walk me through how to size a header for a 6 ft opening in a 2x6 bearing wall." },
+    { "id": "library-crit", "kind": "critique", "message": "Can you critique my library plan? The stacks are in the middle and the reading rooms are on the perimeter." },
+    { "id": "rooftop-ideas", "kind": "brainstorm", "message": "Give me ideas for a rooftop terrace on a four story dorm." },
+    { "id": "sill-leak", "kind": "troubleshoot", "technical": true, "message": "Our window sills keep leaking at the corners after every storm." },
+    { "id": "egress-tech", "kind": "technical", "technical": true, "message": "For a 2-story B occupancy office with sprinklers, how many exits do we need on the second floor and what governs the travel distance?" }
+  ],
+  "lobby_priorities": {
+    "coach": ["principle", "method", "human scale", "proportion", "circulation"],
+    "teammate": ["atmosphere", "concept", "feature stair", "greenery", "together"],
+    "sixth_man": ["root causes", "priority order", "test it in the model", "impact"],
+    "paul-r-williams": ["arrival", "staircase|stair", "proportion"],
+    "julia-morgan": ["Beaux-Arts", "program", "craft"],
+    "frank-lloyd-wright": ["compression and release", "hearth", "site"],
+    "norma-merrick-sklarek": ["coordinat", "documents", "budget"],
+    "ove-arup": ["total design", "acoustic", "integrat"],
+    "i-m-pei": ["geometry", "daylight", "East Building"],
+    "fazlur-rahman-khan": ["structur", "grid", "tube"],
+    "emily-warren-roebling": ["stakeholders", "coordination", "Brooklyn Bridge"],
+    "tadao-ando": ["emptiness", "light", "procession"],
+    "zaha-hadid": ["flow", "landscape", "continuous"]
+  },
+  "documented_titles": ["The Small Home of Tomorrow", "New Homes for Today", "organic architecture", "Key Speech", "total design", "urban carpet", "yes, and", "what should it feel like to be here, and what story does the project want to tell?", "what would a trained eye check, and in what order?", "What is the highest-leverage move, and how do we know it worked?"]
+}

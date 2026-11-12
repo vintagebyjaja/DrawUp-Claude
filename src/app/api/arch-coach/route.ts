@@ -4,6 +4,7 @@ import { quickCall, quickCoachPrompt, type QuickResult } from '@/lib/drawup-quic
 import { createHash } from 'node:crypto';
 import { recordDetailQuery, recordDetailSources, recordDetailsFromAnswer } from '@/lib/drawup-details';
 import { awardXp, coachPersona } from '@/lib/drawup-coach-persona';
+import { SHARED_STANDARDS, classifyRequest, coreReasoning } from '@/lib/drawup-reasoning';
 import { guestKeys, guestLeft, reserveGuest, GUEST_LIMIT } from '@/lib/drawup-guest';
 import { streamCreate, streamRead, withoutSpeedHints } from '@/lib/drawup-stream';
 import { answerHelp, helpText, platformBrief } from '@/lib/drawup-help';
@@ -123,7 +124,7 @@ export async function POST(request: Request) {
     // V20: the member's own Arch Coach (blueprint, skills, legend, language). Never blocks an answer.
     const persona = await coachPersona(user.id).catch(() => '');
     const brief = platformBrief(message, features);
-    const quickP: Promise<QuickResult | null> = useQuick ? quickCall(quickCoachPrompt(transcript || `USER: ${message}`, location, allowClarify) + (persona ? `\nSTYLE GUIDANCE (keep the JSON format exactly as required):\n${persona}` : '') + `\n${brief}`, allowClarify) : Promise.resolve(null);
+    const quickP: Promise<QuickResult | null> = useQuick ? quickCall(quickCoachPrompt(transcript || `USER: ${message}`, location, allowClarify) + `\nREASONING GUIDANCE (keep the JSON format exactly as required):\n${coreReasoning('coach', classifyRequest(message))}` + (persona ? `\nSTYLE GUIDANCE (keep the JSON format exactly as required):\n${persona}` : '') + `\n${brief}`, allowClarify) : Promise.resolve(null);
     const early = useQuick ? await Promise.race([quickP, sleep(QUICK_HEAD_START_MS).then(() => undefined)]) : null;
     const clarifyReply = (q: QuickResult) => { const c = clarifyOut(q)!; return NextResponse.json({ answer: c.question, clarify: c, needs_clarification: true, sources: [], researched: false, credits_charged: 0 }); };
     if (early && early.kind === 'clarify') return clarifyReply(early);
@@ -153,7 +154,9 @@ export async function POST(request: Request) {
     if (hasFiles) await awardXp(user.id, 'upload', 'img:' + createHash('sha1').update(image || attachments.map((a: any) => a.data.slice(0, 2000)).join('')).digest('hex'));
 
     const fileNote = hasFiles ? `ATTACHMENTS: the user attached ${attachments.map((a: any) => a.name).join(', ') || 'a picture'}. Read them. If an attachment shows a building, drawing or construction condition, answer the question, point out problems and code items to confirm, and end with a section titled "Details to draw" listing each construction detail this project still needs drawn as "- Detail name: why it is needed". Mention that Draw it up (in Arch Coach) can turn a picture into a drawing set.` : '';
-    const input = buildCoachPrompt({ message, transcript, location, extra: [persona, fileNote, brief].filter(Boolean).join('\n\n') });
+    // v32: Arch Coach reasons as an instructor, adapted to the kind of request (drawup-reasoning.ts).
+    const reasoning = [SHARED_STANDARDS, coreReasoning('coach', classifyRequest(message))].join('\n\n');
+    const input = buildCoachPrompt({ message, transcript, location, extra: [reasoning, persona, fileNote, brief].filter(Boolean).join('\n\n') });
     const models = modelList(process.env.DRAWUP_COACH_MODEL, process.env.DRAWUP_SEARCH_MODEL, 'gpt-5.6-sol');
     const parts: any[] = [{ type: 'input_text', text: input }];
     if (image) parts.push({ type: 'input_image', image_url: image });
