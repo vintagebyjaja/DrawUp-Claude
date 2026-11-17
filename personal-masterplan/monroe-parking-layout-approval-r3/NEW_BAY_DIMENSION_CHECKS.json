@@ -1,0 +1,20 @@
+{
+  "1": {
+    "passed": true,
+    "annex_right_bays": 7,
+    "all_new_annex_bays_full_9_by_18_ft": true,
+    "straight_approach_fully_paved": true
+  },
+  "2": {
+    "passed": true,
+    "annex_right_bays": 7,
+    "all_new_annex_bays_full_9_by_18_ft": true,
+    "straight_approach_fully_paved": true
+  },
+  "3": {
+    "passed": true,
+    "annex_right_bays": 7,
+    "all_new_annex_bays_full_9_by_18_ft": true,
+    "straight_approach_fully_paved": true
+  }
+}
