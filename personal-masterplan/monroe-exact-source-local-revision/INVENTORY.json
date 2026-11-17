@@ -1,0 +1,137 @@
+[
+  {
+    "path": "Monroe_Exact_Source_Local_Revisions.pdf",
+    "bytes": 16176497,
+    "sha256": "5cf02653a9b0ecd53efeef306fc61aa3f6de5ca92d3dd7969f5e4ca907813955"
+  },
+  {
+    "path": "Option_1_Annex_Before_After.png",
+    "bytes": 123496,
+    "sha256": "862229cf0c54dd6bc9c5f31779f6659357797bf33c7b4993f4345e10948c96f2"
+  },
+  {
+    "path": "Option_1_Approach_Before_After.png",
+    "bytes": 80944,
+    "sha256": "64b0d244ba454fdcede5aa2a98ebfb6bd9ee9910b47931823125c97b69a05501"
+  },
+  {
+    "path": "Option_1_Vehicle_Path_Overlay.png",
+    "bytes": 67782,
+    "sha256": "dce0f0c6866384eaa96b8ec4b10ef1d58cb24190d3f76ebb518021137fd93c5e"
+  },
+  {
+    "path": "Option_2_Annex_Before_After.png",
+    "bytes": 125343,
+    "sha256": "eb50150606f4fbf64ed81ccd98f554a6134242ac1110e54303678fe8a1814e5c"
+  },
+  {
+    "path": "Option_2_Approach_Before_After.png",
+    "bytes": 81461,
+    "sha256": "8a3773d0a3534869b83f6ecde68f00843a854e48bb7a5312859776e86f2763b7"
+  },
+  {
+    "path": "Option_2_Vehicle_Path_Overlay.png",
+    "bytes": 70766,
+    "sha256": "66631c74ee56a47158645356dcde689a5dc00c5fe938920487abb7f9d5c3c3c0"
+  },
+  {
+    "path": "Option_3_Annex_Before_After.png",
+    "bytes": 124544,
+    "sha256": "22544c68955afa471da9301952d91d9b94135fa93165473a724124e9cf307e28"
+  },
+  {
+    "path": "Option_3_Approach_Before_After.png",
+    "bytes": 77536,
+    "sha256": "cdd50f8a135f2e3027bb47b9f1d0a6702e96236b7a2501c847967d01441fbfe0"
+  },
+  {
+    "path": "Option_3_Vehicle_Path_Overlay.png",
+    "bytes": 64251,
+    "sha256": "e0b4c2136a6bb056f9626fa889875f99ecbbb5967a7d88d8fc6123d4b141eaf4"
+  },
+  {
+    "path": "README.md",
+    "bytes": 4716,
+    "sha256": "de6bff379511eed48441fdfdcfe4b31f934ca145ced0ba280735cda1d5a6f8c7"
+  },
+  {
+    "path": "Vehicle_Turning_and_Preservation_Report.pdf",
+    "bytes": 577476,
+    "sha256": "3ccf11d79ddaeac580a6d04ee2f98cdbab07d782068f315a8ae6e12ce9547e00"
+  },
+  {
+    "path": "checks/CLEAN_REBUILD_VERIFICATION.json",
+    "bytes": 462,
+    "sha256": "0bfeb3856705e4a2091a6953c51a08f1a5c00b822f12a008649bd1323ca20e5f"
+  },
+  {
+    "path": "checks/LOCKED_PIXEL_COMPARISON.json",
+    "bytes": 77428,
+    "sha256": "9b659af6e6c78614d0c1d6c629c6325499eef023c5c361d057bda9b08d668883"
+  },
+  {
+    "path": "checks/Option_1_Allowed_Edit_Mask.png",
+    "bytes": 4661,
+    "sha256": "d136ce8d3381f523b5b42d348f7c8e784aa777d0f3701cad479f46153d930ffd"
+  },
+  {
+    "path": "checks/Option_2_Allowed_Edit_Mask.png",
+    "bytes": 4693,
+    "sha256": "d2d9ed367d65e64923cde3696d3dc7fdccf93a04c1ac9d7abeb8198b2ef2251b"
+  },
+  {
+    "path": "checks/Option_3_Allowed_Edit_Mask.png",
+    "bytes": 4707,
+    "sha256": "44a622c701647ce54b039df78fc730b3cea4e1113495d1ebe7e8a642204feaec"
+  },
+  {
+    "path": "checks/vehicle_turning_checks.json",
+    "bytes": 2888473,
+    "sha256": "f68fc254dc16aba30c37d3df479f70ab9fb9c99b837ade04c0f666c44da8c0ec"
+  },
+  {
+    "path": "images/Option_1_Local_Revision.png",
+    "bytes": 3704042,
+    "sha256": "968cba88dd6e9dd0ca20db04d6a07c4b95de0b9888f4c81c28ecc0468497e573"
+  },
+  {
+    "path": "images/Option_2_Local_Revision.png",
+    "bytes": 3769815,
+    "sha256": "aab74586f50c61dc9ef87fc4c0057dead2b4bfda48923238eee46a2f5a4645da"
+  },
+  {
+    "path": "images/Option_3_Local_Revision.png",
+    "bytes": 3684469,
+    "sha256": "82b4bf71de4ca5b76b80030629cadfd5b7342e2a74cf0788c20b248688ab9330"
+  },
+  {
+    "path": "requirements.txt",
+    "bytes": 52,
+    "sha256": "1760d8f1ec7a721a4b6bf7dd2c8eab51f4d89090348f8ffb4eb7aa7f68bc17ac"
+  },
+  {
+    "path": "scripts/check_vehicle_paths.py",
+    "bytes": 12220,
+    "sha256": "b367ec598e5b8c2ca2095f45331decbe761773cdefa682c3db1b5df5c39bfea1"
+  },
+  {
+    "path": "scripts/edit_locked_sources.py",
+    "bytes": 8998,
+    "sha256": "365670a90c8a3ee59938b9a9192c7757a21892e840ff45dd15484b60562582d2"
+  },
+  {
+    "path": "scripts/make_turning_report.py",
+    "bytes": 9467,
+    "sha256": "7978d0159bb07a5870f05120f8060be67c1eb95a67ee50d77b9a88a87fb65399"
+  },
+  {
+    "path": "scripts/rebuild.py",
+    "bytes": 1078,
+    "sha256": "f5332fd4be950ffd59b4d84a7d6ca68af92546f5a736d3b733b9fd696287bf60"
+  },
+  {
+    "path": "source/parking_options_1-3_original.pdf",
+    "bytes": 20311339,
+    "sha256": "8567fa1886863063beb7854642a517518fec4950e7094bc7e728bf617dee9953"
+  }
+]

@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "identical_revised_png_hashes": {
+    "1": "968cba88dd6e9dd0ca20db04d6a07c4b95de0b9888f4c81c28ecc0468497e573",
+    "2": "aab74586f50c61dc9ef87fc4c0057dead2b4bfda48923238eee46a2f5a4645da",
+    "3": "82b4bf71de4ca5b76b80030629cadfd5b7342e2a74cf0788c20b248688ab9330"
+  },
+  "three_new_source_pages": false,
+  "method": "New work directory, original PDF extraction, all kinematic checks, local edits, PDF readback; compare final PNG SHA-256."
+}
