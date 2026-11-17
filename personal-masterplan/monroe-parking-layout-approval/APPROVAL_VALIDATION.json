@@ -1,0 +1,71 @@
+{
+  "stage": "2D layout approval only",
+  "three_d_model_created": false,
+  "options": {
+    "1": {
+      "passed": true,
+      "overlapping_stalls": [],
+      "building_overlap_m2": 0.0,
+      "public_road_overlap_m2": 0.0,
+      "sidewalk_vehicle_overlap_m2": 0.0,
+      "central_grass_separator_area_m2": 0.0,
+      "total_indicative_stalls": 161,
+      "central_angled_rectangular_fit_verified": false,
+      "not_checked": [
+        "Vehicle swept paths",
+        "Detailed cut/fill ramp profiles",
+        "Accessible parking and pedestrian compliance"
+      ],
+      "central_fit_limitation": "Section controls as explicitly requested. Four 45-degree banks shown at four spaces each, plus two six-space end banks. Angled corner outlines are schematic: a full 9x18 rotated rectangle projects 19.09 ft rather than the specified 18 ft band. Resolve stall fit before 3D modeling."
+    },
+    "2": {
+      "passed": true,
+      "overlapping_stalls": [],
+      "building_overlap_m2": 0.0,
+      "public_road_overlap_m2": 0.0,
+      "sidewalk_vehicle_overlap_m2": 0.0,
+      "central_grass_separator_area_m2": null,
+      "total_indicative_stalls": 169,
+      "central_angled_rectangular_fit_verified": true,
+      "not_checked": [
+        "Vehicle swept paths",
+        "Detailed cut/fill ramp profiles",
+        "Accessible parking and pedestrian compliance"
+      ],
+      "central_fit_limitation": null
+    },
+    "3": {
+      "passed": true,
+      "overlapping_stalls": [],
+      "building_overlap_m2": 0.0,
+      "public_road_overlap_m2": 0.0,
+      "sidewalk_vehicle_overlap_m2": 0.0,
+      "central_grass_separator_area_m2": 0.0,
+      "total_indicative_stalls": 171,
+      "central_angled_rectangular_fit_verified": false,
+      "not_checked": [
+        "Vehicle swept paths",
+        "Detailed cut/fill ramp profiles",
+        "Accessible parking and pedestrian compliance"
+      ],
+      "central_fit_limitation": "Section controls as explicitly requested. Four 45-degree banks shown at four spaces each, plus two six-space end banks. Angled corner outlines are schematic: a full 9x18 rotated rectangle projects 19.09 ft rather than the specified 18 ft band. Resolve stall fit before 3D modeling."
+    }
+  },
+  "unchanged_original_exports": [
+    {
+      "path": "01_Original_Road_Layout/Monroe_Original_Road_Layout.blend",
+      "sha256": "094f8f0428129a36d620072951408ff57781e860dc7b77776ffbca52f2220187",
+      "unchanged": true
+    },
+    {
+      "path": "01_Original_Road_Layout/Monroe_Original_Road_Layout.dae",
+      "sha256": "f4e08ad6c5629e2a49149df23300338ec94880313b75b0b5ead9249ceaad6cb2",
+      "unchanged": true
+    },
+    {
+      "path": "01_Original_Road_Layout/Monroe_Original_Road_Layout.fbx",
+      "sha256": "7e7a8039bae7e442c3cb7b32e4da6515ff0ec8d13273ffe6b7e3ebc181972f44",
+      "unchanged": true
+    }
+  ]
+}
