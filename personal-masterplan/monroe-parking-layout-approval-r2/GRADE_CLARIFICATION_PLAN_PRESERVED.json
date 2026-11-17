@@ -1,0 +1,20 @@
+{
+  "1": {
+    "passed": true,
+    "plan_geometry_hash_before": "ba3a54d55ae728a6472df74686001846fe19592504fa9ed8f44f3ea5aca300ae",
+    "plan_geometry_hash_after": "ba3a54d55ae728a6472df74686001846fe19592504fa9ed8f44f3ea5aca300ae",
+    "changed_due_to_grade_clarification": false
+  },
+  "2": {
+    "passed": true,
+    "plan_geometry_hash_before": "9d1c4e53368def8b86618ac29ed6c7a8efbc8cc266627e6680b5ac3ceb1b986a",
+    "plan_geometry_hash_after": "9d1c4e53368def8b86618ac29ed6c7a8efbc8cc266627e6680b5ac3ceb1b986a",
+    "changed_due_to_grade_clarification": false
+  },
+  "3": {
+    "passed": true,
+    "plan_geometry_hash_before": "6bbc555d8aba154f70ba79ee03cc4250f7701f6ee8466b86d95f69425ea94fb2",
+    "plan_geometry_hash_after": "6bbc555d8aba154f70ba79ee03cc4250f7701f6ee8466b86d95f69425ea94fb2",
+    "changed_due_to_grade_clarification": false
+  }
+}
