@@ -1,0 +1,37 @@
+{
+  "mixed_module_envelope_ft": [
+    134,
+    60
+  ],
+  "mixed_stalls": 28,
+  "rectangles_9_by_18_ft": true,
+  "overlapping_stalls": 0,
+  "options": [
+    {
+      "option": 1,
+      "stalls": 142,
+      "all_stalls_full_size": true,
+      "building_count": 3155,
+      "public_road_meshes_unchanged": 245,
+      "hill_path_preserved_and_connected": true
+    },
+    {
+      "option": 2,
+      "stalls": 140,
+      "all_stalls_full_size": true,
+      "building_count": 3155,
+      "public_road_meshes_unchanged": 245,
+      "hill_path_preserved_and_connected": true
+    },
+    {
+      "option": 3,
+      "stalls": 152,
+      "all_stalls_full_size": true,
+      "building_count": 3155,
+      "public_road_meshes_unchanged": 245,
+      "hill_path_preserved_and_connected": true
+    }
+  ],
+  "middle_angled_banks_touch_without_spacer": true,
+  "middle_bank_gap_ft": 0.0
+}

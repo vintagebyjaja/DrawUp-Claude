@@ -1,0 +1,26 @@
+[
+  {
+    "file": "Monroe_Blender_Original_and_Options_1-3.zip",
+    "bytes": 456910276,
+    "sha256": "7d8ecf2dc5da86a63a4075d21fd8f2b85a6101e983546e9a80f9ca611b4fff13",
+    "zip_crc_passed": true
+  },
+  {
+    "file": "Monroe_FBX_Original_and_Options_1-3.zip",
+    "bytes": 458182832,
+    "sha256": "8a136759cbefe739dd3a4cfe18da20998c7042a6f65f78cbcc856c7172c35fa5",
+    "zip_crc_passed": true
+  },
+  {
+    "file": "Monroe_SketchUp_DAE_Original_and_Options_1-3.zip",
+    "bytes": 781017391,
+    "sha256": "4dea8b8c75dad036e8b9734efcb23519743fb36f07891686e9a15b26578bff37",
+    "zip_crc_passed": true
+  },
+  {
+    "file": "Monroe_Previews_and_Checks.zip",
+    "bytes": 30428122,
+    "sha256": "172a7e8b3c99dcbad9ef660ed7d3c9352bfdfea5d3b9e29a7eeb1333a751a167",
+    "zip_crc_passed": true
+  }
+]

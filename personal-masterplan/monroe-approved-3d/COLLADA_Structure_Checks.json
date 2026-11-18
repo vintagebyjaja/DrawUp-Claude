@@ -1,0 +1,42 @@
+[
+  {
+    "model": "Monroe_Original_Editable_Materials",
+    "well_formed_xml": true,
+    "meters_z_up": true,
+    "building_nodes": 3155,
+    "mesh_nodes": 4599,
+    "geometry_count": 4599,
+    "texture_files_found": 73,
+    "material_bindings_valid": true
+  },
+  {
+    "model": "Monroe_Option_1",
+    "well_formed_xml": true,
+    "meters_z_up": true,
+    "building_nodes": 3155,
+    "mesh_nodes": 4605,
+    "geometry_count": 4605,
+    "texture_files_found": 73,
+    "material_bindings_valid": true
+  },
+  {
+    "model": "Monroe_Option_2",
+    "well_formed_xml": true,
+    "meters_z_up": true,
+    "building_nodes": 3155,
+    "mesh_nodes": 4605,
+    "geometry_count": 4605,
+    "texture_files_found": 73,
+    "material_bindings_valid": true
+  },
+  {
+    "model": "Monroe_Option_3",
+    "well_formed_xml": true,
+    "meters_z_up": true,
+    "building_nodes": 3155,
+    "mesh_nodes": 4605,
+    "geometry_count": 4605,
+    "texture_files_found": 73,
+    "material_bindings_valid": true
+  }
+]

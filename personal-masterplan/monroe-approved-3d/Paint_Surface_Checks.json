@@ -1,0 +1,23 @@
+[
+  {
+    "option": 1,
+    "top_face_samples": 2314,
+    "minimum_paint_clearance_m": 0.008749008178710938,
+    "samples_below_asphalt": 0,
+    "samples_outside_road_surface": 0
+  },
+  {
+    "option": 2,
+    "top_face_samples": 2851,
+    "minimum_paint_clearance_m": 0.01091766357421875,
+    "samples_below_asphalt": 0,
+    "samples_outside_road_surface": 0
+  },
+  {
+    "option": 3,
+    "top_face_samples": 3208,
+    "minimum_paint_clearance_m": 0.009450912475585938,
+    "samples_below_asphalt": 0,
+    "samples_outside_road_surface": 0
+  }
+]

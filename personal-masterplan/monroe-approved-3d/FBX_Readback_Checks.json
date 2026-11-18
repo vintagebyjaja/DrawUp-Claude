@@ -1,0 +1,30 @@
+[
+  {
+    "model": "Monroe_Original_Editable_Materials",
+    "mesh_count": 4599,
+    "missing_objects": 0,
+    "max_world_bbox_error_m": 0,
+    "fbx_reimport_passed": true
+  },
+  {
+    "model": "Monroe_Option_1",
+    "mesh_count": 4605,
+    "missing_objects": 0,
+    "max_world_bbox_error_m": 0,
+    "fbx_reimport_passed": true
+  },
+  {
+    "model": "Monroe_Option_2",
+    "mesh_count": 4605,
+    "missing_objects": 0,
+    "max_world_bbox_error_m": 0,
+    "fbx_reimport_passed": true
+  },
+  {
+    "model": "Monroe_Option_3",
+    "mesh_count": 4605,
+    "missing_objects": 0,
+    "max_world_bbox_error_m": 0,
+    "fbx_reimport_passed": true
+  }
+]
