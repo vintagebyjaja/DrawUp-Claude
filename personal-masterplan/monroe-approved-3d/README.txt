@@ -1,3 +1,6 @@
+NEWER CORRECTED MODELS: ../monroe-corrected-wall/README.md
+The corrected download includes the relocated 7+7 retaining wall, pedestrian updates and refreshed FBX materials.
+
 MONROE SCHOOL — ORIGINAL + OPTIONS 1–3
 
 Four editable neighborhood models. Original means original road layout with updated building materials and the authorized school height correction.

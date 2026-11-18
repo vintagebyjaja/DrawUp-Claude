@@ -1,0 +1,47 @@
+[
+  {
+    "option": 1,
+    "spaces": 142,
+    "all_entry_exit_paths_pass": true,
+    "ramp_connections_checked": 2,
+    "maximum_sampled_steering_degrees": 34.99304363849727,
+    "max_longitudinal_grade_pct": 14.028276715959823,
+    "max_cross_slope_pct": 9.09423828125,
+    "minimum_sampled_underbody_clearance_m": 0.04952666418892804,
+    "finished_step_ft": 4,
+    "wall_location": "Center_Island_West / Center_Island_East",
+    "top_side_lower": true,
+    "previous_wall_removed": true,
+    "sampled_screen_passed": true
+  },
+  {
+    "option": 2,
+    "spaces": 140,
+    "all_entry_exit_paths_pass": true,
+    "ramp_connections_checked": 2,
+    "maximum_sampled_steering_degrees": 34.99304363850103,
+    "max_longitudinal_grade_pct": 14.010838099888392,
+    "max_cross_slope_pct": 9.090423583984375,
+    "minimum_sampled_underbody_clearance_m": 0.04797040394374008,
+    "finished_step_ft": 4,
+    "wall_location": "Center_Island_West / Center_Island_East",
+    "top_side_lower": true,
+    "previous_wall_removed": true,
+    "sampled_screen_passed": true
+  },
+  {
+    "option": 3,
+    "spaces": 152,
+    "all_entry_exit_paths_pass": true,
+    "ramp_connections_checked": 2,
+    "maximum_sampled_steering_degrees": 34.99304363850379,
+    "max_longitudinal_grade_pct": 14.035906110491073,
+    "max_cross_slope_pct": 9.09423828125,
+    "minimum_sampled_underbody_clearance_m": 0.04957427978515483,
+    "finished_step_ft": 4,
+    "wall_location": "Center_Island_West / Center_Island_East",
+    "top_side_lower": true,
+    "previous_wall_removed": true,
+    "sampled_screen_passed": true
+  }
+]
